@@ -45,3 +45,6 @@ cumulusci
 # Salesforce Lightning Design System for Django
 django-slds
 django-slds-crispyforms
+
+# Github library
+github3.py==0.9.6

@@ -47,6 +47,7 @@ LOCAL_APPS = (
     'mrbelvedereci.users.apps.UsersConfig',
     'mrbelvedereci.build.apps.BuildConfig',
     'mrbelvedereci.github.apps.GithubConfig',
+    'mrbelvedereci.salesforce.apps.SalesforceConfig',
     'mrbelvedereci.trigger.apps.TriggerConfig',
 )
 
@@ -263,4 +264,7 @@ else:
 ADMIN_URL = r'^admin/'
 
 # Your common stuff: Below this line define 3rd party library settings
-# ------------------------------------------------------------------------------
+GITHUB_USERNAME = env('GITHUB_USERNAME')
+GITHUB_PASSWORD = env('GITHUB_PASSWORD')
+GITHUB_WEBHOOK_BASE_URL = env('GITHUB_WEBHOOK_BASE_URL')
+GITHUB_WEBHOOK_SECRET = env('GITHUB_WEBHOOK_SECRET')
