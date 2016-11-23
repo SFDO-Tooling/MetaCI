@@ -10,6 +10,8 @@ from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from mrbelvedereci.github.models import Branch
+from mrbelvedereci.github.models import Repository
 from mrbelvedereci.trigger.models import Trigger
 from mrbelvedereci.build.models import Build
 
