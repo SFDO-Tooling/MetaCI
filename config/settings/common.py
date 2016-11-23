@@ -44,9 +44,10 @@ THIRD_PARTY_APPS = (
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    # custom users app
     'mrbelvedereci.users.apps.UsersConfig',
-    # Your stuff: custom apps go here
+    'mrbelvedereci.build.apps.BuildConfig',
+    'mrbelvedereci.github.apps.GithubConfig',
+    'mrbelvedereci.trigger.apps.TriggerConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
