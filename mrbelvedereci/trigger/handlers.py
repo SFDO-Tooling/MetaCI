@@ -11,6 +11,8 @@ def create_trigger_webhooks(sender, **kwargs):
     if not kwargs['created']:
         return
 
+    trigger = kwargs['instance']
+
     # Skip manual triggers
     if trigger.type == 'manual':
         return
@@ -25,7 +27,7 @@ def create_trigger_webhooks(sender, **kwargs):
   
     # Initialize repo API 
     github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
-    repo = github.repository(trigger.github_owner, trigger.github_repo)
+    repo = github.repository(trigger.repo.owner, trigger.repo.name)
 
     # Check if webhook exists for repo
     existing = False
@@ -37,7 +39,7 @@ def create_trigger_webhooks(sender, **kwargs):
     if not existing:
         repo.create_hook(
             name = 'web',
-            event = event,
+            events = [event],
             config = {
                 'url': callback_url,
                 'content_type': 'json',

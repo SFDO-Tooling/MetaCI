@@ -5,14 +5,13 @@ import re
 from hashlib import sha1
 
 from django.shortcuts import render
-from django.shortcuts import get_or_create_object
 from django.conf import settings
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from triggers.models import Trigger
-from triggers.models import TriggerEvent
+from mrbelvedereci.trigger.models import Trigger
+from mrbelvedereci.build.models import Build
 
 def validate_github_webhook(request):
     key = settings.GITHUB_WEBHOOK_SECRET
@@ -32,26 +31,26 @@ def github_push_webhook(request):
 
     push = json.loads(request.body)
     repo_id = push['repository']['id']
-    
-    triggers = Trigger.objects.filter(repo_id = repo_id)
-    
+    try:
+        repo = Repository.objects.get(github_id, repo_id)
+    except Repository.DoesNotExist:
+        return HttpResponse('Not listening for this repository')
+   
     branch_ref = push.get('ref')
     if not branch_ref:
         return HttpResponse('No branch found')
 
-    branch = branch_ref.replace('refs/heads/','')
-    branch = get_or_create_object(Branch, repo_id=repo_id, name=branch)
+    branch_name = branch_ref.replace('refs/heads/','')
+    branch = Branch.objects.get_or_create(repo=repo, name=branch_name)
 
-    for trigger in triggers:
-        # Check if the branch matches the trigger's branch regex 
-        if re.findall(trigger.branch, branch): 
-            # Trigger the build event
+    for trigger in repo.triggers:
+        if trigger.check_push(push):
             build = Build(
                 trigger = trigger,
                 commit = push['after'],
                 branch = branch,
             )
-            event.save() 
+            build.save() 
 
     return HttpResponse('OK')
 
@@ -61,26 +60,27 @@ def github_pull_request_webhook(request):
     if not validate_github_webhook(request):
         return HttpResponseForbidden
 
-    push = json.loads(request.body)
-    repo_id = push['repository']['id']
-    
-    triggers = Trigger.objects.filter(repo_id = repo_id)
-    
-    branch_ref = push.get('ref')
+    pull_request = json.loads(request.body)
+    repo_id = pull_request['repository']['id']
+    try:
+        repo = Repository.objects.get(github_id, repo_id)
+    except Repository.DoesNotExist:
+        return HttpResponse('Not listening for this repository')
+   
+    branch_ref = pull_request.get('ref')
     if not branch_ref:
         return HttpResponse('No branch found')
 
-    branch = branch_ref.replace('refs/heads/','')
+    branch_name = branch_ref.replace('refs/heads/','')
+    branch = Branch.objects.get_or_create(repo=repo, name=branch_name)
 
-    for trigger in triggers:
-        # Check if the branch matches the trigger's branch regex 
-        if re.findall(trigger.branch, branch): 
-            # Trigger the build event
-            event = TriggerEvent(
+    for trigger in repo.triggers:
+        if trigger.check_pull_request(pull_request):
+            build = Build(
                 trigger = trigger,
-                commit = push['after'],
+                commit = pull_request['after'],
                 branch = branch,
             )
-            event.save() 
+            build.save() 
 
     return HttpResponse('OK')

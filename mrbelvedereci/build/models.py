@@ -22,3 +22,6 @@ class Build(models.Model):
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True) 
+
+    def __unicode__(self):
+        return '{}: {} - {}'.format(self.id, self.repo, self.commit)

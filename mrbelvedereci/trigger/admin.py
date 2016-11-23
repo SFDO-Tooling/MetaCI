@@ -1,3 +1,6 @@
 from django.contrib import admin
+from mrbelvedereci.trigger.models import Trigger
 
-# Register your models here.
+class TriggerAdmin(admin.ModelAdmin):
+    list_display = ('repo', 'type', 'flows', 'org', 'context')
+admin.site.register(Trigger, TriggerAdmin)
