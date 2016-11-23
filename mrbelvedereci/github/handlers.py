@@ -10,5 +10,5 @@ def create_trigger_webhooks(sender, **kwargs):
 
     if not repository.github_id:
         github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
-        repo = github.repository(trigger.repo.owner, trigger.repo.name)
+        repo = github.repository(repository.owner, repository.name)
         repository.github_id = repo.id
