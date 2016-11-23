@@ -5,6 +5,7 @@ from django.db import models
 class Repository(models.Model):
     name = models.CharField(max_length=255)
     owner = models.CharField(max_length=255)
+    github_id = models.IntegerField(null=True, blank=True)
     url = models.URLField(max_length=255)
 
     def __unicode__(self):
