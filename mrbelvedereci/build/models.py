@@ -65,7 +65,7 @@ class Build(models.Model):
         self.log += '-- Running flow: {}\n'.format(self.flow)
         self.save()
 
-class BuildFlows(models.Model):
+class BuildFlow(models.Model):
     build = models.ForeignKey('build.Build', related_name='steps')
     status = models.CharField(max_length=16, choices=BUILD_FLOW_STATUSES, default='queued')
     flow = models.CharField(max_length=255, null=True, blank=True)
