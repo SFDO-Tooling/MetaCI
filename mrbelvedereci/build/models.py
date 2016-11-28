@@ -113,7 +113,7 @@ class BuildFlow(models.Model):
         self.log += '-- Extracting zip to temp dir:\n     {}\n'.format(build_dir)
         self.save()
         zip_content = StringIO.StringIO(resp.content)
-        zip_file = zipfile.ZipFile(resp.content)
+        zip_file = zipfile.ZipFile(zip_content)
         zip_file.extractall(build_dir)
         build_dir += '/{}-{}'.format(self.build.repo.name, self.build.commit)
         self.log += '-- Commit extracted to build dir:\n     {}\n'.format(build_dir)
