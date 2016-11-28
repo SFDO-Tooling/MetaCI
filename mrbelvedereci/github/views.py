@@ -69,11 +69,10 @@ def github_pull_request_webhook(request):
     except Repository.DoesNotExist:
         return HttpResponse('Not listening for this repository')
   
-    pull_base = pull_request.get('pull_request', {}).get('base', {}) 
     pull_head = pull_request.get('pull_request', {}).get('head', {}) 
 
-    head_branch_name = pull_base.get('ref')
-    if not head_branch_ref:
+    head_branch_name = pull_head.get('ref')
+    if not head_branch_name:
         return HttpResponse('No head branch found')
 
     head_branch = Branch.objects.get_or_create(repo=repo, name=head_branch_name)
