@@ -48,6 +48,7 @@ def github_push_webhook(request):
     for trigger in repo.triggers.filter(type='commit'):
         if trigger.check_push(push):
             build = Build(
+                repo = repo,
                 trigger = trigger,
                 commit = push['after'],
                 branch = branch,
@@ -80,6 +81,7 @@ def github_pull_request_webhook(request):
     for trigger in repo.triggers.filter(type='pr'):
         if trigger.check_pull_request(pull_request):
             build = Build(
+                repo = repo,
                 trigger = trigger,
                 commit = pull_head['sha'],
                 branch = head_branch,
