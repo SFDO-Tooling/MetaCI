@@ -13,7 +13,7 @@ BUILD_STATUSES = (
 class Build(models.Model):
     repo = models.ForeignKey('github.Repository', related_name='builds')
     branch = models.ForeignKey('github.Branch', related_name='builds', null=True, blank=True)
-    commit = models.CharField(max_length=32)
+    commit = models.CharField(max_length=64)
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     trigger = models.ForeignKey('trigger.Trigger', related_name='builds')
