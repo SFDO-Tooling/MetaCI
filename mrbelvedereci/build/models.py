@@ -55,14 +55,11 @@ class Build(models.Model):
             build_flow.run()
         self.status = 'success'
         self.save()
-                
-        
-        
 
     def set_running_status(self): 
         self.status = 'running'
         self.time_start = datetime.now()
-        self.log += '-- Running flow: {}\n'.format(self.flow)
+        self.log += '-- Building commit {}\n'.format(self.commit)
         self.save()
 
 class BuildFlow(models.Model):
