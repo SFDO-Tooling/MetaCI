@@ -5,7 +5,7 @@ from github3 import login
 from mrbelvedereci.github.models import Repository
 
 @receiver(pre_save, sender=Repository)
-def create_trigger_webhooks(sender, **kwargs):
+def create_repo_webhooks(sender, **kwargs):
     repository = kwargs['instance']
 
     if not repository.github_id:
