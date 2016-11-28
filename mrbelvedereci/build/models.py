@@ -59,6 +59,8 @@ class Build(models.Model):
     def set_running_status(self): 
         self.status = 'running'
         self.time_start = datetime.now()
+        if self.log is None:
+            self.log = ''
         self.log += '-- Building commit {}\n'.format(self.commit)
         self.save()
 
@@ -94,6 +96,8 @@ class BuildFlow(models.Model):
     def set_running_status(self): 
         self.status = 'running'
         self.time_start = datetime.now()
+        if self.log is None:
+            self.log = ''
         self.log += '-- Running flow: {}\n'.format(self.flow)
         self.save()
 
