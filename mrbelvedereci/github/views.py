@@ -43,7 +43,7 @@ def github_push_webhook(request):
         return HttpResponse('No branch found')
 
     branch_name = branch_ref.replace('refs/heads/','')
-    branch = Branch.objects.get_or_create(repo=repo, name=branch_name)
+    branch, created = Branch.objects.get_or_create(repo=repo, name=branch_name)
 
     for trigger in repo.triggers.filter(type='commit'):
         if trigger.check_push(push):
@@ -75,7 +75,7 @@ def github_pull_request_webhook(request):
     if not head_branch_name:
         return HttpResponse('No head branch found')
 
-    head_branch = Branch.objects.get_or_create(repo=repo, name=head_branch_name)
+    head_branch, created = Branch.objects.get_or_create(repo=repo, name=head_branch_name)
 
     for trigger in repo.triggers.filter(type='pr'):
         if trigger.check_pull_request(pull_request):
