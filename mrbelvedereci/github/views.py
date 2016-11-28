@@ -34,7 +34,7 @@ def github_push_webhook(request):
     push = json.loads(request.body)
     repo_id = push['repository']['id']
     try:
-        repo = Repository.objects.get(github_id, repo_id)
+        repo = Repository.objects.get(github_id = repo_id)
     except Repository.DoesNotExist:
         return HttpResponse('Not listening for this repository')
    
@@ -65,7 +65,7 @@ def github_pull_request_webhook(request):
     pull_request = json.loads(request.body)
     repo_id = pull_request['repository']['id']
     try:
-        repo = Repository.objects.get(github_id, repo_id)
+        repo = Repository.objects.get(github_id = repo_id)
     except Repository.DoesNotExist:
         return HttpResponse('Not listening for this repository')
    
