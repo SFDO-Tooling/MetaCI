@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from ansi2html import Ansi2HTMLConverter
 
+from mrbelvedereci.build.models import Build
+
 def build_list(request):
     pass
 
