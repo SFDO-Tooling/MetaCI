@@ -1,2 +1,2 @@
 web: gunicorn config.wsgi:application
-worker: celery worker --app=mrbelvedereci.taskapp --loglevel=info
+worker: celery worker --app=config --loglevel=info
