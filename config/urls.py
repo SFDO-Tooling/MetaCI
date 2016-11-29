@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here
+    url(r'^builds', include('mrbelvedereci.build.urls')),
     url(r'^', include('mrbelvedereci.github.urls')),
 
 
