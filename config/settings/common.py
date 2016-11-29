@@ -263,8 +263,13 @@ else:
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
 
-# Your common stuff: Below this line define 3rd party library settings
+# Github credentials
 GITHUB_USERNAME = env('GITHUB_USERNAME')
 GITHUB_PASSWORD = env('GITHUB_PASSWORD')
 GITHUB_WEBHOOK_BASE_URL = env('GITHUB_WEBHOOK_BASE_URL')
 GITHUB_WEBHOOK_SECRET = env('GITHUB_WEBHOOK_SECRET')
+
+# Salesforce OAuth Connected App credentials
+CONNECTED_APP_CLIENT_ID = env('CONNECTED_APP_CLIENT_ID')
+CONNECTED_APP_CLIENT_SECRET = env('CONNECTED_APP_CLIENT_SECRET')
+CONNECTED_APP_CALLBACK_URL = env('CONNECTED_APP_CALLBACK_URL')

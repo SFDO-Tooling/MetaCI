@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import StringIO
+import os
 import tempfile
 import zipfile
 
@@ -9,6 +10,9 @@ from datetime import datetime
 import requests
 
 from django.db import models
+from mrbelvedereci.build.cumulusci.config import MrbelvedereGlobalConfig
+from mrbelvedereci.build.cumulusci.config import MrbelvedereProjectConfig
+from mrbelvedereci.build.cumulusci.keychain import MrbelvedereProjectKeychain
 
 BUILD_STATUSES = (
     ('queued', 'Queued'),
@@ -80,6 +84,9 @@ class BuildFlow(models.Model):
         # Extract the repo to a temp build dir
         build_dir = self.checkout()
 
+        # Change directory to the build_dir
+        os.chdir(build_dir)
+
         # Initialize the project config
         project_config = self.get_project_config(build_dir)
 
@@ -120,13 +127,31 @@ class BuildFlow(models.Model):
         self.save()
 
     def get_project_config(self, build_dir):
-        pass
+        global_config = MrbelvedereGlobalConfig()
+        project_config = global_config.get_project_config(self)
+        keychain = MrbelvedereProjectKeychain(project_config, None)
+        project_config.set_keychain(keychain)
+        return project_config
 
     def get_org(self, project_config):
-        pass
+        org = project_config.keychain.get_org(self.build.trigger.org)
+        return org
 
     def run_flow(self, project_config, org_config):
-        pass
-
+        flow = getattr(project_config, 'flows__{}'.format(self.flow))
+        if not flow:
+            raise FlowNotFoundError('Flow not found: {}'.format(flow_name))
+        flow_config = FlowConfig(flow)
+    
+        # Get the class to look up options
+        class_path = flow_config.config.get('class_path', 'cumulusci.core.flows.BaseFlow')
+        flow_class = import_class(class_path)
+    
+        exception = None
+    
+        # Create the flow and handle initialization exceptions
+        flow = flow_class(project_config, flow_config, org_config)
+        return flow()
+    
     def record_result(self, result):
         pass
