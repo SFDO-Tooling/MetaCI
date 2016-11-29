@@ -11,4 +11,4 @@ def create_repo_webhooks(sender, **kwargs):
         return
 
     # Queue the background job with a 1 second delay to allow the transaction to commit
-    run_build.apply_async((build.id), countdown=1)
+    run_build.apply_async((build.id,), countdown=1)
