@@ -216,5 +216,6 @@ RAVEN_CONFIG = {
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL')
 
-# Your production stuff: Below this line define 3rd party library settings
-# ------------------------------------------------------------------------------
+# Configure celery to use Redis
+CELERY_BROKER_URL=REDIS_LOCATION
+CELERY_RESULT_BACKEND=REDIS_LOCATION

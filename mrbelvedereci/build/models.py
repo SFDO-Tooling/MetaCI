@@ -54,16 +54,34 @@ class Build(models.Model):
     def run(self):
         self.set_running_status()
 
-        flows = [flow.strip() for flow in self.trigger.flows.split(',')]
-        for flow in flows:
-            build_flow = BuildFlow(
-                build = self,
-                flow = flow,
-            )
-            build_flow.save()
-            build_flow.run()
-        self.status = 'success'
-        self.save()
+        try:
+            flows = [flow.strip() for flow in self.trigger.flows.split(',')]
+            for flow in flows:
+                self.log += 'Running flow {} failed'.format(flow)
+                self.save()
+    
+                build_flow = BuildFlow(
+                    build = self,
+                    flow = flow,
+                )
+                build_flow.save()
+                build_flow.run()
+    
+                if build_flow.status != 'success':
+                    self.log += 'Build flow {} failed'.format(flow)
+                    self.status = build_flow.status
+                    self.save()
+                    break
+                else:
+                    self.log += 'Build flow {} completed successfully'.format(flow)
+                    self.save()
+    
+            self.status = 'success'
+            self.save()
+        except Exception as e:
+            self.log += unicode(e)
+            self.status = 'error'
+            self.save()
 
     def set_running_status(self): 
         self.status = 'running'
