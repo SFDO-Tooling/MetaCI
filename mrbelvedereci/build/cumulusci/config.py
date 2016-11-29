@@ -3,8 +3,8 @@ from cumulusci.core.config import YamlProjectConfig
 
 class MrbelvedereProjectConfig(YamlProjectConfig):
     def __init__(self, global_config_obj, build_flow):
-        super(MrbelvedereProjectConfig, self).__init__(global_config_obj)
         self.build_flow = build_flow
+        super(MrbelvedereProjectConfig, self).__init__(global_config_obj)
 
     @property
     def config_project_local_path(self):
