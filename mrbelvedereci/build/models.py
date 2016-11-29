@@ -10,9 +10,9 @@ from datetime import datetime
 import requests
 
 from django.db import models
-from mrbelvedereci.build.cumulusci.config import MrbelvedereGlobalConfig
-from mrbelvedereci.build.cumulusci.config import MrbelvedereProjectConfig
-from mrbelvedereci.build.cumulusci.keychain import MrbelvedereProjectKeychain
+from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
+from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
+from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
 
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.exceptions import FlowNotFoundError
