@@ -8,7 +8,7 @@ def create_repo_webhooks(sender, **kwargs):
     build = kwargs['instance']
     created = kwargs['created']
     if not created:
-        continue
+        return
 
     # Queue the background job
     run_build(build.id)
