@@ -16,6 +16,7 @@ from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
 
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.exceptions import FlowNotFoundError
+from cumulusci.core.logger import delete_log
 from cumulusci.core.utils import import_class
 
 BUILD_STATUSES = (
@@ -85,24 +86,28 @@ class BuildFlow(models.Model):
         # Record the start
         self.set_running_status()
 
-        # Extract the repo to a temp build dir
-        self.build_dir = self.checkout()
-
-        # Change directory to the build_dir
-        os.chdir(self.build_dir)
-
-        # Initialize the project config
-        project_config = self.get_project_config()
-
-        # Look up the org
-        org_config = self.get_org(project_config)
-
-        # Run the flow
-        result = self.run_flow(project_config, org_config)
-
-        # Record result
-        self.record_result(result)
-        
+        try:
+            # Extract the repo to a temp build dir
+            self.build_dir = self.checkout()
+    
+            # Change directory to the build_dir
+            os.chdir(self.build_dir)
+    
+            # Initialize the project config
+            project_config = self.get_project_config()
+    
+            # Look up the org
+            org_config = self.get_org(project_config)
+    
+            # Run the flow
+            result = self.run_flow(project_config, org_config)
+    
+            # Record result
+            self.record_result(result)
+        except Exception as e:
+            self.log += unicode(e)
+            self.status = 'error'
+            self.save()
        
     def set_running_status(self): 
         self.status = 'running'
@@ -152,11 +157,15 @@ class BuildFlow(models.Model):
         class_path = flow_config.config.get('class_path', 'cumulusci.core.flows.BaseFlow')
         flow_class = import_class(class_path)
     
-        exception = None
-    
         # Create the flow and handle initialization exceptions
         flow = flow_class(project_config, flow_config, org_config)
-        return flow()
+        res = flow()
+        
+        self.log += open(flow.log_file, 'r').read()
+        delete_log(flow.log_file)
+        self.save()
     
     def record_result(self, result):
-        pass
+        self.status = 'success'
+        self.time_end = datetime.now()
+        self.save()
