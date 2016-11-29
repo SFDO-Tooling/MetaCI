@@ -1,5 +1,6 @@
 import json
 from cumulusci.core.keychain import BaseProjectKeychain
+from cumulusci.core.config import ConnectedAppOAuthConfig
 from cumulusci.core.config import OrgConfig
 from cumulusci.core.config import ScratchOrgConfig
 from django.conf import settings
