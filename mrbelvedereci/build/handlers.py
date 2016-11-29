@@ -10,5 +10,5 @@ def create_repo_webhooks(sender, **kwargs):
     if not created:
         return
 
-    # Queue the background job
-    run_build.delay(build.id)
+    # Queue the background job with a 1 second delay to allow the transaction to commit
+    run_build.delay(build.id, countdown=1)
