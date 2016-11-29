@@ -14,6 +14,10 @@ from mrbelvedereci.build.cumulusci.config import MrbelvedereGlobalConfig
 from mrbelvedereci.build.cumulusci.config import MrbelvedereProjectConfig
 from mrbelvedereci.build.cumulusci.keychain import MrbelvedereProjectKeychain
 
+from cumulusci.core.config import FlowConfig
+from cumulusci.core.exceptions import FlowNotFoundError
+from cumulusci.core.utils import import_class
+
 BUILD_STATUSES = (
     ('queued', 'Queued'),
     ('running', 'Running'),
