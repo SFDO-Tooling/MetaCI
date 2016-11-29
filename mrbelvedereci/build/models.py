@@ -125,6 +125,7 @@ class BuildFlow(models.Model):
         build_dir += '/{}-{}'.format(self.build.repo.name, self.build.commit)
         self.log += '-- Commit extracted to build dir:\n     {}\n'.format(build_dir)
         self.save()
+        return build_dir
 
     def get_project_config(self, build_dir):
         global_config = MrbelvedereGlobalConfig()
