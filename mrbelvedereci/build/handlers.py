@@ -11,4 +11,4 @@ def create_repo_webhooks(sender, **kwargs):
         return
 
     # Queue the background job
-    run_build(build.id)
+    run_build.delay(build.id)
