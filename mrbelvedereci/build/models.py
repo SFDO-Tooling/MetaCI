@@ -82,13 +82,13 @@ class BuildFlow(models.Model):
         self.set_running_status()
 
         # Extract the repo to a temp build dir
-        build_dir = self.checkout()
+        self.build_dir = self.checkout()
 
         # Change directory to the build_dir
-        os.chdir(build_dir)
+        os.chdir(self.build_dir)
 
         # Initialize the project config
-        project_config = self.get_project_config(build_dir)
+        project_config = self.get_project_config()
 
         # Look up the org
         org_config = self.get_org(project_config)
@@ -127,7 +127,7 @@ class BuildFlow(models.Model):
         self.save()
         return build_dir
 
-    def get_project_config(self, build_dir):
+    def get_project_config(self):
         global_config = MrbelvedereGlobalConfig()
         project_config = global_config.get_project_config(self)
         keychain = MrbelvedereProjectKeychain(project_config, None)
