@@ -7,6 +7,10 @@ from mrbelvedereci.salesforce.models import Org
 
 class MrbelvedereProjectKeychain(BaseProjectKeychain):
 
+    def __init__(self, project_config, key, build_flow):
+        self.build_flow = build_flow
+        super(MrbelvedereProjectKeychain, self).__init__(project_config, key)
+
     def _load_keychain_services(self):
         for key, value in settings.__dict__['_wrapped'].__dict__.items():
             if key.startswith('CUMULUSCI_SERVICE_'):
@@ -35,7 +39,7 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
         raise NotImplementedError('set_default_org is not supported in this keychain')
 
     def get_org(self, org_name):
-        org = Org.objects.get(repo=self.build.repo, name=org_name)
+        org = Org.objects.get(repo=self.build_flow.build.repo, name=org_name)
         org_config = json.loads(org.json)
     
         if org.scratch:

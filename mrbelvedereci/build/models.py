@@ -130,7 +130,7 @@ class BuildFlow(models.Model):
     def get_project_config(self):
         global_config = MrbelvedereGlobalConfig()
         project_config = global_config.get_project_config(self)
-        keychain = MrbelvedereProjectKeychain(project_config, None)
+        keychain = MrbelvedereProjectKeychain(project_config, None, self)
         project_config.set_keychain(keychain)
         return project_config
 
