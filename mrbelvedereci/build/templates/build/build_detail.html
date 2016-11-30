@@ -30,6 +30,12 @@
         <a href="{{ build.repo.url }}/commit/{{ build.commit }}" target="_blank">{{ build.commit }}</a>
       </p>
     </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org">Org</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.trigger.org }}">
+        {{ build.trigger.org }}
+      </p>
+    </li>
   </ul>
 {% endblock %}
 
