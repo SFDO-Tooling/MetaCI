@@ -12,7 +12,7 @@
   <h3 class="slds-text-heading--medium">{{ flow.flow }}</h3>
 
   <div class="slds-box--body">
-    {% autoescape 'off' %}
+    {% autoescape off %}
     {{ build.get_log_html }}
     {% endautoescape %}
   </div>
