@@ -133,7 +133,7 @@ class BuildFlow(models.Model):
             self.status = 'error'
             self.save()
       
-        try 
+        try:
             # Run the flow
             result = self.run_flow(project_config, org_config)
     
