@@ -1,0 +1,20 @@
+{% extends 'layout_full.html' %}
+
+{% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
+
+{% block layout_header_text %}{{ build.name }}{% endblock %}
+
+{% block layout_body %}
+
+<h2 class="slds-text-heading--large">Flows</h2>
+{% for flow in build.flows.all %}
+<div class="slds-box">
+  <h3 class="slds-text-heading--medium">{{ flow.flow }}</h3>
+
+  <div class="slds-box--body">
+    {% autoescape "off" %}
+    {{ build.get_log_html }}
+    {% endautoescape %}
+  </div>
+</div>  
+{% endblock %}
