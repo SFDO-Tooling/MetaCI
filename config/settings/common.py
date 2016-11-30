@@ -40,6 +40,8 @@ THIRD_PARTY_APPS = (
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
+    'django_slds',  # Salesforce Lightning Design System
+    'django_slds_crispyforms',  # SLDS theme for crispyforms
 )
 
 # Apps specific for this project go here.

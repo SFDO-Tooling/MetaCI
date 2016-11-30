@@ -11,12 +11,4 @@ def build_list(request):
 def build_detail(request, build_id):
     build = get_object_or_404(Build, id = build_id)
     
-    build_log = ''
-
-    conv = Ansi2HTMLConverter()
-
-    for flow in build.flows.all():
-        if flow.log:
-            build_log += conv.convert(flow.log)
-    
-    return HttpResponse(build_log)
+    return render(request, 'build/build_detail.html', context={'build': build})

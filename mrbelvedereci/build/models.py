@@ -9,7 +9,10 @@ from datetime import datetime
 
 import requests
 
+from ansi2html import Ansi2HTMLConverter
+
 from django.db import models
+
 from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
 from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
 from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
@@ -50,6 +53,10 @@ class Build(models.Model):
 
     def __unicode__(self):
         return '{}: {} - {}'.format(self.id, self.repo, self.commit)
+
+    def get_log_html(self):
+        conv = Ansi2HTMLConverter()
+        return conv.convert(self.log)
 
     def run(self):
         self.set_running_status()
@@ -99,6 +106,10 @@ class BuildFlow(models.Model):
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True) 
+    
+    def get_log_html(self):
+        conv = Ansi2HTMLConverter()
+        return conv.convert(self.log)
 
     def run(self):
         # Record the start
