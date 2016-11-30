@@ -21,13 +21,13 @@
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Branch">Branch</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.branch }}">
-        {{ build.branch }}
+        <a href="{{ build.repo.url }}/tree/{{ build.branch.name }}" target="_blank">{{ build.branch }}</a>
       </p>
     </li>
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Commit">Commit</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.commit }}">
-        {{ build.commit }}
+        <a href="{{ build.repo.url }}/commit/{{ build.commit }}" target="_blank">{{ build.commit }}</a>
       </p>
     </li>
   </ul>
