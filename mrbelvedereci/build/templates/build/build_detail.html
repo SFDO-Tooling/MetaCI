@@ -4,6 +4,29 @@
 
 {% block layout_header_text %}{{ build.name }}{% endblock %}
 
+{% block layout_header_details %}
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repo">Repo</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.repo }}">
+        <a href="{{ build.repo.url }}" target="_blank">{{ build.repo }}</a>
+      </p>
+    </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repo">Branch</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.branch }}">
+        {{ build.branch }}
+      </p>
+    </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repo">Commit</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.commit }}">
+        {{ build.commit }}
+      </p>
+    </li>
+  </ul>
+{% endblock %}
+
 {% block layout_body %}
 
 <h2 class="slds-text-heading--large">Flows</h2>
@@ -13,7 +36,7 @@
 
   <div class="slds-box--body">
     {% autoescape off %}
-    {{ build.get_log_html }}
+    {{ flow.get_log_html }}
     {% endautoescape %}
   </div>
 </div>  
