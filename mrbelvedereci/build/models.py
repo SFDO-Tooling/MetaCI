@@ -78,7 +78,7 @@ class Build(models.Model):
                     self.log += 'Build flow {} failed'.format(flow)
                     self.status = build_flow.status
                     self.save()
-                    break
+                    return
                 else:
                     self.log += 'Build flow {} completed successfully'.format(flow)
                     self.save()
@@ -128,16 +128,28 @@ class BuildFlow(models.Model):
             # Look up the org
             org_config = self.get_org(project_config)
     
+        except Exception as e:
+            self.log += unicode(e)
+            self.status = 'error'
+            self.save()
+      
+        try 
             # Run the flow
             result = self.run_flow(project_config, org_config)
     
             # Record result
             self.record_result(result)
+
         except Exception as e:
+            flow_instance = getattr(self, flow_instance, None)
+            if flow_instance and flow_instance.log_file:
+                self.log += open(self.flow_instance.log_file, 'r').read()
+                delete_log(self.flow_instance.log_file)
+                self.flow_instance.log_file = None
             self.log += unicode(e)
             self.status = 'error'
             self.save()
-       
+
     def set_running_status(self): 
         self.status = 'running'
         self.time_start = datetime.now()
@@ -187,14 +199,18 @@ class BuildFlow(models.Model):
         flow_class = import_class(class_path)
     
         # Create the flow and handle initialization exceptions
-        flow = flow_class(project_config, flow_config, org_config)
-        res = flow()
+        self.flow_instance = flow_class(project_config, flow_config, org_config)
+        res = self.flow_instance()
         
-        self.log += open(flow.log_file, 'r').read()
-        delete_log(flow.log_file)
+        self.log += open(self.flow_instance.log_file, 'r').read()
+        delete_log(self.flow_instance.log_file)
+        self.flow_instance.log_file = None
         self.save()
     
     def record_result(self, result):
         self.status = 'success'
         self.time_end = datetime.now()
+        elf.log += open(self.flow_instance.log_file, 'r').read()
+        delete_log(self.flow_instance.log_file)
+        self.flow_instance.log_file = None
         self.save()
