@@ -51,6 +51,9 @@ class Build(models.Model):
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True) 
 
+    class Meta:
+        ordering = ['-time_queue']
+
     def __unicode__(self):
         return '{}: {} - {}'.format(self.id, self.repo, self.commit)
 
