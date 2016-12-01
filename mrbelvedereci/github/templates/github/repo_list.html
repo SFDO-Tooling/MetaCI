@@ -1,0 +1,16 @@
+{% extends 'layout_full.html' %}
+
+{% block layout_header_text %}Repositories{% endblock %}
+
+{% block layout_body %}
+
+<div class="slds-box">
+  <div class="slds-box--body">
+    <ul>
+{% for repo in repos %}
+      <li><a href="/repo/{{ repo.owner }}/{{ repo.name }}">{{ repo }}</a></li>
+{% endfor %}
+    </ul>
+  </div>
+</div>  
+{% endblock %}

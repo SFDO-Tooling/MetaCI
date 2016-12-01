@@ -5,6 +5,7 @@ import re
 from hashlib import sha1
 
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
@@ -14,6 +15,31 @@ from mrbelvedereci.github.models import Branch
 from mrbelvedereci.github.models import Repository
 from mrbelvedereci.trigger.models import Trigger
 from mrbelvedereci.build.models import Build
+
+def repo_list(request, owner=None):
+    repos = Repository.objects.all()
+    if owner:
+        repos = repos.filter(owner = owner)
+
+    context = {
+        'repos': repos,
+    }
+    return render(request, 'github/repo_list.html', context=context)
+
+def repo_detail(request, owner, name):
+    repo = get_object_or_404(Repository, owner=owner, name=name)
+    context = {
+        'repo': repo,
+    }
+    return render(request, 'github/repo_detail.html', context=context)
+
+def branch_detail(request, owner, name, branch):
+    repo = get_object_or_404(Repository, owner=owner, name=name)
+    branch = get_object_or_404(Branch, repo=repo, name=branch)
+    context = {
+        'branch': branch,
+    }
+    return render(request, 'github/branch_detail.html', context=context)
 
 def validate_github_webhook(request):
     key = settings.GITHUB_WEBHOOK_SECRET

@@ -1,0 +1,31 @@
+{% extends 'layout_full.html' %}
+
+{% block layout_parent_link %}<a href="/">Repos</a>{% endblock %}
+
+{% block layout_header_text %}{{ repo }}{% endblock %}
+
+{% block layout_header_details %}
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">URL</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ repo.url }}">
+        <a href="{{ repo.url }}" target="_blank">{{ repo.url }}</a>
+      </p>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block layout_body %}
+
+<div class="slds-box">
+  <h3 class="slds-text-heading--medium">Branches</h3>
+
+  <div class="slds-box--body">
+    <ul>
+{% for branch in repo.branches.all %}
+      <li><a href="/repo/{{ branch.repo.owner }}/{{ branch.repo.name }}/branch/{{ branch }}">{{ branch }}</a></li>
+{% endfor %}
+    </ul>
+  </div>
+</div>  
+{% endblock %}
