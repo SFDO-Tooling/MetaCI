@@ -41,6 +41,16 @@ def branch_detail(request, owner, name, branch):
     }
     return render(request, 'github/branch_detail.html', context=context)
 
+def commit_detail(request, owner, name, sha):
+    repo = get_object_or_404(Repository, owner=owner, name=name)
+    builds = Build.objects.filter(repo = repo, commit = sha)
+    context = {
+        'repo': repo,
+        'builds': builds,
+        'commit': sha,
+    }
+    return render(request, 'github/commit_detail.html', context=context)
+
 def validate_github_webhook(request):
     key = settings.GITHUB_WEBHOOK_SECRET
     signature = request.META.get('HTTP_X_HUB_SIGNATURE').split('=')[1]

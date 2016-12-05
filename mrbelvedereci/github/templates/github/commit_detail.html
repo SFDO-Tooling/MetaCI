@@ -1,0 +1,31 @@
+{% extends 'layout_full.html' %}
+
+{% block layout_parent_link %}<a href="/repo/{{ branch.repo.owner }}/{{ branch.repo.name }}">{{ branch.repo }}</a>{% endblock %}
+
+{% block layout_header_text %}{{ commit }}{% endblock %}
+
+{% block layout_header_details %}
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">URL</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ repo.url }}/commit/{{ commit }}">
+        <a href="{{ repo.url }}/commit/{{ commit }}" target="_blank">{{ repo.url }}/commit/{{ commit }}</a>
+      </p>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block layout_body %}
+
+<div class="slds-box">
+  <h3 class="slds-text-heading--medium">Builds</h3>
+
+  <div class="slds-box--body">
+    <ul>
+{% for build in builds %}
+      <li><a href="/builds/{{ build.id }}">{{ build.status }} - {{ build }}</a></li>
+{% endfor %}
+    </ul>
+  </div>
+</div>  
+{% endblock %}

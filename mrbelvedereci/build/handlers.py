@@ -4,7 +4,7 @@ from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.tasks import run_build
 
 @receiver(post_save, sender=Build)
-def create_repo_webhooks(sender, **kwargs):
+def queue_build(sender, **kwargs):
     build = kwargs['instance']
     created = kwargs['created']
     if not created:

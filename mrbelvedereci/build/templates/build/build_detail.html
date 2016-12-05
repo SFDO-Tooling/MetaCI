@@ -15,25 +15,33 @@
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repo">Repo</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.repo }}">
-        <a href="{{ build.repo.url }}" target="_blank">{{ build.repo }}</a>
+        <a href="/repo/{{ build.repo.owner }}/{{ build.repo.name }}">
+          {{ build.repo }}
+        </a>
       </p>
     </li>
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Branch">Branch</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.branch }}">
-        <a href="{{ build.repo.url }}/tree/{{ build.branch.name }}" target="_blank">{{ build.branch }}</a>
+        <a href="/repo/{{ build.repo.owner }}/{{ build.repo.name }}/branch/{{ build.branch.name }}">
+          {{ build.branch }}
+        </a>
       </p>
     </li>
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Commit">Commit</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.commit }}">
-        <a href="{{ build.repo.url }}/commit/{{ build.commit }}" target="_blank">{{ build.commit }}</a>
+        <a href="/repo/{{ build.repo.owner }}/{{ build.repo.name }}/commit/{{ build.commit }}">
+          {{ build.commit }}
+        </a>
       </p>
     </li>
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org">Org</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.trigger.org }}">
-        {{ build.trigger.org }}
+        <a href="/repo/{{ build.repo.owner }}/{{ build.repo.name }}/org/{{ build.trigger.org }}">
+          {{ build.trigger.org }}
+        </a>
       </p>
     </li>
   </ul>
