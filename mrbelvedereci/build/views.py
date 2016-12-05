@@ -7,7 +7,8 @@ from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.tasks import run_build
 
 def build_list(request):
-    pass
+    builds = Build.objects.all()
+    return render(request, 'build/build_list.html', context={'builds': builds})
 
 def build_detail(request, build_id):
     build = get_object_or_404(Build, id = build_id)
