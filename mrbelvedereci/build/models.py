@@ -213,7 +213,7 @@ class BuildFlow(models.Model):
     def record_result(self, result):
         self.status = 'success'
         self.time_end = datetime.now()
-        elf.log += open(self.flow_instance.log_file, 'r').read()
+        self.log += open(self.flow_instance.log_file, 'r').read()
         delete_log(self.flow_instance.log_file)
         self.flow_instance.log_file = None
         self.save()
