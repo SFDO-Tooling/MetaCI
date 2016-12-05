@@ -204,11 +204,6 @@ class BuildFlow(models.Model):
         # Create the flow and handle initialization exceptions
         self.flow_instance = flow_class(project_config, flow_config, org_config)
         res = self.flow_instance()
-        
-        self.log += open(self.flow_instance.log_file, 'r').read()
-        delete_log(self.flow_instance.log_file)
-        self.flow_instance.log_file = None
-        self.save()
     
     def record_result(self, result):
         self.status = 'success'
