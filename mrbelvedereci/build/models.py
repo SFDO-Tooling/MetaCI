@@ -144,7 +144,7 @@ class BuildFlow(models.Model):
             self.record_result(result)
 
         except Exception as e:
-            flow_instance = getattr(self, flow_instance, None)
+            flow_instance = getattr(self, 'flow_instance', None)
             if flow_instance and flow_instance.log_file:
                 self.log += open(self.flow_instance.log_file, 'r').read()
                 delete_log(self.flow_instance.log_file)
