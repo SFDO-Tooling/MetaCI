@@ -107,7 +107,7 @@ You must set the DSN url in production.
 Deployment
 ----------
 
-The following details how to deploy this application.
+The following details how to deploy this application
 
 
 Heroku
