@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import re
 
 from django.db import models
 
@@ -23,7 +24,32 @@ class Trigger(models.Model):
         return unicode(self.name)
 
     def check_push(self, push):
-        return True
+        # Handle commit events
+        if self.type == 'commit':
+            # Check if the event was triggered by a commit
+            if not push['ref'].startswith('refs/heads/'):
+                return False
+            branch = push['ref'][11:]
+
+            # Check the branch against regex
+            if not re.match(self.regex, branch):
+                return False
+            return True
+
+        # Handle tag events
+        elif self.type == 'tag':
+            # Check if the event was triggered by a tag
+            if not push['ref'].startswith('refs/tags/'):
+                return False
+            tag = push['ref'][10:]
+            
+            # Check the tag against regex
+            if not re.match(self.regex, tag):
+                return False
+            return True
+    
+        return False
 
     def check_pull_request(self, pull_request):
         return True
+        

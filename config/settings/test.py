@@ -60,3 +60,13 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
         'django.template.loaders.app_directories.Loader',
     ]),
 ]
+
+GITHUB_USERNAME = 'TestUser'
+GITHUB_PASSWORD = 'TestUserPass123'
+GITHUB_WEBHOOK_BASE_URL = ''
+GITHUB_WEBHOOK_SECRET = 'a secret'
+
+# Salesforce OAuth Connected App credentials
+CONNECTED_APP_CLIENT_ID = '1234567890'
+CONNECTED_APP_CLIENT_SECRET = 'abcdefg1234567890'
+CONNECTED_APP_CALLBACK_URL = 'http://localhost/callback'
