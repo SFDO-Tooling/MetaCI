@@ -49,3 +49,5 @@ django-slds-crispyforms
 github3.py==0.9.6
 
 ansi2html==1.1.1
+
+requests[security]==2.9.1
