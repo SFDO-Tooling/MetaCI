@@ -7,7 +7,6 @@ TRIGGER_TYPES = (
     ('manual', 'Manual'),
     ('commit', 'Commit'),
     ('tag', 'Tag'),
-    ('pr', 'Pull Request'),
 )
 
 class Trigger(models.Model):
@@ -15,7 +14,6 @@ class Trigger(models.Model):
     repo = models.ForeignKey('github.Repository', related_name="triggers")
     type = models.CharField(max_length=8, choices=TRIGGER_TYPES)
     regex = models.CharField(max_length=255, null=True, blank=True)
-    build_pr_commits = models.BooleanField(default=False)
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
     context = models.CharField(max_length=255)
@@ -49,7 +47,3 @@ class Trigger(models.Model):
             return True
     
         return False
-
-    def check_pull_request(self, pull_request):
-        return True
-        

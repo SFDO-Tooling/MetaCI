@@ -8,5 +8,4 @@ urlpatterns = [
     url(r'^repo/(?P<owner>\w+)/(?P<name>[^/].*)/commit/(?P<sha>\w+)$', github_views.commit_detail),
     url(r'^repo/(?P<owner>\w+)/(?P<name>[^/].*)/*$', github_views.repo_detail),
     url(r'^webhook/github/push$', github_views.github_push_webhook),
-    url(r'^webhook/github/pull_request$', github_views.github_pull_request_webhook),
 ]

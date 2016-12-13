@@ -92,36 +92,3 @@ def github_push_webhook(request):
             build.save() 
 
     return HttpResponse('OK')
-
-@csrf_exempt
-@require_POST
-def github_pull_request_webhook(request):
-    if not validate_github_webhook(request):
-        return HttpResponseForbidden
-
-    pull_request = json.loads(request.body)
-    repo_id = pull_request['repository']['id']
-    try:
-        repo = Repository.objects.get(github_id = repo_id)
-    except Repository.DoesNotExist:
-        return HttpResponse('Not listening for this repository')
-  
-    pull_head = pull_request.get('pull_request', {}).get('head', {}) 
-
-    head_branch_name = pull_head.get('ref')
-    if not head_branch_name:
-        return HttpResponse('No head branch found')
-
-    head_branch, created = Branch.objects.get_or_create(repo=repo, name=head_branch_name)
-
-    for trigger in repo.triggers.filter(type='pr'):
-        if trigger.check_pull_request(pull_request):
-            build = Build(
-                repo = repo,
-                trigger = trigger,
-                commit = pull_head['sha'],
-                branch = head_branch,
-            )
-            build.save() 
-
-    return HttpResponse('OK')
