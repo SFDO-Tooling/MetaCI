@@ -120,7 +120,7 @@ class BuildFlow(models.Model):
 
         try:
             # Set up logger
-            init_logger()
+            init_logger(self)
 
             # Extract the repo to a temp build dir
             self.build_dir = self.checkout()
