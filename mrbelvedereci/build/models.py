@@ -198,7 +198,7 @@ class BuildFlow(models.Model):
     def run_flow(self, project_config, org_config):
         flow = getattr(project_config, 'flows__{}'.format(self.flow))
         if not flow:
-            raise FlowNotFoundError('Flow not found: {}'.format(flow_name))
+            raise FlowNotFoundError('Flow not found: {}'.format(self.flow))
         flow_config = FlowConfig(flow)
     
         # Get the class to look up options
