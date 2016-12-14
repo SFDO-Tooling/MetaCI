@@ -20,7 +20,7 @@ def check_queued_build(build_id):
 
     # If this is not a scratch org, ensure no builds are currently running against the org
     if not org.scratch:
-        running_builds = Build.objects.filter(status='running', repo=build.repo, org = build.org).count()
+        running_builds = Build.objects.filter(status='running', repo=build.repo, trigger__org = build.trigger.org).count()
         if running_builds:
             # Requeue this job to check again in 5 seconds
             check_queued_build.apply_async((build.id,), countdown=5)
