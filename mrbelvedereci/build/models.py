@@ -12,6 +12,7 @@ import requests
 from ansi2html import Ansi2HTMLConverter
 
 from django.db import models
+from django.urls import reverse
 
 from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
 from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
@@ -60,6 +61,9 @@ class Build(models.Model):
     def get_log_html(self):
         conv = Ansi2HTMLConverter()
         return conv.convert(self.log)
+
+    def get_absolute_url(self):
+        return reverse('builds.views.details', args=[str(self.id)])
 
     def run(self):
         self.set_running_status()
