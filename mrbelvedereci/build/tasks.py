@@ -39,7 +39,7 @@ def check_queued_build(self, build_id):
         lock_id = 'mrbelvedereci-org-lock-{}'.format(org.id)
         status = cache.add(lock_id, 'build-{}'.format(build_id))
         
-        if status == True:
+        if status is True:
             # Lock successful, run the build
             run_build.apply_async((build.id,lock_id), countdown=1)
         else:

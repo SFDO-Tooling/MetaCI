@@ -10,4 +10,4 @@ def queue_build(sender, **kwargs):
     if not created:
         return
 
-    check_queued_build(build.id)
+    check_queued_build.apply_async((build.id,), countdown=1)
