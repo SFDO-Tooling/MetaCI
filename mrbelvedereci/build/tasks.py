@@ -41,7 +41,7 @@ def check_queued_build(build_id):
 
     # If this is not a scratch org, ensure no builds are currently running against the org
     if not org.scratch:
-        lock_id = 'mrbelvedereci-org-lock-{1}'.format(org.id)
+        lock_id = 'mrbelvedereci-org-lock-{}'.format(org.id)
         logger.debug('Locking org: %s', org)
         with memcache_lock(lock_id, self.app.oid) as acquired:
             if acquired:
