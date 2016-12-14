@@ -104,7 +104,7 @@ MANAGERS = ADMINS
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres:///mrbelvedereci'),
+    'default': env.db('DATABASE_URL', default='sqlite:///ci.db'),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
