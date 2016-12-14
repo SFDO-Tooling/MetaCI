@@ -16,7 +16,7 @@ from django.db import models
 from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
 from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
 from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
-
+from mrbelvedereci.cumulusci.logger import init_logger
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.logger import delete_log
@@ -119,6 +119,9 @@ class BuildFlow(models.Model):
         self.set_running_status()
 
         try:
+            # Set up logger
+            init_logger()
+
             # Extract the repo to a temp build dir
             self.build_dir = self.checkout()
     
