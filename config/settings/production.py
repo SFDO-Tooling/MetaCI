@@ -149,7 +149,7 @@ CACHES = {
         'BACKEND': 'django_redis.cache.RedisCache',
         'LOCATION': REDIS_LOCATION,
         'OPTIONS': {
-            'CONNECTION_POOL_KWARGS': {"max_connections": 10},
+            'CONNECTION_POOL_KWARGS': {"max_connections": 1},
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'IGNORE_EXCEPTIONS': True,  # mimics memcache behavior.
                                         # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
@@ -219,7 +219,7 @@ ADMIN_URL = env('DJANGO_ADMIN_URL')
 
 # Configure celery to use Redis
 CELERY_BROKER_URL=REDIS_LOCATION
-CELERY_BROKER_POOL_LIMIT=3
+CELERY_BROKER_POOL_LIMIT=1
 CELERY_RESULT_BACKEND=REDIS_LOCATION
 
 # Github credentials
