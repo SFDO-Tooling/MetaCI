@@ -29,8 +29,8 @@ def run_build(build_id):
     build.run()
     return build.status
 
-@shared_task
-def check_queued_build(build_id):
+@shared_task(bind=True)
+def check_queued_build(self, build_id):
     build = Build.objects.get(id = build_id)
 
     # Check for concurrency blocking
