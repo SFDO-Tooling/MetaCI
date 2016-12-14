@@ -33,7 +33,7 @@ class LogHandler(logging.StreamHandler):
 
     def __init__(self, model):
         """ Initialize the handler. """
-        Handler.__init__(self)
+        super(LogHandler, self).__init__()
         self.stream = LogStream(model)
 
 

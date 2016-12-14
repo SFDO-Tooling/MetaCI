@@ -138,6 +138,7 @@ class BuildFlow(models.Model):
             self.log += unicode(e)
             self.status = 'error'
             self.save()
+            return
       
         try:
             # Run the flow
