@@ -1,6 +1,6 @@
 from celery import shared_task
 from django.core.cache import cache
-from mrbelvedereci.salesforce.models import Org
+from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.github.utils import create_status
 
 @shared_task

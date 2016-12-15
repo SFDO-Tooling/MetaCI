@@ -15,16 +15,19 @@
         <div class="slds-truncate" title="">#</div>
       </th>
       <th scope="col">
-        <div class="slds-truncate" title="">Commit</div>
+        <div class="slds-truncate" title="">Status</div>
       </th>
       <th scope="col">
-        <div class="slds-truncate" title="">Branch</div>
+        <div class="slds-truncate" title="">Trigger</div>
       </th>
       <th scope="col">
         <div class="slds-truncate" title="">Repo</div>
       </th>
       <th scope="col">
-        <div class="slds-truncate" title="">Status</div>
+        <div class="slds-truncate" title="">Branch</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate" title="">Commit</div>
       </th>
       <th scope="col">
         <div class="slds-truncate" title="">Start Date</div>
@@ -40,17 +43,20 @@
       <th data-label="Build Number">
         <div class="slds-truncate" title="{{ build.id }}"><a href="/builds/{{ build.id }}">{{ build.id }}</a></div>
       </th>
-      <td data-label="Commit">
-        <div class="slds-truncate" title="{{ build.commit }}">{{ build.commit }}</div>
+      <td data-label="Status">
+        <div class="slds-truncate" title="{{ build.status }}">{{ build.status }}</div>
       </td>
-      <td data-label="Branch">
-        <div class="slds-truncate" title="{{ build.branch.name }}">{{ build.branch.name }}</div>
+      <td data-label="Trigger">
+        <div class="slds-truncate" title="{{ build.trigger }}">{{ build.trigger }}</div>
       </td>
       <td data-label="Repository">
         <div class="slds-truncate" title="{{ build.repo.name }}">{{ build.repo.name }}</div>
       </td>
-      <td data-label="Status">
-        <div class="slds-truncate" title="{{ build.status }}">{{ build.status }}</div>
+      <td data-label="Branch">
+        <div class="slds-truncate" title="{{ build.branch.name }}">{{ build.branch.name }}</div>
+      </td>
+      <td data-label="Commit">
+        <div class="slds-truncate" title="{{ build.commit }}">{{ build.commit }}</div>
       </td>
       <td data-label="Start Date">
         <div class="slds-truncate" title="{{ build.time_start }}">{{ build.time_start }}</div>

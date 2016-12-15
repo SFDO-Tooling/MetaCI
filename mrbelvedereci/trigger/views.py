@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
@@ -14,7 +15,7 @@ def trigger_detail(request, trigger_id):
     } 
     return render(request, 'trigger/detail.html', context=context)
     
-
+@login_required
 def trigger_run(request, trigger_id):
     trigger = get_object_or_404(Trigger, id = trigger_id)
 

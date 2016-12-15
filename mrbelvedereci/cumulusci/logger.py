@@ -43,9 +43,8 @@ def init_logger(model):
     logger = logging.getLogger('cumulusci')
 
     # Remove existing handlers
-    if logger.hasHandlers:
-        for handler in logger.handlers:
-            logger.removeHandler(handler)
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
 
     # Create the custom handler
     formatter = coloredlogs.ColoredFormatter(fmt='%(asctime)s: %(message)s')

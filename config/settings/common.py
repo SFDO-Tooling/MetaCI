@@ -49,7 +49,7 @@ LOCAL_APPS = (
     'mrbelvedereci.users.apps.UsersConfig',
     'mrbelvedereci.build.apps.BuildConfig',
     'mrbelvedereci.github.apps.GithubConfig',
-    'mrbelvedereci.salesforce.apps.SalesforceConfig',
+    'mrbelvedereci.cumulusci.apps.CumulusCIConfig',
     'mrbelvedereci.trigger.apps.TriggerConfig',
 )
 

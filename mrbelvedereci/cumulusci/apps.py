@@ -3,5 +3,5 @@ from __future__ import unicode_literals
 from django.apps import AppConfig
 
 
-class SalesforceConfig(AppConfig):
-    name = 'mrbelvedereci.salesforce'
+class CumulusCIConfig(AppConfig):
+    name = 'mrbelvedereci.cumulusci'

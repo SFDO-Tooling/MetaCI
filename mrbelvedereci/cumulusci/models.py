@@ -10,3 +10,10 @@ class Org(models.Model):
 
     def __unicode__(self):
         return '{}: {}'.format(self.repo.name, self.name)
+
+class Service(models.Model):
+    name = models.CharField(max_length=255)
+    json = models.TextField()
+
+    def __unicode__(self):
+        return self.name

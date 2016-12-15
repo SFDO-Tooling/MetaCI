@@ -3,8 +3,10 @@ from cumulusci.core.keychain import BaseProjectKeychain
 from cumulusci.core.config import ConnectedAppOAuthConfig
 from cumulusci.core.config import OrgConfig
 from cumulusci.core.config import ScratchOrgConfig
+from cumulusci.core.config import ServiceConfig
 from django.conf import settings
-from mrbelvedereci.salesforce.models import Org
+from mrbelvedereci.cumulusci.models import Org
+from mrbelvedereci.cumulusci.models import Service
 
 class MrbelvedereProjectKeychain(BaseProjectKeychain):
 
@@ -30,6 +32,22 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
             'client_id': settings.CONNECTED_APP_CLIENT_ID,
             'client_secret': settings.CONNECTED_APP_CLIENT_SECRET,
         })
+
+    def get_service(self, service_name):
+        service = Service.objects.get(name=service_name)
+        service_config = json.loads(service.json)
+        return ServiceConfig(service_config) 
+
+    def set_service(self, service_name, service_config):
+        try:
+            service = Service.objects.get(name = service_name)
+            service.json = json.dumps(service_config.config)
+        except Service.DoesNotExist:
+            service = Service(
+                name = service_name,
+                json = json.dumps(service_config.config),
+            )
+        service.save()
 
     def list_orgs(self):
         raise NotImplementedError('list_orgs is not supported in this keychain')
