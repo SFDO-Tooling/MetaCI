@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.urls import reverse
+
 
 class Repository(models.Model):
     name = models.CharField(max_length=255)
@@ -10,6 +12,9 @@ class Repository(models.Model):
 
     class Meta:
         ordering = ['name','owner']
+
+    def get_absolute_url(self):
+        return reverse('repo_detail', kwargs={'owner': self.owner, 'name': self.name})
 
     def __unicode__(self):
         return '{}/{}'.format(self.owner, self.name)
@@ -21,6 +26,9 @@ class Branch(models.Model):
 
     class Meta:
         ordering = ['repo__name','repo__owner', 'name']
+
+    def get_absolute_url(self):
+        return reverse('branch_detail', kwargs={'owner': self.repo.owner, 'name': self.repo.name, 'branch': self.name})
 
     def __unicode__(self):
         return unicode(self.name)

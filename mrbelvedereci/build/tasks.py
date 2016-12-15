@@ -1,19 +1,21 @@
 from celery import shared_task
 from django.core.cache import cache
-from mrbelvedereci.build.models import Build
 from mrbelvedereci.salesforce.models import Org
 from mrbelvedereci.github.utils import create_status
 
 @shared_task
 def run_build(build_id, lock_id=None):
+    from mrbelvedereci.build.models import Build
     try:
         build = Build.objects.get(id=build_id)
+        exception = None
         build.run()
-        # assume build status values are same as github
-        set_github_status.apply_async((build, build.status), countdown=1)
+        set_github_status.apply_async((build_id,), countdown=1)
+    
     except:
         if lock_id:
             cache.delete(lock_id)
+        set_github_status.apply_async((build_id,), countdown=1)
         
         raise
 
@@ -24,6 +26,7 @@ def run_build(build_id, lock_id=None):
 
 @shared_task(bind=True)
 def check_queued_build(self, build_id):
+    from mrbelvedereci.build.models import Build
     build = Build.objects.get(id = build_id)
 
     # Check for concurrency blocking
@@ -49,5 +52,7 @@ def check_queued_build(self, build_id):
             check_queued_build.apply_async((build.id,), countdown=5)
 
 @shared_task
-def set_github_status(build, state):
-    create_status(build, state)
+def set_github_status(build_id):
+    from mrbelvedereci.build.models import Build
+    build = Build.objects.get(id = build_id)
+    create_status(build)

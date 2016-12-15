@@ -21,6 +21,7 @@ urlpatterns = [
 
     # Your stuff: custom urls includes go here
     url(r'^builds', include('mrbelvedereci.build.urls')),
+    url(r'^triggers', include('mrbelvedereci.trigger.urls')),
     url(r'^', include('mrbelvedereci.github.urls')),
 
 

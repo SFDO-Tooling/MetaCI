@@ -71,9 +71,13 @@ INSTALLED_APPS += ('django_extensions', )
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 ########## CELERY
-# In development, all tasks will be executed locally by blocking until the task returns
-CELERY_ALWAYS_EAGER = True
+REDIS_LOCATION = '{0}/{1}'.format(env('REDIS_URL', default='redis://127.0.0.1:6379'), 0)
+CELERY_BROKER_URL = REDIS_LOCATION
+CELERY_RESULTS_BACKEND = REDIS_LOCATION
 ########## END CELERY
+
+# Site URL
+SITE_URL = env('SITE_URL', default="http://localhost:8000")
 
 # Github credentials
 GITHUB_USERNAME = env('GITHUB_USERNAME')

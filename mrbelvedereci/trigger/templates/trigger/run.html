@@ -1,0 +1,17 @@
+{% extends 'layout_full.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block layout_body %}
+
+  <div class="slds-grid">
+    <div class="slds-col slds-size--1-of-3 slds-p-around--large">
+      {% crispy form form.helper %}
+    </div>
+
+    <div class="slds-col slds-size--1-of-3 slds-p-around--large slds-theme--shade">
+      <p>This form will trigger a new build against the branch and commit you select.</p>
+    </div>
+  </div>
+
+{% endblock %}

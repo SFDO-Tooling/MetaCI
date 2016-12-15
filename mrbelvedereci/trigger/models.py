@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import re
 
 from django.db import models
+from django.urls import reverse
 
 TRIGGER_TYPES = (
     ('manual', 'Manual'),
@@ -17,6 +18,9 @@ class Trigger(models.Model):
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
     context = models.CharField(max_length=255)
+
+    def get_absolute_url(self):
+        return reverse('trigger_detail', kwargs={'trigger_id': self.id})
 
     def __unicode__(self):
         return unicode(self.name)
