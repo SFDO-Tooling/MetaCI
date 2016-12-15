@@ -10,5 +10,5 @@ def queue_build(sender, **kwargs):
     created = kwargs['created']
     if not created:
         return
-    set_github_status.apply_async((build.id), countdown=1)
-    check_queued_build.apply_async((build.id), countdown=1)
+    set_github_status.apply_async((build.id,), countdown=1)
+    check_queued_build.apply_async((build.id,), countdown=1)

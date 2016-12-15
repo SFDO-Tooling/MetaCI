@@ -40,13 +40,19 @@ class LogHandler(logging.StreamHandler):
 def init_logger(model):
     """ Initialize the logger. """
 
-    formatter = coloredlogs.ColoredFormatter(fmt='%(asctime)s: %(message)s')
+    logger = logging.getLogger('cumulusci')
 
+    # Remove existing handlers
+    if logger.hasHandlers:
+        for handler in logger.handlers:
+            logger.removeHandler(handler)
+
+    # Create the custom handler
+    formatter = coloredlogs.ColoredFormatter(fmt='%(asctime)s: %(message)s')
     handler = LogHandler(model)
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(formatter)
 
-    logger = logging.getLogger('cumulusci')
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
