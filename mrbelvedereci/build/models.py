@@ -200,6 +200,9 @@ class BuildFlow(models.Model):
         return org
 
     def run_flow(self, project_config, org_config):
+        # Add the repo root to syspath to allow for custom tasks and flows in the repo
+        sys.path.append(project_config.repo_root)
+
         flow = getattr(project_config, 'flows__{}'.format(self.flow))
         if not flow:
             raise FlowNotFoundError('Flow not found: {}'.format(self.flow))
