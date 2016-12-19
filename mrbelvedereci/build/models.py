@@ -106,6 +106,7 @@ class Build(models.Model):
                 if build_flow.status != 'success':
                     self.log += 'Build flow {} failed\n'.format(flow)
                     self.status = build_flow.status
+                    self.time_end = datetime.now()
                     self.save()
                     return
                 else:
