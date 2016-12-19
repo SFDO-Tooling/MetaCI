@@ -43,7 +43,7 @@ def init_logger(model):
     logger = logging.getLogger('cumulusci')
 
     # Remove existing handlers
-    for handler in logger.handlers:
+    for handler in list(logger.handlers):
         logger.removeHandler(handler)
 
     # Create the custom handler
