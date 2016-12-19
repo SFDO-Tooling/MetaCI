@@ -2,8 +2,8 @@ from cumulusci.core.config import YamlGlobalConfig
 from cumulusci.core.config import YamlProjectConfig
 
 class MrbelvedereProjectConfig(YamlProjectConfig):
-    def __init__(self, global_config_obj, build_flow):
-        self.build_flow = build_flow
+    def __init__(self, global_config_obj, build):
+        self.build = build
         super(MrbelvedereProjectConfig, self).__init__(global_config_obj)
 
     @property
@@ -12,25 +12,25 @@ class MrbelvedereProjectConfig(YamlProjectConfig):
         return
     @property
     def repo_root(self):
-        return self.build_flow.build_dir
+        return self.build.build_dir
     @property
     def repo_name(self):
-        return self.build_flow.build.repo.name
+        return self.build.repo.name
     @property
     def repo_url(self):
-        return self.build_flow.build.repo.url
+        return self.build.repo.url
     @property
     def repo_owner(self):
-        return self.build_flow.build.repo.url.split('/')[-2]
+        return self.build.repo.url.split('/')[-2]
     @property
     def repo_branch(self):
-        return self.build_flow.build.branch.name
+        return self.build.branch.name
     @property
     def repo_commit(self):
-        return self.build_flow.build.commit
+        return self.build.commit
 
 class MrbelvedereGlobalConfig(YamlGlobalConfig):
     project_config_class = MrbelvedereProjectConfig
 
-    def get_project_config(self, build_flow):
-        return self.project_config_class(self, build_flow)
+    def get_project_config(self, build):
+        return self.project_config_class(self, build)

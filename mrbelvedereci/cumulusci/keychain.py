@@ -10,8 +10,8 @@ from mrbelvedereci.cumulusci.models import Service
 
 class MrbelvedereProjectKeychain(BaseProjectKeychain):
 
-    def __init__(self, project_config, key, build_flow):
-        self.build_flow = build_flow
+    def __init__(self, project_config, key, build):
+        self.build = build
         super(MrbelvedereProjectKeychain, self).__init__(project_config, key)
 
     def _load_keychain_services(self):
@@ -59,7 +59,7 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
         raise NotImplementedError('set_default_org is not supported in this keychain')
 
     def get_org(self, org_name):
-        org = Org.objects.get(repo=self.build_flow.build.repo, name=org_name)
+        org = Org.objects.get(repo=self.build.repo, name=org_name)
         org_config = json.loads(org.json)
     
         if org.scratch:
@@ -69,13 +69,13 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
 
     def set_org(self, org_name, org_config):
         try:
-            org = Org.objects.get(repo = self.build_flow.build.repo, name = org_name)
+            org = Org.objects.get(repo = self.build.repo, name = org_name)
             org.json = json.dumps(org_config.config)
         except Org.DoesNotExist:
             org = Org(
                 name = org_name,
                 json = json.dumps(org_config.config),
-                repo = self.build_flow.build.repo,
+                repo = self.build.repo,
             )
             
         org.scratch = isinstance(org_config, ScratchOrgConfig)

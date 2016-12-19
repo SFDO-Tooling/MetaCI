@@ -56,6 +56,11 @@
 {% endblock %}
 
 {% block layout_body %}
+<div class="slds-box">
+  {% autoescape off %}
+  {{ build.get_log_html }}
+  {% endautoescape %}
+</div>
 
 <h2 class="slds-text-heading--large">Flows</h2>
 {% for flow in build.flows.all %}

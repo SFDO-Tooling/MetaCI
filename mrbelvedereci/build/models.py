@@ -59,8 +59,9 @@ class Build(models.Model):
         return '{}: {} - {}'.format(self.id, self.repo, self.commit)
 
     def get_log_html(self):
-        conv = Ansi2HTMLConverter()
-        return conv.convert(self.log)
+        if self.log:
+            conv = Ansi2HTMLConverter()
+            return conv.convert(self.log)
 
     def get_absolute_url(self):
         return reverse('build_detail', kwargs={'build_id': str(self.id)})
@@ -69,63 +70,6 @@ class Build(models.Model):
         self.set_running_status()
 
         try:
-            flows = [flow.strip() for flow in self.trigger.flows.split(',')]
-            for flow in flows:
-                self.log += 'Running flow {} failed'.format(flow)
-                self.save()
-    
-                build_flow = BuildFlow(
-                    build = self,
-                    flow = flow,
-                )
-                build_flow.save()
-                build_flow.run()
-    
-                if build_flow.status != 'success':
-                    self.log += 'Build flow {} failed'.format(flow)
-                    self.status = build_flow.status
-                    self.save()
-                    return
-                else:
-                    self.log += 'Build flow {} completed successfully'.format(flow)
-                    self.save()
-    
-            self.status = 'success'
-            self.save()
-        except Exception as e:
-            self.log += unicode(e)
-            self.status = 'error'
-            self.save()
-
-    def set_running_status(self): 
-        self.status = 'running'
-        self.time_start = datetime.now()
-        if self.log is None:
-            self.log = ''
-        self.log += '-- Building commit {}\n'.format(self.commit)
-        self.save()
-
-class BuildFlow(models.Model):
-    build = models.ForeignKey('build.Build', related_name='flows')
-    status = models.CharField(max_length=16, choices=BUILD_FLOW_STATUSES, default='queued')
-    flow = models.CharField(max_length=255, null=True, blank=True)
-    log = models.TextField(null=True, blank=True)
-    time_queue = models.DateTimeField(auto_now_add=True)
-    time_start = models.DateTimeField(null=True, blank=True)
-    time_end = models.DateTimeField(null=True, blank=True) 
-    
-    def get_log_html(self):
-        conv = Ansi2HTMLConverter()
-        return conv.convert(self.log)
-
-    def run(self):
-        # Record the start
-        self.set_running_status()
-
-        try:
-            # Set up logger
-            init_logger(self)
-
             # Extract the repo to a temp build dir
             self.build_dir = self.checkout()
     
@@ -141,35 +85,62 @@ class BuildFlow(models.Model):
         except Exception as e:
             self.log += unicode(e)
             self.status = 'error'
+            self.time_end = datetime.now()
             self.save()
             return
       
+        # Run flows
         try:
-            # Run the flow
-            result = self.run_flow(project_config, org_config)
+            flows = [flow.strip() for flow in self.trigger.flows.split(',')]
+            for flow in flows:
+                self.log += 'Running flow: {}\n'.format(flow)
+                self.save()
     
-            # Record result
-            self.record_result(result)
-
+                build_flow = BuildFlow(
+                    build = self,
+                    flow = flow,
+                )
+                build_flow.save()
+                build_flow.run(project_config, org_config)
+    
+                if build_flow.status != 'success':
+                    self.log += 'Build flow {} failed\n'.format(flow)
+                    self.status = build_flow.status
+                    self.save()
+                    return
+                else:
+                    self.log += 'Build flow {} completed successfully'.format(flow)
+                    self.save()
+    
         except Exception as e:
-            flow_instance = getattr(self, 'flow_instance', None)
-            if flow_instance and flow_instance.log_file:
+            if org_config.created:
+                self.delete_org(org_config)
             self.log += unicode(e)
             self.status = 'error'
+            self.time_end = datetime.now()
             self.save()
+            return
+
+        # Set success status
+        if org_config.created:
+            self.delete_org(org_config)
+
+        self.status = 'success'
+        self.time_end = datetime.now()
+        self.save()
 
     def set_running_status(self): 
         self.status = 'running'
         self.time_start = datetime.now()
         if self.log is None:
             self.log = ''
-        self.log += '-- Running flow: {}\n'.format(self.flow)
+        self.log += '-- Building commit {}\n'.format(self.commit)
         self.save()
 
     def checkout(self):
         zip_url = '{}/archive/{}.zip'.format(
-            self.build.repo.url,
-            self.build.commit,
+            self.repo.url,
+            self.commit,
         )
         self.log += '-- Download commit from Github URL:\n     {}\n'.format(zip_url)
         self.save()
@@ -180,7 +151,7 @@ class BuildFlow(models.Model):
         zip_content = StringIO.StringIO(resp.content)
         zip_file = zipfile.ZipFile(zip_content)
         zip_file.extractall(build_dir)
-        build_dir += '/{}-{}'.format(self.build.repo.name, self.build.commit)
+        build_dir += '/{}-{}'.format(self.repo.name, self.commit)
         self.log += '-- Commit extracted to build dir:\n     {}\n'.format(build_dir)
         self.save()
         return build_dir
@@ -193,8 +164,58 @@ class BuildFlow(models.Model):
         return project_config
 
     def get_org(self, project_config):
-        org = project_config.keychain.get_org(self.build.trigger.org)
+        org = project_config.keychain.get_org(self.trigger.org)
         return org
+
+    def delete_org(self, org_config):
+        if org_config.scratch:
+            try:
+                org_config.delete_org()
+            except Exception as e:
+                self.log += e.message
+                self.save()
+
+class BuildFlow(models.Model):
+    build = models.ForeignKey('build.Build', related_name='flows')
+    status = models.CharField(max_length=16, choices=BUILD_FLOW_STATUSES, default='queued')
+    flow = models.CharField(max_length=255, null=True, blank=True)
+    log = models.TextField(null=True, blank=True)
+    time_queue = models.DateTimeField(auto_now_add=True)
+    time_start = models.DateTimeField(null=True, blank=True)
+    time_end = models.DateTimeField(null=True, blank=True) 
+    
+    def get_log_html(self):
+        if self.log:
+            conv = Ansi2HTMLConverter()
+            return conv.convert(self.log)
+
+    def run(self, project_config, org_config):
+        # Record the start
+        self.set_running_status()
+
+        # Set up logger
+        init_logger(self)
+
+        try:
+            # Run the flow
+            result = self.run_flow(project_config, org_config)
+
+            # Record result
+            self.record_result(result)
+
+        except Exception as e:
+            self.log += unicode(e)
+            self.status = 'error'
+            self.time_end = datetime.now()
+            self.save()
+
+    def set_running_status(self): 
+        self.status = 'running'
+        self.time_start = datetime.now()
+        if self.log is None:
+            self.log = ''
+        self.log += '-- Running flow: {}\n'.format(self.flow)
+        self.save()
 
     def run_flow(self, project_config, org_config):
         # Add the repo root to syspath to allow for custom tasks and flows in the repo
@@ -211,9 +232,12 @@ class BuildFlow(models.Model):
     
         # Create the flow and handle initialization exceptions
         self.flow_instance = flow_class(project_config, flow_config, org_config)
+
+        # Run the flow
         res = self.flow_instance()
     
     def record_result(self, result):
         self.status = 'success'
         self.time_end = datetime.now()
         self.save()
+
