@@ -54,6 +54,11 @@ class Trigger(models.Model):
             # Check the tag against regex
             if not re.match(self.regex, tag):
                 return run_build, commit
+   
+            if push['head_commit']:
+                # Skip... for some reason a second push event is sent that has no 'before' but does have a head_commit 
+                return run_build, commit
+
             run_build = True
             commit = push['before']
             return run_build, commit
