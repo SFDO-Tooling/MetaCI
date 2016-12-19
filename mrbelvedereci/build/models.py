@@ -21,7 +21,6 @@ from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
 from mrbelvedereci.cumulusci.logger import init_logger
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.exceptions import FlowNotFoundError
-from cumulusci.core.logger import delete_log
 from cumulusci.core.utils import import_class
 
 BUILD_STATUSES = (
@@ -155,9 +154,6 @@ class BuildFlow(models.Model):
         except Exception as e:
             flow_instance = getattr(self, 'flow_instance', None)
             if flow_instance and flow_instance.log_file:
-                self.log += open(self.flow_instance.log_file, 'r').read()
-                delete_log(self.flow_instance.log_file)
-                self.flow_instance.log_file = None
             self.log += unicode(e)
             self.status = 'error'
             self.save()
