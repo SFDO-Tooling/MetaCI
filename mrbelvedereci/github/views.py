@@ -82,11 +82,12 @@ def github_push_webhook(request):
     branch, created = Branch.objects.get_or_create(repo=repo, name=branch_name)
 
     for trigger in repo.triggers.filter(type='commit'):
-        if trigger.check_push(push):
+        run_build, commit = trigger.check_push(push)
+        if run_build:
             build = Build(
                 repo = repo,
                 trigger = trigger,
-                commit = push['after'],
+                commit = commit,
                 branch = branch,
             )
             build.save() 
