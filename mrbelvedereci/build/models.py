@@ -109,7 +109,7 @@ class Build(models.Model):
                     self.save()
                     return
                 else:
-                    self.log += 'Build flow {} completed successfully'.format(flow)
+                    self.log += 'Build flow {} completed successfully\n'.format(flow)
                     self.save()
     
         except Exception as e:
@@ -214,7 +214,6 @@ class BuildFlow(models.Model):
         self.time_start = datetime.now()
         if self.log is None:
             self.log = ''
-        self.log += '-- Running flow: {}\n'.format(self.flow)
         self.save()
 
     def run_flow(self, project_config, org_config):
