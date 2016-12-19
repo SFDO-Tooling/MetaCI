@@ -12,8 +12,13 @@ def build_list(request):
 
 def build_detail(request, build_id):
     build = get_object_or_404(Build, id = build_id)
+
+    context = {
+        'build': build,
+        'flows': build.flows.order_by('time_queue'),
+    }
     
-    return render(request, 'build/build_detail.html', context={'build': build})
+    return render(request, 'build/build_detail.html', context=context)
 
 def build_rebuild(request, build_id):
     build = get_object_or_404(Build, id = build_id)
