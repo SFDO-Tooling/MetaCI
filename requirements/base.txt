@@ -39,7 +39,7 @@ redis>=2.10.5
 celery>=4.0.0
 
 # CumulusCI
-cumulusci>=2.0.0a32
+cumulusci>=2.0.0a33
 
 # Salesforce Lightning Design System for Django
 django-slds
@@ -51,3 +51,7 @@ github3.py==0.9.6
 ansi2html==1.1.1
 
 requests[security]==2.9.1
+
+junitparser>=0.8
+
+django-mptt>=0.8.6
