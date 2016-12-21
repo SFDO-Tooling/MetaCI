@@ -18,6 +18,7 @@ class Trigger(models.Model):
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
     context = models.CharField(max_length=255)
+    active = models.BooleanField(default=True)
 
     def get_absolute_url(self):
         return reverse('trigger_detail', kwargs={'trigger_id': self.id})
