@@ -87,7 +87,7 @@ def github_push_webhook(request):
     if branch_name:
         branch, created = Branch.objects.get_or_create(repo=repo, name=branch_name)
 
-    for trigger in repo.triggers.filter(type__in=['commit', 'tag']):
+    for trigger in repo.triggers.filter(type__in=['commit', 'tag'], active=True):
         run_build, commit = trigger.check_push(push)
         if run_build:
             build = Build(
