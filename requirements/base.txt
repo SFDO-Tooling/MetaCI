@@ -55,3 +55,5 @@ requests[security]==2.9.1
 junitparser>=0.8
 
 django-mptt>=0.8.6
+
+python-dateutil>=2.6.0
