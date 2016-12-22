@@ -76,6 +76,11 @@ CELERY_BROKER_URL = REDIS_LOCATION
 CELERY_RESULTS_BACKEND = REDIS_LOCATION
 ########## END CELERY
 
+# Add the HireFire middleware for monitoring queue to scale dynos
+# See: https://hirefire.readthedocs.io/
+HIREFIRE_PROCS = ['config.procs.WorkerProc']
+HIREFIRE_TOKEN = env('HIREFIRE_TOKEN', default="localtest")
+
 # Site URL
 SITE_URL = env('SITE_URL', default="http://localhost:8000")
 

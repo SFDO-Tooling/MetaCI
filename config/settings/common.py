@@ -42,6 +42,7 @@ THIRD_PARTY_APPS = (
     'allauth.socialaccount',  # registration
     'django_slds',  # Salesforce Lightning Design System
     'django_slds_crispyforms',  # SLDS theme for crispyforms
+    'mptt', # django-mptt: tree data structures
 )
 
 # Apps specific for this project go here.
@@ -51,6 +52,7 @@ LOCAL_APPS = (
     'mrbelvedereci.github.apps.GithubConfig',
     'mrbelvedereci.cumulusci.apps.CumulusCIConfig',
     'mrbelvedereci.trigger.apps.TriggerConfig',
+    #'mrbelvedereci.testresults.apps.TestResultsConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
