@@ -63,7 +63,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for build in trigger.builds.all %}
+  {% for build in builds %}
     <tr>
       <th data-label="Build Number">
         <div class="slds-truncate" title="{{ build.id }}"><a href="/builds/{{ build.id }}">{{ build.id }}</a></div>
@@ -90,4 +90,5 @@
   {% endfor %}
   </tbody>
 </table>
+{% include 'build/build_pagination.html' %}
 {% endblock %}

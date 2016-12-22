@@ -5,9 +5,12 @@ from ansi2html import Ansi2HTMLConverter
 
 from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.tasks import run_build
+from mrbelvedereci.build.utils import paginate
+
 
 def build_list(request):
     builds = Build.objects.all()
+    builds = paginate(builds, request)
     return render(request, 'build/build_list.html', context={'builds': builds})
 
 def build_detail(request, build_id):
