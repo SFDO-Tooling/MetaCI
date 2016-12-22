@@ -40,10 +40,10 @@ def info(request, token):
         for host, tasks in reserved.items():
             count_reserved += len(tasks)
 
-    payload = {
+    payload = [{
         'quantity': count_active + count_scheduled + count_reserved,
         'name': 'worker',
-    }
+    }]
 
     payload = json.dumps(payload)
     return HttpResponse(payload, content_type='application/json')
