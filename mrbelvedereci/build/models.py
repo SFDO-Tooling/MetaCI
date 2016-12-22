@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import StringIO
+import json
 import os
 import sys
 import tempfile
@@ -19,6 +20,8 @@ from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
 from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
 from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
 from mrbelvedereci.cumulusci.logger import init_logger
+from mrbelvedereci.testresults.importer import import_test_results
+
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.utils import import_class
@@ -184,6 +187,9 @@ class BuildFlow(models.Model):
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True) 
+    tests_total = models.IntegerField(null=True, blank=True)
+    tests_pass = models.IntegerField(null=True, blank=True)
+    tests_fail = models.IntegerField(null=True, blank=True)
     
     def get_log_html(self):
         if self.log:
@@ -201,8 +207,11 @@ class BuildFlow(models.Model):
             # Run the flow
             result = self.run_flow(project_config, org_config)
 
+            # Load test results
+            self.load_test_results()
+
             # Record result
-            self.record_result(result)
+            self.record_result()
 
         except Exception as e:
             self.log += unicode(e)
@@ -236,8 +245,20 @@ class BuildFlow(models.Model):
         # Run the flow
         res = self.flow_instance()
     
-    def record_result(self, result):
+    def record_result(self):
         self.status = 'success'
         self.time_end = datetime.now()
         self.save()
 
+    def load_test_results(self):
+        if not os.path.isfile('test_results.json'):
+            return
+        
+        f = open('test_results.json', 'r')
+        results = json.load(f)
+        import_test_results(self, results)
+
+        self.tests_total = self.test_results.count()
+        self.tests_pass = self.test_results.filter(outcome = 'Pass').count()
+        self.tests_fail = self.test_results.filter(outcome__in = ['Fail','CompileFail']).count()
+        self.save()

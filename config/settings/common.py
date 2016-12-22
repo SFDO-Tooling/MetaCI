@@ -52,7 +52,7 @@ LOCAL_APPS = (
     'mrbelvedereci.github.apps.GithubConfig',
     'mrbelvedereci.cumulusci.apps.CumulusCIConfig',
     'mrbelvedereci.trigger.apps.TriggerConfig',
-    #'mrbelvedereci.testresults.apps.TestResultsConfig',
+    'mrbelvedereci.testresults.apps.TestResultsConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -261,6 +261,8 @@ if BROKER_URL == 'django://':
     CELERY_RESULT_BACKEND = 'redis://'
 else:
     CELERY_RESULT_BACKEND = BROKER_URL
+
+CELERY_ACKS_LATE = True
 ########## END CELERY
 
 # Site URL

@@ -65,7 +65,14 @@
 <h2 class="slds-text-heading--large">Flows</h2>
 {% for flow in flows %}
 <div class="slds-box">
-  <h3 class="slds-text-heading--medium">{{ flow.flow }}</h3>
+  <h3 class="slds-text-heading--medium">
+    {{ flow.flow }}
+    {% if flow.tests_total %}
+    <a href="/tests/{{ flow.build.id }}/{{ flow.flow }}">
+      Tests: {{ flow.tests_pass }} Passed, {{ flow.tests_fail }} Failed
+    </a>
+  </h3>
+  {% endif %}
 
   <div class="slds-box--body">
     {% autoescape off %}
