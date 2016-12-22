@@ -2,15 +2,21 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+
+from mrbelvedereci.build.utils import paginate
 from mrbelvedereci.trigger.models import Trigger
 from mrbelvedereci.trigger.forms import RunTriggerForm
+
 
 def trigger_list(request, trigger_id):
     return ''
 
 def trigger_detail(request, trigger_id):
     trigger = get_object_or_404(Trigger, id = trigger_id)
+    builds = trigger.builds.all()
+    builds = paginate(builds, request)
     context = {
+        'builds': builds,
         'trigger': trigger,
     } 
     return render(request, 'trigger/detail.html', context=context)
