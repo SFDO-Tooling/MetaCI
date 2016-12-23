@@ -32,5 +32,10 @@ class MrbelvedereProjectConfig(YamlProjectConfig):
 class MrbelvedereGlobalConfig(YamlGlobalConfig):
     project_config_class = MrbelvedereProjectConfig
 
+    @property
+    def config_global_local_path(self):
+        """ mrbelvedere never uses the local path """
+        return 
+
     def get_project_config(self, build):
         return self.project_config_class(self, build)
