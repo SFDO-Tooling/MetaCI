@@ -10,14 +10,20 @@ def run_build(build_id, lock_id=None):
         build = Build.objects.get(id=build_id)
         exception = None
         build.run()
-        set_github_status.apply_async((build_id,), countdown=1)
+        res_status = set_github_status.apply_async((build_id,), countdown=1)
+        build.task_id_status_end = res_status.task_id
+        build.save()
     
-    except:
+    except Exception as e:
         if lock_id:
             cache.delete(lock_id)
-        set_github_status.apply_async((build_id,), countdown=1)
-        
-        raise
+
+        res_status = set_github_status.apply_async((build_id,), countdown=1)
+        build.task_id_status_end = res_status.task_id
+        build.status = 'error'
+        build.log += '\nERROR: The build raised an exception\n'
+        build.log += unicode(e)
+        build.save()
 
     if lock_id:
         cache.delete(lock_id)
@@ -37,7 +43,8 @@ def check_queued_build(self, build_id):
 
     if org.scratch:
         # For scratch orgs, we don't need concurrency blocking logic, just run the build
-        run_build.apply_async((build.id,), countdown=1)
+        res_run = run_build.apply_async((build.id,), countdown=1)
+        build.task_id_run = res_run.task_id
     
     else:
         # For persistent orgs, use the cache to lock the org
@@ -46,10 +53,14 @@ def check_queued_build(self, build_id):
         
         if status is True:
             # Lock successful, run the build
-            run_build.apply_async((build.id,lock_id), countdown=1)
+            res_run = run_build.apply_async((build.id,lock_id), countdown=1)
+            build.task_id_run = res_run.task_id
+            build.save()
         else:
             # Failed to get lock, queue next check in 5 seconds
-            check_queued_build.apply_async((build.id,), countdown=5)
+            run_check = check_queued_build.apply_async((build.id,), countdown=5)
+            build.task_id_check = res_check.task_id
+            build.save()
 
 @shared_task
 def set_github_status(build_id):

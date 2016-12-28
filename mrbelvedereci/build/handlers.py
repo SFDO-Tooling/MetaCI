@@ -10,5 +10,13 @@ def queue_build(sender, **kwargs):
     created = kwargs['created']
     if not created:
         return
-    set_github_status.apply_async((build.id,), countdown=1)
-    check_queued_build.apply_async((build.id,), countdown=1)
+
+    # Queue the pending status task
+    res_status = set_github_status.apply_async((build.id,), countdown=1)
+    build.task_id_status_start = res_status.task_id
+
+    # Queue the check build task
+    res_check = check_queued_build.apply_async((build.id,), countdown=1)
+    build.task_id_check = res_check.task_id
+
+    build.save()

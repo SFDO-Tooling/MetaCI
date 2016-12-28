@@ -51,6 +51,10 @@ class Build(models.Model):
     log = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES, default='queued')
     current_flow_index = models.IntegerField(default=0)
+    task_id_status_start = models.CharField(max_length=64, null=True, blank=True)
+    task_id_check = models.CharField(max_length=64, null=True, blank=True)
+    task_id_run = models.CharField(max_length=64, null=True, blank=True)
+    task_id_status_end = models.CharField(max_length=64, null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True) 
@@ -244,6 +248,8 @@ class BuildFlow(models.Model):
 
         # Run the flow
         res = self.flow_instance()
+
+        return res
     
     def record_result(self):
         self.status = 'success'
