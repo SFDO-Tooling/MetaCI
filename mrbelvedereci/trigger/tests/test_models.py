@@ -52,6 +52,7 @@ class TriggerTestCase(TestCase):
     def test_check_push_commit_tag_event(self):
         push = {
             'ref': 'refs/tags/test/matches',
+            'head_commit': None,
         }
         run_build, commit = self.commit_trigger.check_push(push)
         self.assertFalse(run_build)
@@ -61,6 +62,7 @@ class TriggerTestCase(TestCase):
         push = {
             'ref': 'refs/tags/test/matches',
             'before': '0123456789',
+            'head_commit': None,
         }
         run_build, commit = self.tag_trigger.check_push(push)
         self.assertTrue(run_build)
@@ -69,6 +71,7 @@ class TriggerTestCase(TestCase):
     def test_check_push_tag_does_not_match(self):
         push = {
             'ref': 'refs/tags/no-match',
+            'head_commit': None,
         }
         run_build, commit = self.tag_trigger.check_push(push)
         self.assertFalse(run_build)
@@ -77,6 +80,7 @@ class TriggerTestCase(TestCase):
     def test_check_push_tag_commit_event(self):
         push = {
             'ref': 'refs/heads/test/matches',
+            'head_commit': None,
         }
         run_build, commit = self.tag_trigger.check_push(push)
         self.assertFalse(run_build)
