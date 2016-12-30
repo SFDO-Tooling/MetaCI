@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import StringIO
 import json
 import os
+import shutils
 import sys
 import tempfile
 import zipfile
@@ -94,6 +95,7 @@ class Build(models.Model):
             self.status = 'error'
             self.time_end = datetime.now()
             self.save()
+            self.delete_build_dir()
             return
       
         # Run flows
@@ -127,12 +129,15 @@ class Build(models.Model):
             self.status = 'error'
             self.time_end = datetime.now()
             self.save()
+            self.delete_build_dir()
             return
 
-        # Set success status
         if org_config.created:
             self.delete_org(org_config)
 
+        self.delete_build_dir()
+
+        # Set success status
         self.status = 'success'
         self.time_end = datetime.now()
         self.save()
@@ -182,6 +187,10 @@ class Build(models.Model):
             except Exception as e:
                 self.log += e.message
                 self.save()
+
+    def delete_build_dir(self):
+        if hasattr(self, 'build_dir'):
+            shutils.rmtree(self.build_dir)
 
 class BuildFlow(models.Model):
     build = models.ForeignKey('build.Build', related_name='flows')
