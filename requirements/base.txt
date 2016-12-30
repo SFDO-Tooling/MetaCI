@@ -39,7 +39,7 @@ redis>=2.10.5
 celery>=4.0.0
 
 # CumulusCI
-cumulusci>=2.0.0a38
+cumulusci>=2.0.0a39
 
 # Salesforce Lightning Design System for Django
 django-slds
