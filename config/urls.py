@@ -19,6 +19,9 @@ urlpatterns = [
     url(r'^users/', include('mrbelvedereci.users.urls', namespace='users')),
     url(r'^accounts/', include('allauth.urls')),
 
+    # django-rq
+    url(r'^django-rq/', include('django_rq.urls')),
+
     # Your stuff: custom urls includes go here
     url(r'^builds', include('mrbelvedereci.build.urls')),
     url(r'^tests', include('mrbelvedereci.testresults.urls')),

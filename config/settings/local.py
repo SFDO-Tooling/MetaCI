@@ -70,12 +70,6 @@ INSTALLED_APPS += ('django_extensions', )
 # ------------------------------------------------------------------------------
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
-########## CELERY
-REDIS_LOCATION = '{0}/{1}'.format(env('REDIS_URL', default='redis://127.0.0.1:6379'), 0)
-CELERY_BROKER_URL = REDIS_LOCATION
-CELERY_RESULTS_BACKEND = REDIS_LOCATION
-########## END CELERY
-
 # Add the HireFire middleware for monitoring queue to scale dynos
 # See: https://hirefire.readthedocs.io/
 HIREFIRE_PROCS = ['config.procs.WorkerProc']

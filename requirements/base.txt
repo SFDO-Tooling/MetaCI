@@ -36,7 +36,9 @@ pytz==2016.7
 django-redis==4.6.0
 redis>=2.10.5
 
-celery>=4.0.0
+# Django RQ
+django-rq>=0.9.4
+django-rq-wrapper>=1.4
 
 # CumulusCI
 cumulusci>=2.0.0a38

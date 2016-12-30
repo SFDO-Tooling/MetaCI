@@ -208,9 +208,7 @@ LOGGING = {
         },
     },
 }
-SENTRY_CELERY_LOGLEVEL = env.int('DJANGO_SENTRY_LOG_LEVEL', logging.INFO)
 RAVEN_CONFIG = {
-    'CELERY_LOGLEVEL': env.int('DJANGO_SENTRY_LOG_LEVEL', logging.INFO),
     'DSN': SENTRY_DSN
 }
 
@@ -221,11 +219,6 @@ HIREFIRE_TOKEN = env('HIREFIRE_TOKEN')
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL')
-
-# Configure celery to use Redis
-CELERY_BROKER_URL=REDIS_LOCATION
-CELERY_BROKER_POOL_LIMIT=0
-CELERY_RESULT_BACKEND=REDIS_LOCATION
 
 # Site URL: assumes appname.herokuapp.com
 SITE_URL = env('SITE_URL')

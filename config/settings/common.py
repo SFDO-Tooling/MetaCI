@@ -40,6 +40,8 @@ THIRD_PARTY_APPS = (
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
+    'django_rq',
+    'django_rq_wrapper',
     'django_slds',  # Salesforce Lightning Design System
     'django_slds_crispyforms',  # SLDS theme for crispyforms
     'mptt', # django-mptt: tree data structures
@@ -252,18 +254,15 @@ LOGIN_URL = 'account_login'
 # SLUGLIFIER
 AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
 
-########## CELERY
-#INSTALLED_APPS += ('mrbelvedereci.taskapp.celery.CeleryConfig',)
-# if you are not using the django database broker (e.g. rabbitmq, redis, memcached), you can remove the next line.
-#INSTALLED_APPS += ('kombu.transport.django',)
-BROKER_URL = env('CELERY_BROKER_URL', default='django://')
-if BROKER_URL == 'django://':
-    CELERY_RESULT_BACKEND = 'redis://'
-else:
-    CELERY_RESULT_BACKEND = BROKER_URL
-
-CELERY_ACKS_LATE = True
-########## END CELERY
+# django-rq
+REDIS_URL = env('REDIS_URL', default='redis://localhost:6379')
+REDIS_URL += '/0'
+RQ_QUEUES = {
+    'default': {
+        'URL': REDIS_URL,
+        'DEFAULT_TIMEOUT': 500,
+    },
+}
 
 # Site URL
 SITE_URL = None

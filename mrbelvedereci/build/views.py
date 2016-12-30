@@ -26,6 +26,6 @@ def build_detail(request, build_id):
 def build_rebuild(request, build_id):
     build = get_object_or_404(Build, id = build_id)
 
-    run_build.apply_async((build.id,), countdown=1)
+    run_build.delay(build.id)
    
     return HttpResponseRedirect('/builds/{}'.format(build.id)) 

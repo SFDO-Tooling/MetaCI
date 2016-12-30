@@ -1,25 +1,25 @@
-from celery import shared_task
+import django_rq
 from django.core.cache import cache
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.github.utils import create_status
 
-@shared_task
+@django_rq.job('default', timeout=14400)
 def run_build(build_id, lock_id=None):
     from mrbelvedereci.build.models import Build
     try:
         build = Build.objects.get(id=build_id)
         exception = None
         build.run()
-        res_status = set_github_status.apply_async((build_id,), countdown=1)
-        build.task_id_status_end = res_status.task_id
+        res_status = set_github_status.delay(build_id)
+        build.task_id_status_end = res_status.id
         build.save()
     
     except Exception as e:
         if lock_id:
             cache.delete(lock_id)
 
-        res_status = set_github_status.apply_async((build_id,), countdown=1)
-        build.task_id_status_end = res_status.task_id
+        res_status = set_github_status.delay(build_id)
+        build.task_id_status_end = res_status.id
         build.status = 'error'
         build.log += '\nERROR: The build raised an exception\n'
         build.log += unicode(e)
@@ -30,10 +30,14 @@ def run_build(build_id, lock_id=None):
 
     return build.status
 
-@shared_task(bind=True)
-def check_queued_build(self, build_id):
+@django_rq.job('default', timeout=60)
+def check_queued_build(build_id):
     from mrbelvedereci.build.models import Build
-    build = Build.objects.get(id = build_id)
+    try:
+        build = Build.objects.get(id = build_id)
+    except Build.DoesNotExist:
+        time.sleep(1)
+        check_queued_build.delay(build_id)
 
     # Check for concurrency blocking
     try:
@@ -43,8 +47,8 @@ def check_queued_build(self, build_id):
 
     if org.scratch:
         # For scratch orgs, we don't need concurrency blocking logic, just run the build
-        res_run = run_build.apply_async((build.id,), countdown=1)
-        build.task_id_run = res_run.task_id
+        res_run = run_build.delay(build.id)
+        build.task_id_run = res_run.id
     
     else:
         # For persistent orgs, use the cache to lock the org
@@ -53,17 +57,25 @@ def check_queued_build(self, build_id):
         
         if status is True:
             # Lock successful, run the build
-            res_run = run_build.apply_async((build.id,lock_id), countdown=1)
-            build.task_id_run = res_run.task_id
+            res_run = run_build.delay(build.id, lock_id)
+            build.task_id_run = res_run.id
             build.save()
         else:
-            # Failed to get lock, queue next check in 5 seconds
-            run_check = check_queued_build.apply_async((build.id,), countdown=5)
-            build.task_id_check = res_check.task_id
+            # Failed to get lock, queue next check
+            run_check = check_queued_build.delay(build.id)
+            build.task_id_check = res_check.id
             build.save()
 
-@shared_task
+@django_rq.job('default')
 def set_github_status(build_id):
     from mrbelvedereci.build.models import Build
     build = Build.objects.get(id = build_id)
     create_status(build)
+
+@django_rq.job('default')
+def check_build_tasks():
+    from mrbelvedereci.build.models import Build
+    builds = Build.objects.filter(status = 'running')
+    import pdb; pdb.set_trace()
+    for build in builds:
+        task_id = build.task_id_run

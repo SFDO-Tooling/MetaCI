@@ -12,11 +12,11 @@ def queue_build(sender, **kwargs):
         return
 
     # Queue the pending status task
-    res_status = set_github_status.apply_async((build.id,), countdown=1)
-    build.task_id_status_start = res_status.task_id
+    res_status = set_github_status.delay(build.id)
+    build.task_id_status_start = res_status.id
 
     # Queue the check build task
-    res_check = check_queued_build.apply_async((build.id,), countdown=1)
-    build.task_id_check = res_check.task_id
+    res_check = check_queued_build.delay(build.id)
+    build.task_id_check = res_check.id
 
     build.save()
