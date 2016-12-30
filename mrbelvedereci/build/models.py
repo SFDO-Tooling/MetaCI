@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import StringIO
 import json
 import os
-import shutils
+import shutil
 import sys
 import tempfile
 import zipfile
@@ -190,7 +190,7 @@ class Build(models.Model):
 
     def delete_build_dir(self):
         if hasattr(self, 'build_dir'):
-            shutils.rmtree(self.build_dir)
+            shutil.rmtree(self.build_dir)
 
 class BuildFlow(models.Model):
     build = models.ForeignKey('build.Build', related_name='flows')
