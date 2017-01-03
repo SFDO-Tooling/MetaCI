@@ -4,7 +4,14 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 
-from celery import _state
+from rq import Worker
+from rq.registry import DeferredJobRegistry
+from rq.registry import FinishedJobRegistry
+from rq.registry import StartedJobRegistry
+
+from django_rq.queues import get_connection
+from django_rq.queues import get_queue_by_index
+from django_rq.settings import QUEUES_LIST
 
 def test(request):
     """
@@ -19,29 +26,44 @@ def info(request, token):
     if token != settings.HIREFIRE_TOKEN:
         return HttpResponseForbidden('Invalid token')
 
-    app = _state.default_app
-    inspect = app.control.inspect()
+    current_tasks = 0
 
-    count_active = 0
-    active = inspect.active()
-    if active:
-        for host, tasks in active.items():
-            count_active += len(tasks)
+    queues = []
+    for index, config in enumerate(QUEUES_LIST):
 
-    count_scheduled = 0
-    scheduled = inspect.scheduled()
-    if scheduled:
-        for host, tasks in scheduled.items():
-            count_scheduled += len(tasks)
+        queue = get_queue_by_index(index)
+        connection = queue.connection
 
-    count_reserved = 0
-    reserved = inspect.reserved()
-    if reserved:
-        for host, tasks in reserved.items():
-            count_reserved += len(tasks)
+        # Only look at the default queue
+        if queue.name != 'default':
+            continue
+
+        queue_data = {
+            'name': queue.name,
+            'jobs': queue.count,
+            'index': index,
+            'connection_kwargs': connection.connection_pool.connection_kwargs
+        }
+
+        connection = get_connection(queue.name)
+        all_workers = Worker.all(connection=connection)
+        queue_workers = [worker for worker in all_workers if queue in worker.queues]
+        queue_data['workers'] = len(queue_workers)
+
+        finished_job_registry = FinishedJobRegistry(queue.name, connection)
+        started_job_registry = StartedJobRegistry(queue.name, connection)
+        deferred_job_registry = DeferredJobRegistry(queue.name, connection)
+        queue_data['finished_jobs'] = len(finished_job_registry)
+        queue_data['started_jobs'] = len(started_job_registry)
+        queue_data['deferred_jobs'] = len(deferred_job_registry)
+        
+        current_tasks += queue_data['jobs']
+        current_tasks += queue_data['started_jobs']
+
+        queues.append(queue_data)
 
     payload = [{
-        'quantity': count_active + count_scheduled + count_reserved,
+        'quantity': current_tasks,
         'name': 'worker',
     }]
 
