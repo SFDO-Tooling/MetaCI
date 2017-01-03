@@ -30,7 +30,7 @@ def run_build(build_id, lock_id=None):
 
     return build.status
 
-@django_rq.job('default', timeout=60)
+@django_rq.job('short', timeout=60)
 def check_queued_build(build_id):
     from mrbelvedereci.build.models import Build
     try:
@@ -66,13 +66,13 @@ def check_queued_build(build_id):
             build.task_id_check = res_check.id
             build.save()
 
-@django_rq.job('default')
+@django_rq.job('short')
 def set_github_status(build_id):
     from mrbelvedereci.build.models import Build
     build = Build.objects.get(id = build_id)
     create_status(build)
 
-@django_rq.job('default')
+@django_rq.job('short')
 def check_build_tasks():
     from mrbelvedereci.build.models import Build
     builds = Build.objects.filter(status = 'running')

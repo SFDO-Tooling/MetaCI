@@ -260,6 +260,10 @@ REDIS_URL += '/0'
 RQ_QUEUES = {
     'default': {
         'URL': REDIS_URL,
+        'DEFAULT_TIMEOUT': 7200,
+    },
+    'short': {
+        'URL': REDIS_URL,
         'DEFAULT_TIMEOUT': 500,
     },
 }
