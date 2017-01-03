@@ -76,6 +76,5 @@ def set_github_status(build_id):
 def check_build_tasks():
     from mrbelvedereci.build.models import Build
     builds = Build.objects.filter(status = 'running')
-    import pdb; pdb.set_trace()
     for build in builds:
         task_id = build.task_id_run
