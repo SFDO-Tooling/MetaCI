@@ -9,6 +9,7 @@ class Repository(models.Model):
     owner = models.CharField(max_length=255)
     github_id = models.IntegerField(null=True, blank=True)
     url = models.URLField(max_length=255)
+    public = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['name','owner']

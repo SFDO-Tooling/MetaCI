@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
-from mrbelvedereci.build.utils import paginate
+from mrbelvedereci.build.utils import view_queryset
 from mrbelvedereci.trigger.models import Trigger
 from mrbelvedereci.trigger.forms import RunTriggerForm
 
@@ -12,9 +12,14 @@ def trigger_list(request, trigger_id):
     return ''
 
 def trigger_detail(request, trigger_id):
-    trigger = get_object_or_404(Trigger, id = trigger_id)
-    builds = trigger.builds.all()
-    builds = paginate(builds, request)
+    query = {'id': trigger_id}
+    if not request.user.is_staff:
+        query['public'] = True
+    trigger = get_object_or_404(Trigger, **query)
+
+    query = {'trigger': trigger}
+    builds = view_queryset(request, query)
+
     context = {
         'builds': builds,
         'trigger': trigger,

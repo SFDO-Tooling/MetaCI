@@ -1,7 +1,7 @@
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.core.paginator import Paginator
-
+from mrbelvedereci.build.models import Build
 
 def paginate(build_list, request):
     page = request.GET.get('page')
@@ -15,4 +15,18 @@ def paginate(build_list, request):
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
         builds = paginator.page(paginator.num_pages)
+    return builds
+
+def view_queryset(request, query=None):
+    if not query:
+        query = {}
+
+    if not request.user.is_staff:
+        query['trigger__public'] = True
+
+    builds = Build.objects.all()
+    if query:
+        builds = builds.filter(**query)
+
+    builds = paginate(builds, request)
     return builds

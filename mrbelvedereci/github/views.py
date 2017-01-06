@@ -15,9 +15,13 @@ from mrbelvedereci.github.models import Branch
 from mrbelvedereci.github.models import Repository
 from mrbelvedereci.trigger.models import Trigger
 from mrbelvedereci.build.models import Build
+from mrbelvedereci.build.utils import view_queryset
 
 def repo_list(request, owner=None):
     repos = Repository.objects.all()
+
+    if not request.user.is_staff:
+        repos = repos.filter(public = True)
     if owner:
         repos = repos.filter(owner = owner)
 
@@ -27,23 +31,52 @@ def repo_list(request, owner=None):
     return render(request, 'github/repo_list.html', context=context)
 
 def repo_detail(request, owner, name):
-    repo = get_object_or_404(Repository, owner=owner, name=name)
+    query = {
+        'owner': owner,
+        'name': name,
+    }
+    if not request.user.is_staff:
+        query['public'] = True
+    repo = get_object_or_404(Repository, **query)
+
+    query = {'repo': repo}
+    builds = view_queryset(request, query)
     context = {
         'repo': repo,
+        'builds': builds,
     }
     return render(request, 'github/repo_detail.html', context=context)
 
 def branch_detail(request, owner, name, branch):
-    repo = get_object_or_404(Repository, owner=owner, name=name)
+    query = {
+        'owner': owner,
+        'name': name,
+    }
+    if not request.user.is_staff:
+        query['public'] = True
+    repo = get_object_or_404(Repository, **query)
+
     branch = get_object_or_404(Branch, repo=repo, name=branch)
+    query = {'branch': branch}
+    builds = view_queryset(request, query)
     context = {
         'branch': branch,
+        'builds': builds,
     }
     return render(request, 'github/branch_detail.html', context=context)
 
 def commit_detail(request, owner, name, sha):
-    repo = get_object_or_404(Repository, owner=owner, name=name)
-    builds = Build.objects.filter(repo = repo, commit = sha)
+    query = {
+        'owner': owner,
+        'name': name,
+    }
+    if not request.user.is_staff:
+        query['public'] = True
+    repo = get_object_or_404(Repository, **query)
+    
+    query = {'commit': sha, 'repo': repo}
+    builds = view_queryset(request, query)
+
     context = {
         'repo': repo,
         'builds': builds,
