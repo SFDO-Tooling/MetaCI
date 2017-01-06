@@ -3,7 +3,7 @@ from github3 import login
 
 
 def create_status(build):
-    if not build.trigger.content:
+    if not build.trigger.context:
         # skip setting Github status if the context field is empty
         return
 
