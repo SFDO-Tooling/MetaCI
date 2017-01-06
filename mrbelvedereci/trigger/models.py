@@ -12,12 +12,13 @@ TRIGGER_TYPES = (
 
 class Trigger(models.Model):
     name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
     repo = models.ForeignKey('github.Repository', related_name="triggers")
     type = models.CharField(max_length=8, choices=TRIGGER_TYPES)
     regex = models.CharField(max_length=255, null=True, blank=True)
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
-    context = models.CharField(max_length=255)
+    context = models.CharField(max_length=255, null=True, blank=True)
     active = models.BooleanField(default=True)
 
     def get_absolute_url(self):

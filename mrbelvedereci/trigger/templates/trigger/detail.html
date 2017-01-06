@@ -36,6 +36,12 @@
 {% endblock %}
 
 {% block layout_body %}
+{% if trigger.description %}
+<div class="slds-box">
+  <h3 class="slds-heading slds-heading--large">Description</h3>
+  <p>{{ trigger.description }}</p>
+</div>
+{% endif %}
 <table class="slds-table slds-table--bordered slds-table--cell-buffer">
   <thead>
     <tr class="slds-text-title--caps">

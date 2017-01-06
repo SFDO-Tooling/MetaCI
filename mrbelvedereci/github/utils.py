@@ -3,6 +3,10 @@ from github3 import login
 
 
 def create_status(build):
+    if not build.trigger.content:
+        # skip setting Github status if the context field is empty
+        return
+
     github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
     repo = github.repository(build.repo.owner, build.repo.name)
 
