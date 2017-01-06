@@ -14,6 +14,7 @@ import requests
 
 from ansi2html import Ansi2HTMLConverter
 
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
