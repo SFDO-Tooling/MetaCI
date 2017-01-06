@@ -158,7 +158,7 @@ class Build(models.Model):
         )
         self.log += '-- Download commit from Github URL:\n     {}\n'.format(zip_url)
         self.save()
-        kwargs = {'auth': [settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD]}
+        kwargs = {'auth': (settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)}
         resp = requests.get(zip_url, **kwargs)
         build_dir = tempfile.mkdtemp()
         self.log += '-- Extracting zip to temp dir:\n     {}\n'.format(build_dir)
