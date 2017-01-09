@@ -9,7 +9,7 @@
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">Status</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.repo }}">
-        {{ build.status }}
+        <div class="slds-badge {% if build.status == 'failure' or build.status == 'error' %}slds-theme--error{% elif build.status == 'success' %}slds-theme--success{% endif %}">{{ build.status }}</div>
       </p>
     </li>
     <li class="slds-page-header__detail-block">

@@ -7,9 +7,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
+from mrbelvedereci.build.views import build_list
 
 urlpatterns = [
     #url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
+    url(r'^$', build_list, name='home'),
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
 
     # Django Admin, use {% url 'admin:index' %}
@@ -27,7 +29,7 @@ urlpatterns = [
     url(r'^tests', include('mrbelvedereci.testresults.urls')),
     url(r'^triggers', include('mrbelvedereci.trigger.urls')),
     url(r'^hirefire/', include('mrbelvedereci.hirefire.urls')),
-    url(r'^', include('mrbelvedereci.github.urls')),
+    url(r'^repo', include('mrbelvedereci.github.urls')),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

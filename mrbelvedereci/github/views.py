@@ -47,6 +47,34 @@ def repo_detail(request, owner, name):
     }
     return render(request, 'github/repo_detail.html', context=context)
 
+def repo_branches(request, owner, name):
+    query = {
+        'owner': owner,
+        'name': name,
+    }
+    if not request.user.is_staff:
+        query['public'] = True
+    repo = get_object_or_404(Repository, **query)
+
+    context = {
+        'repo': repo,
+    }
+    return render(request, 'github/repo_branches.html', context=context)
+
+def repo_triggers(request, owner, name):
+    query = {
+        'owner': owner,
+        'name': name,
+    }
+    if not request.user.is_staff:
+        query['public'] = True
+    repo = get_object_or_404(Repository, **query)
+
+    context = {
+        'repo': repo,
+    }
+    return render(request, 'github/repo_triggers.html', context=context)
+
 def branch_detail(request, owner, name, branch):
     query = {
         'owner': owner,
