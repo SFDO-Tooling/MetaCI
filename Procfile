@@ -1,3 +1,3 @@
 web: gunicorn config.wsgi:application
-worker: python manage.py rqworkers default
-worker_short: python manage.py rqworkers short --workers 5
+worker: python manage.py rqworkers default --worker-class mrbelvedere.build.worker.RequeueingWorker
+worker_short: python manage.py rqworkers short --workers 5 --worker-class mrbelvedere.build.worker.RequeueingWorker
