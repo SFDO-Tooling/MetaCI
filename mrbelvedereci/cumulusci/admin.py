@@ -4,7 +4,7 @@ from mrbelvedereci.cumulusci.models import Service
 
 class OrgAdmin(admin.ModelAdmin):
     list_display = ('name','repo','scratch')
-    list_filter = ('repo','scratch')
+    list_filter = ('name', 'scratch', 'repo')
 admin.site.register(Org, OrgAdmin)
 
 class ServiceAdmin(admin.ModelAdmin):
