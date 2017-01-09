@@ -8,6 +8,9 @@ class Org(models.Model):
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey('github.Repository', related_name='orgs')
 
+    class Meta:
+        ordering = ['name', 'repo__owner', 'repo__name']
+
     def __unicode__(self):
         return '{}: {}'.format(self.repo.name, self.name)
 

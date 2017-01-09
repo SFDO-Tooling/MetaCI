@@ -22,6 +22,9 @@ class Trigger(models.Model):
     public = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
 
+    class Meta:
+        ordering = ['name','repo__owner','repo__name', 'active', 'context']
+
     def get_absolute_url(self):
         return reverse('trigger_detail', kwargs={'trigger_id': self.id})
 
