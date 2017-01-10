@@ -44,7 +44,6 @@ THIRD_PARTY_APPS = (
     'django_rq_wrapper',
     'django_slds',  # Salesforce Lightning Design System
     'django_slds_crispyforms',  # SLDS theme for crispyforms
-    'mptt', # django-mptt: tree data structures
 )
 
 # Apps specific for this project go here.

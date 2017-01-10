@@ -5,8 +5,6 @@ from collections import OrderedDict
 from django.db import models
 from django import forms
 from mrbelvedereci.testresults.choices import OUTCOME_CHOICES
-from mptt.models import MPTTModel
-from mptt.models import TreeForeignKey
 
 class TestClass(models.Model):
     name = models.CharField(max_length=255, db_index=True)
@@ -265,9 +263,9 @@ class TestResult(models.Model):
 
         self.save()
         
-class TestCodeUnit(MPTTModel):
+class TestCodeUnit(models.Model):
     testresult = models.ForeignKey(TestResult, related_name='codeunits')
-    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
     unit = models.TextField(db_index=True)
     unit_type = models.CharField(max_length=255, db_index=True)
     duration = models.FloatField(null=True, blank=True, db_index=True)
