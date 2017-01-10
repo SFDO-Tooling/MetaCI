@@ -40,7 +40,7 @@ THIRD_PARTY_APPS = (
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
-    #'allauth.socialaccount.providers.github', # github
+    'allauth.socialaccount.providers.github', # github
     'django_rq',
     'django_rq_wrapper',
     'django_slds',  # Salesforce Lightning Design System
