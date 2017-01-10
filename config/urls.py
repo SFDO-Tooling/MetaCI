@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
 from mrbelvedereci.build.views import build_list
+from mrbelvedereci.github.views import github_push_webhook
 
 urlpatterns = [
     #url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
@@ -30,6 +31,8 @@ urlpatterns = [
     url(r'^triggers', include('mrbelvedereci.trigger.urls')),
     url(r'^hirefire/', include('mrbelvedereci.hirefire.urls')),
     url(r'^repo', include('mrbelvedereci.github.urls')),
+    url(r'^webhook/github/push$', github_push_webhook, name="github_push_webhook"),
+
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
