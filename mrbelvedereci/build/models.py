@@ -77,7 +77,6 @@ class Build(models.Model):
 
     def run(self):
         self.set_running_status()
-        import pdb; pdb.set_trace()
 
         try:
             # Extract the repo to a temp build dir
