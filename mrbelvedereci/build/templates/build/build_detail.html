@@ -57,14 +57,14 @@
 
 {% block layout_body %}
 <div class="slds-box">
-{% if flow.build.status == 'pending' %}
+{% if flow.build.status == 'queued' %}
   <h3 class="slds-text-heading--medium">Waiting for a worker</h3>
-  <p>The build is currently queued and will start as soon as a worker is available</p>
+  <p>The build is currently queued and will start as soon as a worker is available.</p>
+  <p>If the build is running against a persistent org and another build is running against the org, this build will stay queued until the org becomes available.</p>
 {% else %}
   {% autoescape off %}
   {{ build.get_log_html }}
   {% endautoescape %}
-{% endif %}
 </div>
 
 <h2 class="slds-text-heading--large">Flows</h2>
@@ -86,4 +86,6 @@
   </div>
 </div>  
 {% endfor %}
+
+{% endif %}
 {% endblock %}
