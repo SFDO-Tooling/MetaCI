@@ -46,7 +46,7 @@
 {% endblock %}
 
 {% block layout_header_buttons %}
-      <a href="/plan/{{ plan.id }}/run">
+      <a href="{{ plan.get_absolute_url }}/run">
         <button class="slds-button slds-button--neutral slds-button--last">
           Run
         </button>
