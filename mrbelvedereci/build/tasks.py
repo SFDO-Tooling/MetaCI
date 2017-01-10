@@ -1,7 +1,7 @@
 import django_rq
 from django.core.cache import cache
 from mrbelvedereci.cumulusci.models import Org
-from mrbelvedereci.github.utils import create_status
+from mrbelvedereci.repository.utils import create_status
 
 @django_rq.job('default', timeout=14400)
 def run_build(build_id, lock_id=None):
@@ -41,7 +41,7 @@ def check_queued_build(build_id):
 
     # Check for concurrency blocking
     try:
-        org = Org.objects.get(name = build.trigger.org, repo = build.repo)
+        org = Org.objects.get(name = build.plan.org, repo = build.repo)
     except Org.DoesNotExist:
         return
 

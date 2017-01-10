@@ -40,6 +40,7 @@ THIRD_PARTY_APPS = (
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
+    #'allauth.socialaccount.providers.github', # github
     'django_rq',
     'django_rq_wrapper',
     'django_slds',  # Salesforce Lightning Design System
@@ -50,9 +51,9 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'mrbelvedereci.users.apps.UsersConfig',
     'mrbelvedereci.build.apps.BuildConfig',
-    'mrbelvedereci.github.apps.GithubConfig',
     'mrbelvedereci.cumulusci.apps.CumulusCIConfig',
-    'mrbelvedereci.trigger.apps.TriggerConfig',
+    'mrbelvedereci.plan.apps.PlanConfig',
+    'mrbelvedereci.repository.apps.RepositoryConfig',
     'mrbelvedereci.testresults.apps.TestResultsConfig',
 )
 
@@ -283,6 +284,3 @@ GITHUB_WEBHOOK_SECRET = None
 CONNECTED_APP_CLIENT_ID = None
 CONNECTED_APP_CLIENT_SECRET = None
 CONNECTED_APP_CALLBACK_URL = None
-
-# CumulusCI Services
-CUMULUSCI_SERVICE_github = env('CUMULUSCI_SERVICE_github', default='')

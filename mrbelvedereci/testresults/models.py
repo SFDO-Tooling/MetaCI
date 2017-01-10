@@ -8,7 +8,7 @@ from mrbelvedereci.testresults.choices import OUTCOME_CHOICES
 
 class TestClass(models.Model):
     name = models.CharField(max_length=255, db_index=True)
-    repo = models.ForeignKey('github.Repository', related_name='testclasses')
+    repo = models.ForeignKey('repository.Repository', related_name='testclasses')
     
     class Meta:
         verbose_name = 'Test Class'

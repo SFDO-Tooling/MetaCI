@@ -6,7 +6,7 @@ class Org(models.Model):
     name = models.CharField(max_length=255)
     json = models.TextField()
     scratch = models.BooleanField(default=False)
-    repo = models.ForeignKey('github.Repository', related_name='orgs')
+    repo = models.ForeignKey('repository.Repository', related_name='orgs')
 
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']

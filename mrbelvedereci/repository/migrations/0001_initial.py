@@ -11,29 +11,37 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('repository', '__first__'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Org',
+            name='Branch',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
-                ('json', models.TextField()),
-                ('scratch', models.BooleanField(default=False)),
-                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='orgs', to='repository.Repository')),
+                ('deleted', models.BooleanField(default=False)),
             ],
             options={
-                'ordering': ['name', 'repo__owner', 'repo__name'],
+                'ordering': ['repo__name', 'repo__owner', 'name'],
             },
         ),
         migrations.CreateModel(
-            name='Service',
+            name='Repository',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
-                ('json', models.TextField()),
+                ('owner', models.CharField(max_length=255)),
+                ('github_id', models.IntegerField(blank=True, null=True)),
+                ('url', models.URLField(max_length=255)),
+                ('public', models.BooleanField(default=True)),
             ],
+            options={
+                'ordering': ['name', 'owner'],
+            },
+        ),
+        migrations.AddField(
+            model_name='branch',
+            name='repo',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='branches', to='repository.Repository'),
         ),
     ]

@@ -1,10 +1,18 @@
 {% extends 'layout_full.html' %}
 
-{% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
+{% block layout_parent_link %}<a href="/repo/{{ branch.repo.owner }}/{{ branch.repo.name }}">{{ branch.repo }}</a>{% endblock %}
 
-{% block layout_header_text %}Latest Builds{% endblock %}
+{% block layout_header_text %}{{ commit }}{% endblock %}
 
 {% block layout_header_details %}
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">URL</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ repo.url }}/commit/{{ commit }}">
+        <a href="{{ repo.url }}/commit/{{ commit }}" target="_blank">{{ repo.url }}/commit/{{ commit }}</a>
+      </p>
+    </li>
+  </ul>
 {% endblock %}
 
 {% block layout_body %}
@@ -21,13 +29,7 @@
         <div class="slds-truncate" title="">Plan</div>
       </th>
       <th scope="col">
-        <div class="slds-truncate" title="">Repo</div>
-      </th>
-      <th scope="col">
         <div class="slds-truncate" title="">Branch/Tag</div>
-      </th>
-      <th scope="col">
-        <div class="slds-truncate" title="">Commit</div>
       </th>
       <th scope="col">
         <div class="slds-truncate" title="">Start Date</div>
@@ -44,19 +46,13 @@
         <div class="slds-truncate" title="{{ build.id }}"><a href="/builds/{{ build.id }}">{{ build.id }}</a></div>
       </th>
       <td data-label="Status">
-        <div class="slds-truncate slds-badge {% if build.status == 'failure' or build.status == 'error' %}slds-theme--error{% elif build.status == 'success' %}slds-theme--success{% endif %}" title="{{ build.status }}"><a href="{{ build.get_absolute_url }}">{{ build.status }}</a></div>
+        <div class="slds-truncate slds-badge {% if build.status == 'failure' or build.status == 'error' %}slds-theme--error{% elif build.status == 'success' %}slds-theme--success{% endif %}" title="{{ build.status }}" title="{{ build.status }}"><a href="{{ build.get_absolute_url }}">{{ build.status }}</a></div>
       </td>
       <td data-label="Plan">
         <div class="slds-truncate" title="{{ build.plan }}">{{ build.plan }}</div>
       </td>
-      <td data-label="Repository">
-        <div class="slds-truncate" title="{{ build.repo.name }}">{{ build.repo.name }}</div>
-      </td>
       <td data-label="Branch">
         <div class="slds-truncate" title="{{ build.branch.name }}">{{ build.branch.name }}</div>
-      </td>
-      <td data-label="Commit">
-        <div class="slds-truncate" title="{{ build.commit }}">{{ build.commit }}</div>
       </td>
       <td data-label="Start Date">
         <div class="slds-truncate" title="{{ build.time_start }}">{{ build.time_start }}</div>
@@ -69,4 +65,5 @@
   </tbody>
 </table>
 {% include 'build/build_pagination.html' %}
+
 {% endblock %}

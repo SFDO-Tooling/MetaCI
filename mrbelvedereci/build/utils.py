@@ -22,7 +22,7 @@ def view_queryset(request, query=None):
         query = {}
 
     if not request.user.is_staff:
-        query['trigger__public'] = True
+        query['plan__public'] = True
 
     builds = Build.objects.all()
     if query:

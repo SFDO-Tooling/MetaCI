@@ -44,12 +44,12 @@ BUILD_FLOW_STATUSES = (
 )
 
 class Build(models.Model):
-    repo = models.ForeignKey('github.Repository', related_name='builds')
-    branch = models.ForeignKey('github.Branch', related_name='builds', null=True, blank=True)
+    repo = models.ForeignKey('repository.Repository', related_name='builds')
+    branch = models.ForeignKey('repository.Branch', related_name='builds', null=True, blank=True)
     commit = models.CharField(max_length=64)
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
-    trigger = models.ForeignKey('trigger.Trigger', related_name='builds')
+    plan = models.ForeignKey('plan.Plan', related_name='builds')
     log = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES, default='queued')
     current_flow_index = models.IntegerField(default=0)
@@ -101,7 +101,7 @@ class Build(models.Model):
       
         # Run flows
         try:
-            flows = [flow.strip() for flow in self.trigger.flows.split(',')]
+            flows = [flow.strip() for flow in self.plan.flows.split(',')]
             for flow in flows:
                 self.log += 'Running flow: {}\n'.format(flow)
                 self.save()
@@ -179,7 +179,7 @@ class Build(models.Model):
         return project_config
 
     def get_org(self, project_config):
-        org = project_config.keychain.get_org(self.trigger.org)
+        org = project_config.keychain.get_org(self.plan.org)
         return org
 
     def delete_org(self, org_config):

@@ -13,10 +13,10 @@
       </p>
     </li>
     <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Trigger">Trigger</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ build.trigger }}">
-        <a href="{{ build.trigger.get_absolute_url }}">
-          {{ build.trigger }}
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Plan">Plan</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.plan }}">
+        <a href="{{ build.plan.get_absolute_url }}">
+          {{ build.plan }}
         </a>
       </p>
     </li>
@@ -46,9 +46,9 @@
     </li>
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org">Org</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ build.trigger.org }}">
-        <a href="{{ build.repo.get_absolute_url }}/org/{{ build.trigger.org }}">
-          {{ build.trigger.org }}
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.plan.org }}">
+        <a href="{{ build.repo.get_absolute_url }}/org/{{ build.plan.org }}">
+          {{ build.plan.org }}
         </a>
       </p>
     </li>

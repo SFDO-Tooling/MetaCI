@@ -1,10 +1,18 @@
 {% extends 'layout_full.html' %}
 
-{% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
+{% block layout_parent_link %}<a href="/repo/{{ branch.repo.owner }}/{{ branch.repo.name }}">{{ branch.repo }}</a>{% endblock %}
 
-{% block layout_header_text %}Latest Builds{% endblock %}
+{% block layout_header_text %}{{ branch.name }}{% endblock %}
 
 {% block layout_header_details %}
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">URL</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ branch.repo.url }}/tree/{{ branch.name }}">
+        <a href="{{ branch.repo.url }}/tree/{{ branch.name }}" target="_blank">{{ branch.repo.url }}/tree/{{ branch.name }}</a>
+      </p>
+    </li>
+  </ul>
 {% endblock %}
 
 {% block layout_body %}
@@ -19,12 +27,6 @@
       </th>
       <th scope="col">
         <div class="slds-truncate" title="">Plan</div>
-      </th>
-      <th scope="col">
-        <div class="slds-truncate" title="">Repo</div>
-      </th>
-      <th scope="col">
-        <div class="slds-truncate" title="">Branch/Tag</div>
       </th>
       <th scope="col">
         <div class="slds-truncate" title="">Commit</div>
@@ -49,12 +51,6 @@
       <td data-label="Plan">
         <div class="slds-truncate" title="{{ build.plan }}">{{ build.plan }}</div>
       </td>
-      <td data-label="Repository">
-        <div class="slds-truncate" title="{{ build.repo.name }}">{{ build.repo.name }}</div>
-      </td>
-      <td data-label="Branch">
-        <div class="slds-truncate" title="{{ build.branch.name }}">{{ build.branch.name }}</div>
-      </td>
       <td data-label="Commit">
         <div class="slds-truncate" title="{{ build.commit }}">{{ build.commit }}</div>
       </td>
@@ -69,4 +65,5 @@
   </tbody>
 </table>
 {% include 'build/build_pagination.html' %}
+
 {% endblock %}
