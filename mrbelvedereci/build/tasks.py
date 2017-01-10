@@ -62,7 +62,7 @@ def check_queued_build(build_id):
             build.save()
         else:
             # Failed to get lock, queue next check
-            run_check = check_queued_build.delay(build.id)
+            res_check = check_queued_build.delay(build.id)
             build.task_id_check = res_check.id
             build.save()
 
