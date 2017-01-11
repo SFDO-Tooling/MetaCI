@@ -26,24 +26,38 @@
     </div>
 {% endcomment %}
     <ul class="slds-global-header__item slds-grid slds-grid--vertical-align-center">
-      <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-p-horizontal--xxx-small">
-        <a href="/" class="slds-button slds-button--icon slds-button--icon-small slds-button--icon-container slds-button--icon-x-small slds-global-header__button--icon-actions slds-m-horizontal--xx-small" aria-haspopup="true" title="Builds">
-          {% autoescape off %}
-          <svg class="slds-button__icon" aria-hidden="true">
-            <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#add"></use>
-          </svg>
-          {% endautoescape %}
-          <span class="slds-assistive-text">Builds</span>
+      <li class="slds-p-horizontal--large">
+        <a href="/">
+        <div class="slds-media">
+          <div class="slds-media__figure"> 
+            {% autoescape off %}
+            <svg class="slds-button__icon" aria-hidden="true">
+              <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#database"></use>
+            </svg>
+            {% endautoescape %}
+            <span class="slds-assistive-text">Builds</span>
+          </div>
+          <div class="slds-media__body">
+            <h3 class="slds-text-heading--medium">Builds</h3>
+          </div>
+        </div>
         </a>
       </li>
-      <li class="slds-dropdown-trigger slds-dropdown-trigger--click">
-        <a href="/repo" class="slds-button slds-button--icon slds-button--icon-container slds-button--icon-small slds-global-header__button--icon" aria-haspopup="true" title="Repositories">
-          {% autoescape off %}
-          <svg class="slds-button__icon slds-global-header__icon" aria-hidden="true">
-            <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#setup"></use>
-          </svg>
-          {% endautoescape %}
-          <span class="slds-assistive-text">Repositories</span>
+      <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-p-horizontal--large">
+        <a href="/repo">
+        <div class="slds-media">
+          <div class="slds-media__figure">
+            {% autoescape off %}
+            <svg class="slds-button__icon slds-global-header__icon" aria-hidden="true">
+              <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#setup"></use>
+            </svg>
+            {% endautoescape %}
+            <span class="slds-assistive-text">Repositories</span>
+          </div>
+          <div class="slds-media__body">
+            <h3 class="slds-text-heading--medium">Repositories</h3>
+          </div>
+        </div>
         </a>
       </li>
       {% if request.user.is_authenticated %}
@@ -57,7 +71,7 @@
           {% endautoescape %}
         </button>
       </li>
-      <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-m-left--x-small">
+      <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-m-left--large">
         <a href="{% url 'users:detail' request.user.username  %}" class="slds-button" title="person name" aria-haspopup="true">
           <span class="slds-avatar slds-avatar--circle slds-avatar--medium">
             <img src="/static/slds/assets/images/avatar2.jpg" alt="person name" />
@@ -70,6 +84,7 @@
 </header>
 
 
+<div class="slds-clearfix"></div>
 
 <div class="slds-page-header slds-p-top--x-large slds-m-top--xx-large" role="banner">
   <div class="slds-grid">
