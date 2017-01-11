@@ -1,4 +1,5 @@
 import django_rq
+import time
 from django.core.cache import cache
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.repository.utils import create_status
@@ -62,6 +63,7 @@ def check_queued_build(build_id):
             build.save()
         else:
             # Failed to get lock, queue next check
+            time.sleep(1)
             res_check = check_queued_build.delay(build.id)
             build.task_id_check = res_check.id
             build.save()
