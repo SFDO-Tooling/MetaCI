@@ -1,0 +1,15 @@
+{% extends 'layout_full.html' %}
+
+{% load watson %}
+{% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
+
+{% block layout_header_text %}Latest Builds{% endblock %}
+
+{% block layout_header_details %}
+{% endblock %}
+
+{% block layout_body %}
+
+{% search_results search_entry_list %}
+
+{% endblock %}

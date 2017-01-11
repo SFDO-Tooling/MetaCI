@@ -75,6 +75,7 @@
 <h2 class="slds-text-heading--medium">Flows</h2>
 {% for flow in flows %}
 <div class="slds-box">
+  <a name="flow-{{ flow.flow }}" />
   <h3 class="slds-text-heading--medium">
     {{ flow.flow }}
     {% if flow.tests_total %}

@@ -7,24 +7,26 @@
   <div class="slds-global-header slds-grid slds-grid--align-spread">
     <div class="slds-global-header__item">
       <div class="slds-global-header__logo">
-        <img src="/static/images/logo.jpg" alt="" />
+        <a href="/"><img src="/static/images/logo.jpg" alt="" /></a>
       </div>
     </div>
-{% comment %}
+    {% if request.user.is_staff %}
     <div class="slds-global-header__item slds-global-header__item--search">
       <div class="slds-form-element slds-lookup">
         <label class="slds-assistive-text" for="global-search-01">Search Builds</label>
+        <form action="/search">
         <div class="slds-form-element__control lookup__search-control slds-input-has-icon slds-input-has-icon--left">
           {% autoescape off %}
           <svg class="slds-input__icon" aria-hidden="true">
             <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
           </svg>
           {% endautoescape %}
-          <input type="search" id="global-search-01" class="slds-input slds-lookup__search-input" placeholder="Search Builds" />
+          <input type="search" id="global-search-01" class="slds-input slds-lookup__search-input" name="q" {% if q %}value="{{ q }}"{% else %}placeholder="Search Builds"{% endif %} />
         </div>
+        </form>
       </div>
     </div>
-{% endcomment %}
+    {% endif %}
     <ul class="slds-global-header__item slds-grid slds-grid--vertical-align-center">
       <li class="slds-p-horizontal--large">
         <a href="/">

@@ -7,12 +7,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
-from mrbelvedereci.build.views import build_list
+from mrbelvedereci.build import views as build_views
 from mrbelvedereci.repository.views import github_push_webhook
 
 urlpatterns = [
     #url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
-    url(r'^$', build_list, name='home'),
+    url(r'^$', build_views.build_list, name='home'),
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
 
     # Django Admin, use {% url 'admin:index' %}
@@ -25,8 +25,12 @@ urlpatterns = [
     # django-rq
     url(r'^django-rq/', include('django_rq.urls')),
 
+    # search
+    url(r'^search$', build_views.build_search, name='search'),
+
     # Your stuff: custom urls includes go here
     url(r'^builds', include('mrbelvedereci.build.urls')),
+    url(r'^notifications', include('mrbelvedereci.notification.urls')),
     url(r'^tests', include('mrbelvedereci.testresults.urls')),
     url(r'^plans', include('mrbelvedereci.plan.urls')),
     url(r'^hirefire/', include('mrbelvedereci.hirefire.urls')),

@@ -1,0 +1,12 @@
+{% extends 'layout_full.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block layout_header_text %}Add Repository Notification{% endblock %}
+
+{% block layout_body %}
+
+    {{ form.errors }}
+      {% crispy form form.helper %}
+
+{% endblock %}

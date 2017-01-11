@@ -206,6 +206,12 @@ class BuildFlow(models.Model):
     tests_pass = models.IntegerField(null=True, blank=True)
     tests_fail = models.IntegerField(null=True, blank=True)
     
+    def __unicode__(self):
+        return '{}: {} - {} - {}'.format(self.build.id, self.build.repo, self.build.commit, self.flow)
+
+    def get_absolute_url(self):
+        return reverse('build_detail', kwargs={'build_id': str(self.build.id)}) + '#flow-{}'.format(self.flow)
+
     def get_log_html(self):
         if self.log:
             conv = Ansi2HTMLConverter()
