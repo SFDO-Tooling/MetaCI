@@ -4,7 +4,7 @@ from django.core.cache import cache
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.repository.utils import create_status
 
-@django_rq.job('default', timeout=14400)
+@django_rq.job('default', timeout=28800)
 def run_build(build_id, lock_id=None):
     from mrbelvedereci.build.models import Build
     try:
