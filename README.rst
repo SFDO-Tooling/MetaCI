@@ -49,6 +49,8 @@ Prerequisites
 * The cumulusci python package installed and configured on your local system so you can run deploy commands against your repo locally.  See http://cumulusci.readthedocs.io/en/latest/tutorial.html for more details on setting up CumulusCI locally.
 * Optional, but highly recommended: Access to Salesforce DX.  If you configure the SFDX_CONFIG and SFDX_HUB_ORG config variables with the appropriate json you can use scratch orgs in your builds.  You'll need to configure your local environment to not use encryption when storing credentials in files so you can export the configs to mrbelvedereci.
 
+You can also fork the CumulusCI-Test repository and use that as a demo since it is already configured for CumulusCI.  
+
 Deploy to Heroku
 ----------------
 
@@ -81,6 +83,48 @@ Check the Procfile to see the commands used to run the workers on Heroku.  You c
 .. code-block:: bash
 
     python manage.py rqworkers default short --worker-class mrbelvedereci.build.worker.RequeueingWorker
+
+Configuring Repositories
+------------------------
+
+The first step is to add your repositories.  Go to https://<your_app_name>.herokuapp.com/admin and log in using the admin user you created earlier.  Go to Repository and click Add.
+
+Enter the repo name, owner name, and the url.  Currently only repositories on github.com are supported.  The github id will be automatically looked up for you so you can leave it blank.
+
+Configuring Orgs
+----------------
+
+Any org you connect to your local CumulusCI keychain can be added to mrbelvedereci as a build org.  Go to CUMULUSCI -> Orgs -> Add and give the org a name, select the repo, and paste in the results of `cumulusci2 org info <org_name>` on your local system.  Remember that org names are already namespaced by their repository so rather than package_name_feature, just call the org feature.
+
+
+Configuring Services
+--------------------
+
+For a few flows, you need to have the github service configured in CumulusCI.  On your local system, run `cumulusci12 project show_github` to get the json to load add the `github` service under Service -> Add.  If you get an error, run `cumulusci2 project connect_github` to configure the github service in your local system then run show_github again.
+
+
+Configuring Plans
+-----------------
+
+Plans are what ties together a repository, org, and CumulusCI flows.  Plans can have the following trigger types:
+
+* **Commit**: Triggered by a commit pushed to the repository where the branch name matches a regex pattern
+* **Tag**: Triggered by a tag pushed to the repository where the tag name matches a regex pattern
+* **Manual**: Never automatically triggered, but like all Triggers, can be run by any staff member against any branch manually.
+
+When you create Commit or Tag plans, the webhook should be automatically created in the repository to listen on the Github push event.  Creating the webhook requires that the GITHUB_USERNAME you used in the Heroku config for the app is an admin on the repository.
+
+Private Plans & Repositories
+----------------------------
+
+You can set Plans and Repositories and Private.  When a Plan or Repository is private, the Plan or Repository and its builds will not show up in the public view.  They will show up for any user with the `is_staff` permission.
+
+To set up user logins using Github, go to /admin and create a new Social App.  Create a new OAuth Application in your Github Settings on github.com to get the client id and secret info.  Once created, have your users go to https://<your_app_name>.herokuapp.com/accounts/github/login to login via Github.  Once they log in you can go to Users under admin and check the is_staff field for your staff users.
+
+Notifications
+-------------
+
+Coming soon...
 
 
 Email Server
