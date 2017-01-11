@@ -16,7 +16,8 @@ Deploy to Heroku
 
 Jump to it!
 
-.. _Deploy: https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+.. image:: https://www.herokucdn.com/deploy/button.svg
+   :target: https://heroku.com/deploy
 
 Settings
 --------
