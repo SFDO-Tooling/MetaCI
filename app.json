@@ -18,19 +18,19 @@
     },
     "GITHUB_USERNAME": {
       "description": "The Github username used to connect to repositories and create web hooks",
-      "value": "",
+      "value": ""
     },
     "GITHUB_PASSWORD": {
       "description": "The Github password used to connec to repositories and create web hooks.  Using an application token instead of password is recommended",
-      "value": "",
+      "value": ""
     },
     "GITHUB_WEBHOOK_BASE_URL": {
       "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
-      "value": "",
+      "value": ""
     },
     "GITHUB_WEBHOOK_SECRET": {
       "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
-      "generator": "secret",
+      "generator": "secret"
     },
     "AWS_ACCESS_KEY_ID": {
       "description": "The Access Key ID for the AWS account used for S3 storage of files and images",
@@ -63,7 +63,7 @@
     "SFDX_CONFIG": {
       "description": "The json contents of ~/.appcloud/workspace_config.json from Salesforce DX.  Required to use scratch orgs in builds.",
       "value": "",
-      "required"
+      "required": false
     },
     "SFDX_HUB_ORG": {
       "description": "The json contents of ~/.appcloud/hubOrg.json from Salesforce DX.  Required to use scratch orgs in builds.",
@@ -79,7 +79,7 @@
     "worker": {
       "quantity": 1,
       "size": "Standard-1X"
-    }
+    },
     "worker_short": {
       "quantity": 1,
       "size": "Standard-1X"
