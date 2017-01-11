@@ -90,7 +90,6 @@
   },
   "image": "heroku/python",
   "addons": [
-    "heroku-postgres:standard-0",
     "heroku-redis:premium-2",
     "sendgrid:starter"
   ],
