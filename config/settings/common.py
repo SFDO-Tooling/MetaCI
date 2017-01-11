@@ -52,6 +52,7 @@ LOCAL_APPS = (
     'mrbelvedereci.users.apps.UsersConfig',
     'mrbelvedereci.build.apps.BuildConfig',
     'mrbelvedereci.cumulusci.apps.CumulusCIConfig',
+    'mrbelvedereci.notification.apps.NotificationConfig',
     'mrbelvedereci.plan.apps.PlanConfig',
     'mrbelvedereci.repository.apps.RepositoryConfig',
     'mrbelvedereci.testresults.apps.TestResultsConfig',

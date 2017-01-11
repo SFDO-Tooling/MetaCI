@@ -3,7 +3,75 @@
 {% block base_title %}{% endblock %}
 
 {% block base_page_header %}
-<div class="slds-page-header" role="banner">
+<header class="slds-global-header_container">
+  <div class="slds-global-header slds-grid slds-grid--align-spread">
+    <div class="slds-global-header__item">
+      <div class="slds-global-header__logo">
+        <img src="/static/images/logo.svg" alt="" />
+      </div>
+    </div>
+{% comment %}
+    <div class="slds-global-header__item slds-global-header__item--search">
+      <div class="slds-form-element slds-lookup">
+        <label class="slds-assistive-text" for="global-search-01">Search Builds</label>
+        <div class="slds-form-element__control lookup__search-control slds-input-has-icon slds-input-has-icon--left">
+          {% autoescape off %}
+          <svg class="slds-input__icon" aria-hidden="true">
+            <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
+          </svg>
+          {% endautoescape %}
+          <input type="search" id="global-search-01" class="slds-input slds-lookup__search-input" placeholder="Search Builds" />
+        </div>
+      </div>
+    </div>
+{% endcomment %}
+    <ul class="slds-global-header__item slds-grid slds-grid--vertical-align-center">
+      <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-p-horizontal--xxx-small">
+        <a href="/" class="slds-button slds-button--icon slds-button--icon-small slds-button--icon-container slds-button--icon-x-small slds-global-header__button--icon-actions slds-m-horizontal--xx-small" aria-haspopup="true" title="Builds">
+          {% autoescape off %}
+          <svg class="slds-button__icon" aria-hidden="true">
+            <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#add"></use>
+          </svg>
+          {% endautoescape %}
+          <span class="slds-assistive-text">Builds</span>
+        </a>
+      </li>
+      <li class="slds-dropdown-trigger slds-dropdown-trigger--click">
+        <a href="/repo" class="slds-button slds-button--icon slds-button--icon-container slds-button--icon-small slds-global-header__button--icon" aria-haspopup="true" title="Repositories">
+          {% autoescape off %}
+          <svg class="slds-button__icon slds-global-header__icon" aria-hidden="true">
+            <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#setup"></use>
+          </svg>
+          {% endautoescape %}
+          <span class="slds-assistive-text">Repositories</span>
+        </a>
+      </li>
+      {% if request.user.is_authenticated %}
+      <li class="slds-dropdown-trigger slds-dropdown-trigger--click">
+        <a href="notifications" class="slds-button slds-button--icon slds-button--icon-container slds-button--icon-small slds-global-header__button--icon" aria-haspopup="true" title="Notifications">
+          {% autoescape off %}
+          <svg class="slds-button__icon slds-global-header__icon" aria-hidden="true">
+            <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#notification"></use>
+          </svg>
+          <span class="slds-assistive-text">Notifications</span>
+          {% endautoescape %}
+        </button>
+      </li>
+      <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-m-left--x-small">
+        <a href="{% url 'users:detail' request.user.username  %}" class="slds-button" title="person name" aria-haspopup="true">
+          <span class="slds-avatar slds-avatar--circle slds-avatar--medium">
+            <img src="/static/slds/assets/images/avatar2.jpg" alt="person name" />
+          </span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</header>
+
+
+
+<div class="slds-page-header slds-p-top--large slds-m-top--large" role="banner">
   <div class="slds-grid">
     <div class="slds-media">
       <div class="slds-media__body">
