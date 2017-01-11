@@ -62,8 +62,8 @@ Dive right in:
 Basic Commands
 --------------
 
-Setting Up Your Users
-^^^^^^^^^^^^^^^^^^^^^
+Create Your Initial Admin Account
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
 
@@ -125,6 +125,13 @@ Notifications
 -------------
 
 Coming soon...
+
+Scaling with Hirefire.io
+------------------------
+
+Hirefire.io is a service that monitors your application and scales up/down Heroku dynos based on load.  There is an integration built in to mrbelvedereci that allows you to automatically scale down your build dynos to 0 when no builds are running and scale up to 100 dynos (configurable through Hirefire) when builds are needed.  When all jobs complete, all dynos are shut down within a minute.  Heroku only bills for the dyno seconds used.  Scaling with Hirefire can both save you money and give you a lot more concurrency for whatever your budget is and thus is highly recommended.
+
+Configure Hirefire and then run `heroku config:set HIREFIRE_TOKEN=YOUR_TOKEN`
 
 
 Email Server
