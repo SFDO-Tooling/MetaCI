@@ -11,6 +11,13 @@ A specialized CI server for building Salesforce projects using CumulusCI
 :License: BSD
 
 
+Deploy to Heroku
+----------------
+
+Jump to it!
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 Settings
 --------
 
