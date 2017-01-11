@@ -58,7 +58,7 @@
     },
     "RQ_CONCURRENCY": {
       "description": "The number of build workers to run per worker dyno.  Defaults to 1 so each worker dyno can run one build at a time.",
-      "generator": "config.settings.production"
+      "value": "1",
     },
     "SFDX_CONFIG": {
       "description": "The json contents of ~/.appcloud/workspace_config.json from Salesforce DX.  Required to use scratch orgs in builds.",
