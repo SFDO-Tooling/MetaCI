@@ -68,7 +68,7 @@
   {% if custom_sort %}
     Sorted on {{ sort }}.  <a href="/tests/{{ build_flow.build.id }}">Undo Custom Sorting</a>
   {% else %}
-    <a href="/tests/{{ build_flow.build.id }}?sort=-worst_limit_percent&columns=worst_limit,worst_limit_percent">Sort by worst percent used</a>
+    <a href="/tests/{{ build_flow.build.id }}/{{ build_flow.flow }}?sort=-worst_limit_percent&columns=worst_limit,worst_limit_percent">Sort by worst percent used</a>
   {% endif %}
 
       {% for class_results in results_by_class %}
