@@ -13,7 +13,7 @@ A specialized lightweight CI server for building Salesforce projects from Github
 What is This?
 -------------
 
-`mrbelvedereci` started as an extension of the .. CumulusCI 2.0: https://github.com/SalesforceFoundation/CumulusCI/tree/feature/2.0 project.  After spending almost a year trying to find a cloud hosted CI service that could handle our needs for Salesforce managed package builds, the crazy idea was born: why not just write our own CI server specific to our needs?
+`mrbelvedereci` started as an extension of the CumulusCI 2 (https://github.com/SalesforceFoundation/CumulusCI/tree/feature/2.0) project.  After spending almost a year trying to find a cloud hosted CI service that could handle our needs for Salesforce managed package builds, the crazy idea was born: why not just write our own CI server specific to our needs?
 
 A few key things to point out that made this compelling:
 
