@@ -61,7 +61,7 @@
         </a>
       </li>
       {% if request.user.is_authenticated %}
-      <li class="slds-dropdown-trigger slds-dropdown-trigger--click">
+      <li>
         <a href="notifications" class="slds-button slds-button--icon slds-button--icon-container slds-button--icon-small slds-global-header__button--icon" aria-haspopup="true" title="Notifications">
           {% autoescape off %}
           <svg class="slds-button__icon slds-global-header__icon" aria-hidden="true">
@@ -71,11 +71,46 @@
           {% endautoescape %}
         </button>
       </li>
-      <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-m-left--large">
+      <li class="slds-m-left--large">
         <a href="{% url 'users:detail' request.user.username  %}" class="slds-button" title="person name" aria-haspopup="true">
           <span class="slds-avatar slds-avatar--circle slds-avatar--medium">
             <img src="/static/slds/assets/images/avatar2.jpg" alt="person name" />
           </span>
+        </a>
+      </li>
+      <li class="slds-m-left--large">
+        <a href="/accounts/logout">
+        <div class="slds-media">
+          <div class="slds-media__figure"> 
+            {% autoescape off %}
+            <svg class="slds-button__icon" aria-hidden="true">
+              <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#logout"></use>
+            </svg>
+            {% endautoescape %}
+            <span class="slds-assistive-text">Log Out</span>
+          </div>
+          <div class="slds-media__body">
+            <h3 class="slds-text-heading--medium">Log Out</h3>
+          </div>
+        </div>
+        </a>
+      </li>
+      {% else %}
+      <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-m-left--large">
+        <a href="/accounts/github/login">
+        <div class="slds-media">
+          <div class="slds-media__figure"> 
+            {% autoescape off %}
+            <svg class="slds-button__icon" aria-hidden="true">
+              <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#groups"></use>
+            </svg>
+            {% endautoescape %}
+            <span class="slds-assistive-text">Log In</span>
+          </div>
+          <div class="slds-media__body">
+            <h3 class="slds-text-heading--medium">Log In</h3>
+          </div>
+        </div>
         </a>
       </li>
       {% endif %}
