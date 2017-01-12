@@ -230,6 +230,7 @@ ADMIN_URL = env('DJANGO_ADMIN_URL')
 
 # Site URL: assumes appname.herokuapp.com
 SITE_URL = env('SITE_URL')
+FROM_EMAIL = env('FROM_EMAIL')
 
 # Github credentials
 GITHUB_USERNAME = env('GITHUB_USERNAME')

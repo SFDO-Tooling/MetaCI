@@ -75,6 +75,10 @@ class Build(models.Model):
     def get_absolute_url(self):
         return reverse('build_detail', kwargs={'build_id': str(self.id)})
 
+    def get_external_url(self):
+        url = '{}{}'.format(settings.SITE_URL, self.get_absolute_url())
+        return url
+
     def run(self):
         self.set_running_status()
 

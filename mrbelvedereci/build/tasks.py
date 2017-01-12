@@ -3,6 +3,7 @@ import time
 from django.core.cache import cache
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.repository.utils import create_status
+from mrbelvedereci.build.signals import build_complete
 
 @django_rq.job('default', timeout=28800)
 def run_build(build_id, lock_id=None):
@@ -14,6 +15,8 @@ def run_build(build_id, lock_id=None):
         res_status = set_github_status.delay(build_id)
         build.task_id_status_end = res_status.id
         build.save()
+
+        build_complete.send(sender=build.__class__, build=build, status=build.status)
     
     except Exception as e:
         if lock_id:
@@ -25,6 +28,8 @@ def run_build(build_id, lock_id=None):
         build.log += '\nERROR: The build raised an exception\n'
         build.log += unicode(e)
         build.save()
+
+        build_complete.send(sender=build.__class__, build=build, status=build.status)
 
     if lock_id:
         cache.delete(lock_id)

@@ -100,7 +100,6 @@ EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.s
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
 ADMINS = (
-    ("""Jason Lantz""", 'jlantz@salesforce.com'),
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
@@ -272,6 +271,7 @@ RQ_QUEUES = {
 
 # Site URL
 SITE_URL = None
+FROM_EMAIL = 'test@mailinator.com'
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'

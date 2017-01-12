@@ -29,7 +29,7 @@ def create_status(build):
     response = repo.create_status(
         sha=build.commit,
         state=state,
-        target_url='{}{}'.format(settings.SITE_URL, build.get_absolute_url()),
+        target_url=build.get_external_url(),
         description=description,
         context=build.plan.context,
     )
