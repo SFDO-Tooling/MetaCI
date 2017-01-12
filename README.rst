@@ -40,7 +40,7 @@ So, what does this thing actually do?
 * Each build Plan that has a value in its `context` field gets its own Github Commit Status set for Pending, InProgress, Success, and Fail/Error status.
 * Support for private Repositories and Plans which hide builds from non-staff users
 * Github OAuth login
-* User configurable build notifications (coming soon)
+* User configurable email notifications.  Notifications can be set up for success, fail, and error status on repositories, branches, and plans.
 
 Prerequisites
 -------------
@@ -124,7 +124,7 @@ To set up user logins using Github, go to /admin and create a new Social App.  C
 Notifications
 -------------
 
-Coming soon...
+Click the bell icon at the top to view the My Notifications page (/notifications) where you can view and add your notifications.
 
 Scaling with Hirefire.io
 ------------------------
