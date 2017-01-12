@@ -21,7 +21,7 @@
             <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
           </svg>
           {% endautoescape %}
-          <input type="search" id="global-search-01" class="slds-input slds-lookup__search-input" name="q" {% if q %}value="{{ q }}"{% else %}placeholder="Search Builds"{% endif %} />
+          <input type="search" id="global-search-01" class="slds-input slds-lookup__search-input" name="q" {% if query %}value="{{ query }}"{% else %}placeholder="Search Builds"{% endif %} />
         </div>
         </form>
       </div>
