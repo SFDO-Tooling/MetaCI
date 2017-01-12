@@ -5,6 +5,14 @@
   "logo": "https://avatars.githubusercontent.com/u/5545431?v=3&s=100",
   "keywords": ["ci", "python", "django", "salesforce", "github"],
   "env": {
+    "SITE_URL": {
+      "description": "The base url to the site.  Typically this should be https://<your_app>.herokuapp.com",
+      "value": ""
+    },
+    "FROM_EMAIL": {
+      "description": "The email address outbound mail should be sent from",
+      "value": ""
+    },
     "CONNECTED_APP_CLIENT_ID": {
       "description": "The Client ID of the Salesforce Connected App.  You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
       "value": ""
