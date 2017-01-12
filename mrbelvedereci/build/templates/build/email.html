@@ -303,7 +303,8 @@
                             </tr>
                           </tbody>
                         </table>
-                        <p>{{ log_lines }}</p>
+                        <p><b>Last 25 Log Lines</b></p>
+                        {{ log_lines|linebreaks }}
                       </td>
                     </tr>
                   </table>
