@@ -2,6 +2,7 @@ import django_rq
 import time
 from django.conf import settings
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.template.loader import get_template
 from django.template import Context
 from mrbelvedereci.users.models import User
