@@ -29,7 +29,7 @@ class Plan(models.Model):
         return reverse('plan_detail', kwargs={'plan_id': self.id})
 
     def __unicode__(self):
-        return unicode(self.name)
+        return u'[{}] {}'.format(self.repo.name, self.name)
 
     def check_push(self, push):
         run_build = False

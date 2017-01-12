@@ -32,4 +32,4 @@ class Branch(models.Model):
         return reverse('branch_detail', kwargs={'owner': self.repo.owner, 'name': self.repo.name, 'branch': self.name})
 
     def __unicode__(self):
-        return unicode(self.name)
+        return u'[{}] {}'.format(self.repo.name, self.name)
