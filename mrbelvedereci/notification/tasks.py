@@ -69,6 +69,6 @@ def send_notification_message(build_id, user_id):
 
     subject = '[{}] Build #{} of {} - {}'.format(build.repo.name, build.id, build.branch.name, build.status.upper())
     message = template_txt.render(Context(context))
-    html_message_html = template_html.render(Context(context))
+    html_message = template_html.render(Context(context))
 
     return send_mail(subject, message, settings.FROM_EMAIL, [user.email], html_message=html_message)
