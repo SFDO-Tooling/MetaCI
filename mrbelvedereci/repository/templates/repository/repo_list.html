@@ -7,11 +7,22 @@
 
 <div class="slds-box">
   <div class="slds-box--body">
-    <ul>
+    <table class="slds-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Builds</th>
+        </tr>
+      </thead>
+      <tbody>
 {% for repo in repos %}
-      <li><a href="/repo/{{ repo.owner }}/{{ repo.name }}">{{ repo }}</a></li>
+        <tr>
+          <td><a href="/repo/{{ repo.owner }}/{{ repo.name }}">{{ repo }}</a></td>
+          <td>{{ repo.builds.count }}</td>
+        </tr>
 {% endfor %}
-    </ul>
+      </tbody>
+    </table>
   </div>
 </div>  
 {% endblock %}

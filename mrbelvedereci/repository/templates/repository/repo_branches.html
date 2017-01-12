@@ -37,7 +37,7 @@
       {% for branch in repo.branches.all %}
         <tr>
           <th data-label="Branch">
-            <div class="slds-truncate" title="{{ branch }}"><a href="{{ branch.get_absolute_url }}">{{ branch }}</a></div>
+            <div class="slds-truncate" title="{{ branch.name }}"><a href="{{ branch.get_absolute_url }}">{{ branch.name }}</a></div>
           </th>
         </tr>
       {% endfor %}
