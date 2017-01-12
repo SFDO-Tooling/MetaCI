@@ -59,15 +59,16 @@ def send_notification_message(build_id, user_id):
         log_lines = build.log.split('\n')
     log_lines = '\n'.join(log_lines[-25:])
 
-    t = get_template('build/email.html')
+    template_txt = get_template('build/email.txt')
+    template_html = get_template('build/email.html')
 
     context = {
         'build': build,
         'log_lines': log_lines,
     }
 
-
     subject = '[{}] Build #{} of {} - {}'.format(build.repo.name, build.id, build.branch.name, build.status.upper())
-    message = t.render(Context(context))
+    message = template_txt.render(Context(context))
+    html_message_html = template_html.render(Context(context))
 
-    return send_mail(subject, message, settings.FROM_EMAIL, [user.email])
+    return send_mail(subject, message, settings.FROM_EMAIL, [user.email], html_message=html_message)

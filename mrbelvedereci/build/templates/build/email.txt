@@ -1,0 +1,10 @@
+[{{ build.repo.name }}] Build #{{ build.id }} {{ build.status }}
+
+Build #{{ build.id }} completed{% if build.status == 'success' %} successfully{% elif build.status == 'fail' %} with test failures{% elif build.status == 'error' %} with errors{% endif %}.
+The build of commit {{ build.commit }} on {{ build.branch }} completed {% if build.status == 'success' %} successfully{% elif build.status == 'fail' %} with test failures{% elif build.status == 'error' %} with errors{% endif %}.
+
+View the Build:
+{{ build_url }}
+
+Last 25 Log Lines:
+{{ log_lines }}
