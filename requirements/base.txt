@@ -41,7 +41,7 @@ django-rq>=0.9.4
 django-rq-wrapper>=1.4
 
 # CumulusCI
-cumulusci>=2.0.0b2
+cumulusci>=2.0.0b3
 
 # Salesforce Lightning Design System for Django
 django-slds
