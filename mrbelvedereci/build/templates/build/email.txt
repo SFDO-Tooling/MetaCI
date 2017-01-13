@@ -4,7 +4,7 @@ Build #{{ build.id }} completed{% if build.status == 'success' %} successfully{%
 The build of commit {{ build.commit }} on {{ build.branch }} completed {% if build.status == 'success' %} successfully{% elif build.status == 'fail' %} with test failures{% elif build.status == 'error' %} with errors{% endif %}.
 
 View the Build:
-{{ build.get_full_url }}
+{{ build.get_external_url }}
 
 Last 25 Log Lines:
 {{ log_lines }}
