@@ -48,6 +48,9 @@ class Plan(models.Model):
 
             run_build = True
             commit = push['after']
+            if commit == '0000000000000000000000000000000000000000':
+                run_build = False
+                commit = None
             return run_build, commit
 
         # Handle tag events
