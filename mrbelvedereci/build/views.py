@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from ansi2html import Ansi2HTMLConverter
 
@@ -24,6 +25,13 @@ def build_detail(request, build_id):
 
 def build_rebuild(request, build_id):
     build = get_object_or_404(Build, id = build_id)
+
+    if not request.user.is_staff:
+        return HttpResponseForbidden('You are not authorized to rebuild builds')
+    
+    build.status = 'queued',
+    build.log += '\n=== Build restarted at {} by {} ===\n'.format(datetime.now(), request.user.username)
+    build.save()
 
     run_build.delay(build.id)
    

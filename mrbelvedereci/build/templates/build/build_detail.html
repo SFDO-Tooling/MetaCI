@@ -4,6 +4,18 @@
 
 {% block layout_header_text %}Build #{{ build.id }}{% endblock %}
 
+{% block layout_header_buttons %}
+{% if request.user.is_staff and build.status != 'success' %}
+<div class="slds-button-group" role="group">
+  <a href="{{ build.get_absolute_url }}/rebuild">
+    <button class="slds-button slds-button--neutral">
+      Rebuild
+    </button>
+  </a>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block layout_header_details %}
   <ul class="slds-grid slds-page-header__detail-row">
     <li class="slds-page-header__detail-block">
