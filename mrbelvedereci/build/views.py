@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from ansi2html import Ansi2HTMLConverter
 
 from mrbelvedereci.build.models import Build
+from mrbelvedereci.build.models import Rebuild
 from mrbelvedereci.build.tasks import run_build
 from mrbelvedereci.build.utils import view_queryset
 from watson import search as watson
@@ -29,13 +30,18 @@ def build_rebuild(request, build_id):
 
     if not request.user.is_staff:
         return HttpResponseForbidden('You are not authorized to rebuild builds')
+
+    rebuild = Rebuild(
+        build = build,
+        user = request.user,
+    )
+    rebuild.save()
     
     build.status = 'queued'
     build.log += '\n=== Build restarted at {} by {} ===\n'.format(timezone.now(), request.user.username)
+    build.current_rebuild = rebuild
     build.save()
 
-    run_build.delay(build.id)
-   
     return HttpResponseRedirect('/builds/{}'.format(build.id)) 
 
 def build_search(request):

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import BuildFlow
+from mrbelvedereci.build.models import Rebuild
 
 class BuildAdmin(admin.ModelAdmin):
     list_display = ('repo', 'plan', 'branch', 'commit', 'status', 'time_queue', 'time_start', 'time_end')
@@ -11,3 +12,8 @@ class BuildFlowAdmin(admin.ModelAdmin):
     list_display = ('build', 'status', 'time_queue', 'time_start', 'time_end')
     list_filter = ('build__repo', 'build')
 admin.site.register(BuildFlow, BuildFlowAdmin)
+
+class RebuildAdmin(admin.ModelAdmin):
+    list_display = ('build', 'user', 'status', 'time_queue', 'time_start', 'time_end')
+    list_filter = ('build__repo', 'build')
+admin.site.register(Rebuild, RebuildAdmin)

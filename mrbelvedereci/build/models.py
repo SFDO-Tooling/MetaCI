@@ -52,11 +52,11 @@ class Build(models.Model):
     plan = models.ForeignKey('plan.Plan', related_name='builds')
     log = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES, default='queued')
-    current_flow_index = models.IntegerField(default=0)
     task_id_status_start = models.CharField(max_length=64, null=True, blank=True)
     task_id_check = models.CharField(max_length=64, null=True, blank=True)
     task_id_run = models.CharField(max_length=64, null=True, blank=True)
     task_id_status_end = models.CharField(max_length=64, null=True, blank=True)
+    current_rebuild = models.ForeignKey('build.Rebuild', related_name='current_builds', null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True) 
@@ -101,6 +101,10 @@ class Build(models.Model):
             self.time_end = timezone.now()
             self.save()
             self.delete_build_dir()
+            if self.current_rebuild:
+                self.current_rebuild.status = self.status
+                self.current_rebuild.time_end = timezone.now()
+                self.current_rebuild.save()
             return
       
         # Run flows
@@ -112,6 +116,7 @@ class Build(models.Model):
     
                 build_flow = BuildFlow(
                     build = self,
+                    rebuild = self.current_rebuild,
                     flow = flow,
                 )
                 build_flow.save()
@@ -122,6 +127,10 @@ class Build(models.Model):
                     self.status = build_flow.status
                     self.time_end = timezone.now()
                     self.save()
+                    if self.current_rebuild:
+                        self.current_rebuild.status = self.status
+                        self.current_rebuild.time_end = timezone.now()
+                        self.current_rebuild.save()
                     return
                 else:
                     self.log += 'Build flow {} completed successfully\n'.format(flow)
@@ -135,6 +144,10 @@ class Build(models.Model):
             self.time_end = timezone.now()
             self.save()
             self.delete_build_dir()
+            if self.current_rebuild:
+                self.current_rebuild.status = self.status
+                self.current_rebuild.time_end = timezone.now()
+                self.current_rebuild.save()
             return
 
         if org_config.created:
@@ -146,6 +159,10 @@ class Build(models.Model):
         self.status = 'success'
         self.time_end = timezone.now()
         self.save()
+        if self.current_rebuild:
+            self.current_rebuild.status = self.status
+            self.current_rebuild.time_end = timezone.now()
+            self.current_rebuild.save()
 
     def set_running_status(self): 
         self.status = 'running'
@@ -154,6 +171,10 @@ class Build(models.Model):
             self.log = ''
         self.log += '-- Building commit {}\n'.format(self.commit)
         self.save()
+        if self.current_rebuild:
+            self.current_rebuild.status = self.status
+            self.current_rebuild.time_start = timezone.now()
+            self.current_rebuild.save()
 
     def checkout(self):
         zip_url = '{}/archive/{}.zip'.format(
@@ -200,6 +221,7 @@ class Build(models.Model):
 
 class BuildFlow(models.Model):
     build = models.ForeignKey('build.Build', related_name='flows')
+    rebuild = models.ForeignKey('build.Rebuild', related_name='flows', null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_FLOW_STATUSES, default='queued')
     flow = models.CharField(max_length=255, null=True, blank=True)
     log = models.TextField(null=True, blank=True)
@@ -289,3 +311,11 @@ class BuildFlow(models.Model):
         self.tests_pass = self.test_results.filter(outcome = 'Pass').count()
         self.tests_fail = self.test_results.filter(outcome__in = ['Fail','CompileFail']).count()
         self.save()
+
+class Rebuild(models.Model):
+    build = models.ForeignKey('build.Build', related_name='rebuilds')
+    user = models.ForeignKey('users.User', related_name='rebuilds')
+    status = models.CharField(max_length=16, choices=BUILD_STATUSES)
+    time_queue = models.DateTimeField(auto_now_add=True)
+    time_start = models.DateTimeField(null=True, blank=True)
+    time_end = models.DateTimeField(null=True, blank=True) 
