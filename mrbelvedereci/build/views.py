@@ -30,7 +30,7 @@ def build_rebuild(request, build_id):
     if not request.user.is_staff:
         return HttpResponseForbidden('You are not authorized to rebuild builds')
     
-    build.status = 'queued',
+    build.status = 'queued'
     build.log += '\n=== Build restarted at {} by {} ===\n'.format(datetime.now(), request.user.username)
     build.save()
 
