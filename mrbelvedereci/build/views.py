@@ -1,4 +1,4 @@
-from datetime import datetime
+from django.utils import timezone
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseForbidden
@@ -31,7 +31,7 @@ def build_rebuild(request, build_id):
         return HttpResponseForbidden('You are not authorized to rebuild builds')
     
     build.status = 'queued'
-    build.log += '\n=== Build restarted at {} by {} ===\n'.format(datetime.now(), request.user.username)
+    build.log += '\n=== Build restarted at {} by {} ===\n'.format(timezone.now(), request.user.username)
     build.save()
 
     run_build.delay(build.id)

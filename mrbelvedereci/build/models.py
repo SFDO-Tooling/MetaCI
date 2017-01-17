@@ -8,7 +8,7 @@ import sys
 import tempfile
 import zipfile
 
-from datetime import datetime
+from django.utils import timezone
 
 import requests
 
@@ -98,7 +98,7 @@ class Build(models.Model):
         except Exception as e:
             self.log += unicode(e)
             self.status = 'error'
-            self.time_end = datetime.now()
+            self.time_end = timezone.now()
             self.save()
             self.delete_build_dir()
             return
@@ -120,7 +120,7 @@ class Build(models.Model):
                 if build_flow.status != 'success':
                     self.log += 'Build flow {} failed\n'.format(flow)
                     self.status = build_flow.status
-                    self.time_end = datetime.now()
+                    self.time_end = timezone.now()
                     self.save()
                     return
                 else:
@@ -132,7 +132,7 @@ class Build(models.Model):
                 self.delete_org(org_config)
             self.log += unicode(e)
             self.status = 'error'
-            self.time_end = datetime.now()
+            self.time_end = timezone.now()
             self.save()
             self.delete_build_dir()
             return
@@ -144,12 +144,12 @@ class Build(models.Model):
 
         # Set success status
         self.status = 'success'
-        self.time_end = datetime.now()
+        self.time_end = timezone.now()
         self.save()
 
     def set_running_status(self): 
         self.status = 'running'
-        self.time_start = datetime.now()
+        self.time_start = timezone.now()
         if self.log is None:
             self.log = ''
         self.log += '-- Building commit {}\n'.format(self.commit)
@@ -241,12 +241,12 @@ class BuildFlow(models.Model):
         except Exception as e:
             self.log += unicode(e)
             self.status = 'error'
-            self.time_end = datetime.now()
+            self.time_end = timezone.now()
             self.save()
 
     def set_running_status(self): 
         self.status = 'running'
-        self.time_start = datetime.now()
+        self.time_start = timezone.now()
         if self.log is None:
             self.log = ''
         self.save()
@@ -274,7 +274,7 @@ class BuildFlow(models.Model):
     
     def record_result(self):
         self.status = 'success'
-        self.time_end = datetime.now()
+        self.time_end = timezone.now()
         self.save()
 
     def load_test_results(self):
