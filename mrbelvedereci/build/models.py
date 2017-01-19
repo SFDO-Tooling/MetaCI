@@ -217,7 +217,9 @@ class Build(models.Model):
 
     def delete_build_dir(self):
         if hasattr(self, 'build_dir'):
+            self.log += 'Deleting build dir {}'.format(self.build_dir)
             shutil.rmtree(self.build_dir)
+            self.save()
 
 class BuildFlow(models.Model):
     build = models.ForeignKey('build.Build', related_name='flows')
