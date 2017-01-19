@@ -55,6 +55,7 @@ def check_queued_build(build_id):
         # For scratch orgs, we don't need concurrency blocking logic, just run the build
         res_run = run_build.delay(build.id)
         build.task_id_run = res_run.id
+        build.save()
     
     else:
         # For persistent orgs, use the cache to lock the org
