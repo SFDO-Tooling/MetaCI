@@ -56,6 +56,7 @@ def check_queued_build(build_id):
         res_run = run_build.delay(build.id)
         build.task_id_run = res_run.id
         build.save()
+        return "Org is a scratch org, running build concurrently as task {}".format(res_run.id)
     
     else:
         # For persistent orgs, use the cache to lock the org
@@ -67,12 +68,14 @@ def check_queued_build(build_id):
             res_run = run_build.delay(build.id, lock_id)
             build.task_id_run = res_run.id
             build.save()
+            return "Got a lock on the org, running as task {}".format(res_run.id)
         else:
             # Failed to get lock, queue next check
             time.sleep(1)
             res_check = check_queued_build.delay(build.id)
             build.task_id_check = res_check.id
             build.save()
+            return "Failed to get lock on org.  {} has the org locked.  Queueing next check.".format(cache.get(lock_id))
 
 @django_rq.job('short')
 def set_github_status(build_id):
