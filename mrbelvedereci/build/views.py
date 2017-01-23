@@ -38,6 +38,9 @@ def build_rebuild(request, build_id):
     rebuild.save()
     
     build.status = 'queued'
+    if not build.log:
+        build.log = ''
+    
     build.log += '\n=== Build restarted at {} by {} ===\n'.format(timezone.now(), request.user.username)
     build.current_rebuild = rebuild
     build.save()
