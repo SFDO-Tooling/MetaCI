@@ -127,6 +127,8 @@ class Build(models.Model):
                     self.status = build_flow.status
                     self.time_end = timezone.now()
                     self.save()
+                    if org_config.created:
+                        self.delete_org(org_config)
                     if self.current_rebuild:
                         self.current_rebuild.status = self.status
                         self.current_rebuild.time_end = timezone.now()
