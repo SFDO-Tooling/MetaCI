@@ -7,7 +7,9 @@ from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.repository.utils import create_status
 from mrbelvedereci.build.signals import build_complete
 
-@django_rq.job('default', timeout=28800)
+BUILD_TIMEOUT=28800
+
+@django_rq.job('default', timeout=BUILD_TIMEOUT)
 def run_build(build_id, lock_id=None):
     from mrbelvedereci.build.models import Build
     try:
@@ -74,7 +76,7 @@ def check_queued_build(build_id):
     else:
         # For persistent orgs, use the cache to lock the org
         lock_id = 'mrbelvedereci-org-lock-{}'.format(org.id)
-        status = cache.add(lock_id, 'build-{}'.format(build_id))
+        status = cache.add(lock_id, 'build-{}'.format(build_id), timeout=BUILD_TIMEOUT)
         
         if status is True:
             # Lock successful, run the build
