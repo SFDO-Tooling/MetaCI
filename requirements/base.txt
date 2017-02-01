@@ -39,9 +39,10 @@ redis>=2.10.5
 # Django RQ
 django-rq>=0.9.4
 django-rq-wrapper>=1.4
+django-rq-scheduler>=1.0.1
 
 # CumulusCI
-cumulusci>=2.0.0b10
+cumulusci>=2.0.0b11
 
 # Salesforce Lightning Design System for Django
 django-slds
