@@ -18,10 +18,10 @@
         <div class="slds-truncate" title="">Status</div>
       </th>
       <th scope="col">
-        <div class="slds-truncate" title="">Plan</div>
+        <div class="slds-truncate" title="">Repo</div>
       </th>
       <th scope="col">
-        <div class="slds-truncate" title="">Repo</div>
+        <div class="slds-truncate" title="">Plan</div>
       </th>
       <th scope="col">
         <div class="slds-truncate" title="">Branch/Tag</div>
@@ -46,11 +46,11 @@
       <td data-label="Status">
         <div class="slds-truncate slds-badge {% if build.status == 'failure' or build.status == 'error' %}slds-theme--error{% elif build.status == 'success' %}slds-theme--success{% endif %}" title="{{ build.status }}"><a href="{{ build.get_absolute_url }}">{{ build.status }}</a></div>
       </td>
-      <td data-label="Plan">
-        <div class="slds-truncate" title="{{ build.plan }}">{{ build.plan }}</div>
-      </td>
       <td data-label="Repository">
         <div class="slds-truncate" title="{{ build.repo.name }}">{{ build.repo.name }}</div>
+      </td>
+      <td data-label="Plan">
+        <div class="slds-truncate" title="{{ build.plan.name }}">{{ build.plan.name }}</div>
       </td>
       <td data-label="Branch">
         <div class="slds-truncate" title="{{ build.branch.name }}">{{ build.branch.name }}</div>
