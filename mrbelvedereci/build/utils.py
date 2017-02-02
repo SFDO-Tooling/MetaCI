@@ -28,5 +28,9 @@ def view_queryset(request, query=None):
     if query:
         builds = builds.filter(**query)
 
+    order_by = request.GET.get('order_by', '-time_queue')
+    order_by = order_by.split(',')
+    builds = builds.order_by(*order_by)
+
     builds = paginate(builds, request)
     return builds
