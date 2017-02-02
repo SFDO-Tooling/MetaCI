@@ -113,3 +113,20 @@ def check_build_tasks():
     builds = Build.objects.filter(status = 'running')
     for build in builds:
         task_id = build.task_id_run
+
+@django_rq.job('short')
+def delete_scratch_orgs():
+    from mrbelvedereci.cumulusci.models import ScratchOrgInstance
+    orgs_deleted = 0
+    orgs_failed = 0
+    for org in ScratchOrgInstance.objects.filter(delete_error__isnull = False):
+        org.delete_org()
+        if org.deleted:
+            orgs_deleted += 1
+        else:
+            orgs_failed += 1
+
+    if orgs_deleted and not orgs_failed:
+        return 'No orgs found to delete'
+
+    return 'Deleted {} orgs and failed to delete {} orgs'.format(orgs_deleted, orgs_failed)

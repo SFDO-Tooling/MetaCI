@@ -1,0 +1,5 @@
+{
+    "EnableTokenEncryption": false,
+    "ApiVersion": "38.0",
+    "SfdcLoginUrl" : "https://gs0.salesforce.com"
+}

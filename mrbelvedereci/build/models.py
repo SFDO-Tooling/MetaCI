@@ -225,11 +225,7 @@ class Build(models.Model):
         self.logger = init_logger(self)
         if org_config.scratch:
             try:
-                org_config.delete_org()
-                if self.org_instance:
-                    self.org_instance.deleted = True
-                    self.org_instance.time_deleted = timezone.now() 
-                    self.org_instance.save()
+                self.org_instance.delete_org(org_config)
             except Exception as e:
                 self.logger.error(e.message)
                 self.save()

@@ -103,6 +103,7 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
         # Create a ScratchOrgInstance to store the org info
         instance = ScratchOrgInstance(
             org = org_config.org,
+            build = self.build,
             sf_org_id = info['org_id'],
             username = info['username'],
             json_dx = dx_json,
