@@ -86,11 +86,20 @@ def check_queued_build(build_id):
             return "Got a lock on the org, running as task {}".format(res_run.id)
         else:
             # Failed to get lock, queue next check
-            time.sleep(1)
-            res_check = check_queued_build.delay(build.id)
-            build.task_id_check = res_check.id
-            build.save()
             return "Failed to get lock on org.  {} has the org locked.  Queueing next check.".format(cache.get(lock_id))
+
+@django_rq.job('short', timeout=60)
+def check_queued_builds():
+    from mrbelvedereci.build.models import Build
+    builds = []
+    for build in Build.objects.filter(status = 'queued').order_by('time_queue'):
+        builds.append(build.id)
+        check_queued_build.delay(build.id)
+
+    if builds:
+        return 'Checked queued builds: {}'.format(', '.join(builds))
+    else:
+        return 'No queued builds to check'
 
 @django_rq.job('short')
 def set_github_status(build_id):

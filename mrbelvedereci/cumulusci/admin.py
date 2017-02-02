@@ -1,5 +1,6 @@
 from django.contrib import admin
 from mrbelvedereci.cumulusci.models import Org
+from mrbelvedereci.cumulusci.models import ScratchOrgInstance
 from mrbelvedereci.cumulusci.models import Service
 
 class OrgAdmin(admin.ModelAdmin):
@@ -10,3 +11,8 @@ admin.site.register(Org, OrgAdmin)
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ('name',)
 admin.site.register(Service, ServiceAdmin)
+
+class ScratchOrgInstanceAdmin(admin.ModelAdmin):
+    list_display = ('org', 'sf_org_id', 'username', 'deleted', 'time_created', 'time_deleted')
+    list_filter = ('deleted', 'org')
+admin.site.register(ScratchOrgInstance, ScratchOrgInstanceAdmin)

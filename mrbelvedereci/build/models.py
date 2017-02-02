@@ -50,6 +50,8 @@ class Build(models.Model):
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     plan = models.ForeignKey('plan.Plan', related_name='builds')
+    org = models.ForeignKey('cumulusci.Org', related_name='builds', null=True, blank=True)
+    org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance', related_name='builds', null=True, blank=True)
     log = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES, default='queued')
     task_id_status_start = models.CharField(max_length=64, null=True, blank=True)
@@ -80,6 +82,7 @@ class Build(models.Model):
         return url
 
     def run(self):
+        self.logger = init_logger(self)
         self.set_running_status()
 
         try:
@@ -94,9 +97,13 @@ class Build(models.Model):
     
             # Look up the org
             org_config = self.get_org(project_config)
+
+            # Save a reference to the org on the build
+            self.org = org_config.org
+            self.save()
     
         except Exception as e:
-            self.log += unicode(e)
+            self.logger.error(unicode(e))
             self.status = 'error'
             self.time_end = timezone.now()
             self.save()
@@ -111,7 +118,8 @@ class Build(models.Model):
         try:
             flows = [flow.strip() for flow in self.plan.flows.split(',')]
             for flow in flows:
-                self.log += 'Running flow: {}\n'.format(flow)
+                self.logger = init_logger(self)
+                self.logger.info('Running flow: {}'.format(flow))
                 self.save()
     
                 build_flow = BuildFlow(
@@ -123,7 +131,8 @@ class Build(models.Model):
                 build_flow.run(project_config, org_config)
     
                 if build_flow.status != 'success':
-                    self.log += 'Build flow {} failed\n'.format(flow)
+                    self.logger = init_logger(self)
+                    self.logger.error('Build flow {} failed'.format(flow))
                     self.status = build_flow.status
                     self.time_end = timezone.now()
                     self.save()
@@ -135,13 +144,15 @@ class Build(models.Model):
                         self.current_rebuild.save()
                     return
                 else:
-                    self.log += 'Build flow {} completed successfully\n'.format(flow)
+                    self.logger = init_logger(self)
+                    self.logger.info('Build flow {} completed successfully'.format(flow))
                     self.save()
     
         except Exception as e:
             if org_config.created:
                 self.delete_org(org_config)
-            self.log += unicode(e)
+            self.logger = init_logger(self)
+            self.logger.error(unicode(e))
             self.status = 'error'
             self.time_end = timezone.now()
             self.save()
@@ -169,9 +180,7 @@ class Build(models.Model):
     def set_running_status(self): 
         self.status = 'running'
         self.time_start = timezone.now()
-        if self.log is None:
-            self.log = ''
-        self.log += '-- Building commit {}\n'.format(self.commit)
+        self.logger.info('-- Building commit {}'.format(self.commit))
         self.save()
         if self.current_rebuild:
             self.current_rebuild.status = self.status
@@ -183,18 +192,18 @@ class Build(models.Model):
             self.repo.url,
             self.commit,
         )
-        self.log += '-- Download commit from Github URL:\n     {}\n'.format(zip_url)
+        self.logger.info('-- Download commit from URL: {}'.format(zip_url))
         self.save()
         kwargs = {'auth': (settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)}
         resp = requests.get(zip_url, **kwargs)
         build_dir = tempfile.mkdtemp()
-        self.log += '-- Extracting zip to temp dir:\n     {}\n'.format(build_dir)
+        self.logger.info('-- Extracting zip to temp dir {}'.format(build_dir))
         self.save()
         zip_content = StringIO.StringIO(resp.content)
         zip_file = zipfile.ZipFile(zip_content)
         zip_file.extractall(build_dir)
         build_dir += '/{}-{}'.format(self.repo.name, self.commit)
-        self.log += '-- Commit extracted to build dir:\n     {}\n'.format(build_dir)
+        self.logger.info('-- Commit extracted to build dir: {}'.format(build_dir))
         self.save()
         return build_dir
 
@@ -206,20 +215,28 @@ class Build(models.Model):
         return project_config
 
     def get_org(self, project_config):
-        org = project_config.keychain.get_org(self.plan.org)
-        return org
+        org_config = project_config.keychain.get_org(self.plan.org)
+        self.org = org_config.org
+        self.org_instance = org_config.org_instance
+        self.save()
+        return org_config
 
     def delete_org(self, org_config):
+        self.logger = init_logger(self)
         if org_config.scratch:
             try:
                 org_config.delete_org()
+                if self.org_instance:
+                    self.org_instance.deleted = True
+                    self.org_instance.time_deleted = timezone.now() 
+                    self.org_instance.save()
             except Exception as e:
-                self.log += e.message
+                self.logger.error(e.message)
                 self.save()
 
     def delete_build_dir(self):
         if hasattr(self, 'build_dir'):
-            self.log += 'Deleting build dir {}'.format(self.build_dir)
+            self.logger.info('Deleting build dir {}'.format(self.build_dir))
             shutil.rmtree(self.build_dir)
             self.save()
 
@@ -252,7 +269,7 @@ class BuildFlow(models.Model):
         self.set_running_status()
 
         # Set up logger
-        init_logger(self)
+        self.logger = init_logger(self)
 
         try:
             # Run the flow
@@ -265,7 +282,7 @@ class BuildFlow(models.Model):
             self.record_result()
 
         except Exception as e:
-            self.log += unicode(e)
+            self.logger.error(unicode(e))
             self.status = 'error'
             self.time_end = timezone.now()
             self.save()
@@ -273,8 +290,6 @@ class BuildFlow(models.Model):
     def set_running_status(self): 
         self.status = 'running'
         self.time_start = timezone.now()
-        if self.log is None:
-            self.log = ''
         self.save()
 
     def run_flow(self, project_config, org_config):

@@ -1,11 +1,14 @@
 import json
+import os
 from cumulusci.core.keychain import BaseProjectKeychain
 from cumulusci.core.config import ConnectedAppOAuthConfig
 from cumulusci.core.config import OrgConfig
 from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import ServiceConfig
 from django.conf import settings
+from mrbelvedereci.cumulusci.logger import init_logger
 from mrbelvedereci.cumulusci.models import Org
+from mrbelvedereci.cumulusci.models import ScratchOrgInstance
 from mrbelvedereci.cumulusci.models import Service
 
 class MrbelvedereProjectKeychain(BaseProjectKeychain):
@@ -63,9 +66,51 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
         org_config = json.loads(org.json)
     
         if org.scratch:
-            return ScratchOrgConfig(org_config)
+            config = ScratchOrgConfig(org_config)
         else:
-            return OrgConfig(org_config)
+            config = OrgConfig(org_config)
+
+        # Attach the org model instance to the org config
+        config.org = org
+        config.org_instance = None
+
+        # Initialize the scratch org instance
+        if org.scratch:
+            config = self._init_scratch_org(config)
+
+        return config
+
+    def _init_scratch_org(self, org_config):
+        if not org_config.scratch:
+            # Only run against scratch orgs
+            return
+
+        # Set up the logger to output to the build.log field
+        init_logger(self.build)
+
+        # Create the scratch org and get its info
+        info = org_config.scratch_info
+
+        # Get the contents of the org's json file from Salesforce DX
+        json_path = os.path.join(os.path.expanduser('~'), '.appcloud', info['username'] + '.json')
+        with open(json_path, 'r') as json_file:
+            dx_json = json_file.read()
+
+        org_json = json.dumps(org_config.config)
+
+        # Create a ScratchOrgInstance to store the org info
+        instance = ScratchOrgInstance(
+            org = org_config.org,
+            sf_org_id = info['org_id'],
+            username = info['username'],
+            json_dx = dx_json,
+            json = org_json,
+        )
+        instance.save()
+        org_config.org_instance = instance
+
+        return org_config
+        
 
     def set_org(self, org_name, org_config):
         try:
@@ -80,4 +125,3 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
             
         org.scratch = isinstance(org_config, ScratchOrgConfig)
         org.save()
-        

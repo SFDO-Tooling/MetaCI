@@ -20,6 +20,8 @@ class LogStream(object):
         self.buffer = ''
 
     def flush(self):
+        if self.model.log is None:
+            self.model.log = u''
         self.model.log += self.buffer
         self.model.save()
         self.buffer = ''
@@ -55,3 +57,5 @@ def init_logger(model):
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
+
+    return logger
