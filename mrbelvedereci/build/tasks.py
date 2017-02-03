@@ -125,7 +125,7 @@ def delete_scratch_orgs():
     from mrbelvedereci.cumulusci.models import ScratchOrgInstance
     orgs_deleted = 0
     orgs_failed = 0
-    for org in ScratchOrgInstance.objects.filter(delete_error__isnull = False):
+    for org in ScratchOrgInstance.objects.filter(deleted = False, delete_error__isnull = False):
         org.delete_org()
         if org.deleted:
             orgs_deleted += 1
