@@ -6,6 +6,7 @@ import os
 from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.exceptions import ScratchOrgException
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 class Org(models.Model):
@@ -20,6 +21,9 @@ class Org(models.Model):
     def __unicode__(self):
         return '{}: {}'.format(self.repo.name, self.name)
 
+    def get_absolute_url(self):
+        return reverse('org_detail', kwargs={'org_id': self.id})
+    
 class ScratchOrgInstance(models.Model):
     org = models.ForeignKey('cumulusci.Org', related_name='instances')
     build = models.ForeignKey('build.Build', related_name='scratch_orgs', null=True, blank=True)
@@ -31,6 +35,16 @@ class ScratchOrgInstance(models.Model):
     json_dx = models.TextField()
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
+
+    def __unicode__(self):
+        if self.username:
+            return self.username
+        if self.sf_org_id:
+            return self.sf_org_id
+        return '{}: {}'.format(self.org, self.id)
+
+    def get_absolute_url(self):
+        return reverse('org_instance_detail', kwargs={'org_id': self.org.id, 'instance_id': self.id})
     
     def get_org_config(self):
         # Write the org json file to the filesystem for Salesforce DX to use

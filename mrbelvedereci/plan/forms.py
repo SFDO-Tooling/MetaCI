@@ -15,6 +15,7 @@ class RunPlanForm(forms.Form):
 
     branch = forms.ChoiceField(choices=(), label='Branch')
     commit = forms.CharField(required=False)
+    keep_org = forms.BooleanField(required=False)
 
     def __init__(self, plan, *args, **kwargs):
         self.plan = plan
@@ -33,6 +34,11 @@ class RunPlanForm(forms.Form):
             Fieldset(
                 'Enter the commit you want to build.  The HEAD commit on the branch will be used if you do not specify a commit',
                 Field('commit', css_class='slds-input'),
+                css_class='slds-form-element',
+            ),
+            Fieldset(
+                'Keep org? (scratch orgs only)',
+                Field('keep_org', css_class='slds-checkbox'),
                 css_class='slds-form-element',
             ),
             FormActions(
@@ -67,11 +73,14 @@ class RunPlanForm(forms.Form):
             name=self.cleaned_data['branch'],
         )
             
+        keep_org = self.cleaned_data.get('keep_org')
+
         build = Build(
             repo = self.plan.repo,
             plan = self.plan,
             branch = branch,
             commit = commit,
+            keep_org = keep_org,
         )
         build.save()
         

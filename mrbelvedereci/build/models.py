@@ -54,6 +54,7 @@ class Build(models.Model):
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance', related_name='builds', null=True, blank=True)
     log = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES, default='queued')
+    keep_org = models.BooleanField(default=False)
     task_id_status_start = models.CharField(max_length=64, null=True, blank=True)
     task_id_check = models.CharField(max_length=64, null=True, blank=True)
     task_id_run = models.CharField(max_length=64, null=True, blank=True)
@@ -223,12 +224,16 @@ class Build(models.Model):
 
     def delete_org(self, org_config):
         self.logger = init_logger(self)
-        if org_config.scratch:
-            try:
-                self.org_instance.delete_org(org_config)
-            except Exception as e:
-                self.logger.error(e.message)
-                self.save()
+        if not org_config.scratch:
+            return
+        if self.keep_org:
+            self.logger.info('Skipping scratch org deletion since keep_org was requested')
+            return
+        try:
+            self.org_instance.delete_org(org_config)
+        except Exception as e:
+            self.logger.error(e.message)
+            self.save()
 
     def delete_build_dir(self):
         if hasattr(self, 'build_dir'):

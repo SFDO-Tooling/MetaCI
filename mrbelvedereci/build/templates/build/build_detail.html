@@ -59,9 +59,17 @@
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org">Org</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.plan.org }}">
-        <a href="{{ build.repo.get_absolute_url }}/org/{{ build.plan.org }}">
-          {{ build.plan.org }}
+        {% if build.org_instance %}
+        <a href="{{ build.org_instance.get_absolute_url }}">
+          {{ build.org.name }}
         </a>
+        {% elif build.org %}
+        <a href="{{ build.org.get_absolute_url }}">
+          {{ build.org.name }}
+        </a>
+        {% else %}
+        {{ build.plan.org.name }}
+        {% endif %}
       </p>
     </li>
   </ul>

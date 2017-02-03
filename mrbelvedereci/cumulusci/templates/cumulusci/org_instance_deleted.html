@@ -1,0 +1,50 @@
+{% extends 'layout_full.html' %}
+
+{% block layout_parent_link %}<a href="/">Repos</a>{% endblock %}
+
+{% block layout_header_text %}{{ repo }}: Branches{% endblock %}
+
+{% block layout_header_details %}
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">URL</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ repo.url }}">
+        <a href="{{ repo.url }}" target="_blank">{{ repo.url }}</a>
+      </p>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block layout_body %}
+
+<div class="slds-tabs--default">
+  <ul class="slds-tabs--default__nav" role="tablist">
+    <li class="slds-tabs--default__item" title="Builds" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Latest Builds</a></li>
+    <li class="slds-tabs--default__item slds-active" title="Branches" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/branches" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Branches</a></li>
+    <li class="slds-tabs--default__item" title="Plans" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/plans" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item">Plans</a></li>
+  </ul>
+  <div id="tab-default-2" class="slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-2__item">
+
+    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+      <thead>
+        <tr class="slds-text-title--caps">
+          <th scope="col">
+            <div class="slds-truncate" title="">Name</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for branch in repo.branches.all %}
+        <tr>
+          <th data-label="Branch">
+            <div class="slds-truncate" title="{{ branch.name }}"><a href="{{ branch.get_absolute_url }}">{{ branch.name }}</a></div>
+          </th>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    
+  </div>
+</div>
+
+{% endblock %}
