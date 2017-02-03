@@ -9,8 +9,13 @@ from mrbelvedereci.build.signals import build_complete
 
 BUILD_TIMEOUT=28800
 
+def reset_database_connection():
+    from django import db
+    db.close_connection()
+
 @django_rq.job('default', timeout=BUILD_TIMEOUT)
 def run_build(build_id, lock_id=None):
+    reset_database_connection()
     from mrbelvedereci.build.models import Build
     try:
         build = Build.objects.get(id=build_id)
@@ -53,6 +58,8 @@ def run_build(build_id, lock_id=None):
 
 @django_rq.job('short', timeout=60)
 def check_queued_build(build_id):
+    reset_database_connection()
+
     from mrbelvedereci.build.models import Build
     try:
         build = Build.objects.get(id = build_id)
@@ -90,6 +97,8 @@ def check_queued_build(build_id):
 
 @django_rq.job('short', timeout=60)
 def check_queued_builds():
+    reset_database_connection()
+
     from mrbelvedereci.build.models import Build
     builds = []
     for build in Build.objects.filter(status = 'queued').order_by('time_queue'):
@@ -103,19 +112,16 @@ def check_queued_builds():
 
 @django_rq.job('short')
 def set_github_status(build_id):
+    reset_database_connection()
+
     from mrbelvedereci.build.models import Build
     build = Build.objects.get(id = build_id)
     create_status(build)
 
 @django_rq.job('short')
-def check_build_tasks():
-    from mrbelvedereci.build.models import Build
-    builds = Build.objects.filter(status = 'running')
-    for build in builds:
-        task_id = build.task_id_run
-
-@django_rq.job('short')
 def delete_scratch_orgs():
+    reset_database_connection()
+
     from mrbelvedereci.cumulusci.models import ScratchOrgInstance
     orgs_deleted = 0
     orgs_failed = 0
