@@ -2,6 +2,7 @@ import django_rq
 import os
 import requests
 import time
+from django import db
 from django.core.cache import cache
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.repository.utils import create_status
@@ -10,8 +11,7 @@ from mrbelvedereci.build.signals import build_complete
 BUILD_TIMEOUT=28800
 
 def reset_database_connection():
-    from django import db
-    db.close_connection()
+    db.connection.close()
 
 @django_rq.job('default', timeout=BUILD_TIMEOUT)
 def run_build(build_id, lock_id=None):
