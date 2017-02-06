@@ -98,10 +98,6 @@ class Build(models.Model):
     
             # Look up the org
             org_config = self.get_org(project_config)
-
-            # Save a reference to the org on the build
-            self.org = org_config.org
-            self.save()
     
         except Exception as e:
             self.logger.error(unicode(e))

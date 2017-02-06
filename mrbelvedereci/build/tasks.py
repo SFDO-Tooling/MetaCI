@@ -67,11 +67,14 @@ def check_queued_build(build_id):
         time.sleep(1)
         check_queued_build.delay(build_id)
 
+    if build.status != 'queued':
+        return 'Build is not queued.  Current build status is {}'.format(build.status)
+
     # Check for concurrency blocking
     try:
         org = Org.objects.get(name = build.plan.org, repo = build.repo)
     except Org.DoesNotExist:
-        return
+        return 'Could not find org configuration for org {}'.format(build.plan.org)
 
     if org.scratch:
         # For scratch orgs, we don't need concurrency blocking logic, just run the build
