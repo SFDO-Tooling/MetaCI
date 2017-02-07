@@ -1,5 +1,6 @@
 import django_rq
 import time
+from django import db
 from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import send_mail
@@ -11,8 +12,13 @@ from mrbelvedereci.notification.models import RepositoryNotification
 from mrbelvedereci.notification.models import BranchNotification
 from mrbelvedereci.notification.models import PlanNotification
 
+def reset_database_connection():
+    db.connection.close()
+
 @django_rq.job('short', timeout=60)
 def queue_build_notifications(build_id):
+    reset_database_connection()
+
     build = Build.objects.get(id=build_id)
 
     status_query = {}
@@ -50,6 +56,8 @@ def queue_build_notifications(build_id):
 
 @django_rq.job('short', timeout=60)
 def send_notification_message(build_id, user_id):
+    reset_database_connection()
+
     build = Build.objects.get(id=build_id)
     user = User.objects.get(id=user_id)
 
