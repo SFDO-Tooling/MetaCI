@@ -61,11 +61,7 @@ def check_queued_build(build_id):
     reset_database_connection()
 
     from mrbelvedereci.build.models import Build
-    try:
-        build = Build.objects.get(id = build_id)
-    except Build.DoesNotExist:
-        time.sleep(1)
-        check_queued_build.delay(build_id)
+    build = Build.objects.get(id = build_id)
 
     if build.status != 'queued':
         return 'Build is not queued.  Current build status is {}'.format(build.status)
@@ -74,11 +70,16 @@ def check_queued_build(build_id):
     try:
         org = Org.objects.get(name = build.plan.org, repo = build.repo)
     except Org.DoesNotExist:
+        message = 'Could not find org configuration for org {}'.format(build.plan.org)
+        build.log = message
+        build.status = 'error'
+        build.save()
         return 'Could not find org configuration for org {}'.format(build.plan.org)
 
     if org.scratch:
         # For scratch orgs, we don't need concurrency blocking logic, just run the build
         res_run = run_build.delay(build.id)
+        build.task_id_check = None
         build.task_id_run = res_run.id
         build.save()
         return "Org is a scratch org, running build concurrently as task {}".format(res_run.id)
@@ -96,6 +97,8 @@ def check_queued_build(build_id):
             return "Got a lock on the org, running as task {}".format(res_run.id)
         else:
             # Failed to get lock, queue next check
+            build.task_id_check = None
+            build.save()
             return "Failed to get lock on org.  {} has the org locked.  Queueing next check.".format(cache.get(lock_id))
 
 @django_rq.job('short', timeout=60)
@@ -104,9 +107,11 @@ def check_queued_builds():
 
     from mrbelvedereci.build.models import Build
     builds = []
-    for build in Build.objects.filter(status = 'queued').order_by('time_queue'):
+    for build in Build.objects.filter(status = 'queued', task_id_check__isnull = True).order_by('time_queue'):
         builds.append(build.id)
-        check_queued_build.delay(build.id)
+        res_check = check_queued_build.delay(build.id)
+        build.task_id_check = res_check.id
+        build.save()
 
     if builds:
         return 'Checked queued builds: {}'.format(', '.join(builds))
@@ -135,7 +140,7 @@ def delete_scratch_orgs():
         else:
             orgs_failed += 1
 
-    if orgs_deleted and not orgs_failed:
+    if not orgs_deleted and not orgs_failed:
         return 'No orgs found to delete'
 
     return 'Deleted {} orgs and failed to delete {} orgs'.format(orgs_deleted, orgs_failed)
