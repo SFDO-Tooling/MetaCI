@@ -25,6 +25,7 @@ from mrbelvedereci.cumulusci.logger import init_logger
 from mrbelvedereci.testresults.importer import import_test_results
 
 from cumulusci.core.config import FlowConfig
+from cumulusci.core.exceptions import ApexTestException
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.utils import import_class
 
