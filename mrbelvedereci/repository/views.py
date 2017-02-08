@@ -149,12 +149,13 @@ def github_push_webhook(request):
         branch, created = Branch.objects.get_or_create(repo=repo, name=branch_name)
 
     for plan in repo.plans.filter(type__in=['commit', 'tag'], active=True):
-        run_build, commit = plan.check_push(push)
+        run_build, commit, commit_message = plan.check_push(push)
         if run_build:
             build = Build(
                 repo = repo,
                 plan = plan,
                 commit = commit,
+                commit = commit_message,
                 branch = branch,
             )
             build.save() 

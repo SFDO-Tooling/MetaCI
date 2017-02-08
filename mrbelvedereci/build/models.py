@@ -48,6 +48,7 @@ class Build(models.Model):
     repo = models.ForeignKey('repository.Repository', related_name='builds')
     branch = models.ForeignKey('repository.Branch', related_name='builds', null=True, blank=True)
     commit = models.CharField(max_length=64)
+    commit_message = models.TextField(null=True, blank=True)
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     plan = models.ForeignKey('plan.Plan', related_name='builds')
