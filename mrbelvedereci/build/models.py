@@ -135,7 +135,7 @@ class Build(models.Model):
                 if build_flow.status != 'success':
                     self.logger = init_logger(self)
                     self.logger.error('Build flow {} completed with status {}'.format(flow, build_flow.status))
-                    self.logger.error('    {}: {}'.format(build_flow.exception, build_flow.message))
+                    self.logger.error('    {}: {}'.format(build_flow.exception, build_flow.error_message))
                     self.status = build_flow.status
                     self.time_end = timezone.now()
                     self.save()
