@@ -23,7 +23,7 @@ def queue_build_notifications(build_id):
 
     status_query = {}
 
-    if build.status in ['queued', 'in_progress']:
+    if build.status in ['queued', 'waiting', 'in_progress']:
         return 'Skipping, build not done yet'
     
     if build.status == 'success':

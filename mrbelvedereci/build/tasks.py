@@ -63,9 +63,6 @@ def check_queued_build(build_id):
     from mrbelvedereci.build.models import Build
     build = Build.objects.get(id = build_id)
 
-    if build.status != 'queued':
-        return 'Build is not queued.  Current build status is {}'.format(build.status)
-
     # Check for concurrency blocking
     try:
         org = Org.objects.get(name = build.plan.org, repo = build.repo)
@@ -98,23 +95,25 @@ def check_queued_build(build_id):
         else:
             # Failed to get lock, queue next check
             build.task_id_check = None
+            build.status = 'waiting'
+            build.log = 'Waiting on build #{} to complete'.format(cache.get(lock_id))
             build.save()
             return "Failed to get lock on org.  {} has the org locked.  Queueing next check.".format(cache.get(lock_id))
 
 @django_rq.job('short', timeout=60)
-def check_queued_builds():
+def check_waiting_builds():
     reset_database_connection()
 
     from mrbelvedereci.build.models import Build
     builds = []
-    for build in Build.objects.filter(status = 'queued', task_id_check__isnull = True).order_by('time_queue'):
+    for build in Build.objects.filter(status = 'waiting').order_by('time_queue'):
         builds.append(build.id)
         res_check = check_queued_build.delay(build.id)
         build.task_id_check = res_check.id
         build.save()
 
     if builds:
-        return 'Checked queued builds: {}'.format(', '.join(builds))
+        return 'Checked waiting builds: {}'.format(', '.join(builds))
     else:
         return 'No queued builds to check'
 

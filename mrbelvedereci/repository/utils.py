@@ -13,6 +13,9 @@ def create_status(build):
     if build.status == 'queued':
         state = 'pending'
         description = 'The build is queued'
+    if build.status == 'waiting':
+        state = 'pending'
+        description = 'The build is waiting for another build to complete'
     if build.status == 'running':
         state = 'pending'
         description = 'The build is running'

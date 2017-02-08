@@ -28,7 +28,7 @@
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Plan">Plan</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.plan.name }}">
         <a href="{{ build.plan.get_absolute_url }}">
-          {{ build.plan }}
+          {{ build.plan.name }}
         </a>
       </p>
     </li>
@@ -44,7 +44,7 @@
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Branch">Branch</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.branch.name }}">
         <a href="{{ build.branch.get_absolute_url }}">
-          {{ build.branch }}
+          {{ build.branch.name }}
         </a>
       </p>
     </li>

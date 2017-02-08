@@ -30,6 +30,7 @@ from cumulusci.core.utils import import_class
 
 BUILD_STATUSES = (
     ('queued', 'Queued'),
+    ('waiting', 'Waiting'),
     ('running', 'Running'),
     ('success', 'Success'),
     ('error', 'Error'),
@@ -53,6 +54,8 @@ class Build(models.Model):
     org = models.ForeignKey('cumulusci.Org', related_name='builds', null=True, blank=True)
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance', related_name='builds', null=True, blank=True)
     log = models.TextField(null=True, blank=True)
+    exception = models.TextField(null=True, blank=True)
+    error_message = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES, default='queued')
     keep_org = models.BooleanField(default=False)
     task_id_status_start = models.CharField(max_length=64, null=True, blank=True)
@@ -129,7 +132,8 @@ class Build(models.Model):
     
                 if build_flow.status != 'success':
                     self.logger = init_logger(self)
-                    self.logger.error('Build flow {} failed'.format(flow))
+                    self.logger.error('Build flow {} completed with status {}'.format(flow, build_flow.status))
+                    self.logger.error('    {}: {}'.format(build_flow.exception, build_flow.message))
                     self.status = build_flow.status
                     self.time_end = timezone.now()
                     self.save()
@@ -243,6 +247,8 @@ class BuildFlow(models.Model):
     status = models.CharField(max_length=16, choices=BUILD_FLOW_STATUSES, default='queued')
     flow = models.CharField(max_length=255, null=True, blank=True)
     log = models.TextField(null=True, blank=True)
+    exception = models.TextField(null=True, blank=True)
+    error_message = models.TextField(null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True) 
@@ -268,6 +274,7 @@ class BuildFlow(models.Model):
         # Set up logger
         self.logger = init_logger(self)
 
+        exception = None
         try:
             # Run the flow
             result = self.run_flow(project_config, org_config)
@@ -278,9 +285,18 @@ class BuildFlow(models.Model):
             # Record result
             self.record_result()
 
+        except ApexTestException as e:
+            exception = e
+            self.status = 'fail'
+
         except Exception as e:
-            self.logger.error(unicode(e))
+            exception = e
             self.status = 'error'
+
+        if exception:
+            self.logger.error(unicode(e))
+            self.exception = e.__class__.__name__
+            self.error_message = unicode(e)
             self.time_end = timezone.now()
             self.save()
 
