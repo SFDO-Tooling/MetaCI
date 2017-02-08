@@ -155,7 +155,7 @@ def github_push_webhook(request):
                 repo = repo,
                 plan = plan,
                 commit = commit,
-                commit = commit_message,
+                commit_message = commit_message,
                 branch = branch,
             )
             build.save() 
