@@ -1,5 +1,6 @@
 from django.utils import timezone
 from django.shortcuts import render
+from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
@@ -17,6 +18,10 @@ def build_list(request):
 
 def build_detail(request, build_id):
     build = get_object_or_404(Build, id = build_id)
+
+    if not request.user.is_staff and not build.plan.public:
+        if build.plan.private
+        return HttpResponseForbidden('You are not authorized to view this build')
 
     context = {
         'build': build,
