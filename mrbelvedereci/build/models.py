@@ -294,6 +294,7 @@ class BuildFlow(models.Model):
 
         except ApexTestException as e:
             exception = e
+            self.load_test_results()
             self.status = 'fail'
 
         except Exception as e:
