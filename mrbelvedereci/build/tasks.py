@@ -19,6 +19,11 @@ def run_build(build_id, lock_id=None):
     from mrbelvedereci.build.models import Build
     try:
         build = Build.objects.get(id=build_id)
+    except Build.DoesNotExist:
+        time.sleep(1)
+        build = Build.objects.get(id=build_id)
+
+    try:
         exception = None
         build.run()
         res_status = set_github_status.delay(build_id)
