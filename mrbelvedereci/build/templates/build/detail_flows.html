@@ -1,0 +1,18 @@
+{% extends 'build/detail_layout.html' %}
+
+{% block tab_content %}
+{% for flow in flows %}
+<div class="slds-box slds-m-bottom--large">
+  <a name="flow-{{ flow.flow }}"></a>
+  <h3 class="slds-text-heading--large">
+    {{ flow.flow }}
+  </h3>
+
+  <div class="slds-box--body">
+    {% autoescape off %}
+    {{ flow.get_log_html }}
+    {% endautoescape %}
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

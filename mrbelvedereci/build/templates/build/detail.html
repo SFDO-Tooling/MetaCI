@@ -1,0 +1,15 @@
+{% extends "build/detail_layout.html" %}
+{% block tab_content %}
+{% if build.status == 'fail' or build.status == 'error' %}
+<div class="slds-box slds-theme--warning slds-m-bottom--large">
+  <h3 class="slds-text-heading--large">Build Exception: {{ build.exception }}</h3>
+  <p>{{ build.error_message|linebreaks }}</p>
+</div>
+{% endif %}
+<div class="slds-box">
+  <h3 class="slds-text-heading--large">Build Log</h3>
+  {% autoescape off %}
+  {{ build.get_log_html }}
+  {% endautoescape %}
+</div>
+{% endblock %}

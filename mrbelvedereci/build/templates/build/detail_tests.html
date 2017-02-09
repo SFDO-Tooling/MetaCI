@@ -1,0 +1,29 @@
+{% extends "build/detail_layout.html" %}
+
+{% block tab_content %}
+<div class="slds-box slds-m-bottom--large {% if tests.fail %}slds-theme--warning{% else %}slds-theme--success{% endif %}">
+  <h3 class="slds-text-heading--large">{{ tests.pass }} of {{ tests.total }} tests passed{% if tests.fail %}.  {{ tests.fail }} tests failed{% endif %}</h3>
+</div>
+{% if tests.fail %}
+<div class="slds-box slds-theme--default slds-m-bottom--large">
+  <h3 class="slds-text-heading--large slds-m-bottom--medium">Failing Tests</h3>
+  <ul class="slds-list--dotted">
+  {% for test in tests.failed_tests %}
+    <li>
+      <h3 class="slds-text-heading--medium">{{ test.method.testclass }}.{{ test.method }}</h3>
+      <p>{{ test.stacktrace|linebreaks }}</p>
+      <p>{{ test.message|linebreaks }}</p>
+    </li>
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}
+<div class="slds-box">
+  <h3 class="slds-text-heading--large slds-m-bottom--medium">Detailed Test Reports</h3>
+  <ul class="slds-list--dotted">
+  {% for flow in flows %}
+    <li><a href="/tests/{{ build.id }}/{{ flow.flow }}">Full test report for flow {{ flow.flow }}</a></li>
+  {% endfor %}
+  </ul>
+</div>
+{% endblock %}

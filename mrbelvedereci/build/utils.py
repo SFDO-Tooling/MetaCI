@@ -1,7 +1,9 @@
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.core.paginator import Paginator
-from mrbelvedereci.build.models import Build
+
+from django.apps import apps
+from ansi2html import Ansi2HTMLConverter
 
 def paginate(build_list, request):
     page = request.GET.get('page')
@@ -24,6 +26,7 @@ def view_queryset(request, query=None):
     if not request.user.is_staff:
         query['plan__public'] = True
 
+    Build = apps.get_model('build', 'Build')
     builds = Build.objects.all()
     if query:
         builds = builds.filter(**query)
@@ -34,3 +37,11 @@ def view_queryset(request, query=None):
 
     builds = paginate(builds, request)
     return builds
+
+def format_log(log):
+    conv = Ansi2HTMLConverter(dark_bg=False, scheme='solarized')
+    headers = conv.produce_headers()
+    content = conv.convert(log, full=False)
+    content = '<pre class="ansi2html-content">{}</pre>'.format(content)
+    #content = '<div class="body_foreground body_background">{}</div>'.format(content)
+    return headers + content

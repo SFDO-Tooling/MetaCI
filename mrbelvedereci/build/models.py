@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import StringIO
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -12,12 +13,11 @@ from django.utils import timezone
 
 import requests
 
-from ansi2html import Ansi2HTMLConverter
-
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
+from mrbelvedereci.build.utils import format_log
 from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
 from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
 from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
@@ -78,8 +78,7 @@ class Build(models.Model):
 
     def get_log_html(self):
         if self.log:
-            conv = Ansi2HTMLConverter()
-            return conv.convert(self.log)
+            return format_log(self.log)
 
     def get_absolute_url(self):
         return reverse('build_detail', kwargs={'build_id': str(self.id)})
@@ -138,6 +137,8 @@ class Build(models.Model):
                     self.logger.error('Build flow {} completed with status {}'.format(flow, build_flow.status))
                     self.logger.error('    {}: {}'.format(build_flow.exception, build_flow.error_message))
                     self.status = build_flow.status
+                    self.exception = build_flow.exception
+                    self.error_message = build_flow.error_message
                     self.time_end = timezone.now()
                     self.save()
                     if org_config.created:
@@ -267,8 +268,7 @@ class BuildFlow(models.Model):
 
     def get_log_html(self):
         if self.log:
-            conv = Ansi2HTMLConverter()
-            return conv.convert(self.log)
+            return format_log(self.log)
 
     def run(self, project_config, org_config):
         # Record the start
@@ -301,7 +301,8 @@ class BuildFlow(models.Model):
             self.status = 'error'
 
         if exception:
-            self.logger.error(unicode(e))
+            if self.status == 'error':
+                self.logger.error(unicode(e))
             self.exception = e.__class__.__name__
             self.error_message = unicode(e)
             self.time_end = timezone.now()
@@ -354,7 +355,7 @@ class BuildFlow(models.Model):
 class Rebuild(models.Model):
     build = models.ForeignKey('build.Build', related_name='rebuilds')
     user = models.ForeignKey('users.User', related_name='rebuilds')
-    status = models.CharField(max_length=16, choices=BUILD_STATUSES)
+    status = models.CharField(max_length=16, choices=BUILD_STATUSES, default='queued')
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True) 

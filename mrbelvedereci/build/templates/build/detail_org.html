@@ -1,0 +1,48 @@
+{% extends "build/detail_layout.html" %}
+
+{% block tab_content %}
+{% if build.org_instance %}
+<div class="slds-box">
+  <div class="slds-grid">
+    <div class="slds-col slds-has-flexi-truncate">
+    <h3 class="slds-text-heading--large">Scratch Org Instance</h3>
+    </div>
+    <div class="slds-col slds-no-flex slds-align-bottom">
+      <div class="slds-button-group">
+      {% if not build.org_instance.deleted %}
+        <a class="slds-button" href="{{ build.org_instance.get_absolute_url }}/login">Log In</a>
+        <a class="slds-button" href="{{ build.org_instance.get_absolute_url }}/delete">Delete</a>
+      {% endif %}
+      </div>
+    </div>
+  </div>
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org Config">Org Config</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.org_instance.org }}"><a href="{{ build.org_instance.org.get_absolute_url }}">{{ build.org_instance.org }}</a></p>
+    </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org ID">Org Id</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.org_instance.sf_org_id }}">{{ build.org_instance.sf_org_id }}/p>
+    </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Username">Username</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.org_instance.username }}">{{ build.org_instance.username }}/p>
+    </li>
+    {% if build.org_instance.deleted %}
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Username">Deleted</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.org_instance.time_deleted }}">{{ build.org_instance.time_deleted }}/p>
+    </li>
+    {% endif %}
+  </ul>
+  {% if not build.org_instance.deleted %}
+    {% if build.org_instance.delete_error %}
+    <p>The last attempt to delete the scratch org failed with the error:</p>
+    <p>{{ build.org_instance.delete_error|linebreaks }}</p>
+    {% endif %}
+  {% endif %}
+{% elif build.org %}
+{% else %}
+{% endif %}
+{% endblock %}

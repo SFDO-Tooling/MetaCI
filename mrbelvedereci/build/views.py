@@ -16,18 +16,54 @@ def build_list(request):
     builds = view_queryset(request)
     return render(request, 'build/build_list.html', context={'builds': builds})
 
-def build_detail(request, build_id):
+def build_detail(request, build_id, tab=None):
     build = get_object_or_404(Build, id = build_id)
 
-    if not request.user.is_staff and not build.plan.public:
-        return HttpResponseForbidden('You are not authorized to view this build')
+    if not request.user.is_staff:
+        if build.plan.public:
+            return HttpResponseForbidden('You are not authorized to view this build')
+        if tab == 'org':
+            return HttpResponseForbidden("You are not authorized to view this build's org info")
 
+    if build.current_rebuild:
+        flows = build.current_rebuild.flows
+    else:
+        flows = build.flows
+    flows = flows.order_by('time_queue')
+
+    tests = {
+        'total': 0,
+        'pass': 0,
+        'fail': 0,
+        'failed_tests': [],
+    }
+
+    for flow in flows.all():
+        if flow.tests_total:
+            tests['total'] += flow.tests_total
+        if flow.tests_pass:
+            tests['pass'] += flow.tests_pass
+        if flow.tests_fail:
+            tests['fail'] += flow.tests_fail
+            tests['failed_tests'].extend(list(flow.test_results.filter(outcome__in = ['Fail','CompileFail'])))
+    
     context = {
         'build': build,
-        'flows': build.flows.order_by('time_queue'),
+        'tab': tab,
+        'flows': flows,
+        'tests': tests,
     }
-    
-    return render(request, 'build/build_detail.html', context=context)
+
+    if not tab:
+        return render(request, 'build/detail.html', context=context)
+    elif tab == 'flows':
+        return render(request, 'build/detail_flows.html', context=context)
+    elif tab == 'tests':
+        return render(request, 'build/detail_tests.html', context=context)
+    elif tab == 'rebuilds':
+        return render(request, 'build/detail_rebuilds.html', context=context)
+    elif tab == 'org':
+        return render(request, 'build/detail_org.html', context=context)
 
 def build_rebuild(request, build_id):
     build = get_object_or_404(Build, id = build_id)
