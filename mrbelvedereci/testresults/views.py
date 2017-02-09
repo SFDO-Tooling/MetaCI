@@ -1,10 +1,20 @@
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
+from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import BuildFlow
 
 def build_flow_tests(request, build_id, flow):
-    build_flow = get_object_or_404(BuildFlow, build_id=build_id, flow=flow)
+    build = get_object_or_404(Build, id=build_id)
+
+    if not build.plan.public and not request.user.is_staff:
+        raise Http404()
+    query = {'build_id': build_id, 'flow': flow}
+    if build.current_rebuild:
+        query['rebuild_id'] = build.current_rebuild
+
+    build_flow = get_object_or_404(BuildFlow, **query)
     data = {'build_flow': build_flow}
 
     last_class = None
