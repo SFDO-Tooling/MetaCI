@@ -20,7 +20,6 @@ def build_detail(request, build_id):
     build = get_object_or_404(Build, id = build_id)
 
     if not request.user.is_staff and not build.plan.public:
-        if build.plan.private
         return HttpResponseForbidden('You are not authorized to view this build')
 
     context = {
