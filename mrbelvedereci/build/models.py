@@ -360,3 +360,7 @@ class Rebuild(models.Model):
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True) 
+
+    def get_absolute_url(self):
+        return reverse('build_rebuild_detail', kwargs={'build_id': str(self.build.id), 'rebuild_id': str(self.id)})
+

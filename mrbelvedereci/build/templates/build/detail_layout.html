@@ -2,7 +2,15 @@
 
 {% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
 
-{% block layout_header_text %}Build #{{ build.id }}{% endblock %}
+{% block layout_header_text %}
+  {% if rebuild %}
+    <a href="{{ build.get_absolute_url }}">Build #{{ build.id }}</a>, Rebuild #{{ rebuild.id }}
+  {% elif original_build %}
+    <a href="{{ build.get_absolute_url }}">Build #{{ build.id }}</a>, Original Build
+  {% else %}
+    Build #{{ build.id }}
+  {% endif %}
+{% endblock %}
 
 {% block layout_header_buttons %}
 {% if request.user.is_staff and build.status != 'success' %}
@@ -69,24 +77,19 @@
   {% endif %}
 {% else %}
 
-<style type="text/css">
-  pre.ansi2html-content {padding-top: 1em; padding-bottom: 1em}
-  pre.ansi2html-content span {padding: 1em}
-</style>
-
 <ul class="slds-tabs--default__nav" role="tablist">
-  <li class="slds-tabs--default__item{% if not tab %} slds-active{% endif %}" title="Overview" role="presentation"><a class="slds-tabs--default__link" href="{{ build.get_absolute_url }}" role="tab" tabindex="{% if not tab %}0{% else %}-1{% endif %}" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Overview</a></li>
+  <li class="slds-tabs--default__item{% if not tab %} slds-active{% endif %}" title="Overview" role="presentation"><a class="slds-tabs--default__link" href="{% if rebuild %}{{ rebuild.get_absolute_url }}{% else %}{{ build.get_absolute_url }}{% endif %}" role="tab" tabindex="{% if not tab %}0{% else %}-1{% endif %}" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Overview</a></li>
 {% if flows.count %}
-  <li class="slds-tabs--default__item{% if tab == 'flows' %} slds-active{% endif %}" title="Flows" role="presentation"><a class="slds-tabs--default__link" href="{{ build.get_absolute_url }}/flows" role="tab" tabindex="{% if tab == 'flows' %}0{% else %}-1{% endif %}" aria-selected="true" aria-controls="tab-default-2" id="tab-default-2__item">Flows ({{ flows.count }})</a></li>
+  <li class="slds-tabs--default__item{% if tab == 'flows' %} slds-active{% endif %}" title="Flows" role="presentation"><a class="slds-tabs--default__link" href="{% if rebuild %}{{ rebuild.get_absolute_url }}{% else %}{{ build.get_absolute_url }}{% endif %}/flows" role="tab" tabindex="{% if tab == 'flows' %}0{% else %}-1{% endif %}" aria-selected="true" aria-controls="tab-default-2" id="tab-default-2__item">Flows ({{ flows.count }})</a></li>
 {% endif %}
 {% if tests.total %}
-  <li class="slds-tabs--default__item{% if tab == 'tests' %} slds-active{% endif %}" title="Tests" role="presentation"><a class="slds-tabs--default__link" href="{{ build.get_absolute_url }}/tests" role="tab" tabindex="{% if tab == 'tests' %}0{% else %}-1{% endif %}" aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item">Tests ({{ tests.total }})</a></li>
+  <li class="slds-tabs--default__item{% if tab == 'tests' %} slds-active{% endif %}" title="Tests" role="presentation"><a class="slds-tabs--default__link" href="{% if rebuild %}{{ rebuild.get_absolute_url }}{% else %}{{ build.get_absolute_url }}{% endif %}/tests" role="tab" tabindex="{% if tab == 'tests' %}0{% else %}-1{% endif %}" aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item">Tests ({{ tests.total }})</a></li>
 {% endif %}
 {% if build.rebuilds.count %}
-  <li class="slds-tabs--default__item{% if tab == 'rebuilds' %} slds-active{% endif %}" title="Rebuilds" role="presentation"><a class="slds-tabs--default__link" href="{{ build.get_absolute_url }}/rebuilds" role="tab" tabindex="{% if tab == 'rebuilds' %}0{% else %}-1{% endif %}" aria-selected="false" aria-controls="tab-default-4" id="tab-default-4__item">Rebuilds ({{ build.rebuilds.count }})</a></li>
+  <li class="slds-tabs--default__item{% if tab == 'rebuilds' %} slds-active{% endif %}" title="Rebuilds" role="presentation"><a class="slds-tabs--default__link" href="{% if rebuild %}{{ rebuild.get_absolute_url }}{% else %}{{ build.get_absolute_url }}{% endif %}/rebuilds" role="tab" tabindex="{% if tab == 'rebuilds' %}0{% else %}-1{% endif %}" aria-selected="false" aria-controls="tab-default-4" id="tab-default-4__item">Rebuilds ({{ build.rebuilds.count }})</a></li>
 {% endif %}
 {% if request.user.is_staff %}
-  <li class="slds-tabs--default__item{% if tab == 'org' %} slds-active{% endif %}" title="Org" role="presentation"><a class="slds-tabs--default__link" href="{{ build.get_absolute_url }}/org" role="tab" tabindex="{% if tab == 'org' %}0{% else %}-1{% endif %}" aria-selected="false" aria-controls="tab-default-5" id="tab-default-5__item">Org</a></li>
+  <li class="slds-tabs--default__item{% if tab == 'org' %} slds-active{% endif %}" title="Org" role="presentation"><a class="slds-tabs--default__link" href="{% if rebuild %}{{ rebuild.get_absolute_url }}{% else %}{{ build.get_absolute_url }}{% endif %}/org" role="tab" tabindex="{% if tab == 'org' %}0{% else %}-1{% endif %}" aria-selected="false" aria-controls="tab-default-5" id="tab-default-5__item">Org</a></li>
 {% endif %}
 </ul>
 

@@ -2,20 +2,30 @@
 
 {% block tab_content %}
 <div class="slds-box slds-m-bottom--large {% if tests.fail %}slds-theme--warning{% else %}slds-theme--success{% endif %}">
-  <h3 class="slds-text-heading--large">{{ tests.pass }} of {{ tests.total }} tests passed{% if tests.fail %}.  {{ tests.fail }} tests failed{% endif %}</h3>
+  <h3 class="slds-text-heading--large">{{ tests.pass }} of {{ tests.total }} tests passed</h3>
 </div>
 {% if tests.fail %}
-<div class="slds-box slds-theme--default slds-m-bottom--large">
-  <h3 class="slds-text-heading--large slds-m-bottom--medium">Failing Tests</h3>
-  <ul class="slds-list--dotted">
-  {% for test in tests.failed_tests %}
-    <li>
-      <h3 class="slds-text-heading--medium">{{ test.method.testclass }}.{{ test.method }}</h3>
-      <p>{{ test.stacktrace|linebreaks }}</p>
-      <p>{{ test.message|linebreaks }}</p>
-    </li>
-  {% endfor %}
-  </ul>
+<div class="slds-card slds-m-bottom--large">
+  <div class="slds-card__header slds-grid">
+    <h3 class="slds-text-heading--large slds-m-bottom--medium">Failing Tests ({{ tests.fail }})</h3>
+  </div>
+
+  <div class="slds-card__body">
+    <div class="slds-card__body--inner">
+
+    {% for test in tests.failed_tests %}
+      <div class="slds-tile slds-m-bottom--medium">
+        <h3 class="slds-truncate slds-text-heading--small" title="{{ test.method.testclass }}.{{ test.method }}">{{ test.method.testclass }}.{{ test.method }}</h3>
+        <div class="slds-tile__detail slds-text-body--small">
+          <dl class="slds-list--horizontal slds-wrap">
+            <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Stack Trace">Stack Trace:</dt>
+            <dd class="slds-item--detail">{{ test.stacktrace|linebreaks }}</dd>
+          </dl>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
 </div>
 {% endif %}
 <div class="slds-box">

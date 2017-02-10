@@ -16,8 +16,9 @@ def build_list(request):
     builds = view_queryset(request)
     return render(request, 'build/build_list.html', context={'builds': builds})
 
-def build_detail(request, build_id, tab=None):
+def build_detail(request, build_id, rebuild_id=None, tab=None):
     build = get_object_or_404(Build, id = build_id)
+    rebuild = None
 
     if not request.user.is_staff:
         if build.plan.public:
@@ -25,10 +26,18 @@ def build_detail(request, build_id, tab=None):
         if tab == 'org':
             return HttpResponseForbidden("You are not authorized to view this build's org info")
 
-    if build.current_rebuild:
-        flows = build.current_rebuild.flows
+    if not rebuild_id:
+        if build.current_rebuild:
+            flows = build.current_rebuild.flows
+        else:
+            flows = build.flows
     else:
-        flows = build.flows
+        if rebuild_id == 'original':
+            flows = build.flows.filter(rebuild__isnull = True)
+        else:
+            rebuild = get_object_or_404(Rebuild, build_id = build.id, id=rebuild_id)
+            flows = rebuild.flows
+
     flows = flows.order_by('time_queue')
 
     tests = {
@@ -49,6 +58,8 @@ def build_detail(request, build_id, tab=None):
     
     context = {
         'build': build,
+        'rebuild': rebuild,
+        'original_build': rebuild_id == 'original',
         'tab': tab,
         'flows': flows,
         'tests': tests,

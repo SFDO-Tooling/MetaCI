@@ -5,40 +5,38 @@
 <div class="slds-box">
   <div class="slds-grid">
     <div class="slds-col slds-has-flexi-truncate">
-    <h3 class="slds-text-heading--large">Scratch Org Instance</h3>
+    <h3 class="slds-text-heading--large slds-m-bottom--medium">Scratch Org Instance</h3>
     </div>
     <div class="slds-col slds-no-flex slds-align-bottom">
-      <div class="slds-button-group">
+      <div class="slds-button-group" role="group">
       {% if not build.org_instance.deleted %}
-        <a class="slds-button" href="{{ build.org_instance.get_absolute_url }}/login">Log In</a>
-        <a class="slds-button" href="{{ build.org_instance.get_absolute_url }}/delete">Delete</a>
+        <a href="{{ build.org_instance.get_absolute_url }}/login"><button class="slds-button slds-button--brand">Log In</button></a>
+        <a href="{{ build.org_instance.get_absolute_url }}/delete"><button class="slds-button slds-button--neutral slds-button--last">Delete</button></a>
       {% endif %}
       </div>
     </div>
   </div>
-  <ul class="slds-grid slds-page-header__detail-row">
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org Config">Org Config</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ build.org_instance.org }}"><a href="{{ build.org_instance.org.get_absolute_url }}">{{ build.org_instance.org }}</a></p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org ID">Org Id</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ build.org_instance.sf_org_id }}">{{ build.org_instance.sf_org_id }}/p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Username">Username</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ build.org_instance.username }}">{{ build.org_instance.username }}/p>
-    </li>
-    {% if build.org_instance.deleted %}
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Username">Deleted</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ build.org_instance.time_deleted }}">{{ build.org_instance.time_deleted }}/p>
-    </li>
-    {% endif %}
-  </ul>
+  <div class="slds-tile slds-m-bottom--medium">
+    <div class="slds-tile__detail">
+      <dl class="slds-list--horizontal slds-wrap">
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org Config">Org Config:</dt>
+        <dd class="slds-item--detail slds-truncate"><a href="{{ build.org_instance.org.get_absolute_url }}">{{ build.org_instance.org }}</a></dd>
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org ID">Org ID</dt>
+        <dd class="slds-item--detail slds-truncate">{{ build.org_instance.sf_org_id }}</dd>
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Username">Username</dt>
+        <dd class="slds-item--detail slds-truncate">{{ build.org_instance.username }}</dd>
+        {% if build.org_instance.deleted %}
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Date Deleted">Date Deleted</dt>
+        <dd class="slds-item--detail slds-truncate">{{ build.org_instance.time_deleted }}</dd>
+        {% endif %}
+      </dl>
+    </div>
+  </div>
+    
   {% if not build.org_instance.deleted %}
     {% if build.org_instance.delete_error %}
-    <p>The last attempt to delete the scratch org failed with the error:</p>
+    <div class="slds-box slds-theme--warning">
+    <h3 class="slds-text-heading--small slds-m-bottom--small">The last attempt to delete the scratch org failed with the error:</h3>
     <p>{{ build.org_instance.delete_error|linebreaks }}</p>
     {% endif %}
   {% endif %}
