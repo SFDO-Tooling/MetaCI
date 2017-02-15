@@ -21,7 +21,7 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
     rebuild = None
 
     if not request.user.is_staff:
-        if build.plan.public:
+        if not build.plan.public:
             return HttpResponseForbidden('You are not authorized to view this build')
         if tab == 'org':
             return HttpResponseForbidden("You are not authorized to view this build's org info")
