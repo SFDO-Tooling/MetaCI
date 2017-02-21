@@ -118,7 +118,7 @@ def check_waiting_builds():
         build.save()
 
     if builds:
-        return 'Checked waiting builds: {}'.format(', '.join(builds))
+        return 'Checked waiting builds: {}'.format(builds)
     else:
         return 'No queued builds to check'
 
