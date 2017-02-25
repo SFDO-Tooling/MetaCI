@@ -1,3 +1,7 @@
+import os
+
+import heroku3
+
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.core.paginator import Paginator
@@ -45,3 +49,19 @@ def format_log(log):
     content = '<pre class="ansi2html-content">{}</pre>'.format(content)
     #content = '<div class="body_foreground body_background">{}</div>'.format(content)
     return headers + content
+
+def restart_heroku_dyno():
+    api_token = os.environ.get('HEROKU_API_TOKEN')
+    app_name = os.environ.get('HEROKU_APP_NAME')
+    dyno_name = os.environ.get('DYNO')
+    this_dyno = None
+
+    conn = heroku3.from_key(api_token)
+    app = conn.apps()[app_name]
+    
+    for dyno in app.dynos():
+        if dyno.name == dyno_name:
+            this_dyno = dyno
+            break
+
+    this_dyno.restart()

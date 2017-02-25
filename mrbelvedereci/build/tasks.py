@@ -4,6 +4,7 @@ import requests
 import time
 from django import db
 from django.core.cache import cache
+from mrbelvedereci.build.utils import restart_heroku_dyno
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.repository.utils import create_status
 from mrbelvedereci.build.signals import build_complete
@@ -49,15 +50,9 @@ def run_build(build_id, lock_id=None):
         cache.delete(lock_id)
 
     # Restart the Heroku dyno if on Heroku
-    dyno_id = os.environ.get('HEROKU_DYNO_ID')
-    api_token = os.environ.get('HEROKU_API_TOKEN')
-    app_id = os.environ.get('HEROKU_APP_ID')
-    if dyno_id and api_token and app_id:
-        headers = {
-            'Accept': "application/vnd.heroku+json; version=3",
-            "Authorization": "Bearer {}".format(api_token),
-        }
-        resp = requests.delete('https://api.heroku.com/apps/{}/dynos/{}'.format(app_id, dyno_id), headers=headers)
+    dyno_name = os.environ.get('DYNO')
+    if dyno_name:
+        restart_heroku_dyno()
     
     return build.status
 
