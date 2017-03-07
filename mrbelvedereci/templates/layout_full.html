@@ -2,6 +2,11 @@
 
 {% block base_title %}{% endblock %}
 
+{% block base_head %}
+<!-- SLDS Overrides -->
+<link href="{% static 'css/mebelvedere-slds.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block base_page_header %}
 <header class="slds-global-header_container">
   <div class="slds-global-header slds-grid slds-grid--align-spread">
