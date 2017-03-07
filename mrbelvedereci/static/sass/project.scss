@@ -59,6 +59,11 @@ $red: #b94a48;
   }
 }
 
+// SLDS Header is below body content
+.slds-global-header_container {
+  z-index: 1;
+}
+
 ////////////////////////////////
 		//Django Toolbar//
 ////////////////////////////////
