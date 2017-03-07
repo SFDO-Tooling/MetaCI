@@ -1,4 +1,3 @@
-/* These styles are generated from project.scss. */
 .alert-debug {
   background-color: #fff;
   border-color: #d6e9c6;
@@ -27,10 +26,6 @@
   .nav.navbar-nav.pull-xs-right {
     float: none !important;
   }
-}
-
-.slds-global-header_container {
-  z-index: 1;
 }
 
 [hidden][style="display: block;"] {

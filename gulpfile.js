@@ -45,24 +45,25 @@ var paths = pathsConfig();
 
 // Styles autoprefixing and minification
 gulp.task('styles', function() {
-  return gulp.src(paths.sass + '/project.scss')
+  return gulp.src(paths.sass + '/*.scss')
     .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
     .pipe(plumber()) // Checks for errors
     .pipe(autoprefixer({browsers: ['last 2 version']})) // Adds vendor prefixes
     .pipe(pixrem())  // add fallbacks for rem units
-    .pipe(gulp.dest(paths.css))
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(cssnano()) // Minifies the result
     .pipe(gulp.dest(paths.css));
+    // Dont need minified CSS 
+    // .pipe(rename({ suffix: '.min' }))
+    // .pipe(cssnano()) // Minifies the result
+    // .pipe(gulp.dest(paths.css));
 });
 
 // Javascript minification
 gulp.task('scripts', function() {
   return gulp.src(paths.js + '/project.js')
-    .pipe(plumber()) // Checks for errors
-    .pipe(uglify()) // Minifies the js
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(gulp.dest(paths.js));
+    .pipe(plumber()); // Checks for errors
+    // .pipe(uglify()) // Minifies the js
+    // .pipe(rename({ suffix: '.min' }))
+    // .pipe(gulp.dest(paths.js));
 });
 
 // Image compression

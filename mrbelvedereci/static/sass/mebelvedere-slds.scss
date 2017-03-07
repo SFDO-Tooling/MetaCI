@@ -1,0 +1,6 @@
+// A SCSS file to override project specific SLDS
+
+// SLDS Header is below body content
+.slds-global-header_container {
+  z-index: 1;
+}
