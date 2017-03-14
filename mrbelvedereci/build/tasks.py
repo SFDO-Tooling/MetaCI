@@ -53,6 +53,8 @@ def run_build(build_id, lock_id=None):
     dyno_name = os.environ.get('DYNO')
     if dyno_name:
         restart_heroku_dyno()
+        # Sleep for 60 seconds to avoid this dyno starting another build before the restart
+        time.sleep(60)
     
     return build.status
 
