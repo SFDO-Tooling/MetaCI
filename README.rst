@@ -160,4 +160,4 @@ Sentry
 Sentry is an error logging aggregator service. You can sign up for a free account at  https://getsentry.com/signup/?code=cookiecutter  or download and host it yourself.
 The system is setup with reasonable defaults, including 404 logging and integration with the WSGI application.
 
-Setting the Sentry DSN in production is optional but highly recommended.  Having good error management for your CI app is really nice
+Setting the Sentry DSN in production is optional but highly recommended.  Having good error management for your CI app is really nice!
