@@ -92,9 +92,9 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
         info = org_config.scratch_info
 
         # Get the contents of the org's json file from Salesforce DX
-        json_path = os.path.join(os.path.expanduser('~'), '.appcloud', info['username'] + '.json')
+        json_path = os.path.join(os.path.expanduser('~'), '.sfdx', info['username'] + '.json')
         if not os.path.isfile(json_path):
-            json_path = os.path.join(os.path.expanduser('~'), '.local', '.appcloud', info['username'] + '.json')
+            json_path = os.path.join(os.path.expanduser('~'), '.local', '.sfdx', info['username'] + '.json')
         with open(json_path, 'r') as json_file:
             dx_json = json_file.read()
 
