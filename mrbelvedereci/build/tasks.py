@@ -4,7 +4,6 @@ import requests
 import time
 from django import db
 from django.core.cache import cache
-from mrbelvedereci.build.utils import restart_heroku_dyno
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.repository.utils import create_status
 from mrbelvedereci.build.signals import build_complete
@@ -49,13 +48,6 @@ def run_build(build_id, lock_id=None):
     if lock_id:
         cache.delete(lock_id)
 
-    # Restart the Heroku dyno if on Heroku
-    dyno_name = os.environ.get('DYNO')
-    if dyno_name:
-        restart_heroku_dyno()
-        # Sleep for 60 seconds to avoid this dyno starting another build before the restart
-        time.sleep(60)
-    
     return build.status
 
 @django_rq.job('short', timeout=60)
