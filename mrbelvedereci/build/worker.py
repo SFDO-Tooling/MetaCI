@@ -1,3 +1,4 @@
+import errno
 import signal
 import os
 from rq.worker import StopRequested
