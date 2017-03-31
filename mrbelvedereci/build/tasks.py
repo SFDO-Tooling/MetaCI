@@ -124,16 +124,27 @@ def delete_scratch_orgs():
     reset_database_connection()
 
     from mrbelvedereci.cumulusci.models import ScratchOrgInstance
-    orgs_deleted = 0
-    orgs_failed = 0
+    count = 0
     for org in ScratchOrgInstance.objects.filter(deleted = False, delete_error__isnull = False):
-        org.delete_org()
-        if org.deleted:
-            orgs_deleted += 1
-        else:
-            orgs_failed += 1
-
-    if not orgs_deleted and not orgs_failed:
+        delete_scratch_org.delay(org.id)
+        count += 1
+    
+    if not count:
         return 'No orgs found to delete'
 
     return 'Deleted {} orgs and failed to delete {} orgs'.format(orgs_deleted, orgs_failed)
+
+@django_rq.job('short')
+def delete_scratch_org(org_instance_id):
+    reset_database_connection()
+    from mrbelvedereci.cumulusci.models import ScratchOrgInstance
+    try:
+        org = ScratchOrgInstance.objects.get(id=org_instance_id)
+    except ScratchOrgInstance.DoesNotExist:
+        return 'Failed: could not find ScratchOrgInstance with id {}'.format(org_instance_id)
+
+    org.delete_org()
+    if org.deleted:
+        return 'Deleted org instance #{}'.format(org.id)
+    else:
+        return 'Failed to delete org instance #{}'.format(org.id)
