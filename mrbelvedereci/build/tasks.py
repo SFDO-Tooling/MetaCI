@@ -132,7 +132,7 @@ def delete_scratch_orgs():
     if not count:
         return 'No orgs found to delete'
 
-    return 'Deleted {} orgs and failed to delete {} orgs'.format(orgs_deleted, orgs_failed)
+    return 'Scheduled deletion attempts for {} orgs'.format(count)
 
 @django_rq.job('short')
 def delete_scratch_org(org_instance_id):
