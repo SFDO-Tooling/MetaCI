@@ -1,6 +1,5 @@
 import os
-
-import heroku3
+import subprocess
 
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -50,18 +49,44 @@ def format_log(log):
     #content = '<div class="body_foreground body_background">{}</div>'.format(content)
     return headers + content
 
-def restart_heroku_dyno():
-    api_token = os.environ.get('HEROKU_API_TOKEN')
-    app_name = os.environ.get('HEROKU_APP_NAME')
-    dyno_name = os.environ.get('DYNO')
-    this_dyno = None
-
-    conn = heroku3.from_key(api_token)
-    app = conn.apps()[app_name]
+def set_default_devhub(username):
+    # Record the previous defaultdevhubusername
+    command = "sfdx force:config:get defaultdevhubusername | tail -1 | cut -f 3 -d ' '"
+    previous_dev_hub = run_command(command)
+    # run_command will raise an exception if there are any errors so we presume
+    # the output of run_command contains only the previous dev hub username
+    previous_dev_hub = ''.join(previous_dev_hub)
     
-    for dyno in app.dynos():
-        if dyno.name == dyno_name:
-            this_dyno = dyno
-            break
+    # Set the new defaultdevhubusername
+    command = "sfdx force:config:set defaultdevhubusername={}".format(username)
+    new_dev_hub = run_command(command)
+    
+    return {
+        'previous': previous_dev_hub,
+        'output': '\n'.join(new_dev_hub)
+    }
 
-    this_dyno.restart()
+def run_command(command, env=None, cwd=None):
+    kwargs = {}
+    if env:
+        kwargs['env'] = env
+    if cwd:
+        kwargs['cwd'] = cwd
+    p = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        bufsize=1,
+        shell=True,
+        executable='/bin/bash',
+        **kwargs
+    )
+    for line in iter(p.stdout.readline, ''):
+        yield line
+    p.stdout.close()
+    p.wait()
+    if p.returncode:
+        message = 'Return code: {}\nstderr: {}'.format(
+            p.returncode,
+            p.stderr,
+        )
+        raise CommandException(message)
