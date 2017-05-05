@@ -18,6 +18,7 @@ from django.db import models
 from django.urls import reverse
 
 from mrbelvedereci.build.utils import format_log
+from mrbelvedereci.build.utils import set_default_devhub
 from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
 from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
 from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain

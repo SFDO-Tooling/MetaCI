@@ -10,7 +10,7 @@
     <div class="slds-col slds-no-flex slds-align-bottom">
       <div class="slds-button-group" role="group">
       {% if not build.org_instance.deleted %}
-        <a href="{{ build.org_instance.get_absolute_url }}/login"><button class="slds-button slds-button--brand">Log In</button></a>
+        <a href="{{ build.org_instance.get_absolute_url }}/login" target="_blank"><button class="slds-button slds-button--brand">Log In</button></a>
         <a href="{{ build.org_instance.get_absolute_url }}/delete"><button class="slds-button slds-button--neutral slds-button--last">Delete</button></a>
       {% endif %}
       </div>
