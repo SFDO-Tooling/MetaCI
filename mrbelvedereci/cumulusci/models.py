@@ -4,6 +4,7 @@ import json
 import os
 
 from cumulusci.core.config import ScratchOrgConfig
+from cumulusci.core.config import OrgConfig
 from cumulusci.core.exceptions import ScratchOrgException
 from django.db import models
 from django.urls import reverse
@@ -23,6 +24,11 @@ class Org(models.Model):
 
     def get_absolute_url(self):
         return reverse('org_detail', kwargs={'org_id': self.id})
+
+    def get_org_config(self):
+        org_config = json.loads(self.json)
+
+        return OrgConfig(org_config)
     
 class ScratchOrgInstance(models.Model):
     org = models.ForeignKey('cumulusci.Org', related_name='instances')
