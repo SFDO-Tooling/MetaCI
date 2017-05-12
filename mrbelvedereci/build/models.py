@@ -26,7 +26,7 @@ from mrbelvedereci.testresults.importer import import_test_results
 
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.exceptions import ApexTestException
-from cumulusci.core.excpetions import BrowserTestException
+from cumulusci.core.excpetions import BrowserTestFailure
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.utils import import_class
@@ -298,7 +298,7 @@ class BuildFlow(models.Model):
             self.load_test_results()
             self.status = 'fail'
 
-        except BrowserTestException as e:
+        except BrowserTestFailure as e:
             exception = e
             self.status = 'fail'
 
