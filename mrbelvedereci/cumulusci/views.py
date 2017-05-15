@@ -58,8 +58,8 @@ def org_instance_delete(request, org_id, instance_id):
 
     try:
         instance.delete_org()
-    except:
-        return render(request, 'cumulusci/org_delete_failed.html', context=context)
+    except Exception as e:
+        pass
     return HttpResponseRedirect(instance.get_absolute_url())
 
 @staff_member_required

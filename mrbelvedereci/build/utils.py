@@ -1,6 +1,5 @@
 import os
-
-import heroku3
+import subprocess
 
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -8,6 +7,8 @@ from django.core.paginator import Paginator
 
 from django.apps import apps
 from ansi2html import Ansi2HTMLConverter
+
+from cumulusci.core.exceptions import CommandException
 
 def paginate(build_list, request):
     page = request.GET.get('page')
@@ -50,18 +51,30 @@ def format_log(log):
     #content = '<div class="body_foreground body_background">{}</div>'.format(content)
     return headers + content
 
-def restart_heroku_dyno():
-    api_token = os.environ.get('HEROKU_API_TOKEN')
-    app_name = os.environ.get('HEROKU_APP_NAME')
-    dyno_name = os.environ.get('DYNO')
-    this_dyno = None
-
-    conn = heroku3.from_key(api_token)
-    app = conn.apps()[app_name]
+    previous_dev_hub = ''.join(previous_dev_hub)
+    previous_dev_hub = previous_dev_hub.strip()
     
-    for dyno in app.dynos():
-        if dyno.name == dyno_name:
-            this_dyno = dyno
-            break
-
-    this_dyno.restart()
+def run_command(command, env=None, cwd=None):
+    kwargs = {}
+    if env:
+        kwargs['env'] = env
+    if cwd:
+        kwargs['cwd'] = cwd
+    p = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        bufsize=1,
+        shell=True,
+        executable='/bin/bash',
+        **kwargs
+    )
+    for line in iter(p.stdout.readline, ''):
+        yield line
+    p.stdout.close()
+    p.wait()
+    if p.returncode:
+        message = 'Return code: {}\nstderr: {}'.format(
+            p.returncode,
+            p.stderr,
+        )
+        raise CommandException(message)

@@ -19,6 +19,7 @@ class Plan(models.Model):
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
     context = models.CharField(max_length=255, null=True, blank=True)
+    devhub = models.CharField(max_length=255, null=True, blank=True)
     public = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
 

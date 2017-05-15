@@ -26,6 +26,7 @@ from mrbelvedereci.testresults.importer import import_test_results
 
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.exceptions import ApexTestException
+from cumulusci.core.excpetions import BrowserTestFailure
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.utils import import_class
@@ -100,7 +101,7 @@ class Build(models.Model):
     
             # Initialize the project config
             project_config = self.get_project_config()
-    
+
             # Look up the org
             org_config = self.get_org(project_config)
     
@@ -181,6 +182,7 @@ class Build(models.Model):
             self.current_rebuild.status = self.status
             self.current_rebuild.time_end = timezone.now()
             self.current_rebuild.save()
+
 
     def set_running_status(self): 
         self.status = 'running'
@@ -295,6 +297,10 @@ class BuildFlow(models.Model):
         except ApexTestException as e:
             exception = e
             self.load_test_results()
+            self.status = 'fail'
+
+        except BrowserTestFailure as e:
+            exception = e
             self.status = 'fail'
 
         except Exception as e:

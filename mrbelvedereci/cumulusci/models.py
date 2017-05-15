@@ -4,7 +4,9 @@ import json
 import os
 
 from cumulusci.core.config import ScratchOrgConfig
+from cumulusci.core.config import OrgConfig
 from cumulusci.core.exceptions import ScratchOrgException
+from mrbelvedereci.build.utils import set_default_devhub
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -23,6 +25,11 @@ class Org(models.Model):
 
     def get_absolute_url(self):
         return reverse('org_detail', kwargs={'org_id': self.id})
+
+    def get_org_config(self):
+        org_config = json.loads(self.json)
+
+        return OrgConfig(org_config)
     
 class ScratchOrgInstance(models.Model):
     org = models.ForeignKey('cumulusci.Org', related_name='instances')
@@ -62,15 +69,22 @@ class ScratchOrgInstance(models.Model):
     def delete_org(self, org_config=None):
         if org_config is None:
             org_config = self.get_org_config()
-        
+    
+        if self.build.plan.devhub:
+            default_devhub = set_default_devhub(self.build.plan.devhub)
+                
         try:
             org_config.delete_org()
         except ScratchOrgException as e:
             self.delete_error = e.message
             self.deleted = False
             self.save()
+            if self.build.plan.devhub:
+                set_default_devhub(default_devhub)
             return
 
+        if self.build.plan.devhub:
+            set_default_devhub(default_devhub)
         self.time_deleted = timezone.now()
         self.deleted = True
         self.save()
