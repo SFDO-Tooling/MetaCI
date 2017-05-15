@@ -41,6 +41,29 @@
     {% endif %}
   {% endif %}
 {% elif build.org %}
+<div class="slds-box">
+  <div class="slds-grid">
+    <div class="slds-col slds-has-flexi-truncate">
+    <h3 class="slds-text-heading--large slds-m-bottom--medium">Persistent Org</h3>
+    </div>
+    <div class="slds-col slds-no-flex slds-align-bottom">
+      <div class="slds-button-group" role="group">
+        <a href="{{ build.org.get_absolute_url }}/login"><button class="slds-button slds-button--brand">Log In</button></a>
+      </div>
+    </div>
+  </div>
+  <div class="slds-tile slds-m-bottom--medium">
+    <div class="slds-tile__detail">
+      <dl class="slds-list--horizontal slds-wrap">
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org Config">Org Config:</dt>
+        <dd class="slds-item--detail slds-truncate"><a href="{{ build.org.get_absolute_url }}">{{ build.org }}</a></dd>
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org ID">Org ID</dt>
+        <dd class="slds-item--detail slds-truncate">{{ build.org.get_org_config.org_id|default_if_none:"Unknown" }}</dd>
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Username">Username</dt>
+        <dd class="slds-item--detail slds-truncate">{{ build.org.get_org_config.username|default_if_none:"Unknown" }}</dd>
+      </dl>
+    </div>
+  </div>
 {% else %}
 {% endif %}
 {% endblock %}
