@@ -26,11 +26,13 @@
 {% endblock %}
 
 {% block layout_header_buttons %}
-      <a href="{{ instance.get_absolute_url }}/login" target="_blank">
+{% if not org.scratch %}
+      <a href="{{ org.get_absolute_url }}/login" target="_blank">
         <button class="slds-button slds-button--brand">
           Log In
         </button>
       </a>
+      {% endif %}
 {% endblock %}
 
 {% block layout_body %}
