@@ -8,6 +8,8 @@ from django.core.paginator import Paginator
 from django.apps import apps
 from ansi2html import Ansi2HTMLConverter
 
+from cumulusci.core.exceptions import CommandException
+
 def paginate(build_list, request):
     page = request.GET.get('page')
     per_page = request.GET.get('per_page', '25')
@@ -49,23 +51,9 @@ def format_log(log):
     #content = '<div class="body_foreground body_background">{}</div>'.format(content)
     return headers + content
 
-def set_default_devhub(username):
-    # Record the previous defaultdevhubusername
-    command = "sfdx force:config:get defaultdevhubusername | tail -1 | cut -f 3 -d ' '"
-    previous_dev_hub = run_command(command)
-    # run_command will raise an exception if there are any errors so we presume
-    # the output of run_command contains only the previous dev hub username
     previous_dev_hub = ''.join(previous_dev_hub)
+    previous_dev_hub = previous_dev_hub.strip()
     
-    # Set the new defaultdevhubusername
-    command = "sfdx force:config:set defaultdevhubusername={}".format(username)
-    new_dev_hub = run_command(command)
-    
-    return {
-        'previous': previous_dev_hub,
-        'output': '\n'.join(new_dev_hub)
-    }
-
 def run_command(command, env=None, cwd=None):
     kwargs = {}
     if env:

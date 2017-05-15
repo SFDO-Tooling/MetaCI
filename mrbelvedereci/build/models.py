@@ -18,7 +18,6 @@ from django.db import models
 from django.urls import reverse
 
 from mrbelvedereci.build.utils import format_log
-from mrbelvedereci.build.utils import set_default_devhub
 from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
 from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
 from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
@@ -102,9 +101,6 @@ class Build(models.Model):
             # Initialize the project config
             project_config = self.get_project_config()
 
-            # Set sfdx devhub
-            self.set_devhub()
-    
             # Look up the org
             org_config = self.get_org(project_config)
     
@@ -118,8 +114,6 @@ class Build(models.Model):
                 self.current_rebuild.status = self.status
                 self.current_rebuild.time_end = timezone.now()
                 self.current_rebuild.save()
-            # Reset the default devhub back to the original if it was changed
-            self.reset_devhub()
             return
       
         # Run flows
@@ -153,8 +147,6 @@ class Build(models.Model):
                         self.current_rebuild.status = self.status
                         self.current_rebuild.time_end = timezone.now()
                         self.current_rebuild.save()
-                    # Reset the default devhub back to the original if it was changed
-                    self.reset_devhub()
                     return
                 else:
                     self.logger = init_logger(self)
@@ -174,8 +166,6 @@ class Build(models.Model):
                 self.current_rebuild.status = self.status
                 self.current_rebuild.time_end = timezone.now()
                 self.current_rebuild.save()
-            # Reset the default devhub back to the original if it was changed
-            self.reset_devhub()
             return
 
         if org_config.created:
@@ -192,8 +182,6 @@ class Build(models.Model):
             self.current_rebuild.time_end = timezone.now()
             self.current_rebuild.save()
 
-        # Reset the default devhub back to the original if it was changed
-        self.reset_devhub()
 
     def set_running_status(self): 
         self.status = 'running'
@@ -231,20 +219,6 @@ class Build(models.Model):
         keychain = MrbelvedereProjectKeychain(project_config, None, self)
         project_config.set_keychain(keychain)
         return project_config
-
-    def set_devhub(self):
-        if not self.plan.devhub:
-            return
-        result = set_default_devhub(self.plan.devhub)
-        self.logger.info('Switching default devhub per plan configuration')
-        self.previous_devhub = result['previous']
-        
-    def reset_devhub(self):
-        if not hasattr(self, 'previous_devhub'):
-            return
-        self.logger.info('Resetting default devhub')
-        result = set_default_devhub(self.previous_devhub)
-        del self.previous_devhub
 
     def get_org(self, project_config):
         org_config = project_config.keychain.get_org(self.plan.org)
