@@ -57,6 +57,7 @@ class Build(models.Model):
     plan = models.ForeignKey('plan.Plan', related_name='builds')
     org = models.ForeignKey('cumulusci.Org', related_name='builds', null=True, blank=True)
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance', related_name='builds', null=True, blank=True)
+    schedule = models.ForeignKey('plan.PlanSchedule', related_name='builds', null=True, blank=True)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
@@ -91,6 +92,9 @@ class Build(models.Model):
     def run(self):
         self.logger = init_logger(self)
         self.set_running_status()
+
+        if self.schedule:
+            self.logger.info('Build triggered by {} schedule #{}'.format(self.schedule.schedule, self.schedule.id))
 
         try:
             # Extract the repo to a temp build dir

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import re
 
+from django.apps import apps
 from django.db import models
 from django.urls import reverse
 
@@ -19,7 +20,6 @@ class Plan(models.Model):
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
     context = models.CharField(max_length=255, null=True, blank=True)
-    devhub = models.CharField(max_length=255, null=True, blank=True)
     public = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
 
@@ -87,3 +87,25 @@ class Plan(models.Model):
             return run_build, commit, commit_message
     
         return run_build, commit, commit_message
+
+SCHEDULE_CHOICES=(
+    ('daily', 'Daily'),
+    ('hourly', 'Hourly'),
+)
+
+class PlanSchedule(models.Model):
+    plan = models.ForeignKey(Plan)
+    branch = models.ForeignKey('repository.branch')
+    schedule = models.CharField(max_length=16, choices=SCHEDULE_CHOICES)
+
+    def run(self):
+        Build = apps.get_model('build', 'Build')
+        build = Build(
+            repo = self.plan.repo,
+            plan = self.plan,
+            branch = self.branch,
+            commit = self.branch.github_api.commit.sha,
+            schedule = self,
+        )
+        build.save()
+        return build

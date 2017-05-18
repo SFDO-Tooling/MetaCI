@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 from django.db import models
 from django.urls import reverse
 
+from github3 import login
+from django.conf import settings
 
 class Repository(models.Model):
     name = models.CharField(max_length=255)
@@ -19,7 +21,13 @@ class Repository(models.Model):
 
     def __unicode__(self):
         return '{}/{}'.format(self.owner, self.name)
-    
+   
+    @property 
+    def github_api(self):
+        gh = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
+        repo = gh.repository(self.owner, self.name)
+        return repo
+
 class Branch(models.Model):
     name = models.CharField(max_length=255)
     repo = models.ForeignKey(Repository, related_name='branches')
@@ -33,3 +41,8 @@ class Branch(models.Model):
 
     def __unicode__(self):
         return u'[{}] {}'.format(self.repo.name, self.name)
+
+    @property 
+    def github_api(self):
+        branch = self.repo.github_api.branch(self.name)
+        return branch
