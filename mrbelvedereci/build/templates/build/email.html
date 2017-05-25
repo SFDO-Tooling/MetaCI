@@ -277,7 +277,7 @@
           <div class="content">
 
             <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader">Build #{{ build.id }} completed{% if build.status == 'success' %} successfully{% elif build.status == 'fail' %} with deployment or test failures{% elif build.status == 'error' %} with errors{% endif %}</span>
+            <span class="preheader">Build #{{ build.id }} of plan {{ build.plan.name }} on {{ build.branch.name }} completed{% if build.status == 'success' %} successfully{% elif build.status == 'fail' %} with deployment or test failures{% elif build.status == 'error' %} with errors{% endif %}</span>
             <table class="main">
 
               <!-- START MAIN CONTENT AREA -->
@@ -286,7 +286,7 @@
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <p>The build of commit {{ build.commit }} on {{ build.branch }} completed {% if build.status == 'success' %} successfully{% elif build.status == 'fail' %} with deployment or test failures{% elif build.status == 'error' %} with errors{% endif %}. </p>
+                        <p>The build of plan {{ build.plan.name }} on commit {{ build.commit }} of {{ build.branch.name }} completed {% if build.status == 'success' %} successfully{% elif build.status == 'fail' %} with deployment or test failures{% elif build.status == 'error' %} with errors{% endif %}. </p>
 
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
@@ -304,8 +304,8 @@
                           </tbody>
                         </table>
                         {% if build.status == 'fail' or build.status == 'error' %}
-                        <p><b>{{ build.get_exception }}:</b></p>
-                        <p>{{ build.get_error_message|linebreaks }}</p>
+                        <p><b>{{ build.exception }}:</b></p>
+                        <p>{{ build.error_message|linebreaks }}</p>
                         {% endif %}
 
                         <p><b>Last 25 Log Lines</b></p>
