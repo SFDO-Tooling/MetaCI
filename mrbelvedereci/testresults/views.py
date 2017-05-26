@@ -102,7 +102,7 @@ def build_flow_tests(request, build_id, flow):
 
 @login_required
 def test_method_trend(request, method_id):
-    if not request.user.email.endswith('@example.com'):
+    if not request.user.is_staff:
         return redirect('/login/?next=%s' % request.path)
 
     method = get_object_or_404(TestMethod, id=method_id)
