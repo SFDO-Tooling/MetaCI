@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import BuildFlow
+from mrbelvedereci.build.utils import paginate
 from mrbelvedereci.testresults.models import TestMethod
 
 def build_flow_tests(request, build_id, flow):
@@ -101,6 +102,8 @@ def test_method_trend(request, method_id):
     method = get_object_or_404(TestMethod, id=method_id)
     
     latest_results = method.test_results.order_by('-build_flow__time_end')
+
+    latest_results = paginate(latest_results, request)
     
     results_by_plan = {}
     i = 0
@@ -136,6 +139,7 @@ def test_method_trend(request, method_id):
         'method': method,
         'headers': headers,
         'results': results,
+        'all_results': latest_results,
     }
 
     return render(request, 'testresults/test_method_trend.html', data)
