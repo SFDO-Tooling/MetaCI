@@ -1,6 +1,7 @@
 {% extends 'layout_full.html' %}
+{% load humanize %}
 
-{% block layout_header_text %}Test Trend for {{ method.testclass }}{{ method }} in {{ method.testclass.repo }}{% endblock %}
+{% block layout_header_text %}Test Trend for {{ method.testclass }}.{{ method }} in {{ method.testclass.repo }}{% endblock %}
 
 {% block layout_header_details %}
 {% endblock %}
@@ -19,10 +20,11 @@
     {% for plan_result in results %}
     <tr>
       <th scope="row">{{ plan_result.0 }}</th>
-      {% for result in plan_result.1 %}
+      <th scope="row">{{ plan_result.1 }}</th>
+      {% for result in plan_result.2 %}
       <td>
         {% if result.outcome == 'Pass' %}
-        <a href="{{ result.build_flow.build.get_absolute_url }}">
+        <a href="{{ result.build_flow.build.get_absolute_url }}" title="Started: {{ result.build_flow.time_start|naturaltime }}{{ result.build_flow.build.commit }}>
           <div class="slds-media__figure"> 
             {% autoescape off %}
             <svg class="slds-button__icon slds-theme--success" aria-hidden="true">

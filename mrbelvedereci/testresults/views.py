@@ -114,7 +114,10 @@ def test_method_trend(request, method_id):
     results_by_plan = {}
     i = 0
     for result in latest_results:
-        plan_name = result.build_flow.build.plan.name
+        plan_name = (
+            result.build_flow.build.plan.name,
+            result.build_flow.build.branch.name,
+        )
         if plan_name not in results_by_plan:
             # Create the list padded with None for prior columns
             results_by_plan[plan_name] = [None,] * i
@@ -135,10 +138,10 @@ def test_method_trend(request, method_id):
         plan_results = []
         for result in results_by_plan[key]:
             plan_results.append(result)
-        results.append((key, plan_results))
+        results.append((key[0], key[1], plan_results))
 
 
-    headers = ['Plan',]
+    headers = ['Plan','Branch/Tag']
     headers += ['',] * i
 
     data = {
