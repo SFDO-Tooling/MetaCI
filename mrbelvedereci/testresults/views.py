@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import BuildFlow
+from mrbelvedereci.testresults.models import TestMethod
 
 def build_flow_tests(request, build_id, flow):
     build = get_object_or_404(Build, id=build_id)
@@ -95,3 +96,46 @@ def build_flow_tests(request, build_id, flow):
     data['columns'] = columns
 
     return render(request, 'testresults/build_flow_tests.html', data)
+
+def test_method_trend(request, method_id):
+    method = get_object_or_404(TestMethod, id=method_id)
+    
+    latest_results = method.test_results.order_by('-build_flow__time_end')
+    
+    results_by_plan = {}
+    i = 0
+    for result in latest_results:
+        plan_name = result.build_flow.build.plan.name
+        if plan_name not in results_by_plan:
+            # Create the list padded with None for prior columns
+            results_by_plan[plan_name] = [None,] * i
+        results_by_plan[plan_name].append(result)
+        i += 1
+
+        # Pad the other field's lists with None values for this column
+        for key in results_by_plan.keys():
+            if key == plan_name:
+                continue
+            else:
+                results_by_plan[key].append(None)
+
+    results = []
+    plan_keys = results_by_plan.keys()
+    plan_keys.sort()
+    for key in plan_keys:
+        plan_results = []
+        for result in results_by_plan[key]:
+            plan_results.append(result)
+        results.append((key, plan_results))
+
+
+    headers = ['Plan',]
+    headers += ['',] * i
+
+    data = {
+        'method': method,
+        'headers': headers,
+        'results': results,
+    }
+
+    return render(request, 'testresults/test_method_trend.html', data)

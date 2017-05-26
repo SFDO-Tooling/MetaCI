@@ -1,0 +1,54 @@
+{% extends 'layout_full.html' %}
+
+{% block layout_header_text %}Test Trend for {{ method.testclass }}{{ method }} in {{ method.testclass.repo }}{% endblock %}
+
+{% block layout_header_details %}
+{% endblock %}
+
+{% block layout_body %}
+
+<table class="slds-table slds-table--bordered slds-table--cell-buffer">
+  <thead>
+    <tr class="slds-text-title--caps">
+    {% for header in headers %}
+      <th scope="col">{{ header }}</th>
+    {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for plan_result in results %}
+    <tr>
+      <th scope="row">{{ plan_result.0 }}</th>
+      {% for result in plan_result.1 %}
+      <td>
+        {% if result.outcome == 'Pass' %}
+        <a href="{{ result.build_flow.build.get_absolute_url }}">
+          <div class="slds-media__figure"> 
+            {% autoescape off %}
+            <svg class="slds-button__icon slds-theme--success" aria-hidden="true">
+              <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#success"></use>
+            </svg>
+            {% endautoescape %}
+            <span class="slds-assistive-text">Pass</span>
+          </div>
+        </a>
+        {% elif result.outcome == 'Fail' %}
+        <a href="{{ result.build_flow.build.get_absolute_url }}">
+          <div class="slds-media__figure"> 
+            {% autoescape off %}
+            <svg class="slds-button__icon slds-theme--error" aria-hidden="true">
+              <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+            </svg>
+            {% endautoescape %}
+            <span class="slds-assistive-text">Fail</span>
+          </div>
+        </a>
+        {% endif %}
+      </td>  
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
