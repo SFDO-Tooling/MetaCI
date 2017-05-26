@@ -15,7 +15,7 @@
 
     {% for test in tests.failed_tests %}
       <div class="slds-tile slds-m-bottom--medium">
-        <h3 class="slds-truncate slds-text-heading--small" title="{{ test.method.testclass }}.{{ test.method }}"><a href="/testresults/trend/method/{{ test.method.id }}">{{ test.method.testclass }}.{{ test.method }}</a></h3>
+        <h3 class="slds-truncate slds-text-heading--small" title="{{ test.method.testclass }}.{{ test.method }}"><a href="/tests/trend/method/{{ test.method.id }}">{{ test.method.testclass }}.{{ test.method }}</a></h3>
         <div class="slds-tile__detail slds-text-body--small">
           <dl class="slds-list--horizontal slds-wrap">
             <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Stack Trace">Stack Trace:</dt>

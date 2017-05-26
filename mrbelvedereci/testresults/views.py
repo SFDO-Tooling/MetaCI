@@ -1,6 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
+from django.shortcuts import redirect
 
 from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import BuildFlow
@@ -98,7 +100,11 @@ def build_flow_tests(request, build_id, flow):
 
     return render(request, 'testresults/build_flow_tests.html', data)
 
+@login_required
 def test_method_trend(request, method_id):
+    if not request.user.email.endswith('@example.com'):
+        return redirect('/login/?next=%s' % request.path)
+
     method = get_object_or_404(TestMethod, id=method_id)
     
     latest_results = method.test_results.order_by('-build_flow__time_end')
