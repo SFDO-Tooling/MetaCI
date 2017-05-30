@@ -1,12 +1,14 @@
 from __future__ import unicode_literals
 
 import StringIO
+from glob import iglob
 import json
 import os
 import re
 import shutil
 import sys
 import tempfile
+import xml.etree.ElementTree as ET
 import zipfile
 
 from django.utils import timezone
@@ -351,17 +353,53 @@ class BuildFlow(models.Model):
         self.save()
 
     def load_test_results(self):
-        if not os.path.isfile('test_results.json'):
-            return
-        
-        f = open('test_results.json', 'r')
-        results = json.load(f)
+        results = []
+        if self.build.plan.junit_path:
+            if not os.path.exists(self.build.plan.junit_path):
+                raise ApexTestException('junit_path does not exist: {}'.format(
+                    self.build.plan.junit_path
+                ))
+            for filename in iglob(self.build.plan.junit_path):
+                results.extend(self.load_junit(filename))
+        else:
+            try:
+                with open('test_results.json', 'r') as f:
+                    results.extend(json.load(f))
+            except IOError as e:
+                try:
+                    results.extend(self.load_junit('test_results.xml'))
+                except IOError as e:
+                    return
         import_test_results(self, results)
 
         self.tests_total = self.test_results.count()
         self.tests_pass = self.test_results.filter(outcome = 'Pass').count()
         self.tests_fail = self.test_results.filter(outcome__in = ['Fail','CompileFail']).count()
         self.save()
+
+    def load_junit(self, filename):
+        results = []
+        tree = ET.parse(filename)
+        testsuite = tree.getroot()
+        for testcase in testsuite.getchildren():
+            result = {
+                'ClassName': testcase.attrib['classname'],
+                'Method': testcase.attrib['name'],
+                'Outcome': 'Pass',
+                'StackTrace': '',
+                'Message': '',
+                'Stats': {
+                    'duration': testcase.get('time'),
+                },
+            }
+            failures = testcase.getchildren()
+            for failure in failures:
+                result['Outcome'] = 'Fail'
+                result['StackTrace'] += failure.attrib['type'] + '\n'
+                result['Message'] += failure.text + '\n'
+            results.append(result)
+        return results
+
 
 class Rebuild(models.Model):
     build = models.ForeignKey('build.Build', related_name='rebuilds')
