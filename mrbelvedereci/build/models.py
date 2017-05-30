@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import StringIO
+from glob import iglob
 import json
 import os
 import re
@@ -352,14 +353,23 @@ class BuildFlow(models.Model):
         self.save()
 
     def load_test_results(self):
-        try:
-            with open('test_results.json', 'r') as f:
-                results = json.load(f)
-        except IOError as e:
+        results = []
+        if self.build.plan.junit_path:
+            if not os.path.exists(self.build.plan.junit_path):
+                raise ApexTestException('junit_path does not exist: {}'.format(
+                    self.build.plan.junit_path
+                ))
+            for filename in iglob(self.build.plan.junit_path):
+                results.extend(self.load_junit(filename))
+        else:
             try:
-                results = self.load_junit('test_results.xml')
+                with open('test_results.json', 'r') as f:
+                    results.extend(json.load(f))
             except IOError as e:
-                return
+                try:
+                    results.extend(self.load_junit('test_results.xml'))
+                except IOError as e:
+                    return
         import_test_results(self, results)
 
         self.tests_total = self.test_results.count()
