@@ -307,6 +307,7 @@ class BuildFlow(models.Model):
 
         except BrowserTestFailure as e:
             exception = e
+            self.load_test_results()
             self.status = 'fail'
 
         except Exception as e:
