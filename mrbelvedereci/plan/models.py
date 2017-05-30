@@ -22,6 +22,7 @@ class Plan(models.Model):
     context = models.CharField(max_length=255, null=True, blank=True)
     public = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
+    junit_path = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         ordering = ['name','repo__owner','repo__name', 'active', 'context']
