@@ -379,7 +379,7 @@ class BuildFlow(models.Model):
                 'StackTrace': '',
                 'Message': '',
                 'Stats': {
-                    'Duration': testcase.get('time'),
+                    'duration': testcase.get('time'),
                 },
             }
             failures = testcase.getchildren()
