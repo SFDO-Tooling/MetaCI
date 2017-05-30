@@ -355,12 +355,9 @@ class BuildFlow(models.Model):
     def load_test_results(self):
         results = []
         if self.build.plan.junit_path:
-            if not os.path.exists(self.build.plan.junit_path):
-                raise ApexTestException('junit_path does not exist: {}'.format(
-                    self.build.plan.junit_path
-                ))
-            for filename in iglob(self.build.plan.junit_path):
-                results.extend(self.load_junit(filename))
+            if os.path.exists(self.build.plan.junit_path):
+                for filename in iglob(self.build.plan.junit_path):
+                    results.extend(self.load_junit(filename))
         else:
             try:
                 with open('test_results.json', 'r') as f:
