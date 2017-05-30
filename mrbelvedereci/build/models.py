@@ -356,7 +356,10 @@ class BuildFlow(models.Model):
             with open('test_results.json', 'r') as f:
                 results = json.load(f)
         except IOError as e:
-            results = self.load_junit('test_results.xml')
+            try:
+                results = self.load_junit('test_results.xml')
+            except IOError as e:
+                return
         import_test_results(self, results)
 
         self.tests_total = self.test_results.count()
@@ -385,6 +388,7 @@ class BuildFlow(models.Model):
                 result['StackTrace'] += failure.attrib['type'] + '\n'
                 result['Message'] += failure.text + '\n'
             results.append(result)
+        return results
 
 
 class Rebuild(models.Model):
