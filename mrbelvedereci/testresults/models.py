@@ -87,6 +87,7 @@ class TestResult(models.Model):
     outcome = models.CharField(max_length=16, choices=OUTCOME_CHOICES, db_index=True)
     stacktrace = models.TextField(null=True, blank=True)
     message = models.TextField(null=True, blank=True)
+    source_file = models.CharField(max_length=255)
     email_invocations_used = models.IntegerField(null=True, blank=True, db_index=True)
     email_invocations_allowed = models.IntegerField(null=True, blank=True, db_index=True)
     email_invocations_percent = models.IntegerField(null=True, blank=True, db_index=True)

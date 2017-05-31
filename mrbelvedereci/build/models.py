@@ -359,17 +359,23 @@ class BuildFlow(models.Model):
             for filename in iglob(self.build.plan.junit_path):
                 results.extend(self.load_junit(filename))
             if not results:
-                self.logger.warning('JUnit path {} not found'.format(self.build.plan.junit_path))
-                return
-        else:
+                self.logger.warning('No results found at JUnit path {}'.format(
+                    self.build.plan.junit_path
+                ))
+        try:
+            results_filename = 'test_results.json'
+            with open(results_filename, 'r') as f:
+                results.extend(json.load(f))
+            for result in results:
+                result['SourceFile'] = results_filename
+        except IOError as e:
             try:
-                with open('test_results.json', 'r') as f:
-                    results.extend(json.load(f))
+                results_filename = 'test_results.xml'
+                results.extend(self.load_junit(results_filename))
             except IOError as e:
-                try:
-                    results.extend(self.load_junit('test_results.xml'))
-                except IOError as e:
-                    return
+                pass
+        if not results:
+            return
         import_test_results(self, results)
 
         self.tests_total = self.test_results.count()
@@ -381,7 +387,7 @@ class BuildFlow(models.Model):
         results = []
         tree = ET.parse(filename)
         testsuite = tree.getroot()
-        for testcase in testsuite.getchildren():
+        for testcase in testsuite.iter('testcase'):
             result = {
                 'ClassName': testcase.attrib['classname'],
                 'Method': testcase.attrib['name'],
@@ -391,12 +397,17 @@ class BuildFlow(models.Model):
                 'Stats': {
                     'duration': testcase.get('time'),
                 },
+                'SourceFile': filename,
             }
-            failures = testcase.getchildren()
-            for failure in failures:
+            for element in testcase.iter():
+                if element.tag not in ['failure', 'error']:
+                    continue
                 result['Outcome'] = 'Fail'
-                result['StackTrace'] += failure.attrib['type'] + '\n'
-                result['Message'] += failure.text + '\n'
+                result['StackTrace'] += element.text + '\n'
+                message = element.attrib['type']
+                if 'message' in element.attrib:
+                    message += ': ' + element.attrib['message']
+                result['Message'] += message + '\n'
             results.append(result)
         return results
 

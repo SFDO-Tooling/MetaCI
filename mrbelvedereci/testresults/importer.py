@@ -68,6 +68,7 @@ def import_test_results(build_flow, results):
             outcome = result['Outcome'],
             stacktrace = result['StackTrace'],
             message = result['Message'],
+            source_file = result['SourceFile']
         ) 
         testresult.save()
 
