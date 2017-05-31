@@ -392,11 +392,15 @@ class BuildFlow(models.Model):
                     'duration': testcase.get('time'),
                 },
             }
-            failures = testcase.getchildren()
-            for failure in failures:
+            for child in testcase.getchildren():
+                if child.tag not in ['failure', 'error']:
+                    continue
                 result['Outcome'] = 'Fail'
-                result['StackTrace'] += failure.attrib['type'] + '\n'
-                result['Message'] += failure.text + '\n'
+                result['StackTrace'] += child.text + '\n'
+                message = child.attrib['message']
+                if 'type' in child.attrib:
+                    message = child.attrib['type'] + ': ' + message
+                result['Message'] += message + '\n'
             results.append(result)
         return results
 
