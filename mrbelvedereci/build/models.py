@@ -381,7 +381,7 @@ class BuildFlow(models.Model):
         results = []
         tree = ET.parse(filename)
         testsuite = tree.getroot()
-        for testcase in testsuite.getchildren():
+        for testcase in testsuite.iter('testcase'):
             result = {
                 'ClassName': testcase.attrib['classname'],
                 'Method': testcase.attrib['name'],
@@ -392,14 +392,14 @@ class BuildFlow(models.Model):
                     'duration': testcase.get('time'),
                 },
             }
-            for child in testcase.getchildren():
-                if child.tag not in ['failure', 'error']:
+            for element in testcase.iter():
+                if element.tag not in ['failure', 'error']:
                     continue
                 result['Outcome'] = 'Fail'
-                result['StackTrace'] += child.text + '\n'
-                message = child.attrib['message']
-                if 'type' in child.attrib:
-                    message = child.attrib['type'] + ': ' + message
+                result['StackTrace'] += element.text + '\n'
+                message = element.attrib['message']
+                if 'type' in element.attrib:
+                    message = element.attrib['type'] + ': ' + message
                 result['Message'] += message + '\n'
             results.append(result)
         return results
