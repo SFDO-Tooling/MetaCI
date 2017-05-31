@@ -397,9 +397,9 @@ class BuildFlow(models.Model):
                     continue
                 result['Outcome'] = 'Fail'
                 result['StackTrace'] += element.text + '\n'
-                message = element.attrib['message']
-                if 'type' in element.attrib:
-                    message = element.attrib['type'] + ': ' + message
+                message = element.attrib['type']
+                if 'message' in element.attrib:
+                    message += ': ' + element.attrib['message']
                 result['Message'] += message + '\n'
             results.append(result)
         return results
