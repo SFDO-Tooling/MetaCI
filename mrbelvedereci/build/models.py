@@ -365,11 +365,11 @@ class BuildFlow(models.Model):
         try:
             with open('test_results.json', 'r') as f:
                 results.extend(json.load(f))
+        except IOError as e:
+            try:
+                results.extend(self.load_junit('test_results.xml'))
             except IOError as e:
-                try:
-                    results.extend(self.load_junit('test_results.xml'))
-                except IOError as e:
-                    pass
+                pass
         if not results:
             return
         import_test_results(self, results)
