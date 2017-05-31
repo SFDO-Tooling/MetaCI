@@ -363,11 +363,15 @@ class BuildFlow(models.Model):
                     self.build.plan.junit_path
                 ))
         try:
-            with open('test_results.json', 'r') as f:
+            results_filename = 'test_results.json'
+            with open(results_filename, 'r') as f:
                 results.extend(json.load(f))
+            for result in results:
+                result['SourceFile'] = results_filename
         except IOError as e:
             try:
-                results.extend(self.load_junit('test_results.xml'))
+                results_filename = 'test_results.xml'
+                results.extend(self.load_junit(results_filename))
             except IOError as e:
                 pass
         if not results:
@@ -393,6 +397,7 @@ class BuildFlow(models.Model):
                 'Stats': {
                     'duration': testcase.get('time'),
                 },
+                'SourceFile': filename,
             }
             for element in testcase.iter():
                 if element.tag not in ['failure', 'error']:
