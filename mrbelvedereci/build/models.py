@@ -359,17 +359,19 @@ class BuildFlow(models.Model):
             for filename in iglob(self.build.plan.junit_path):
                 results.extend(self.load_junit(filename))
             if not results:
-                self.logger.warning('JUnit path {} not found'.format(self.build.plan.junit_path))
-                return
-        else:
-            try:
-                with open('test_results.json', 'r') as f:
-                    results.extend(json.load(f))
+                self.logger.warning('No results found at JUnit path {}'.format(
+                    self.build.plan.junit_path
+                ))
+        try:
+            with open('test_results.json', 'r') as f:
+                results.extend(json.load(f))
             except IOError as e:
                 try:
                     results.extend(self.load_junit('test_results.xml'))
                 except IOError as e:
-                    return
+                    pass
+        if not results:
+            return
         import_test_results(self, results)
 
         self.tests_total = self.test_results.count()
