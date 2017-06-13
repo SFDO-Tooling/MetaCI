@@ -117,6 +117,7 @@ class Build(models.Model):
             self.time_end = timezone.now()
             self.save()
             self.delete_build_dir()
+            self.logger.handler.stream.flush(force=True)
             if self.current_rebuild:
                 self.current_rebuild.status = self.status
                 self.current_rebuild.time_end = timezone.now()
@@ -158,6 +159,7 @@ class Build(models.Model):
                 else:
                     self.logger = init_logger(self)
                     self.logger.info('Build flow {} completed successfully'.format(flow))
+                    self.logger.handler.stream.flush(force=True)
                     self.save()
     
         except Exception as e:
@@ -169,6 +171,7 @@ class Build(models.Model):
             self.time_end = timezone.now()
             self.save()
             self.delete_build_dir()
+            self.logger.handler.stream.flush(force=True)
             if self.current_rebuild:
                 self.current_rebuild.status = self.status
                 self.current_rebuild.time_end = timezone.now()
@@ -179,6 +182,7 @@ class Build(models.Model):
             self.delete_org(org_config)
 
         self.delete_build_dir()
+        self.logger.handler.stream.flush(force=True)
 
         # Set success status
         self.status = 'success'
