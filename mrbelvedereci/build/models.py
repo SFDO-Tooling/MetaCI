@@ -91,6 +91,10 @@ class Build(models.Model):
         url = '{}{}'.format(settings.SITE_URL, self.get_absolute_url())
         return url
 
+    def flush_log(self):
+        for handler in self.logger.handlers:
+            handler.stream.flush(force=True)
+
     def run(self):
         self.logger = init_logger(self)
         self.set_running_status()
@@ -117,7 +121,7 @@ class Build(models.Model):
             self.time_end = timezone.now()
             self.save()
             self.delete_build_dir()
-            self.logger.handler.stream.flush(force=True)
+            self.flush_log()
             if self.current_rebuild:
                 self.current_rebuild.status = self.status
                 self.current_rebuild.time_end = timezone.now()
@@ -159,7 +163,7 @@ class Build(models.Model):
                 else:
                     self.logger = init_logger(self)
                     self.logger.info('Build flow {} completed successfully'.format(flow))
-                    self.logger.handler.stream.flush(force=True)
+                    self.flush_log()
                     self.save()
     
         except Exception as e:
@@ -171,7 +175,7 @@ class Build(models.Model):
             self.time_end = timezone.now()
             self.save()
             self.delete_build_dir()
-            self.logger.handler.stream.flush(force=True)
+            self.flush_log()
             if self.current_rebuild:
                 self.current_rebuild.status = self.status
                 self.current_rebuild.time_end = timezone.now()
@@ -182,7 +186,7 @@ class Build(models.Model):
             self.delete_org(org_config)
 
         self.delete_build_dir()
-        self.logger.handler.stream.flush(force=True)
+        self.flush_log()
 
         # Set success status
         self.status = 'success'
