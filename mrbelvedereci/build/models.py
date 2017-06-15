@@ -218,6 +218,13 @@ class Build(models.Model):
         build_dir += '/{}-{}'.format(self.repo.name, self.commit)
         self.logger.info('-- Commit extracted to build dir: {}'.format(build_dir))
         self.save()
+
+        if self.plan.sfdx_config:
+            self.logger.info("-- Injecting custom sfdx-workspace.json from plan")
+            f = open(os.path.join(build_dir, 'sfdx-workspace.json'), 'w')
+            f.write(self.plan.sfdx_config)
+            f.close()
+
         return build_dir
 
     def get_project_config(self):
