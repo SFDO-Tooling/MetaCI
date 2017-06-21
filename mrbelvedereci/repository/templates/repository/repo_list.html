@@ -1,4 +1,5 @@
 {% extends 'layout_full.html' %}
+{% load humanize %}
 
 {% block layout_parent_link %}{% endblock %}
 {% block layout_header_text %}Repositories{% endblock %}
@@ -11,16 +12,59 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>Builds</th>
+          <th># Builds</th>
+{% for column in columns %}
+          <th>{{ column }}</th>
+{% endfor %}
         </tr>
       </thead>
       <tbody>
 {% for repo in repos %}
         <tr>
-          <td><a href="/repo/{{ repo.owner }}/{{ repo.name }}">{{ repo }}</a></td>
-          <td>{{ repo.builds.count }}</td>
+          <td><a href="/repo/{{ repo.owner }}/{{ repo.name }}">{{ repo.title }}</a></td>
+          <td>{{ repo.build_count }}</td>
+        {% for column in repo.columns %}
+          <td>
+          {% for build in column %}
+            {% if build.status == 'queued' or build.status == 'waiting' or build.status == 'running' %}
+              <a href="{{ build.get_absolute_url }}" title="Started: {{ build.time_start|naturaltime }}{{ build.commit }}">
+                <div class="slds-media__figure"> 
+                  {% autoescape off %}
+                  <svg class="slds-button__icon slds-theme--default" aria-hidden="true">
+                    <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#inbox"></use>
+                  </svg>
+                  {% endautoescape %}
+                  <span class="slds-assistive-text">Pass</span>
+                </div>
+              </a>
+            {% elif build.status == 'success' %}
+              <a href="{{ build.get_absolute_url }}" title="Started: {{ build.time_start|naturaltime }} Commit: {{ build.commit }}">
+                <div class="slds-media__figure"> 
+                  {% autoescape off %}
+                  <svg class="slds-button__icon slds-theme--success" aria-hidden="true">
+                    <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#success"></use>
+                  </svg>
+                  {% endautoescape %}
+                  <span class="slds-assistive-text">Pass</span>
+                </div>
+              </a>
+            {% elif build.status == 'fail' or build.status == 'error' %}
+              <a href="{{ build.get_absolute_url }}">
+                <div class="slds-media__figure" title="Started: {{ build.time_start|naturaltime }} Commit: {{ build.commit }}"> 
+                  {% autoescape off %}
+                  <svg class="slds-button__icon slds-theme--error" aria-hidden="true">
+                    <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                  </svg>
+                  {% endautoescape %}
+                  <span class="slds-assistive-text">Fail</span>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
+          </td>
+        {% endfor %}
         </tr>
-{% endfor %}
+      {% endfor %}
       </tbody>
     </table>
   </div>

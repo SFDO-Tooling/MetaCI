@@ -25,9 +25,42 @@ def repo_list(request, owner=None):
     if owner:
         repos = repos.filter(owner = owner)
 
+    repo_list = []
+    columns = []
+       
+    for repo in repos:
+        repo_info = {}
+        repo_info['name'] = repo.name
+        repo_info['owner'] = repo.owner
+        repo_info['title'] = unicode(repo)
+        repo_info['build_count'] = repo.builds.count()
+        repo_info['columns'] = {}
+        for plan in repo.plans.filter(dashboard__isnull = False):
+            if plan.name not in columns:
+                columns.append(plan.name)
+            builds = []
+            latest_builds = plan.builds.order_by('time_start')
+            if plan.dashboard == 'last':
+                builds.extend(latest_builds[:1])
+            elif plan.dashboard == 'recent':
+                builds.extend(latest_builds[:5])
+            if builds:
+                repo_info['columns'][plan.name] = builds
+        repo_list.append(repo_info)
+
+    columns.sort()
+
+    for repo in repo_list:
+        repo_columns = []
+        for column in columns:
+            repo_columns.append(repo['columns'].get(column))
+        repo['columns'] = repo_columns
+
     context = {
-        'repos': repos,
+        'repos': repo_list,
+        'columns': columns,
     }
+    print context
     return render(request, 'repository/repo_list.html', context=context)
 
 def repo_detail(request, owner, name):

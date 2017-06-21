@@ -11,6 +11,12 @@ TRIGGER_TYPES = (
     ('tag', 'Tag'),
 )
 
+DASHBOARD_CHOICES = (
+    ('last', 'Most Recent Build'),
+    ('recent', '5 Most Recent Build'),
+    ('branches', 'Latest Builds by Branch'),
+)
+
 class Plan(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -22,6 +28,7 @@ class Plan(models.Model):
     context = models.CharField(max_length=255, null=True, blank=True)
     public = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
+    dashboard = models.CharField(max_length=8, choices=DASHBOARD_CHOICES, default=None, null=True, blank=True)
     junit_path = models.CharField(max_length=255, null=True, blank=True)
     sfdx_config = models.TextField(null=True, blank=True)
 
