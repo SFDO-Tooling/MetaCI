@@ -16,6 +16,7 @@
         <th>On Success</th>
         <th>On Failure</th>
         <th>On Error</th>
+        <th>Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -25,6 +26,7 @@
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>
+        <td><a class="slds-button--destructive" href="/notifications/delete/repository/{{ notification.id }}">Delete</a></td>
       </tr>
     {% endfor %}
     </tbody>
@@ -43,6 +45,7 @@
         <th>On Success</th>
         <th>On Failure</th>
         <th>On Error</th>
+        <th>Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -53,6 +56,7 @@
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>
+        <td><a class="slds-button--destructive" href="/notifications/delete/plan/{{ notification.id }}">Delete</a></td>
       </tr>
     {% endfor %}
     </tbody>
@@ -70,6 +74,7 @@
         <th>On Success</th>
         <th>On Failure</th>
         <th>On Error</th>
+        <th>Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -80,6 +85,7 @@
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>
+        <td><a class="slds-button--destructive" href="/notifications/delete/branch/{{ notification.id }}">Delete</a></td>
       </tr>
     {% endfor %}
     </tbody>

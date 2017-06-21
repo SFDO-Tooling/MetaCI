@@ -22,4 +22,19 @@ urlpatterns = [
         views.add_plan_notification,
         name='add_plan_notification',
     ),
+    url(
+        r'^/delete/branch/(?P<pk>\d+)$',
+        views.delete_branch_notification,
+        name='delete_branch_notification',
+    ),
+    url(
+        r'^/delete/plan/(?P<pk>\d+)$',
+        views.delete_plan_notification,
+        name='delete_plan_notification',
+    ),
+    url(
+        r'^/delete/repository/(?P<pk>\d+)$',
+        views.delete_repository_notification,
+        name='delete_repository_notification',
+    ),
 ]

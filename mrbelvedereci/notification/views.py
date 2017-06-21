@@ -1,9 +1,16 @@
 from django.shortcuts import render
+from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+
 from mrbelvedereci.notification.forms import AddRepositoryNotificationForm
 from mrbelvedereci.notification.forms import AddBranchNotificationForm
 from mrbelvedereci.notification.forms import AddPlanNotificationForm
+from mrbelvedereci.notification.forms import DeleteNotificationForm
+from mrbelvedereci.notification.models import BranchNotification
+from mrbelvedereci.notification.models import PlanNotification
+from mrbelvedereci.notification.models import RepositoryNotification
+
 
 @login_required
 def my_notifications(request):
@@ -69,3 +76,32 @@ def add_plan_notification(request):
     }
 
     return render(request, 'notification/add_plan_notification.html', context=context)
+
+@login_required
+def delete_branch_notification(request, pk):
+    return delete_notification(request, BranchNotification.objects.get(pk=pk))
+
+@login_required
+def delete_plan_notification(request, pk):
+    return delete_notification(request, PlanNotification.objects.get(pk=pk))
+
+@login_required
+def delete_repository_notification(request, pk):
+    return delete_notification(request, RepositoryNotification.objects.get(pk=pk))
+
+def delete_notification(request, o):
+    if request.user != o.user:
+        return HttpResponseForbidden()
+    if request.method == 'POST':
+        form = DeleteNotificationForm(request.POST)
+        if form.is_valid():
+            if request.POST['action'] == 'Delete':
+                o.delete()
+            return HttpResponseRedirect('/notifications')
+    else:
+        form = DeleteNotificationForm()
+    return render(
+        request,
+        'notification/delete_notification.html',
+        context={'form': form},
+    )

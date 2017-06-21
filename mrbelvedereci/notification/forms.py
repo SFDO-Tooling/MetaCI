@@ -108,3 +108,29 @@ class AddPlanNotificationForm(forms.ModelForm):
         fields = ['plan','user','on_success','on_fail','on_error']
         widgets = {'user': forms.HiddenInput()}
 
+
+class DeleteNotificationForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(DeleteNotificationForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_class = 'form-vertical'
+        self.helper.form_id = 'delete-notification-form'
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Fieldset(
+                'Are you sure you want to delete this notification?',
+                css_class='slds-form-element',
+            ),
+            FormActions(
+                Submit(
+                    'action',
+                    'Cancel',
+                    css_class='slds-button slds-button--neutral',
+                ),
+                Submit(
+                    'action',
+                    'Delete',
+                    css_class='slds-button slds-button--destructive',
+                ),
+            ),
+        )
