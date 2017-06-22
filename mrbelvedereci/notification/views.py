@@ -103,5 +103,12 @@ def delete_notification(request, o):
     return render(
         request,
         'notification/delete_notification.html',
-        context={'form': form},
+        context={
+            'form': form,
+            'notification': o,
+            'notification_type': o.__class__.__name__.replace(
+                'Notification',
+                '',
+            ),
+        },
     )

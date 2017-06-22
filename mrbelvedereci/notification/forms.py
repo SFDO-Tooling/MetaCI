@@ -118,11 +118,6 @@ class DeleteNotificationForm(forms.Form):
         self.helper.form_id = 'delete-notification-form'
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
-            HTML(
-                '<div class="slds-text-body--regular">' +
-                'Are you sure you want to delete this notification?' +
-                '</div>',
-            ),
             FormActions(
                 Submit(
                     'action',
