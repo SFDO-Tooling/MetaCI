@@ -4,6 +4,7 @@ from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field
 from crispy_forms.layout import Fieldset
+from crispy_forms.layout import HTML
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 from django import forms
@@ -117,9 +118,10 @@ class DeleteNotificationForm(forms.Form):
         self.helper.form_id = 'delete-notification-form'
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
-            Fieldset(
-                'Are you sure you want to delete this notification?',
-                css_class='slds-form-element',
+            HTML(
+                '<div class="slds-text-body--regular">' +
+                'Are you sure you want to delete this notification?' +
+                '</div>',
             ),
             FormActions(
                 Submit(
