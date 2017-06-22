@@ -2,16 +2,13 @@ from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field
 from crispy_forms.layout import Fieldset
-from crispy_forms.layout import HTML
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 from django import forms
-from django.conf import settings
-from github3 import login
 
-from mrbelvedereci.notification.models import RepositoryNotification
 from mrbelvedereci.notification.models import BranchNotification
 from mrbelvedereci.notification.models import PlanNotification
+from mrbelvedereci.notification.models import RepositoryNotification
 
 
 class AddRepositoryNotificationForm(forms.ModelForm):
