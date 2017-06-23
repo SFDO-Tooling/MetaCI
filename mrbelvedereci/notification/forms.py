@@ -1,5 +1,3 @@
-from github3 import login
-
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field
@@ -7,12 +5,14 @@ from crispy_forms.layout import Fieldset
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 from django import forms
-from django.conf import settings
-from mrbelvedereci.notification.models import RepositoryNotification
+
 from mrbelvedereci.notification.models import BranchNotification
 from mrbelvedereci.notification.models import PlanNotification
+from mrbelvedereci.notification.models import RepositoryNotification
+
 
 class AddRepositoryNotificationForm(forms.ModelForm):
+
     def __init__(self, *args, **kwargs):
         super(AddRepositoryNotificationForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -34,17 +34,22 @@ class AddRepositoryNotificationForm(forms.ModelForm):
                 css_class='slds-form-element',
             ),
             FormActions(
-                Submit('submit', 'Submit',
-                       css_class='slds-button slds-button--brand')
+                Submit(
+                    'submit',
+                    'Submit',
+                    css_class='slds-button slds-button--brand',
+                ),
             ),
         )
 
     class Meta:
         model = RepositoryNotification
-        fields = ['repo','user','on_success','on_fail','on_error']
+        fields = ['repo', 'user', 'on_success', 'on_fail', 'on_error']
         widgets = {'user': forms.HiddenInput()}
 
+
 class AddBranchNotificationForm(forms.ModelForm):
+
     def __init__(self, *args, **kwargs):
         super(AddBranchNotificationForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -66,17 +71,22 @@ class AddBranchNotificationForm(forms.ModelForm):
                 css_class='slds-form-element',
             ),
             FormActions(
-                Submit('submit', 'Submit',
-                       css_class='slds-button slds-button--brand')
+                Submit(
+                    'submit',
+                    'Submit',
+                    css_class='slds-button slds-button--brand',
+                ),
             ),
         )
 
     class Meta:
         model = BranchNotification
-        fields = ['branch','user','on_success','on_fail','on_error']
+        fields = ['branch', 'user', 'on_success', 'on_fail', 'on_error']
         widgets = {'user': forms.HiddenInput()}
 
+
 class AddPlanNotificationForm(forms.ModelForm):
+
     def __init__(self, *args, **kwargs):
         super(AddPlanNotificationForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -98,13 +108,39 @@ class AddPlanNotificationForm(forms.ModelForm):
                 css_class='slds-form-element',
             ),
             FormActions(
-                Submit('submit', 'Submit',
-                       css_class='slds-button slds-button--brand')
+                Submit(
+                    'submit',
+                    'Submit',
+                    css_class='slds-button slds-button--brand',
+                ),
             ),
         )
 
     class Meta:
         model = PlanNotification
-        fields = ['plan','user','on_success','on_fail','on_error']
+        fields = ['plan', 'user', 'on_success', 'on_fail', 'on_error']
         widgets = {'user': forms.HiddenInput()}
 
+
+class DeleteNotificationForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super(DeleteNotificationForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_class = 'form-vertical'
+        self.helper.form_id = 'delete-notification-form'
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            FormActions(
+                Submit(
+                    'action',
+                    'Cancel',
+                    css_class='slds-button slds-button--neutral',
+                ),
+                Submit(
+                    'action',
+                    'Delete',
+                    css_class='slds-button slds-button--destructive',
+                ),
+            ),
+        )

@@ -16,6 +16,7 @@
         <th>On Success</th>
         <th>On Failure</th>
         <th>On Error</th>
+        <th>Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -25,6 +26,18 @@
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>
+        <td>
+          <a href="/notifications/delete/repository/{{ notification.id }}">
+            <button class="slds-button slds-button_icon" title="Delete notification">
+              {% autoescape off %}
+              <svg class="slds-button__icon slds-theme--default" aria-hidden="true">
+                <use xlink:href="/static/slds/assets/icons/action-sprite/svg/symbols.svg#delete"></use>
+              </svg>
+              {% endautoescape %}
+              <span class="slds-assistive-text">Delete notification</span>
+            </button>
+          </a>
+        </td>
       </tr>
     {% endfor %}
     </tbody>
@@ -39,10 +52,11 @@
     <thead>
       <tr>
         <th>Plan</th>
-        <th>Repo</th>
+        <th>Repository</th>
         <th>On Success</th>
         <th>On Failure</th>
         <th>On Error</th>
+        <th>Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -53,6 +67,18 @@
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>
+        <td>
+          <a href="/notifications/delete/plan/{{ notification.id }}">
+            <button class="slds-button slds-button_icon" title="Delete notification">
+              {% autoescape off %}
+              <svg class="slds-button__icon slds-theme--default" aria-hidden="true">
+                <use xlink:href="/static/slds/assets/icons/action-sprite/svg/symbols.svg#delete"></use>
+              </svg>
+              {% endautoescape %}
+              <span class="slds-assistive-text">Delete notification</span>
+            </button>
+          </a>
+        </td>
       </tr>
     {% endfor %}
     </tbody>
@@ -66,10 +92,11 @@
     <thead>
       <tr>
         <th>Branch</th>
-        <th>Repo</th>
+        <th>Repository</th>
         <th>On Success</th>
         <th>On Failure</th>
         <th>On Error</th>
+        <th>Delete</th>
       </tr>
     </thead>
     <tbody>
@@ -80,6 +107,18 @@
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>
+        <td>
+          <a href="/notifications/delete/branch/{{ notification.id }}">
+            <button class="slds-button slds-button_icon" title="Delete notification">
+              {% autoescape off %}
+              <svg class="slds-button__icon slds-theme--default" aria-hidden="true">
+                <use xlink:href="/static/slds/assets/icons/action-sprite/svg/symbols.svg#delete"></use>
+              </svg>
+              {% endautoescape %}
+              <span class="slds-assistive-text">Delete notification</span>
+            </button>
+          </a>
+        </td>
       </tr>
     {% endfor %}
     </tbody>
