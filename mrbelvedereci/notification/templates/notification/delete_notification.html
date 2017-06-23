@@ -6,11 +6,10 @@
 
 {% block layout_body %}
 
-<h3 class="slds-text-heading--medium">
+<h3 class="slds-text-heading--medium slds-m-bottom--medium">
   Are you sure you want to delete this {{ notification_type }} Notification?
 </h3>
-<br/>
-<div class="slds-box">
+<div class="slds-box slds-m-bottom--medium">
   <table class="slds-table slds-no-row-hover">
     <thead>
       <tr>
@@ -43,7 +42,6 @@
     </tbody>
   </table>
 </div>
-<br/>
 
     {{ form.errors }}
       {% crispy form form.helper %}
