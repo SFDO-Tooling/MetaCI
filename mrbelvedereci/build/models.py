@@ -112,6 +112,10 @@ class Build(models.Model):
             # Initialize the project config
             project_config = self.get_project_config()
 
+            # Set the sentry context for build errors
+            sentry_environment = 'mrbelvedereci'
+            project_config.config['sentry_environment'] = sentry_environment
+
             # Look up the org
             org_config = self.get_org(project_config)
     
