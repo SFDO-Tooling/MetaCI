@@ -29,7 +29,7 @@
       "value": ""
     },
     "GITHUB_PASSWORD": {
-      "description": "The Github password used to connec to repositories and create web hooks.  Using an application token instead of password is recommended",
+      "description": "The Github password used to connect to repositories and create web hooks.  Using an application token instead of password is recommended",
       "value": ""
     },
     "GITHUB_WEBHOOK_BASE_URL": {
@@ -39,18 +39,6 @@
     "GITHUB_WEBHOOK_SECRET": {
       "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
       "generator": "secret"
-    },
-    "AWS_ACCESS_KEY_ID": {
-      "description": "The Access Key ID for the AWS account used for S3 storage of files and images",
-      "value": "admin"
-    },
-    "AWS_SECRET_ACCESS_KEY": {
-      "description": "The Secret Access Key for the AWS account used for S3 storage of files and images",
-      "value": "admin"
-    },
-    "AWS_ACCESS_BUCKET_NAME": {
-      "description": "The bucket name for S3 to store files and images",
-      "value": "mrbelvedereci"
     },
     "DJANGO_ADMIN_URL": {
       "description": "The url path to the admin section of the site",
@@ -64,17 +52,18 @@
       "description": "The site settings to use",
       "generator": "config.settings.production"
     },
-    "RQ_CONCURRENCY": {
-      "description": "The number of build workers to run per worker dyno.  Defaults to 1 so each worker dyno can run one build at a time.",
-      "value": "1"
-    },
-    "SFDX_CONFIG": {
-      "description": "The json contents of ~/.appcloud/workspace_config.json from Salesforce DX.  Required to use scratch orgs in builds.",
+    "SFDX_PRIVATE_KEY": {
+      "description": "The private key for the JWT authentication to the devhub for Salesforce DX.  Required to use scratch orgs",
       "value": "",
       "required": false
     },
-    "SFDX_HUB_ORG": {
-      "description": "The json contents of ~/.appcloud/hubOrg.json from Salesforce DX.  Required to use scratch orgs in builds.",
+    "SFDX_CLIENT_ID": {
+      "description": "The ClientID of the JWT connected app used for authenticating to the devhub for Salesforce DX.  Required to use scratch orgs",
+      "value": "",
+      "required": false
+    },
+    "SFDX_HUB_USERNAME": {
+      "description": "The username for the devhub org for Salesforce DX.  Required to use scratch orgs"
       "value": "",
       "required": false
     }
