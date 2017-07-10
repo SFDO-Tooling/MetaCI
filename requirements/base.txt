@@ -1,7 +1,7 @@
  
 
 # Bleeding edge Django
-django==1.10.3
+django==1.10.7
 
 # Configuration
 django-environ==0.4.1
@@ -42,7 +42,7 @@ django-rq-wrapper>=1.4
 django-rq-scheduler>=1.1.1
 
 # CumulusCI
-cumulusci>=2.0.0b48
+cumulusci>=2.0.0b49
 
 # Salesforce Lightning Design System for Django
 django-slds
