@@ -16,6 +16,9 @@
 # proportion of contributors will probably not be using SublimeText
 # *.sublime-project
 
+# vscode
+.vscode/*
+
 # sftp configuration file
 sftp-config.json
 
@@ -57,6 +60,7 @@ node_modules/
 
 # virtual environments
 .env
+local_setup.sh
 
 # User-uploaded media
 mrbelvedereci/media/

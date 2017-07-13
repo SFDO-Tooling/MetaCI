@@ -5,6 +5,7 @@ from cumulusci.core.config import ConnectedAppOAuthConfig
 from cumulusci.core.config import OrgConfig
 from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import ServiceConfig
+from cumulusci.core.exceptions import ServiceNotConfigured
 from django.conf import settings
 from mrbelvedereci.cumulusci.logger import init_logger
 from mrbelvedereci.cumulusci.models import Org
@@ -37,9 +38,12 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
         })
 
     def get_service(self, service_name):
-        service = Service.objects.get(name=service_name)
-        service_config = json.loads(service.json)
-        return ServiceConfig(service_config) 
+        try:
+            service = Service.objects.get(name=service_name)
+            service_config = json.loads(service.json)
+            return ServiceConfig(service_config) 
+        except Service.DoesNotExist:
+            raise ServiceNotConfigured(service_name)
 
     def set_service(self, service_name, service_config):
         try:
