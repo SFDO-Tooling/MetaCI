@@ -135,5 +135,10 @@ def get_value_from_stats(stats, field):
         return
 
     value = stats[stats_key][suffix]
-    value = value.replace(' ******* CLOSE TO LIMIT', '')
+    
+    try:
+        value = value.replace(' ******* CLOSE TO LIMIT', '')
+    except AttributeError:
+        pass
+
     return int(value)
