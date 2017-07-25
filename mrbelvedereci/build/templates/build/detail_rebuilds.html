@@ -26,7 +26,7 @@
         <div class="slds-truncate" title="{{ rebuild.id }}"><a href="{{ rebuild.get_absolute_url }}">{{ rebuild.id }}</a></div>
       </th>
       <td data-label="Status">
-        <div class="slds-truncate slds-badge {% if rebuild.status == 'fail' or rebuild.status == 'error' %}slds-theme--error{% elif rebuild.status == 'success' %}slds-theme--success{% endif %}" title="{{ rebuild.status }}"><a href="{{ rebuild.get_absolute_url }}">{{ rebuild.status }}</a></div>
+        <div class="slds-truncate slds-badge {% if rebuild.status == 'fail' or rebuild.status == 'error' %}slds-theme--error{% elif rebuild.status == 'success' %}slds-theme--success{% endif %}" title="{{ rebuild.status }}">{{ rebuild.status }}</div>
       </td>
       <th data-label="User">
         <div class="slds-truncate" title="{{ rebuild.user }}">{{ rebuild.user }}</div>
