@@ -1,8 +1,16 @@
 <div class="slds-button-group slds-m-top--medium" role="group">
   {% if builds.has_previous %}
-    <a class="slds-button slds-button--neutral" href="?page={{ builds.previous_page_number }}">previous</a>
+    <a
+      class="slds-button slds-button--neutral"
+      href="?page={{ builds.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+      >previous
+    </a>
   {% endif %}
   {% if builds.has_next %}
-    <a class="slds-button slds-button--neutral" href="?page={{ builds.next_page_number }}">next</a>
+    <a
+      class="slds-button slds-button--neutral"
+      href="?page={{ builds.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+      >next
+    </a>
   {% endif %}
 </div>
