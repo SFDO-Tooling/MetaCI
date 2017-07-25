@@ -10,6 +10,7 @@ from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import Rebuild
 from mrbelvedereci.build.tasks import run_build
 from mrbelvedereci.build.utils import view_queryset
+from mrbelvedereci.build.exceptions import BuildError
 from watson import search as watson
 
 def build_list(request):
@@ -82,6 +83,8 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
         return render(request, 'build/detail_rebuilds.html', context=context)
     elif tab == 'org':
         return render(request, 'build/detail_org.html', context=context)
+    else:
+        raise BuildError('Unsupported value for "tab": {}'.format(tab))
 
 def build_rebuild(request, build_id):
     build = get_object_or_404(Build, id = build_id)
