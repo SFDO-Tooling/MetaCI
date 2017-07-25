@@ -13,16 +13,6 @@ urlpatterns = [
         name='build_search',
     ),
     url(
-        r'^/(?P<build_id>\w+)$',
-        views.build_detail,
-        name='build_detail',
-    ),
-    url(
-        r'^/(?P<build_id>\w+)/(?P<tab>\w+)$',
-        views.build_detail,
-        name='build_detail_tab',
-    ),
-    url(
         r'^/(?P<build_id>\w+)/rebuild$',
         views.build_rebuild,
         name='build_rebuild',
@@ -36,5 +26,15 @@ urlpatterns = [
         r'^/(?P<build_id>\w+)/rebuilds/(?P<rebuild_id>\w+)$',
         views.build_detail,
         name='build_rebuild_detail',
+    ),
+    url(
+        r'^/(?P<build_id>\w+)/(?P<tab>\w+)$',
+        views.build_detail,
+        name='build_detail_tab',
+    ),
+    url(
+        r'^/(?P<build_id>\w+)$',
+        views.build_detail,
+        name='build_detail',
     ),
 ]
