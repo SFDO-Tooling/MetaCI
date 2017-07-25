@@ -1,5 +1,7 @@
 from django.conf.urls import url
+
 from mrbelvedereci.notification import views
+
 
 urlpatterns = [
     url(
