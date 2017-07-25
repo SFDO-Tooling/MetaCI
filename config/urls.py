@@ -29,13 +29,13 @@ urlpatterns = [
     url(r'^search$', build_views.build_search, name='search'),
 
     # Your stuff: custom urls includes go here
-    url(r'^builds', include('mrbelvedereci.build.urls')),
-    url(r'^notifications', include('mrbelvedereci.notification.urls')),
-    url(r'^tests', include('mrbelvedereci.testresults.urls')),
-    url(r'^plans', include('mrbelvedereci.plan.urls')),
-    url(r'^orgs', include('mrbelvedereci.cumulusci.urls')),
+    url(r'^builds/', include('mrbelvedereci.build.urls')),
+    url(r'^notifications/', include('mrbelvedereci.notification.urls')),
+    url(r'^tests/', include('mrbelvedereci.testresults.urls')),
+    url(r'^plans/', include('mrbelvedereci.plan.urls')),
+    url(r'^orgs/', include('mrbelvedereci.cumulusci.urls')),
     url(r'^hirefire/', include('mrbelvedereci.hirefire.urls')),
-    url(r'^repo', include('mrbelvedereci.repository.urls')),
+    url(r'^repo/', include('mrbelvedereci.repository.urls')),
     url(r'^webhook/github/push$', github_push_webhook, name="github_push_webhook"),
 
 
