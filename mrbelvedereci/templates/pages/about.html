@@ -1,1 +1,7 @@
 {% extends "base.html" %}
+
+{% block content %}
+  <p>Heroku release version: {{ HEROKU_RELEASE_VERSION }}</p>
+  <p>Heroku release created at: {{ HEROKU_RELEASE_CREATED_AT }}</p>
+  <p>Heroku slug commit: {{ HEROKU_SLUG_COMMIT }}</p>
+{% endblock content %}

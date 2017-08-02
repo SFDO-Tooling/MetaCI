@@ -7,13 +7,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
+from mrbelvedereci import views as mbci_views
 from mrbelvedereci.build import views as build_views
 from mrbelvedereci.repository.views import github_push_webhook
 
 urlpatterns = [
     #url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
     url(r'^$', build_views.build_list, name='home'),
-    url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
+    url(r'^about/$', mbci_views.AboutView.as_view(template_name='pages/about.html'), name='about'),
 
     # Django Admin, use {% url 'admin:index' %}
     url(settings.ADMIN_URL, admin.site.urls),
