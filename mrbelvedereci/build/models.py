@@ -11,13 +11,17 @@ import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
 
-from django.utils import timezone
-
-import requests
-
+from cumulusci.core.config import FlowConfig
+from cumulusci.core.exceptions import ApexTestException
+from cumulusci.core.exceptions import BrowserTestFailure
+from cumulusci.core.exceptions import FlowNotFoundError
+from cumulusci.core.utils import import_class
+from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
+import requests
 
 from mrbelvedereci.build.utils import format_log
 from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
@@ -25,13 +29,6 @@ from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
 from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
 from mrbelvedereci.cumulusci.logger import init_logger
 from mrbelvedereci.testresults.importer import import_test_results
-
-from cumulusci.core.config import FlowConfig
-from cumulusci.core.exceptions import ApexTestException
-from cumulusci.core.exceptions import BrowserTestFailure
-from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
-from cumulusci.core.exceptions import FlowNotFoundError
-from cumulusci.core.utils import import_class
 
 BUILD_STATUSES = (
     ('queued', 'Queued'),
@@ -49,30 +46,38 @@ BUILD_FLOW_STATUSES = (
     ('fail', 'Failed'),
 )
 
+
 class Build(models.Model):
     repo = models.ForeignKey('repository.Repository', related_name='builds')
-    branch = models.ForeignKey('repository.Branch', related_name='builds', null=True, blank=True)
+    branch = models.ForeignKey('repository.Branch', related_name='builds',
+        null=True, blank=True)
     commit = models.CharField(max_length=64)
     commit_message = models.TextField(null=True, blank=True)
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     plan = models.ForeignKey('plan.Plan', related_name='builds')
-    org = models.ForeignKey('cumulusci.Org', related_name='builds', null=True, blank=True)
-    org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance', related_name='builds', null=True, blank=True)
-    schedule = models.ForeignKey('plan.PlanSchedule', related_name='builds', null=True, blank=True)
+    org = models.ForeignKey('cumulusci.Org', related_name='builds', null=True,
+        blank=True)
+    org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
+        related_name='builds', null=True, blank=True)
+    schedule = models.ForeignKey('plan.PlanSchedule', related_name='builds',
+        null=True, blank=True)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
-    status = models.CharField(max_length=16, choices=BUILD_STATUSES, default='queued')
+    status = models.CharField(max_length=16, choices=BUILD_STATUSES,
+        default='queued')
     keep_org = models.BooleanField(default=False)
-    task_id_status_start = models.CharField(max_length=64, null=True, blank=True)
+    task_id_status_start = models.CharField(max_length=64, null=True,
+        blank=True)
     task_id_check = models.CharField(max_length=64, null=True, blank=True)
     task_id_run = models.CharField(max_length=64, null=True, blank=True)
     task_id_status_end = models.CharField(max_length=64, null=True, blank=True)
-    current_rebuild = models.ForeignKey('build.Rebuild', related_name='current_builds', null=True, blank=True)
+    current_rebuild = models.ForeignKey('build.Rebuild',
+        related_name='current_builds', null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
-    time_end = models.DateTimeField(null=True, blank=True) 
+    time_end = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-time_queue']
@@ -100,15 +105,16 @@ class Build(models.Model):
         self.set_running_status()
 
         if self.schedule:
-            self.logger.info('Build triggered by {} schedule #{}'.format(self.schedule.schedule, self.schedule.id))
+            self.logger.info('Build triggered by {} schedule #{}'.format(
+                self.schedule.schedule, self.schedule.id))
 
         try:
             # Extract the repo to a temp build dir
             self.build_dir = self.checkout()
-    
+
             # Change directory to the build_dir
             os.chdir(self.build_dir)
-    
+
             # Initialize the project config
             project_config = self.get_project_config()
 
@@ -118,7 +124,7 @@ class Build(models.Model):
 
             # Look up the org
             org_config = self.get_org(project_config)
-    
+
         except Exception as e:
             self.logger.error(unicode(e))
             self.status = 'error'
@@ -131,7 +137,7 @@ class Build(models.Model):
                 self.current_rebuild.time_end = timezone.now()
                 self.current_rebuild.save()
             return
-      
+
         # Run flows
         try:
             flows = [flow.strip() for flow in self.plan.flows.split(',')]
@@ -139,19 +145,22 @@ class Build(models.Model):
                 self.logger = init_logger(self)
                 self.logger.info('Running flow: {}'.format(flow))
                 self.save()
-    
+
                 build_flow = BuildFlow(
-                    build = self,
-                    rebuild = self.current_rebuild,
-                    flow = flow,
+                    build=self,
+                    rebuild=self.current_rebuild,
+                    flow=flow,
                 )
                 build_flow.save()
                 build_flow.run(project_config, org_config)
-    
+
                 if build_flow.status != 'success':
                     self.logger = init_logger(self)
-                    self.logger.error('Build flow {} completed with status {}'.format(flow, build_flow.status))
-                    self.logger.error('    {}: {}'.format(build_flow.exception, build_flow.error_message))
+                    self.logger.error(
+                        'Build flow {} completed with status {}'.format(
+                        flow, build_flow.status))
+                    self.logger.error('    {}: {}'.format(build_flow.exception,
+                        build_flow.error_message))
                     self.status = build_flow.status
                     self.exception = build_flow.exception
                     self.error_message = build_flow.error_message
@@ -166,10 +175,12 @@ class Build(models.Model):
                     return
                 else:
                     self.logger = init_logger(self)
-                    self.logger.info('Build flow {} completed successfully'.format(flow))
+                    self.logger.info(
+                        'Build flow {} completed successfully'.format(
+                        flow))
                     self.flush_log()
                     self.save()
-    
+
         except Exception as e:
             if org_config.created:
                 self.delete_org(org_config)
@@ -201,8 +212,7 @@ class Build(models.Model):
             self.current_rebuild.time_end = timezone.now()
             self.current_rebuild.save()
 
-
-    def set_running_status(self): 
+    def set_running_status(self):
         self.status = 'running'
         self.time_start = timezone.now()
         self.logger.info('-- Building commit {}'.format(self.commit))
@@ -228,11 +238,13 @@ class Build(models.Model):
         zip_file = zipfile.ZipFile(zip_content)
         zip_file.extractall(build_dir)
         build_dir += '/{}-{}'.format(self.repo.name, self.commit)
-        self.logger.info('-- Commit extracted to build dir: {}'.format(build_dir))
+        self.logger.info('-- Commit extracted to build dir: {}'.format(
+            build_dir))
         self.save()
 
         if self.plan.sfdx_config:
-            self.logger.info("-- Injecting custom sfdx-workspace.json from plan")
+            self.logger.info(
+                '-- Injecting custom sfdx-workspace.json from plan')
             f = open(os.path.join(build_dir, 'sfdx-workspace.json'), 'w')
             f.write(self.plan.sfdx_config)
             f.close()
@@ -258,7 +270,8 @@ class Build(models.Model):
         if not org_config.scratch:
             return
         if self.keep_org:
-            self.logger.info('Skipping scratch org deletion since keep_org was requested')
+            self.logger.info(
+                'Skipping scratch org deletion since keep_org was requested')
             return
         try:
             self.org_instance.delete_org(org_config)
@@ -272,26 +285,31 @@ class Build(models.Model):
             shutil.rmtree(self.build_dir)
             self.save()
 
+
 class BuildFlow(models.Model):
     build = models.ForeignKey('build.Build', related_name='flows')
-    rebuild = models.ForeignKey('build.Rebuild', related_name='flows', null=True, blank=True)
-    status = models.CharField(max_length=16, choices=BUILD_FLOW_STATUSES, default='queued')
+    rebuild = models.ForeignKey('build.Rebuild', related_name='flows',
+        null=True, blank=True)
+    status = models.CharField(max_length=16, choices=BUILD_FLOW_STATUSES,
+        default='queued')
     flow = models.CharField(max_length=255, null=True, blank=True)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
-    time_end = models.DateTimeField(null=True, blank=True) 
+    time_end = models.DateTimeField(null=True, blank=True)
     tests_total = models.IntegerField(null=True, blank=True)
     tests_pass = models.IntegerField(null=True, blank=True)
     tests_fail = models.IntegerField(null=True, blank=True)
-    
+
     def __unicode__(self):
-        return '{}: {} - {} - {}'.format(self.build.id, self.build.repo, self.build.commit, self.flow)
+        return '{}: {} - {} - {}'.format(self.build.id, self.build.repo,
+            self.build.commit, self.flow)
 
     def get_absolute_url(self):
-        return reverse('build_detail', kwargs={'build_id': str(self.build.id)}) + '#flow-{}'.format(self.flow)
+        return reverse('build_detail', kwargs={
+            'build_id': str(self.build.id)}) + '#flow-{}'.format(self.flow)
 
     def get_log_html(self):
         if self.log:
@@ -341,32 +359,35 @@ class BuildFlow(models.Model):
             self.time_end = timezone.now()
             self.save()
 
-    def set_running_status(self): 
+    def set_running_status(self):
         self.status = 'running'
         self.time_start = timezone.now()
         self.save()
 
     def run_flow(self, project_config, org_config):
-        # Add the repo root to syspath to allow for custom tasks and flows in the repo
+        # Add the repo root to syspath to allow for custom tasks and flows in
+        # the repo
         sys.path.append(project_config.repo_root)
 
         flow = getattr(project_config, 'flows__{}'.format(self.flow))
         if not flow:
             raise FlowNotFoundError('Flow not found: {}'.format(self.flow))
         flow_config = FlowConfig(flow)
-    
+
         # Get the class to look up options
-        class_path = flow_config.config.get('class_path', 'cumulusci.core.flows.BaseFlow')
+        class_path = flow_config.config.get('class_path',
+            'cumulusci.core.flows.BaseFlow')
         flow_class = import_class(class_path)
-    
+
         # Create the flow and handle initialization exceptions
-        self.flow_instance = flow_class(project_config, flow_config, org_config)
+        self.flow_instance = flow_class(project_config, flow_config,
+            org_config)
 
         # Run the flow
         res = self.flow_instance()
 
         return res
-    
+
     def record_result(self):
         self.status = 'success'
         self.time_end = timezone.now()
@@ -398,8 +419,9 @@ class BuildFlow(models.Model):
         import_test_results(self, results)
 
         self.tests_total = self.test_results.count()
-        self.tests_pass = self.test_results.filter(outcome = 'Pass').count()
-        self.tests_fail = self.test_results.filter(outcome__in = ['Fail','CompileFail']).count()
+        self.tests_pass = self.test_results.filter(outcome='Pass').count()
+        self.tests_fail = self.test_results.filter(
+            outcome__in=['Fail', 'CompileFail']).count()
         self.save()
 
     def load_junit(self, filename):
@@ -434,14 +456,15 @@ class BuildFlow(models.Model):
 class Rebuild(models.Model):
     build = models.ForeignKey('build.Build', related_name='rebuilds')
     user = models.ForeignKey('users.User', related_name='rebuilds')
-    status = models.CharField(max_length=16, choices=BUILD_STATUSES, default='queued')
+    status = models.CharField(max_length=16, choices=BUILD_STATUSES,
+        default='queued')
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
-    time_end = models.DateTimeField(null=True, blank=True) 
+    time_end = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-id']
 
     def get_absolute_url(self):
-        return reverse('build_rebuild_detail', kwargs={'build_id': str(self.build.id), 'rebuild_id': str(self.id)})
-
+        return reverse('build_rebuild_detail', kwargs={
+            'build_id': str(self.build.id), 'rebuild_id': str(self.id)})

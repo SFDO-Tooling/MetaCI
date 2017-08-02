@@ -1,14 +1,17 @@
 import errno
-import signal
 import os
-from rq.worker import StopRequested
+import signal
+
 from rq.worker import signal_name
+from rq.worker import StopRequested
 from rq.worker import Worker
 
+
 class RequeueingWorker(Worker):
-    """ An extension of the base rq worker which handles requeueing the job
-        if SIGTERM or SIGINT causes the worker to close.  This currently uses
-        the delay method on the target function so the function must support that """
+    """An extension of the base rq worker which handles requeueing the job
+    if SIGTERM or SIGINT causes the worker to close.  This currently uses
+    the delay method on the target function so the function must support that
+    """
 
     def _install_signal_handlers(self):
         """Installs signal handlers for handling SIGINT and SIGTERM
@@ -16,8 +19,7 @@ class RequeueingWorker(Worker):
         """
 
         def request_force_stop(signum, frame):
-            """Terminates the application (cold shutdown).
-            """
+            """Terminates the application (cold shutdown)."""
             self.log.warning('Cold shut down.')
 
             # If shutdown is requested in the middle of a job,

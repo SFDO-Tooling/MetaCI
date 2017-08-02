@@ -1,17 +1,18 @@
-from django.utils import timezone
-from django.shortcuts import render
-from django.http import Http404
-from django.http import HttpResponseRedirect
-from django.http import HttpResponseForbidden
-from django.shortcuts import get_object_or_404
 from ansi2html import Ansi2HTMLConverter
+from django.http import Http404
+from django.http import HttpResponseForbidden
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render
+from django.utils import timezone
+from watson import search as watson
 
+from mrbelvedereci.build.exceptions import BuildError
 from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import Rebuild
 from mrbelvedereci.build.tasks import run_build
 from mrbelvedereci.build.utils import view_queryset
-from mrbelvedereci.build.exceptions import BuildError
-from watson import search as watson
+
 
 def build_list(request):
     query = {}
@@ -24,15 +25,18 @@ def build_list(request):
     builds = view_queryset(request, query)
     return render(request, 'build/build_list.html', context={'builds': builds})
 
+
 def build_detail(request, build_id, rebuild_id=None, tab=None):
-    build = get_object_or_404(Build, id = build_id)
+    build = get_object_or_404(Build, id=build_id)
     rebuild = None
 
     if not request.user.is_staff:
         if not build.plan.public:
-            return HttpResponseForbidden('You are not authorized to view this build')
+            return HttpResponseForbidden(
+                'You are not authorized to view this build')
         if tab == 'org':
-            return HttpResponseForbidden("You are not authorized to view this build's org info")
+            return HttpResponseForbidden(
+                "You are not authorized to view this build's org info")
 
     if not rebuild_id:
         if build.current_rebuild:
@@ -41,9 +45,10 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
             flows = build.flows
     else:
         if rebuild_id == 'original':
-            flows = build.flows.filter(rebuild__isnull = True)
+            flows = build.flows.filter(rebuild__isnull=True)
         else:
-            rebuild = get_object_or_404(Rebuild, build_id = build.id, id=rebuild_id)
+            rebuild = get_object_or_404(Rebuild, build_id=build.id,
+                id=rebuild_id)
             flows = rebuild.flows
 
     flows = flows.order_by('time_queue')
@@ -62,8 +67,9 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
             tests['pass'] += flow.tests_pass
         if flow.tests_fail:
             tests['fail'] += flow.tests_fail
-            tests['failed_tests'].extend(list(flow.test_results.filter(outcome__in = ['Fail','CompileFail'])))
-    
+            tests['failed_tests'].extend(list(flow.test_results.filter(
+                outcome__in=['Fail', 'CompileFail'])))
+
     context = {
         'build': build,
         'rebuild': rebuild,
@@ -86,27 +92,31 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
     else:
         raise BuildError('Unsupported value for "tab": {}'.format(tab))
 
+
 def build_rebuild(request, build_id):
-    build = get_object_or_404(Build, id = build_id)
+    build = get_object_or_404(Build, id=build_id)
 
     if not request.user.is_staff:
-        return HttpResponseForbidden('You are not authorized to rebuild builds')
+        return HttpResponseForbidden(
+            'You are not authorized to rebuild builds')
 
     rebuild = Rebuild(
-        build = build,
-        user = request.user,
+        build=build,
+        user=request.user,
     )
     rebuild.save()
-    
+
     build.status = 'queued'
     if not build.log:
         build.log = ''
-    
-    build.log += '\n=== Build restarted at {} by {} ===\n'.format(timezone.now(), request.user.username)
+
+    build.log += '\n=== Build restarted at {} by {} ===\n'.format(
+        timezone.now(), request.user.username)
     build.current_rebuild = rebuild
     build.save()
 
-    return HttpResponseRedirect('/builds/{}'.format(build.id)) 
+    return HttpResponseRedirect('/builds/{}'.format(build.id))
+
 
 def build_search(request):
     results = []
@@ -121,4 +131,3 @@ def build_search(request):
     }
 
     return render(request, 'build/search.html', context=context)
-    

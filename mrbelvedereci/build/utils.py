@@ -1,14 +1,13 @@
 import os
 import subprocess
 
+from ansi2html import Ansi2HTMLConverter
+from cumulusci.core.exceptions import CommandException
+from django.apps import apps
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.core.paginator import Paginator
 
-from django.apps import apps
-from ansi2html import Ansi2HTMLConverter
-
-from cumulusci.core.exceptions import CommandException
 
 def paginate(build_list, request):
     page = request.GET.get('page')
@@ -23,6 +22,7 @@ def paginate(build_list, request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         builds = paginator.page(paginator.num_pages)
     return builds
+
 
 def view_queryset(request, query=None):
     if not query:
@@ -43,17 +43,21 @@ def view_queryset(request, query=None):
     builds = paginate(builds, request)
     return builds
 
+
 def format_log(log):
     conv = Ansi2HTMLConverter(dark_bg=False, scheme='solarized')
     headers = conv.produce_headers()
     content = conv.convert(log, full=False)
-    content = '<pre class="ansi2html-content">{}</pre>'.format(content.encode('utf8'))
-    #content = '<div class="body_foreground body_background">{}</div>'.format(content)
+    content = '<pre class="ansi2html-content">{}</pre>'.format(
+        content.encode('utf8'))
+    #content = '<div class="body_foreground body_background">{}</div>'.format(
+    #    content)
     return headers + content
 
     previous_dev_hub = ''.join(previous_dev_hub)
     previous_dev_hub = previous_dev_hub.strip()
-    
+
+
 def run_command(command, env=None, cwd=None):
     kwargs = {}
     if env:

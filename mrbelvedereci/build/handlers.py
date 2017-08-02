@@ -1,10 +1,12 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+
 from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import Rebuild
 from mrbelvedereci.build.tasks import check_queued_build
 from mrbelvedereci.build.tasks import set_github_status
+
 
 @receiver(post_save, sender=Build)
 def queue_build(sender, **kwargs):
@@ -22,6 +24,7 @@ def queue_build(sender, **kwargs):
     build.task_id_check = res_check.id
 
     build.save()
+
 
 @receiver(post_save, sender=Rebuild)
 def queue_rebuild(sender, **kwargs):
