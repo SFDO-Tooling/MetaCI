@@ -1,4 +1,5 @@
-from django.conf import settings
+import os
+
 from django.views.generic.base import TemplateView
 
 
@@ -16,7 +17,7 @@ class AboutView(TemplateView):
             'HEROKU_SLUG_COMMIT',
             'HEROKU_SLUG_DESCRIPTION',
         ]
-        default = 'Heroku dyno metadata not found'
         for var in heroku_env_vars:
-            context[var] = getattr(settings, var, default)
+            context[var] = os.environ.get(var,
+                'Heroku dyno metadata not found')
         return context
