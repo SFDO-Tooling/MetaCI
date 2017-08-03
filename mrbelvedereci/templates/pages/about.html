@@ -1,7 +1,15 @@
 {% extends "base.html" %}
 
-{% block content %}
-  <p>Heroku release version: {{ HEROKU_RELEASE_VERSION }}</p>
-  <p>Heroku release created at: {{ HEROKU_RELEASE_CREATED_AT }}</p>
-  <p>Heroku slug commit: {{ HEROKU_SLUG_COMMIT }}</p>
-{% endblock content %}
+{% block layout_body %}
+<table class="slds-table">
+  <tbody>
+    <tr><th>HEROKU_APP_ID</th><td>{{ HEROKU_APP_ID }}</td></tr>
+    <tr><th>HEROKU_APP_NAME</th><td>{{ HEROKU_APP_NAME }}</td></tr>
+    <tr><th>HEROKU_DYNO_ID</th><td>{{ HEROKU_DYNO_ID }}</td></tr>
+    <tr><th>HEROKU_RELEASE_CREATED_AT</th><td>{{ HEROKU_RELEASE_CREATED_AT }}</td></tr>
+    <tr><th>HEROKU_RELEASE_VERSION</th><td>{{ HEROKU_RELEASE_VERSION }}</td></tr>
+    <tr><th>HEROKU_SLUG_COMMIT</th><td>{{ HEROKU_SLUG_COMMIT }}</td></tr>
+    <tr><th>HEROKU_SLUG_DESCRIPTION</th><td>{{ HEROKU_SLUG_DESCRIPTION }}</td></tr>
+  </tbody>
+</table>
+{% endblock layout_body %}
