@@ -4,6 +4,7 @@
 <table class="slds-table">
   <tbody>
     <tr><th>CumulusCI version</th><td>{{ CUMULUSCI_VERSION }}</td></tr>
+    {% if user.is_authenticated %}
     <tr><th>HEROKU_APP_ID</th><td>{{ HEROKU_APP_ID }}</td></tr>
     <tr><th>HEROKU_APP_NAME</th><td>{{ HEROKU_APP_NAME }}</td></tr>
     <tr><th>HEROKU_DYNO_ID</th><td>{{ HEROKU_DYNO_ID }}</td></tr>
@@ -11,6 +12,7 @@
     <tr><th>HEROKU_RELEASE_VERSION</th><td>{{ HEROKU_RELEASE_VERSION }}</td></tr>
     <tr><th>HEROKU_SLUG_COMMIT</th><td>{{ HEROKU_SLUG_COMMIT }}</td></tr>
     <tr><th>HEROKU_SLUG_DESCRIPTION</th><td>{{ HEROKU_SLUG_DESCRIPTION }}</td></tr>
+    {% endif %}
   </tbody>
 </table>
 {% endblock layout_body %}
