@@ -1,5 +1,3 @@
-from cumulusci.core.config import ConnectedAppOAuthConfig
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import Http404
@@ -10,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from mrbelvedereci.build.utils import view_queryset
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.cumulusci.models import ScratchOrgInstance
+from mrbelvedereci.cumulusci.utils import get_connected_app
 
 @staff_member_required
 def org_detail(request, org_id):
@@ -31,11 +30,7 @@ def org_login(request, org_id, instance_id=None):
 
     def get_org_config(org):
         org_config = org.get_org_config()
-        connected_app = ConnectedAppOAuthConfig({
-            'callback_url': settings.CONNECTED_APP_CALLBACK_URL,
-            'client_id': settings.CONNECTED_APP_CLIENT_ID,
-            'client_secret': settings.CONNECTED_APP_CLIENT_SECRET,
-        })
+        connected_app = get_connected_app()
         org_config.refresh_oauth_token(connected_app)
         return org_config
 
