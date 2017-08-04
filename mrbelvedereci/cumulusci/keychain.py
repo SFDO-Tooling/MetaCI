@@ -1,7 +1,6 @@
 import json
 import os
 from cumulusci.core.keychain import BaseProjectKeychain
-from cumulusci.core.config import ConnectedAppOAuthConfig
 from cumulusci.core.config import OrgConfig
 from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import ServiceConfig
@@ -11,6 +10,7 @@ from mrbelvedereci.cumulusci.logger import init_logger
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.cumulusci.models import ScratchOrgInstance
 from mrbelvedereci.cumulusci.models import Service
+from mrbelvedereci.cumulusci.utils import get_connected_app
 
 class MrbelvedereProjectKeychain(BaseProjectKeychain):
 
@@ -31,11 +31,7 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
         raise NotImplementedError('set_connected_app is not supported in this keychain')
 
     def get_connected_app(self):
-        return ConnectedAppOAuthConfig({
-            'callback_url': settings.CONNECTED_APP_CALLBACK_URL,
-            'client_id': settings.CONNECTED_APP_CLIENT_ID,
-            'client_secret': settings.CONNECTED_APP_CLIENT_SECRET,
-        })
+        return get_connected_app()
 
     def get_service(self, service_name):
         try:

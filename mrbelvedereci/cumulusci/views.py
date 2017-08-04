@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from mrbelvedereci.build.utils import view_queryset
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.cumulusci.models import ScratchOrgInstance
+from mrbelvedereci.cumulusci.utils import get_connected_app
 
 @staff_member_required
 def org_detail(request, org_id):
@@ -27,9 +28,15 @@ def org_detail(request, org_id):
 def org_login(request, org_id, instance_id=None):
     org = get_object_or_404(Org, id=org_id)
 
+    def get_org_config(org):
+        org_config = org.get_org_config()
+        connected_app = get_connected_app()
+        org_config.refresh_oauth_token(connected_app)
+        return org_config
+
     # For non-scratch orgs, just log into the org
     if not org.scratch:
-        org_config = org.get_org_config()
+        org_config = get_org_config(org)
         return HttpResponseRedirect(org_config.start_url)
 
     # If an instance was selected, log into the org
@@ -41,7 +48,7 @@ def org_login(request, org_id, instance_id=None):
             raise Http404("Cannot log in: the org instance is already deleted")
 
         # Log into the scratch org
-        org_config = instance.get_org_config()
+        org_config = get_org_config(instance)
         return HttpResponseRedirect(org_config.start_url)
 
     raise Http404()
