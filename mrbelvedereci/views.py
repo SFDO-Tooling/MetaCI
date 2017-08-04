@@ -1,4 +1,5 @@
 import os
+import sys
 
 from django.views.generic.base import TemplateView
 from pip.utils import get_installed_version
@@ -8,7 +9,13 @@ class AboutView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutView, self).get_context_data(**kwargs)
-        # try to add Heroku env vars
+        # python
+        context['PYTHON_VERSION'] = '{}.{}.{}'.format(
+            sys.version_info.major,
+            sys.version_info.minor,
+            sys.version_info.micro,
+        )
+        # heroku
         heroku_env_vars = [
             'HEROKU_APP_ID',
             'HEROKU_APP_NAME',
@@ -21,5 +28,6 @@ class AboutView(TemplateView):
         for var in heroku_env_vars:
             context[var] = os.environ.get(var,
                 'Heroku dyno metadata not found')
+        # cumulusci
         context['CUMULUSCI_VERSION'] = get_installed_version('cumulusci')
         return context

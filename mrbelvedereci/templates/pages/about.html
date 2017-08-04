@@ -12,6 +12,7 @@
 <div class="slds-box slds-m-top--xx-large slds-m-horizontal--xx-large">
   <table class="slds-table">
     <tbody>
+      <tr><th>Python version</th><td>{{ PYTHON_VERSION }}</td></tr>
       <tr><th>CumulusCI version</th><td>{{ CUMULUSCI_VERSION }}</td></tr>
       {% if user.is_authenticated %}
       <tr><th>HEROKU_APP_ID</th><td>{{ HEROKU_APP_ID }}</td></tr>
