@@ -1,3 +1,5 @@
+from cumulusci.core.config import ConnectedAppOAuthConfig
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import Http404
@@ -27,9 +29,19 @@ def org_detail(request, org_id):
 def org_login(request, org_id, instance_id=None):
     org = get_object_or_404(Org, id=org_id)
 
+    def get_org_config(org):
+        org_config = org.get_org_config()
+        connected_app = ConnectedAppOAuthConfig({
+            'callback_url': settings.CONNECTED_APP_CALLBACK_URL,
+            'client_id': settings.CONNECTED_APP_CLIENT_ID,
+            'client_secret': settings.CONNECTED_APP_CLIENT_SECRET,
+        })
+        org_config.refresh_oauth_token(connected_app)
+        return org_config
+
     # For non-scratch orgs, just log into the org
     if not org.scratch:
-        org_config = org.get_org_config()
+        org_config = get_org_config(org)
         return HttpResponseRedirect(org_config.start_url)
 
     # If an instance was selected, log into the org
@@ -41,7 +53,7 @@ def org_login(request, org_id, instance_id=None):
             raise Http404("Cannot log in: the org instance is already deleted")
 
         # Log into the scratch org
-        org_config = instance.get_org_config()
+        org_config = get_org_config(instance)
         return HttpResponseRedirect(org_config.start_url)
 
     raise Http404()
