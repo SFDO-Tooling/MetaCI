@@ -1,4 +1,6 @@
 import os
+import re
+import subprocess
 import sys
 
 import django
@@ -24,6 +26,16 @@ class AboutView(TemplateView):
             sys.version_info.minor,
             sys.version_info.micro,
         )
+
+        # Salesforce DX
+        out = subprocess.check_output(['sfdx', '--version'])
+        match = re.match(r'sfdx-cli/(\d+.\d+.\d+)-.+', out)
+        if match:
+            context['SFDX_CLI_VERSION'] = match.group(1)
+        out = subprocess.check_output(['sfdx', 'plugins'])
+        match = re.match(r'salesforcedx (\d+.\d+.\d+)', out)
+        if match:
+            context['SFDX_PLUGIN_VERSION'] = match.group(1)
 
         # cumulusci
         context['CUMULUSCI_VERSION'] = get_installed_version('cumulusci')
