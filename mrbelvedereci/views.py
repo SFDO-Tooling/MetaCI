@@ -1,6 +1,7 @@
 import os
 import sys
 
+import django
 from django.views.generic.base import TemplateView
 from pip.utils import get_installed_version
 
@@ -9,6 +10,12 @@ class AboutView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutView, self).get_context_data(**kwargs)
+        # django
+        context['DJANGO_VERSION'] = '{}.{}.{}'.format(
+            django.VERSION[0], # major
+            django.VERSION[1], # minor
+            django.VERSION[2], # micro
+        )
         # python
         context['PYTHON_VERSION'] = '{}.{}.{}'.format(
             sys.version_info.major,
