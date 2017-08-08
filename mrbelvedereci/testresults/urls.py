@@ -14,4 +14,5 @@ urlpatterns = [
         views.test_method_trend,
         name='test_method_trend',
     ),
+    url(r'^compare/$', views.build_flow_compare, name='build_flow_compare',),
 ]

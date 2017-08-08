@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import BuildFlow
 from mrbelvedereci.build.utils import paginate
-from mrbelvedereci.testresults.models import TestMethod
+from mrbelvedereci.testresults.models import TestMethod, TestResult
 
 def build_flow_tests(request, build_id, flow):
     build = get_object_or_404(Build, id=build_id)
@@ -152,3 +152,18 @@ def test_method_trend(request, method_id):
     }
 
     return render(request, 'testresults/test_method_trend.html', data)
+
+def build_flow_compare(request,):
+    execution1_id = request.GET.get('execution1', None)
+    execution2_id = request.GET.get('execution2', None)
+    execution1 = get_object_or_404(BuildFlow, id=execution1_id)
+    execution2 = get_object_or_404(BuildFlow, id=execution2_id)
+
+    diff = TestResult.objects.compare_results([execution1,execution2])
+
+    context = {
+        'execution1': execution1,
+        'execution2': execution2,
+        'diff': diff,
+    }
+    return render(request, 'testresults/build_flow_compare.html', context)
