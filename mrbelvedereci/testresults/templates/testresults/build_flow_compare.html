@@ -1,164 +1,105 @@
-{% extends 'layout_full.html' %}
+{% extends 'layout_full.html' %} 
+{% block layout_parent_link %} <a href="/builds">Builds</a> {% endblock %} 
 
-{% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
-
-{% block layout_header_text %}Test Comparison for BuildFlow #{{ execution1.id }} and #{{ execution2.id }}{% endblock %}
-
-{% block layout_header_details %}
-  <ul class="slds-grid slds-page-header__detail-row">
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Build">Build</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution1.build }}">
-        <a href="{{ execution1.build.get_absolute_url }}">{{ execution1.build.id }}</a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">Status</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution1.build.repo }}">
-        {{ execution1.build.status }}
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Plan">Plan</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution1.build.plan }}">
-        <a href="{{ execution1.build.plan.get_absolute_url }}">
-          {{ execution1.build.plan }}
-        </a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repo">Repo</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution1.build.repo }}">
-        <a href="{{ execution1.build.repo.get_absolute_url }}">
-          {{ execution1.build.repo }}
-        </a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Branch">Branch</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution1.build.branch }}">
-        <a href="{{ execution1.build.branch.get_absolute_url }}">
-          {{ execution1.build.branch }}
-        </a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Commit">Commit</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution1.build.commit }}">
-        <a href="{{ build_flow.build.repo.get_absolute_url }}/commit/{{ execution1.build.commit }}">
-          {{ execution1.build.commit }}
-        </a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org">Org</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution1.build.plan.org }}">
-        <a href="{{ execution1.build.repo.get_absolute_url }}/org/{{ execution1.build.plan.org }}">
-          {{ execution1.build.plan.org }}
-        </a>
-      </p>
-    </li>
-  </ul>
-    <ul class="slds-grid slds-page-header__detail-row">
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Build">Build</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution2.build }}">
-        <a href="{{ execution2.build.get_absolute_url }}">{{ execution2.build.id }}</a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">Status</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution2.build.repo }}">
-        {{ execution2.build.status }}
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Plan">Plan</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution2.build.plan }}">
-        <a href="{{ build_flow.build.plan.get_absolute_url }}">
-          {{ execution2.build.plan }}
-        </a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repo">Repo</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution2.build.repo }}">
-        <a href="{{ execution2.build.repo.get_absolute_url }}">
-          {{ execution2.build.repo }}
-        </a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Branch">Branch</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution2.build.branch }}">
-        <a href="{{ execution2.build.branch.get_absolute_url }}">
-          {{ execution2.build.branch }}
-        </a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Commit">Commit</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ execution2.build.commit }}">
-        <a href="{{ execution2.build.repo.get_absolute_url }}/commit/{{ execution2.build.commit }}">
-          {{ execution2.build.commit }}
-        </a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org">Org</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ build_flow.build.plan.org }}">
-        <a href="{{ build_flow.build.repo.get_absolute_url }}/org/{{ execution2.build.plan.org }}">
-          {{ execution2.build.plan.org }}
-        </a>
-      </p>
-    </li>
-  </ul>
-
+{% block layout_header_text %} 
+<div class="slds-m-bottom--medium">
+Test Comparison for {{ execution1.build.repo }}
+</div>
 {% endblock %}
 
-{% block layout_body %}
+{% block layout_header_details %}
+<div class="slds-grid">
+  <div class="slds-col slds-size--1-of-2 slds-col--padded-large">
+    <div class="slds-card">
+      <div class="slds-card__header">
+        <h3 class="slds-text-heading--large"><a href="{{ execution1.build.get_absolute_url }}">Build #{{ execution1.build.id }}</a></h3>
+      </div>
 
+      <div class="slds-card__body">
+        <div class="slds-card__body--inner">
 
-<div class="container">
-
-
-
-  <div class="panel panel-primary">
-    <div class="panel-heading">
-      <h3>Test Differences</h3>
-    </div>
-    <div class="panel-body">
-      {% for testclass, methods in diff.items %}
-      <div class="panel panel-default">
-        <div class="panel-heading"><h5>{{ testclass }}</h5></div>
-        <div class="panel-body">
-
-          {% for method, limits in methods.items %}
-          <h3>{{ method }}</h3>
-          <table class="table table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>Limit</th>
-                <th>Execution #{{ execution1.id }}</th>
-                <th>Execution #{{ execution2.id }}</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% for limit, executions in limits.items %}
-              <tr>
-                <td>{{ limit }}</td>
-                {% for execution, value in executions.items %}
-                <td>{{ value }}</td>
-                {% endfor %}
-              </tr>
-            {% endfor %}
-            <tbody>
-          </table>
-          {% endfor %}
+          <div class="slds-tile slds-m-bottom--medium">
+            <h3 class="slds-truncate" title="{{ execution1.build.plan }}"><a href="{{ execution1.build.plan.get_absolute_url }}">{{ execution1.build.plan }}</a></h3>
+            <div class="slds-tile__detail">
+              <dl class="slds-list--horizontal slds-wrap">
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Branch">Branch:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution1.build.branch.get_absolute_url }}">{{ execution1.build.branch }}</a></dd>
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Commit">Commit:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution1.build.commit.get_absolute_url }}">{{ execution1.build.commit }}</a></dd>
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org">Org:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution1.build.org.get_absolute_url }}">{{ execution1.build.org }}</a></dd>
+              </dl>
+            </div>
+          </div>
         </div>
       </div>
-      {% endfor %}
     </div>
   </div>
+  <div class="slds-col slds-size--1-of-2 slds-col--padded-large">
+    <div class="slds-card">
+      <div class="slds-card__header">
+        <h3 class="slds-text-heading--large"><a href="{{ execution2.build.get_absolute_url }}">Build #{{ execution2.build.id }}</a></h3>
+      </div>
+
+      <div class="slds-card__body">
+        <div class="slds-card__body--inner">
+
+          <div class="slds-tile slds-m-bottom--medium">
+            <h3 class="slds-truncate" title="{{ execution2.build.plan }}"><a href="{{ execution2.build.plan.get_absolute_url }}">{{ execution2.build.plan }}</a></h3>
+            <div class="slds-tile__detail">
+              <dl class="slds-list--horizontal slds-wrap">
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Branch">Branch:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution2.build.branch.get_absolute_url }}">{{ execution2.build.branch }}</a></dd>
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Commit">Commit:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution2.build.commit.get_absolute_url }}">{{ execution2.build.commit }}</a></dd>
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org">Org:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution2.build.org.get_absolute_url }}">{{ execution2.build.org }}</a></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+</div>
+
+
+{% endblock %} 
+
+{% block layout_body %} 
+
+{% for testclass, methods in diff.items %} {% for method, limits in methods.items %}
+<article class="slds-card">
+  <div class="slds-card__header slds-grid">
+    <header>{{ testclass }} - {{ method }}</header>
+  </div>
+
+
+  <div class="slds-card__body">
+    <table class="slds-table slds-table--col-bordered slds-table--bordered slds-table--cell-buffer">
+      <thead>
+        <tr>
+          <th>Limit</th>
+          <th>Build #{{ execution1.build.id }}</th>
+          <th>Build #{{ execution2.build.id }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for limit, executions in limits.items %}
+        <tr>
+          <td>{{ limit }}</td>
+          {% for execution, value in executions.items %}
+          <td>{{ value }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+        <tbody>
+    </table>
+  </div>
+</article>
+{% endfor %} 
+{% endfor %} 
 {% endblock %}
