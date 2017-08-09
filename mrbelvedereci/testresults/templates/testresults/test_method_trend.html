@@ -1,7 +1,12 @@
 {% extends 'layout_full.html' %}
 {% load humanize %}
 
-{% block layout_header_text %}Test Trend for {{ method.testclass }}.{{ method }} in {{ method.testclass.repo }}{% endblock %}
+{% block layout_header_text %}
+
+Test Trend for {{ method.testclass }}.{{ method }} in {{ method.testclass.repo }}
+<a href="https://github.com/{{ method.testclass.repo }}/search?q={{method.testclass}}">(github search)</a>
+
+{% endblock %}
 
 {% block layout_header_details %}
 {% endblock %}
