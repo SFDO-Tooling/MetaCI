@@ -49,15 +49,11 @@ class TestResultManager(models.Manager):
                     results[cls][method] = {}
     
                 for limit in result.get_limit_types():
-                    limit = limit + '_used'
-                    test_limit = 'test_' + limit
+                    test_limit = 'test_{}_used'.format( limit )
     
-                    if limit not in results[cls][method]:
-                        results[cls][method][limit] = OrderedDict()
                     if test_limit not in results[cls][method]:
                         results[cls][method][test_limit] = OrderedDict()
     
-                    results[cls][method][limit][build_flow.id] = getattr(result, limit)
                     results[cls][method][test_limit][build_flow.id] = getattr(result, test_limit)
     
         diff = OrderedDict()
