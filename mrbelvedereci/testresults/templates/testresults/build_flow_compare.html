@@ -1,0 +1,105 @@
+{% extends 'layout_full.html' %} 
+{% block layout_parent_link %} <a href="/builds">Builds</a> {% endblock %} 
+
+{% block layout_header_text %} 
+<div class="slds-m-bottom--medium">
+Test Comparison for {{ execution1.build.repo }}
+</div>
+{% endblock %}
+
+{% block layout_header_details %}
+<div class="slds-grid">
+  <div class="slds-col slds-size--1-of-2 slds-col--padded-large">
+    <div class="slds-card">
+      <div class="slds-card__header">
+        <h3 class="slds-text-heading--large"><a href="{{ execution1.build.get_absolute_url }}">Build #{{ execution1.build.id }}</a></h3>
+      </div>
+
+      <div class="slds-card__body">
+        <div class="slds-card__body--inner">
+
+          <div class="slds-tile slds-m-bottom--medium">
+            <h3 class="slds-truncate" title="{{ execution1.build.plan }}"><a href="{{ execution1.build.plan.get_absolute_url }}">{{ execution1.build.plan }}</a></h3>
+            <div class="slds-tile__detail">
+              <dl class="slds-list--horizontal slds-wrap">
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Branch">Branch:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution1.build.branch.get_absolute_url }}">{{ execution1.build.branch }}</a></dd>
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Commit">Commit:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution1.build.commit.get_absolute_url }}">{{ execution1.build.commit }}</a></dd>
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org">Org:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution1.build.org.get_absolute_url }}">{{ execution1.build.org }}</a></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slds-col slds-size--1-of-2 slds-col--padded-large">
+    <div class="slds-card">
+      <div class="slds-card__header">
+        <h3 class="slds-text-heading--large"><a href="{{ execution2.build.get_absolute_url }}">Build #{{ execution2.build.id }}</a></h3>
+      </div>
+
+      <div class="slds-card__body">
+        <div class="slds-card__body--inner">
+
+          <div class="slds-tile slds-m-bottom--medium">
+            <h3 class="slds-truncate" title="{{ execution2.build.plan }}"><a href="{{ execution2.build.plan.get_absolute_url }}">{{ execution2.build.plan }}</a></h3>
+            <div class="slds-tile__detail">
+              <dl class="slds-list--horizontal slds-wrap">
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Branch">Branch:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution2.build.branch.get_absolute_url }}">{{ execution2.build.branch }}</a></dd>
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Commit">Commit:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution2.build.commit.get_absolute_url }}">{{ execution2.build.commit }}</a></dd>
+                <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org">Org:</dt>
+                <dd class="slds-item--detail"><a href="{{ execution2.build.org.get_absolute_url }}">{{ execution2.build.org }}</a></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+
+{% endblock %} 
+
+{% block layout_body %} 
+
+{% for testclass, methods in diff.items %} {% for method, limits in methods.items %}
+<article class="slds-card">
+  <div class="slds-card__header slds-grid">
+    <header>{{ testclass }} - {{ method }}</header>
+  </div>
+
+
+  <div class="slds-card__body">
+    <table class="slds-table slds-table--col-bordered slds-table--bordered slds-table--cell-buffer">
+      <thead>
+        <tr>
+          <th>Limit</th>
+          <th>Build #{{ execution1.build.id }}</th>
+          <th>Build #{{ execution2.build.id }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for limit, executions in limits.items %}
+        <tr>
+          <td>{{ limit }}</td>
+          {% for execution, value in executions.items %}
+          <td>{{ value }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+        <tbody>
+    </table>
+  </div>
+</article>
+{% endfor %} 
+{% endfor %} 
+{% endblock %}
