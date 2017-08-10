@@ -63,4 +63,11 @@
 {% endblock %}
 
 {% block layout_body %}
+<ul>
+{% for bf in possible_comparisons %}
+<li>
+<a href="{% url 'build_flow_compare' %}?buildflow1={{build_flow.id}}&buildflow2={{bf.id}}">{{ bf }}</a>
+</li>
+{% endfor %}
+</ul>
 {% endblock %}

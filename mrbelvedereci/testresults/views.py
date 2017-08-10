@@ -183,6 +183,7 @@ def build_flow_compare_to(request, build_id, flow):
     build_flow = get_object_or_404(BuildFlow, **query)
 
     # get a list of build_flows that could be compared to
+    possible_comparisons = BuildFlow.objects.filter(build__repo__exact=1)
     
-    data = {'build_flow': build_flow}
+    data = {'build_flow': build_flow, 'possible_comparisons': possible_comparisons}
     return render(request, 'testresults/build_flow_compare_to.html', data)
