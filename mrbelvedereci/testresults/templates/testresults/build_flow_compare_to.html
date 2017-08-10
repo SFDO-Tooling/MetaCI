@@ -63,11 +63,22 @@
 {% endblock %}
 
 {% block layout_body %}
-<ul>
-{% for bf in possible_comparisons %}
-<li>
-<a href="{% url 'build_flow_compare' %}?buildflow1={{build_flow.id}}&buildflow2={{bf.id}}">{{ bf }}</a>
-</li>
-{% endfor %}
-</ul>
+<table class="slds-table slds-table--bordered slds-table--cell-buffer">
+    <thead>
+        <tr class="slds-text-title--caps">
+            <th>Compare</th>
+            <th>Branch</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bf in possible_comparisons %}
+        <tr>
+            <td><a href="{% url 'build_flow_compare' %}?buildflow1={{build_flow.id}}&buildflow2={{bf.id}}">{{ bf }}</a></td>
+            <td>{{ bf.build.branch.name }}</td>
+            <td>{{ bf.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
