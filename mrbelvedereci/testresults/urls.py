@@ -19,4 +19,9 @@ urlpatterns = [
         views.build_flow_compare,
         name='build_flow_compare',
     ),
+    url(
+        r'^(?P<build_id>\d+)/(?P<flow>.*)/compare_to',
+        views.build_flow_compare_to,
+        name='build_flow_compare_to',
+    )
 ]

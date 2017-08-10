@@ -168,3 +168,17 @@ def build_flow_compare(request,):
         'diff': diff,
     }
     return render(request, 'testresults/build_flow_compare.html', context)
+
+def build_flow_compare_to(request, build_id, flow):
+    # TODO: wrap this in a helper. or somethign?
+
+    build = get_object_or_404(Build, id=build_id)
+
+    if not build.plan.public and not request.user.is_staff:
+        raise Http404()
+    query = {'build_id': build_id, 'flow': flow}
+    if build.current_rebuild:
+        query['rebuild_id'] = build.current_rebuild
+
+    build_flow = get_object_or_404(BuildFlow, **query)
+    

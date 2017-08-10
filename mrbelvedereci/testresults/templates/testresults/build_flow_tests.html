@@ -4,6 +4,16 @@
 
 {% block layout_header_text %}Test Results for {{ build_flow.flow }} on Build #{{ build_flow.build.id }}{% endblock %}
 
+{% block layout_header_buttons %}
+<div class="slds-button-group" role="group">
+  <a href="{% url 'build_flow_compare_to' build_flow.build.id build_flow.flow %}">
+    <button class="slds-button slds-button--neutral">
+      Compare
+    </button>
+  </a>
+</div>
+{% endblock %}
+
 {% block layout_header_details %}
   <ul class="slds-grid slds-page-header__detail-row">
     <li class="slds-page-header__detail-block">
