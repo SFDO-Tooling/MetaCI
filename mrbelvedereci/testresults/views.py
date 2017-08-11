@@ -10,6 +10,8 @@ from mrbelvedereci.build.utils import paginate
 from mrbelvedereci.testresults.models import TestMethod
 from mrbelvedereci.testresults.models import TestResult
 
+from mrbelvedereci.testresults.filters import BuildFlowFilter
+
 def build_flow_tests(request, build_id, flow):
     build = get_object_or_404(Build, id=build_id)
 
@@ -184,6 +186,7 @@ def build_flow_compare_to(request, build_id, flow):
 
     # get a list of build_flows that could be compared to
     possible_comparisons = BuildFlow.objects.filter(build__repo__exact=1).order_by('-time_end')
+    comparison_filter = BuildFlowFilter(request.GET, queryset=possible_comparisons)
     
-    data = {'build_flow': build_flow, 'possible_comparisons': possible_comparisons}
+    data = {'build_flow': build_flow, 'filter': comparison_filter}
     return render(request, 'testresults/build_flow_compare_to.html', data)

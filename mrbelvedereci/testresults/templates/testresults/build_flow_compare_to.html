@@ -63,6 +63,13 @@
 {% endblock %}
 
 {% block layout_body %}
+
+<form method="get">
+  {{ filter.form.as_p }}
+  <button type="submit">Search</button>
+</form>
+
+
 <table class="slds-table slds-table--bordered slds-table--cell-buffer">
     <thead>
         <tr class="slds-text-title--caps">
@@ -72,7 +79,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for bf in possible_comparisons %}
+        {% for bf in filter.qs %}
         <tr>
             <td><a href="{% url 'build_flow_compare' %}?buildflow1={{build_flow.id}}&buildflow2={{bf.id}}">{{ bf }}</a></td>
             <td>{{ bf.build.branch.name }}</td>
