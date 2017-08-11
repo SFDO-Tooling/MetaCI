@@ -13,7 +13,8 @@
 {% endblock %}
 
 {% block layout_header_buttons %}
-{% if request.user.is_staff and build.get_status != 'success' %}
+{% if request.user.is_staff %}
+{% if build.get_status == 'error' or build.get_status == 'fail' %}
 <div class="slds-button-group" role="group">
   <a href="{{ build.get_absolute_url }}/rebuild">
     <button class="slds-button slds-button--neutral">
@@ -21,6 +22,7 @@
     </button>
   </a>
 </div>
+{% endif %}
 {% endif %}
 {% endblock %}
 
