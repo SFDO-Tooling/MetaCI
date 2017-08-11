@@ -70,6 +70,10 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
             tests['failed_tests'].extend(list(flow.test_results.filter(
                 outcome__in=['Fail', 'CompileFail'])))
 
+    if rebuild and rebuild.org_instance:
+        org_instance = rebuild.org_instance
+    else:
+        org_instance = build.org_instance
     context = {
         'build': build,
         'rebuild': rebuild,
@@ -77,6 +81,7 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
         'tab': tab,
         'flows': flows,
         'tests': tests,
+        'org_instance': org_instance,
     }
 
     if not tab:
@@ -103,10 +108,10 @@ def build_rebuild(request, build_id):
     rebuild = Rebuild(
         build=build,
         user=request.user,
+        status='queued',
     )
     rebuild.save()
 
-    build.status = 'queued'
     if not build.log:
         build.log = ''
 

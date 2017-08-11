@@ -1,14 +1,14 @@
-[{{ build.repo.name }}] Build #{{ build.id }} {{ build.status }}
+[{{ build.repo.name }}] Build #{{ build.id }} {{ build.get_status }}
 
-The build of plan {{ build.plan }} on commit {{ build.commit }} of {{ build.branch.name }} completed {% if build.status == 'success' %} successfully{% elif build.status == 'fail' %} with deploy or test failures{% elif build.status == 'error' %} with errors{% endif %}.
+The build of plan {{ build.plan }} on commit {{ build.commit }} of {{ build.branch.name }} completed {% if build.get_status == 'success' %} successfully{% elif build.get_status == 'fail' %} with deploy or test failures{% elif build.get_status == 'error' %} with errors{% endif %}.
 
 View the Build:
 {{ build.get_external_url }}
-{% if build.status == 'fail' or build.status == 'error' %}
+{% if build.get_status == 'fail' or build.get_status == 'error' %}
 
-Exception: {{ build.exception }}
+Exception: {{ build.get_exception }}
 Error Message:
-{{ build.error_message }}
+{{ build.get_error_message }}
 
 {% endif %}
 Last 25 Log Lines:

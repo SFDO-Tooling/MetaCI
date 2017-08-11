@@ -26,8 +26,8 @@
         {% for column in repo.columns %}
           <td>
           {% for build in column %}
-            {% if build.status == 'queued' or build.status == 'waiting' or build.status == 'running' %}
-              <a href="{{ build.get_absolute_url }}" title="Started: {{ build.time_start|naturaltime }}{{ build.commit }}">
+            {% if build.get_status == 'queued' or build.get_status == 'waiting' or build.get_status == 'running' %}
+              <a href="{{ build.get_absolute_url }}" title="Started: {{ build.get_time_start|naturaltime }}{{ build.commit }}">
                 <div class="slds-media__figure"> 
                   {% autoescape off %}
                   <svg class="slds-button__icon slds-theme--default" aria-hidden="true">
@@ -37,8 +37,8 @@
                   <span class="slds-assistive-text">Pass</span>
                 </div>
               </a>
-            {% elif build.status == 'success' %}
-              <a href="{{ build.get_absolute_url }}" title="Started: {{ build.time_start|naturaltime }} Commit: {{ build.commit }}">
+            {% elif build.get_status == 'success' %}
+              <a href="{{ build.get_absolute_url }}" title="Started: {{ build.get_time_start|naturaltime }} Commit: {{ build.commit }}">
                 <div class="slds-media__figure"> 
                   {% autoescape off %}
                   <svg class="slds-button__icon slds-theme--success" aria-hidden="true">
@@ -48,9 +48,9 @@
                   <span class="slds-assistive-text">Pass</span>
                 </div>
               </a>
-            {% elif build.status == 'fail' or build.status == 'error' %}
+            {% elif build.get_status == 'fail' or build.get_status == 'error' %}
               <a href="{{ build.get_absolute_url }}">
-                <div class="slds-media__figure" title="Started: {{ build.time_start|naturaltime }} Commit: {{ build.commit }}"> 
+                <div class="slds-media__figure" title="Started: {{ build.get_time_start|naturaltime }} Commit: {{ build.commit }}"> 
                   {% autoescape off %}
                   <svg class="slds-button__icon slds-theme--error" aria-hidden="true">
                     <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#error"></use>

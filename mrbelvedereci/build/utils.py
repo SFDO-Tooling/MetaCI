@@ -24,6 +24,12 @@ def paginate(build_list, request):
     return builds
 
 
+def set_build_info(build, **kwargs):
+    for attr, value in kwargs.items():
+        setattr(build, attr, value)
+    build.save()
+
+
 def view_queryset(request, query=None):
     if not query:
         query = {}

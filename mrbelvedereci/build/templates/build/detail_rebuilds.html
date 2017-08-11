@@ -50,19 +50,23 @@
         <div class="slds-truncate" title="original"><a href="{{ build.get_absolute_url }}/rebuilds/original">original</a></div>
       </th>
       <td data-label="Status">
-        <div class="slds-truncate slds-badge"><div class="slds-badge">N/A</div>
+        <div
+          class="slds-truncate slds-badge {% if build.status == 'fail' or build.status == 'error' %}slds-theme--error{% elif build.status == 'success' %}slds-theme--success{% endif %}"
+          title="{{ build.status }}">
+          {{ build.status }}
+        </div>
       </td>
       <th data-label="User">
         <div class="slds-truncate" title="N/A">N/A</div>
       </th>
       <th data-label="Queued">
-        <div class="slds-truncate" title="N/A">N/A</div>
+        <div class="slds-truncate" title="{{ build.time_queue }}">{{ build.time_queue }}</div>
       </th>
       <th data-label="Started">
-        <div class="slds-truncate" title="N/A">N/A</div>
+        <div class="slds-truncate" title="{{ build.time_start }}">{{ build.time_start }}</div>
       </th>
       <th data-label="Finished">
-        <div class="slds-truncate" title="N/A">N/A</div>
+        <div class="slds-truncate" title="{{ build.time_end }}">{{ build.time_end }}</div>
       </th>
     </tr>
   </tbody>

@@ -24,6 +24,7 @@ from django.utils import timezone
 import requests
 
 from mrbelvedereci.build.utils import format_log
+from mrbelvedereci.build.utils import set_build_info
 from mrbelvedereci.cumulusci.config import MrbelvedereGlobalConfig
 from mrbelvedereci.cumulusci.config import MrbelvedereProjectConfig
 from mrbelvedereci.cumulusci.keychain import MrbelvedereProjectKeychain
@@ -96,13 +97,42 @@ class Build(models.Model):
         url = '{}{}'.format(settings.SITE_URL, self.get_absolute_url())
         return url
 
+    def get_build_attr(self, attr):
+        # get an attribute from the most recent build/rebuild
+        build = self.current_rebuild if self.current_rebuild else self
+        return getattr(build, attr)
+
+    def get_status(self):
+        return self.get_build_attr('status')
+
+    def get_exception(self):
+        return self.get_build_attr('exception')
+
+    def get_error_message(self):
+        return self.get_build_attr('error_message')
+
+    def get_time_queue(self):
+        return self.get_build_attr('time_queue')
+
+    def get_time_start(self):
+        return self.get_build_attr('time_start')
+
+    def get_time_end(self):
+        return self.get_build_attr('time_end')
+
     def flush_log(self):
         for handler in self.logger.handlers:
             handler.stream.flush(force=True)
 
     def run(self):
         self.logger = init_logger(self)
-        self.set_running_status()
+        self.logger.info('-- Building commit {}'.format(self.commit))
+        if self.current_rebuild:
+            build = self.current_rebuild
+            self.flush_log()
+        else:
+            build = self
+        set_build_info(build, status='running', time_start=timezone.now())
 
         if self.schedule:
             self.logger.info('Build triggered by {} schedule #{}'.format(
@@ -127,15 +157,9 @@ class Build(models.Model):
 
         except Exception as e:
             self.logger.error(unicode(e))
-            self.status = 'error'
-            self.time_end = timezone.now()
-            self.save()
+            set_build_info(build, status='error', time_end=timezone.now())
             self.delete_build_dir()
             self.flush_log()
-            if self.current_rebuild:
-                self.current_rebuild.status = self.status
-                self.current_rebuild.time_end = timezone.now()
-                self.current_rebuild.save()
             return
 
         # Run flows
@@ -161,17 +185,16 @@ class Build(models.Model):
                         flow, build_flow.status))
                     self.logger.error('    {}: {}'.format(build_flow.exception,
                         build_flow.error_message))
-                    self.status = build_flow.status
-                    self.exception = build_flow.exception
-                    self.error_message = build_flow.error_message
-                    self.time_end = timezone.now()
-                    self.save()
+                    set_build_info(
+                        build,
+                        status=build_flow.status,
+                        exception=build_flow.exception,
+                        error_message=build_flow.error_message,
+                        time_end=timezone.now(),
+                    )
+                    self.flush_log()
                     if org_config.created:
                         self.delete_org(org_config)
-                    if self.current_rebuild:
-                        self.current_rebuild.status = self.status
-                        self.current_rebuild.time_end = timezone.now()
-                        self.current_rebuild.save()
                     return
                 else:
                     self.logger = init_logger(self)
@@ -182,19 +205,13 @@ class Build(models.Model):
                     self.save()
 
         except Exception as e:
+            set_build_info(build, status='error', time_end=timezone.now())
             if org_config.created:
                 self.delete_org(org_config)
             self.logger = init_logger(self)
             self.logger.error(unicode(e))
-            self.status = 'error'
-            self.time_end = timezone.now()
-            self.save()
             self.delete_build_dir()
             self.flush_log()
-            if self.current_rebuild:
-                self.current_rebuild.status = self.status
-                self.current_rebuild.time_end = timezone.now()
-                self.current_rebuild.save()
             return
 
         if org_config.created:
@@ -202,25 +219,7 @@ class Build(models.Model):
 
         self.delete_build_dir()
         self.flush_log()
-
-        # Set success status
-        self.status = 'success'
-        self.time_end = timezone.now()
-        self.save()
-        if self.current_rebuild:
-            self.current_rebuild.status = self.status
-            self.current_rebuild.time_end = timezone.now()
-            self.current_rebuild.save()
-
-    def set_running_status(self):
-        self.status = 'running'
-        self.time_start = timezone.now()
-        self.logger.info('-- Building commit {}'.format(self.commit))
-        self.save()
-        if self.current_rebuild:
-            self.current_rebuild.status = self.status
-            self.current_rebuild.time_start = timezone.now()
-            self.current_rebuild.save()
+        set_build_status(build, status='success', time_end=timezone.now())
 
     def checkout(self):
         zip_url = '{}/archive/{}.zip'.format(
@@ -261,9 +260,42 @@ class Build(models.Model):
     def get_org(self, project_config):
         org_config = project_config.keychain.get_org(self.plan.org)
         self.org = org_config.org
-        self.org_instance = org_config.org_instance
+        if self.current_rebuild:
+            self.current_rebuild.org_instance = org_config.org_instance
+            self.current_rebuild.save()
+        else:
+            self.org_instance = org_config.org_instance
         self.save()
         return org_config
+
+    def get_org_instance(self):
+        if self.current_rebuild:
+            return self.current_rebuild.org_instance
+        else:
+            return self.org_instance
+
+    def get_org_attr(self, attr):
+        org_instance = self.get_org_instance()
+        obj = getattr(org_instance, attr, '')
+        return obj() if callable(obj) else obj
+
+    def get_org_deleted(self):
+        return self.get_org_attr('deleted')
+
+    def get_org_sf_org_id(self):
+        return self.get_org_attr('sf_org_id')
+
+    def get_org_name(self):
+        return self.get_org_attr('__unicode__')
+
+    def get_org_time_deleted(self):
+        return self.get_org_attr('time_deleted')
+
+    def get_org_url(self):
+        return self.get_org_attr('get_absolute_url')
+
+    def get_org_username(self):
+        return self.get_org_attr('username')
 
     def delete_org(self, org_config):
         self.logger = init_logger(self)
@@ -274,7 +306,8 @@ class Build(models.Model):
                 'Skipping scratch org deletion since keep_org was requested')
             return
         try:
-            self.org_instance.delete_org(org_config)
+            org_instance = self.get_org_instance()
+            org_instance.delete_org(org_config)
         except Exception as e:
             self.logger.error(e.message)
             self.save()
@@ -317,12 +350,11 @@ class BuildFlow(models.Model):
 
     def run(self, project_config, org_config):
         # Record the start
-        self.set_running_status()
+        set_build_info(self, status='running', time_start=timezone.now())
 
         # Set up logger
         self.logger = init_logger(self)
 
-        exception = None
         try:
             # Run the flow
             result = self.run_flow(project_config, org_config)
@@ -331,38 +363,37 @@ class BuildFlow(models.Model):
             self.load_test_results()
 
             # Record result
-            self.record_result()
+            exception = None
+            status = 'success'
 
         except MetadataComponentFailure as e:
             exception = e
-            self.status = 'fail'
+            status = 'fail'
 
         except ApexTestException as e:
             exception = e
             self.load_test_results()
-            self.status = 'fail'
+            status = 'fail'
 
         except BrowserTestFailure as e:
             exception = e
             self.load_test_results()
-            self.status = 'fail'
+            status = 'fail'
 
         except Exception as e:
             exception = e
-            self.status = 'error'
+            status = 'error'
 
+        kwargs = {
+            'status': status,
+            'time_end': timezone.now(),
+        }
         if exception:
-            if self.status == 'error':
+            if status == 'error':
                 self.logger.error(unicode(e))
-            self.exception = e.__class__.__name__
-            self.error_message = unicode(e)
-            self.time_end = timezone.now()
-            self.save()
-
-    def set_running_status(self):
-        self.status = 'running'
-        self.time_start = timezone.now()
-        self.save()
+            kwargs['error_message'] = unicode(e)
+            kwargs['exception'] = e.__class__.__name__
+        set_build_info(self, **kwargs)
 
     def run_flow(self, project_config, org_config):
         # Add the repo root to syspath to allow for custom tasks and flows in
@@ -456,8 +487,12 @@ class BuildFlow(models.Model):
 class Rebuild(models.Model):
     build = models.ForeignKey('build.Build', related_name='rebuilds')
     user = models.ForeignKey('users.User', related_name='rebuilds')
+    org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
+        related_name='rebuilds', null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES,
         default='queued')
+    exception = models.TextField(null=True, blank=True)
+    error_message = models.TextField(null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
