@@ -266,7 +266,7 @@ class Build(models.Model):
         return org_config
 
     def get_org_instance(self):
-        if self.current_rebuild:
+        if self.current_rebuild and self.current_rebuild.org_instance:
             return self.current_rebuild.org_instance
         else:
             return self.org_instance
