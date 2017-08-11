@@ -127,11 +127,8 @@ class Build(models.Model):
     def run(self):
         self.logger = init_logger(self)
         self.logger.info('-- Building commit {}'.format(self.commit))
-        if self.current_rebuild:
-            build = self.current_rebuild
-            self.flush_log()
-        else:
-            build = self
+        self.flush_log()
+        build = self.current_rebuild if self.current_rebuild else self
         set_build_info(build, status='running', time_start=timezone.now())
 
         if self.schedule:
