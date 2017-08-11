@@ -216,7 +216,7 @@ class Build(models.Model):
 
         self.delete_build_dir()
         self.flush_log()
-        set_build_status(build, status='success', time_end=timezone.now())
+        set_build_info(build, status='success', time_end=timezone.now())
 
     def checkout(self):
         zip_url = '{}/archive/{}.zip'.format(
