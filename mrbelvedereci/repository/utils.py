@@ -10,22 +10,22 @@ def create_status(build):
     github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
     repo = github.repository(build.repo.owner, build.repo.name)
 
-    if build.status == 'queued':
+    if build.get_status() == 'queued':
         state = 'pending'
         description = 'The build is queued'
-    if build.status == 'waiting':
+    if build.get_status() == 'waiting':
         state = 'pending'
         description = 'The build is waiting for another build to complete'
-    if build.status == 'running':
+    if build.get_status() == 'running':
         state = 'pending'
         description = 'The build is running'
-    if build.status == 'success':
+    if build.get_status() == 'success':
         state = 'success'
         description = 'The build was successful'
-    elif build.status == 'error':
+    elif build.get_status() == 'error':
         state = 'error'
         description = 'An error occurred during build'
-    elif build.status == 'fail':
+    elif build.get_status() == 'fail':
         state = 'failure'
         description = 'Tests failed'
 

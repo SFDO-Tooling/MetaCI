@@ -34,8 +34,11 @@ def run_build(build_id, lock_id=None):
         build.task_id_status_end = res_status.id
         build.save()
 
-        build_complete.send(sender=build.__class__, build=build,
-            status=build.status)
+        build_complete.send(
+            sender=build.__class__,
+            build=build,
+            status=build.get_status(),
+        )
 
     except Exception as e:
         if lock_id:
@@ -43,18 +46,21 @@ def run_build(build_id, lock_id=None):
 
         res_status = set_github_status.delay(build_id)
         build.task_id_status_end = res_status.id
-        build.status = 'error'
+        build.set_status('error')
         build.log += '\nERROR: The build raised an exception\n'
         build.log += unicode(e)
         build.save()
 
-        build_complete.send(sender=build.__class__, build=build,
-            status=build.status)
+        build_complete.send(
+            sender=build.__class__,
+            build=build,
+            status=build.get_status(),
+        )
 
     if lock_id:
         cache.delete(lock_id)
 
-    return build.status
+    return build.get_status()
 
 
 @django_rq.job('short', timeout=60)
@@ -71,7 +77,7 @@ def check_queued_build(build_id):
         message = 'Could not find org configuration for org {}'.format(
             build.plan.org)
         build.log = message
-        build.status = 'error'
+        build.set_status('error')
         build.save()
         return 'Could not find org configuration for org {}'.format(
             build.plan.org)
@@ -102,7 +108,7 @@ def check_queued_build(build_id):
         else:
             # Failed to get lock, queue next check
             build.task_id_check = None
-            build.status = 'waiting'
+            build.set_status('waiting')
             build.log = 'Waiting on build #{} to complete'.format(
                 cache.get(lock_id))
             build.save()
