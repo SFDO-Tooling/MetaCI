@@ -150,6 +150,7 @@ def test_method_trend(request, method_id):
     return render(request, 'testresults/test_method_trend.html', data)
 
 def build_flow_compare(request,):
+    """ compare two buildflows for their limits usage """
     execution1_id = request.GET.get('buildflow1', None)
     execution2_id = request.GET.get('buildflow2', None)
     execution1 = get_object_or_404(BuildFlow, id=execution1_id)
@@ -165,10 +166,13 @@ def build_flow_compare(request,):
     return render(request, 'testresults/build_flow_compare.html', context)
 
 def build_flow_compare_to(request, build_id, flow):
+    """ allows the user to select a build_flow to compare against the one they are on. """
     build_flow = find_buildflow(request, build_id, flow)
     # get a list of build_flows that could be compared to
     possible_comparisons = BuildFlow.objects.filter(build__repo__exact=1).order_by('-time_end')
+    # use a BuildFlowFilter to dynamically filter the queryset (and generate a form to display them)
     comparison_filter = BuildFlowFilter(request.GET, queryset=possible_comparisons)
+    # LIMIT 10
     records = comparison_filter.qs[:10]
     
     data = {'build_flow': build_flow, 'filter': comparison_filter, 'records': records}

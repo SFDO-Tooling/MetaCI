@@ -4,6 +4,7 @@ from mrbelvedereci.build.models import BuildFlow
 
 
 def find_buildflow(request, build_id, flow):
+    """ given a build_id and flow name, find a single BuildFlow (ala tests/ urls patterns). """
     build = get_object_or_404(Build, id=build_id)
 
     if not build.plan.public and not request.user.is_staff:
