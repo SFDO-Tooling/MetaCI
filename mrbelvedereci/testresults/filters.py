@@ -3,9 +3,9 @@ import django_filters
 from mrbelvedereci.build.models import BuildFlow
 
 class BuildFlowFilter(django_filters.FilterSet):
-    flow_name = django_filters.CharFilter(name="flow__name")
+    plan = django_filters.CharFilter(name="build__plan__name", label='Plan Name', lookup_expr='contains')
     build = django_filters.CharFilter(name='build')
 
     class Meta:
         model = BuildFlow
-        fields = ['build','flow_name']
+        fields = ['build','plan']
