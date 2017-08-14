@@ -46,6 +46,12 @@ BUILD_FLOW_STATUSES = (
     ('error', 'Error'),
     ('fail', 'Failed'),
 )
+BUILD_TYPES = (
+    ('manual', 'Manual'),
+    ('auto', 'Auto'),
+    ('scheduled', 'Scheduled'),
+    ('legacy','Legacy - Probably Automatic')
+)
 
 
 class Build(models.Model):
@@ -79,6 +85,9 @@ class Build(models.Model):
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
+
+    build_type = models.CharField(max_length=16, choices=BUILD_TYPES, default='legacy')
+    user = models.ForeignKey('users.User', related_name='builds', null=True, on_delete=models.PROTECT)
 
     class Meta:
         ordering = ['-time_queue']

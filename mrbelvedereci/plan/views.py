@@ -31,12 +31,12 @@ def plan_run(request, plan_id):
     plan = get_object_or_404(Plan, id = plan_id)
 
     if request.method == 'POST':
-        form = RunPlanForm(plan, request.POST)
+        form = RunPlanForm(plan, request.user, request.POST,)
         if form.is_valid():
             build = form.create_build()
             return HttpResponseRedirect(build.get_absolute_url())
     else:
-        form = RunPlanForm(plan)
+        form = RunPlanForm(plan, request.user)
     context = {
         'plan': plan,
         'form': form,
