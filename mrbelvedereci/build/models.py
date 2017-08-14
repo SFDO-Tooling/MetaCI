@@ -97,9 +97,12 @@ class Build(models.Model):
         url = '{}{}'.format(settings.SITE_URL, self.get_absolute_url())
         return url
 
+    def get_build(self):
+        return self.current_rebuild if self.current_rebuild else self
+
     def get_build_attr(self, attr):
         # get an attribute from the most recent build/rebuild
-        build = self.current_rebuild if self.current_rebuild else self
+        build = self.get_build()
         return getattr(build, attr)
 
     def get_status(self):
@@ -119,6 +122,11 @@ class Build(models.Model):
 
     def get_time_end(self):
         return self.get_build_attr('time_end')
+
+    def set_status(self, status):
+        build = self.get_build()
+        build.status = status
+        build.save()
 
     def flush_log(self):
         for handler in self.logger.handlers:
