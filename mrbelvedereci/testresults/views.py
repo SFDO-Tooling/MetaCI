@@ -11,17 +11,10 @@ from mrbelvedereci.testresults.models import TestMethod
 from mrbelvedereci.testresults.models import TestResult
 
 from mrbelvedereci.testresults.filters import BuildFlowFilter
+from mrbelvedereci.testresults.utils import find_buildflow
 
 def build_flow_tests(request, build_id, flow):
-    build = get_object_or_404(Build, id=build_id)
-
-    if not build.plan.public and not request.user.is_staff:
-        raise Http404()
-    query = {'build_id': build_id, 'flow': flow}
-    if build.current_rebuild:
-        query['rebuild_id'] = build.current_rebuild
-
-    build_flow = get_object_or_404(BuildFlow, **query)
+    build_flow = find_buildflow(request, build_id, flow)
     data = {'build_flow': build_flow}
 
     last_class = None
@@ -172,18 +165,7 @@ def build_flow_compare(request,):
     return render(request, 'testresults/build_flow_compare.html', context)
 
 def build_flow_compare_to(request, build_id, flow):
-    # TODO: wrap this in a helper. or somethign?
-    # get the build and build_flow specified in the url
-    build = get_object_or_404(Build, id=build_id)
-
-    if not build.plan.public and not request.user.is_staff:
-        raise Http404()
-    query = {'build_id': build_id, 'flow': flow}
-    if build.current_rebuild:
-        query['rebuild_id'] = build.current_rebuild
-
-    build_flow = get_object_or_404(BuildFlow, **query)
-
+    build_flow = find_buildflow(request, build_id, flow)
     # get a list of build_flows that could be compared to
     possible_comparisons = BuildFlow.objects.filter(build__repo__exact=1).order_by('-time_end')
     comparison_filter = BuildFlowFilter(request.GET, queryset=possible_comparisons)
