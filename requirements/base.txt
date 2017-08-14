@@ -11,6 +11,7 @@ whitenoise==3.2.2
 # Forms
 django-braces==1.10.0
 django-crispy-forms==1.6.1
+django_filter==1.0.4
 
 # Models
 django-model-utils==2.6
