@@ -115,6 +115,7 @@ class PlanSchedule(models.Model):
             branch = self.branch,
             commit = self.branch.github_api.commit.sha,
             schedule = self,
+            build_type = 'cron',
         )
         build.save()
         return build

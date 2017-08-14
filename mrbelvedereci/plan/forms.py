@@ -81,6 +81,7 @@ class RunPlanForm(forms.Form):
             branch = branch,
             commit = commit,
             keep_org = keep_org,
+            build_type = 'manual',
         )
         build.save()
         

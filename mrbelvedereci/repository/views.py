@@ -190,6 +190,7 @@ def github_push_webhook(request):
                 commit = commit,
                 commit_message = commit_message,
                 branch = branch,
+                build_type = 'auto',
             )
             build.save() 
 

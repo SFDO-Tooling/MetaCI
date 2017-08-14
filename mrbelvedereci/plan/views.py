@@ -34,6 +34,7 @@ def plan_run(request, plan_id):
         form = RunPlanForm(plan, request.POST)
         if form.is_valid():
             build = form.create_build()
+            build.user = self.request.user
             return HttpResponseRedirect(build.get_absolute_url())
     else:
         form = RunPlanForm(plan)
