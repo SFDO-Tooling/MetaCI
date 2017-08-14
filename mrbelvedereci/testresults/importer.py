@@ -3,7 +3,6 @@ import json
 from mrbelvedereci.testresults.models import TestClass
 from mrbelvedereci.testresults.models import TestMethod
 from mrbelvedereci.testresults.models import TestResult
-from mrbelvedereci.testresults.models import TestCodeUnit
 
 STATS_MAP = {
     'email_invocations': 'Number of Email Invocations',
@@ -72,55 +71,10 @@ def import_test_results(build_flow, results):
         ) 
         testresult.save()
 
-        if 'Stats' in result and result['Stats']:
-            testcodeunit = TestCodeUnit(
-                testresult = testresult,
-                unit = result['Method'],
-                unit_type = 'Test Method',
-            )
-            for stat in STATS_MAP.keys():
-                used = '%s_used' % stat
-                setattr(testcodeunit, used, get_value_from_stats(result['Stats'], used))
-                allowed = '%s_allowed' % stat
-                setattr(testcodeunit, allowed, get_value_from_stats(result['Stats'], allowed))
-
-            testcodeunit.save()
-
-        if 'Children' in result and result['Children']:
-            process_children(result['Children'], testresult, testcodeunit)
 
         testresult.populate_limit_fields()
 
     return build_flow
-
-def process_children(children, testresult, parent):
-    if not children:
-        return
-
-    for child in children:
-        testcodeunit = TestCodeUnit(
-            testresult = testresult,
-            parent = parent,
-            unit = child['unit'],
-            unit_type = child['unit_type'],
-            duration = child['stats'].get('duration', None)
-        )
-
-        for stat in STATS_MAP.keys():
-            used = '%s_used' % stat
-            setattr(testcodeunit, used, get_value_from_stats(child['stats'], used))
-            allowed = '%s_allowed' % stat
-            setattr(testcodeunit, allowed, get_value_from_stats(child['stats'], allowed))
-
-        if 'unit_info' in child and child['unit_info']:
-            testcodeunit.sobject = child['unit_info'].get('object')
-            testcodeunit.event = child['unit_info'].get('event')
-
-        testcodeunit.save()
-
-        if child['children']:
-            process_children(child['children'], testresult, testcodeunit)
-            
 
 def get_value_from_stats(stats, field):
     if not stats:
