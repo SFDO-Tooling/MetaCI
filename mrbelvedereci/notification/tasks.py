@@ -23,14 +23,14 @@ def queue_build_notifications(build_id):
 
     status_query = {}
 
-    if build.status in ['queued', 'waiting', 'in_progress']:
+    if build.get_status() in ['queued', 'waiting', 'in_progress']:
         return 'Skipping, build not done yet'
     
-    if build.status == 'success':
+    if build.get_status() == 'success':
         status_query['on_success'] = True
-    elif build.status == 'fail':
+    elif build.get_status() == 'fail':
         status_query['on_fail'] = True
-    elif build.status == 'error':
+    elif build.get_status() == 'error':
         status_query['on_error'] = True
     
     repo_notifications = RepositoryNotification.objects.filter(repo = build.repo, **status_query).values('user__id').distinct()
@@ -75,7 +75,7 @@ def send_notification_message(build_id, user_id):
         'log_lines': log_lines,
     }
 
-    subject = '[{}] Build #{} of {} {} - {}'.format(build.repo.name, build.id, build.branch.name, build.plan.name, build.status.upper())
+    subject = '[{}] Build #{} of {} {} - {}'.format(build.repo.name, build.id, build.branch.name, build.plan.name, build.get_status().upper())
     message = template_txt.render(Context(context))
     html_message = template_html.render(Context(context))
 
