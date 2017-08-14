@@ -79,7 +79,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for bf in filter.qs %}
+        {% for bf in records %}
         <tr>
             <td><a href="{% url 'build_flow_compare' %}?buildflow1={{build_flow.id}}&buildflow2={{bf.id}}">{{ bf }}</a></td>
             <td>{{ bf.build.branch.name }}</td>

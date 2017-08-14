@@ -169,6 +169,7 @@ def build_flow_compare_to(request, build_id, flow):
     # get a list of build_flows that could be compared to
     possible_comparisons = BuildFlow.objects.filter(build__repo__exact=1).order_by('-time_end')
     comparison_filter = BuildFlowFilter(request.GET, queryset=possible_comparisons)
+    records = comparison_filter.qs[:10]
     
-    data = {'build_flow': build_flow, 'filter': comparison_filter}
+    data = {'build_flow': build_flow, 'filter': comparison_filter, 'records': records}
     return render(request, 'testresults/build_flow_compare_to.html', data)
