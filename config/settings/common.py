@@ -47,6 +47,7 @@ THIRD_PARTY_APPS = (
     'django_slds',  # Salesforce Lightning Design System
     'django_slds_crispyforms',  # SLDS theme for crispyforms
     'watson', # Full text search
+    'django_filters', # view helpers for filtering models
 )
 
 # Apps specific for this project go here.

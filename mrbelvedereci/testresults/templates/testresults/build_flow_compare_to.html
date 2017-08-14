@@ -2,17 +2,8 @@
 
 {% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
 
-{% block layout_header_text %}Test Results for {{ build_flow.flow }} on Build #{{ build_flow.build.id }}{% endblock %}
+{% block layout_header_text %}Compare test results for {{ build_flow.flow }} on Build #{{ build_flow.build.id }}{% endblock %}
 
-{% block layout_header_buttons %}
-<div class="slds-button-group" role="group">
-  <a href="{% url 'build_flow_compare_to' build_flow.build.id build_flow.flow %}">
-    <button class="slds-button slds-button--neutral">
-      Compare
-    </button>
-  </a>
-</div>
-{% endblock %}
 
 {% block layout_header_details %}
   <ul class="slds-grid slds-page-header__detail-row">
@@ -25,7 +16,7 @@
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">Status</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build_flow.build.repo }}">
-        {{ build_flow.build.get_status }}
+        {{ build_flow.build.status }}
       </p>
     </li>
     <li class="slds-page-header__detail-block">
@@ -73,43 +64,28 @@
 
 {% block layout_body %}
 
+<form method="get">
+  {{ filter.form.as_table }}
+  <button type="submit">Search</button>
+</form>
 
-<div class="container">
-  {% if custom_sort %}
-    Sorted on {{ sort }}.  <a href="/tests/{{ build_flow.build.id }}">Undo Custom Sorting</a>
-  {% else %}
-    <a href="/tests/{{ build_flow.build.id }}/{{ build_flow.flow }}?sort=-worst_limit_percent&columns=worst_limit,worst_limit_percent">Sort by worst percent used</a>
-  {% endif %}
 
-      {% for class_results in results_by_class %}
-      <div class="slds-box slds-p-top--large">
-        <h3 class="slds-text-heading--small slds-p-bottom--small">{{ class_results.class.name }}</h3>
-
-          <table class="slds-table slds-table--bordered slds-table--cell-buffer">
-            <thead>
-              <tr class="slds-text-title--caps">
-                <th>Method</th>
-                <th>Result</th>
-                <th>Duration</th>
-                {% for column in columns %}
-                <th>{{ column }}</th>
-                {% endfor %}
-              </tr>
-            </thead>
-            <tbody>
-            {% for result in class_results.results %}
-              <tr>
-                <td><a href="/tests/trend/method/{{ result.result.method.id }}">{{ result.result.method.name }}</a></td>
-                <td class="{% if result.result.outcome == 'Pass' %}success{% else %}danger{% endif %}">{{ result.result.outcome }}</td>
-                <td>{{ result.result.duration }}</td>
-                {% for column in result.columns %}
-                <td class="{{ column.status }}">{{ column.value }}</td>
-                {% endfor %}
-              </tr>
-            {% endfor %}
-            <tbody>
-          </table>
-      </div>
-      {% endfor %}
-
+<table class="slds-table slds-table--bordered slds-table--cell-buffer">
+    <thead>
+        <tr class="slds-text-title--caps">
+            <th>Compare</th>
+            <th>Branch</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bf in records %}
+        <tr>
+            <td><a href="{% url 'build_flow_compare' %}?buildflow1={{build_flow.id}}&buildflow2={{bf.id}}">{{ bf }}</a></td>
+            <td>{{ bf.build.branch.name }}</td>
+            <td>{{ bf.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
