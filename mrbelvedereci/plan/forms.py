@@ -17,8 +17,9 @@ class RunPlanForm(forms.Form):
     commit = forms.CharField(required=False)
     keep_org = forms.BooleanField(required=False)
 
-    def __init__(self, plan, *args, **kwargs):
+    def __init__(self, plan, user, *args, **kwargs):
         self.plan = plan
+        self.user = user
         super(RunPlanForm, self).__init__(*args, **kwargs)
         self.fields['branch'].choices = self._get_branch_choices()
         self.helper = FormHelper()
@@ -82,6 +83,7 @@ class RunPlanForm(forms.Form):
             commit = commit,
             keep_org = keep_org,
             build_type = 'manual',
+            user = self.user
         )
         build.save()
         
