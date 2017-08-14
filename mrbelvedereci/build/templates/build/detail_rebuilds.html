@@ -57,7 +57,7 @@
         </div>
       </td>
       <th data-label="User">
-        <div class="slds-truncate" title="N/A">{{ build.user|default:build.build_type }}</div>
+        <div class="slds-truncate" title="{{ build.user|default:build.build_type }}">{{ build.user|default:build.build_type }}</div>
       </th>
       <th data-label="Queued">
         <div class="slds-truncate" title="{{ build.time_queue }}">{{ build.time_queue }}</div>
