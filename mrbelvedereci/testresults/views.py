@@ -169,7 +169,10 @@ def build_flow_compare_to(request, build_id, flow):
     """ allows the user to select a build_flow to compare against the one they are on. """
     build_flow = find_buildflow(request, build_id, flow)
     # get a list of build_flows that could be compared to
-    possible_comparisons = BuildFlow.objects.filter(build__repo__exact=build_flow.build.repo).order_by('-time_end')
+    possible_comparisons = BuildFlow.objects.filter(
+        build__repo__exact=build_flow.build.repo,
+        status__in=['success','fail','error']
+    ).order_by('-time_end')
     # use a BuildFlowFilter to dynamically filter the queryset (and generate a form to display them)
     comparison_filter = BuildFlowFilter(request.GET, queryset=possible_comparisons)
     # LIMIT 10
