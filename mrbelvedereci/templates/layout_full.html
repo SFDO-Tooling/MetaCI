@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block base_title %}{% endblock %}
+{% block base_title %}mrbelvedereci{% endblock %}
 
 {% block base_head %}
 <!-- SLDS Overrides -->
@@ -10,8 +10,23 @@
 {% endblock %}
 
 {% block base_page_header %}
-<header class="slds-global-header_container">
-  <div class="slds-global-header slds-grid slds-grid--align-spread">
+
+{% block local_header %}
+{% if debug %}
+<div class="slds-notify_container">
+    <div class="slds-notify slds-notify--toast" role="alert">
+      <span class="slds-assistive-text">Info</span>
+
+      <div class="slds-notify__content">
+        <h2 class="slds-text-heading--small">DEVELOPING ON {{ request.META.HTTP_HOST }}</h2>
+      </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+<header class="slds-global-header_container ">
+  <div class="slds-global-header slds-grid slds-grid--align-spread ">
     <div class="slds-global-header__item">
       <div class="slds-global-header__logo">
         <a href="/"><img src="/static/images/logo.jpg" alt="" /></a>
