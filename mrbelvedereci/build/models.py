@@ -258,9 +258,9 @@ class Build(models.Model):
         if self.plan.sfdx_config:
             self.logger.info(
                 '-- Injecting custom sfdx-workspace.json from plan')
-            f = open(os.path.join(build_dir, 'sfdx-workspace.json'), 'w')
-            f.write(self.plan.sfdx_config)
-            f.close()
+            filename = os.path.join(build_dir, 'sfdx-workspace.json')
+            with open(filename, 'w') as f:
+                f.write(self.plan.sfdx_config)
 
         return build_dir
 

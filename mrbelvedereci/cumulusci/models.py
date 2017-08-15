@@ -57,9 +57,9 @@ class ScratchOrgInstance(models.Model):
         dx_local_dir = os.path.join(os.path.expanduser('~'), '.local', '.sfdx')
         if not os.path.isdir(dx_local_dir):
              dx_local_dir = os.path.join(os.path.expanduser('~'), '.sfdx')
-        f = open(os.path.join(dx_local_dir, '{}.json'.format(self.username)), 'w')
-        f.write(self.json_dx)
-        f.close()
+        filename = os.path.join(dx_local_dir, '{}.json'.format(self.username))
+        with open(filename, 'w') as f:
+            f.write(self.json_dx)
 
         org_config = json.loads(self.json)
 
