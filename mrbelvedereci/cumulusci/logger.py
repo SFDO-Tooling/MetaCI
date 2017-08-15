@@ -6,6 +6,7 @@ import datetime
 import logging
 
 import coloredlogs
+from django.utils import timezone
 
 from mrbelvedereci.cumulusci.exceptions import LoggerException
 
@@ -18,14 +19,14 @@ class LogStream(object):
             raise LoggerException('Model does not have "log" attribute.')
         self.model = model
         self.buffer = ''
-        self.last_save_time = datetime.datetime.utcnow()
+        self.last_save_time = timezone.now()
 
     def flush(self, force=False):
         if self.model.log is None:
             self.model.log = u''
         self.model.log += self.buffer
         self.buffer = ''
-        now = datetime.datetime.utcnow()
+        now = timezone.now()
         if force or now - self.last_save_time > datetime.timedelta(seconds=1):
             self.model.save()
             self.last_save_time = now
