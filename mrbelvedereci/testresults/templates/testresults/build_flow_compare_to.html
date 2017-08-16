@@ -64,26 +64,35 @@
 
 {% block layout_body %}
 
-<form method="get">
+<article class="slds-card">
+
+    <div class="slds-card__body slds-p-around--small">
+        
+    <form method="get">
   {{ filter.form.as_table }}
   <button type="submit">Search</button>
 </form>
-
-
+</div>
+</article>
+<br/>
 <table class="slds-table slds-table--bordered slds-table--cell-buffer">
     <thead>
         <tr class="slds-text-title--caps">
             <th>Compare</th>
+            <th>Plan</th>
             <th>Branch</th>
             <th>Status</th>
+            <th>Start Date</th>
         </tr>
     </thead>
     <tbody>
         {% for bf in records %}
         <tr>
-            <td><a href="{% url 'build_flow_compare' %}?buildflow1={{build_flow.id}}&buildflow2={{bf.id}}">{{ bf }}</a></td>
+            <td class="slds-truncate"><a href="{% url 'build_flow_compare' %}?buildflow1={{build_flow.id}}&buildflow2={{bf.id}}">{{ bf.build.id }}: {{bf.flow}}</a></td>
+            <td>{{ bf.build.plan.name }}</td>
             <td>{{ bf.build.branch.name }}</td>
             <td>{{ bf.status }}</td>
+            <td>{{ bf.build.time_start }}</td>
         </tr>
         {% endfor %}
     </tbody>
