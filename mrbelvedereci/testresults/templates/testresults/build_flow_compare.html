@@ -25,7 +25,7 @@ Test Comparison for {{ execution1.build.repo }}
                 <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Branch">Branch:</dt>
                 <dd class="slds-item--detail"><a href="{{ execution1.build.branch.get_absolute_url }}">{{ execution1.build.branch }}</a></dd>
                 <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Commit">Commit:</dt>
-                <dd class="slds-item--detail"><a href="{{ execution1.build.commit.get_absolute_url }}">{{ execution1.build.commit }}</a></dd>
+                <dd class="slds-item--detail"><a href="{% url 'commit_detail' execution1.build.repo.owner execution1.build.repo.name execution1.build.commit %}">{{ execution1.build.commit }}</a></dd>
                 <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org">Org:</dt>
                 <dd class="slds-item--detail"><a href="{{ execution1.build.org.get_absolute_url }}">{{ execution1.build.org }}</a></dd>
               </dl>
@@ -51,7 +51,7 @@ Test Comparison for {{ execution1.build.repo }}
                 <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Branch">Branch:</dt>
                 <dd class="slds-item--detail"><a href="{{ execution2.build.branch.get_absolute_url }}">{{ execution2.build.branch }}</a></dd>
                 <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Commit">Commit:</dt>
-                <dd class="slds-item--detail"><a href="{{ execution2.build.commit.get_absolute_url }}">{{ execution2.build.commit }}</a></dd>
+                <dd class="slds-item--detail"><a href="{% url 'commit_detail' execution2.build.repo.owner execution2.build.repo.name execution2.build.commit %}">{{ execution2.build.commit }}</a></dd>
                 <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Org">Org:</dt>
                 <dd class="slds-item--detail"><a href="{{ execution2.build.org.get_absolute_url }}">{{ execution2.build.org }}</a></dd>
               </dl>
