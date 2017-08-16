@@ -37,7 +37,7 @@ class PlanTestCase(TestCase):
             'ref': 'refs/heads/test/matches',
             'after': '0123456789',
         }
-        run_build, commit = self.commit_plan.check_push(push)
+        run_build, commit, commit_message = self.commit_plan.check_push(push)
         self.assertTrue(run_build)
         self.assertEquals(commit, push['after'])
 
@@ -45,7 +45,7 @@ class PlanTestCase(TestCase):
         push = {
             'ref': 'refs/heads/no-match',
         }
-        run_build, commit = self.commit_plan.check_push(push)
+        run_build, commit, commit_message = self.commit_plan.check_push(push)
         self.assertFalse(run_build)
         self.assertEquals(commit, None)
 
@@ -54,7 +54,7 @@ class PlanTestCase(TestCase):
             'ref': 'refs/tags/test/matches',
             'head_commit': None,
         }
-        run_build, commit = self.commit_plan.check_push(push)
+        run_build, commit, commit_message = self.commit_plan.check_push(push)
         self.assertFalse(run_build)
         self.assertEquals(commit, None)
 
@@ -64,7 +64,7 @@ class PlanTestCase(TestCase):
             'before': '0123456789',
             'head_commit': None,
         }
-        run_build, commit = self.tag_plan.check_push(push)
+        run_build, commit, commit_message = self.tag_plan.check_push(push)
         self.assertTrue(run_build)
         self.assertEquals(commit, push['before'])
 
@@ -73,7 +73,7 @@ class PlanTestCase(TestCase):
             'ref': 'refs/tags/no-match',
             'head_commit': None,
         }
-        run_build, commit = self.tag_plan.check_push(push)
+        run_build, commit, commit_message = self.tag_plan.check_push(push)
         self.assertFalse(run_build)
         self.assertEquals(commit, None)
 
@@ -82,7 +82,7 @@ class PlanTestCase(TestCase):
             'ref': 'refs/heads/test/matches',
             'head_commit': None,
         }
-        run_build, commit = self.tag_plan.check_push(push)
+        run_build, commit, commit_message = self.tag_plan.check_push(push)
         self.assertFalse(run_build)
         self.assertEquals(commit, None)
 
