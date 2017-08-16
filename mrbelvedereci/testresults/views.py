@@ -171,8 +171,8 @@ def build_flow_compare_to(request, build_id, flow):
     # get a list of build_flows that could be compared to
     possible_comparisons = BuildFlow.objects.filter(
         build__repo__exact=build_flow.build.repo,
-        status__in=['success','fail','error']
-    ).order_by('-time_end')
+        status__in=['success','fail','error'],
+    ).exclude(pk=build_flow.id).order_by('build')
     # use a BuildFlowFilter to dynamically filter the queryset (and generate a form to display them)
     comparison_filter = BuildFlowFilter(request.GET, queryset=possible_comparisons)
     # LIMIT 10
