@@ -48,7 +48,7 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
             flows = build.flows.filter(rebuild__isnull=True)
         else:
             rebuild = get_object_or_404(Rebuild, build_id=build.id,
-                id=rebuild_id)
+                                        id=rebuild_id)
             flows = rebuild.flows
 
     flows = flows.order_by('time_queue')

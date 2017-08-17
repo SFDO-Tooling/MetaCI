@@ -56,7 +56,7 @@ def format_log(log):
     content = conv.convert(log, full=False)
     content = '<pre class="ansi2html-content">{}</pre>'.format(
         content.encode('utf8'))
-    #content = '<div class="body_foreground body_background">{}</div>'.format(
+    # content = '<div class="body_foreground body_background">{}</div>'.format(
     #    content)
     return headers + content
 
