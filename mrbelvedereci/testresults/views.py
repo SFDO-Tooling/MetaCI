@@ -21,7 +21,7 @@ def build_flow_tests(request, build_id, flow):
     results_by_class = []
     current_class_results = []
 
-    results_query = build_flow.test_results.all()
+    results_query = build_flow.test_results.select_related("method", "method__testclass")
 
     # Handle configurable display columns
     columns = request.GET.get('columns', 'worst_limit,worst_limit_percent')
