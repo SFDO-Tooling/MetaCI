@@ -90,13 +90,13 @@ def check_queued_build(build_id):
         build.task_id_run = res_run.id
         build.save()
         return ('Org is a scratch org, running build concurrently ' +
-            'as task {}'.format(res_run.id))
+                'as task {}'.format(res_run.id))
 
     else:
         # For persistent orgs, use the cache to lock the org
         lock_id = 'mrbelvedereci-org-lock-{}'.format(org.id)
         status = cache.add(lock_id, 'build-{}'.format(build_id),
-            timeout=BUILD_TIMEOUT)
+                           timeout=BUILD_TIMEOUT)
 
         if status is True:
             # Lock successful, run the build
@@ -113,8 +113,8 @@ def check_queued_build(build_id):
                 cache.get(lock_id))
             build.save()
             return ('Failed to get lock on org. ' +
-                '{} has the org locked. Queueing next check.'.format(
-                cache.get(lock_id)))
+                    '{} has the org locked. Queueing next check.'.format(
+                        cache.get(lock_id)))
 
 
 @django_rq.job('short', timeout=60)
@@ -151,7 +151,7 @@ def delete_scratch_orgs():
     from mrbelvedereci.cumulusci.models import ScratchOrgInstance
     count = 0
     for org in ScratchOrgInstance.objects.filter(deleted=False,
-            delete_error__isnull=False):
+                                                 delete_error__isnull=False):
         delete_scratch_org.delay(org.id)
         count += 1
 

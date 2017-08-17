@@ -50,38 +50,38 @@ BUILD_TYPES = (
     ('manual', 'Manual'),
     ('auto', 'Auto'),
     ('scheduled', 'Scheduled'),
-    ('legacy','Legacy - Probably Automatic')
+    ('legacy', 'Legacy - Probably Automatic')
 )
 
 
 class Build(models.Model):
     repo = models.ForeignKey('repository.Repository', related_name='builds')
     branch = models.ForeignKey('repository.Branch', related_name='builds',
-        null=True, blank=True)
+                               null=True, blank=True)
     commit = models.CharField(max_length=64)
     commit_message = models.TextField(null=True, blank=True)
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     plan = models.ForeignKey('plan.Plan', related_name='builds')
     org = models.ForeignKey('cumulusci.Org', related_name='builds', null=True,
-        blank=True)
+                            blank=True)
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
-        related_name='builds', null=True, blank=True)
+                                     related_name='builds', null=True, blank=True)
     schedule = models.ForeignKey('plan.PlanSchedule', related_name='builds',
-        null=True, blank=True)
+                                 null=True, blank=True)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES,
-        default='queued')
+                              default='queued')
     keep_org = models.BooleanField(default=False)
     task_id_status_start = models.CharField(max_length=64, null=True,
-        blank=True)
+                                            blank=True)
     task_id_check = models.CharField(max_length=64, null=True, blank=True)
     task_id_run = models.CharField(max_length=64, null=True, blank=True)
     task_id_status_end = models.CharField(max_length=64, null=True, blank=True)
     current_rebuild = models.ForeignKey('build.Rebuild',
-        related_name='current_builds', null=True, blank=True)
+                                        related_name='current_builds', null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
@@ -196,9 +196,9 @@ class Build(models.Model):
                     self.logger = init_logger(self)
                     self.logger.error(
                         'Build flow {} completed with status {}'.format(
-                        flow, build_flow.status))
+                            flow, build_flow.status))
                     self.logger.error('    {}: {}'.format(build_flow.exception,
-                        build_flow.error_message))
+                                                          build_flow.error_message))
                     set_build_info(
                         build,
                         status=build_flow.status,
@@ -214,7 +214,7 @@ class Build(models.Model):
                     self.logger = init_logger(self)
                     self.logger.info(
                         'Build flow {} completed successfully'.format(
-                        flow))
+                            flow))
                     self.flush_log()
                     self.save()
 
@@ -336,9 +336,9 @@ class Build(models.Model):
 class BuildFlow(models.Model):
     build = models.ForeignKey('build.Build', related_name='flows')
     rebuild = models.ForeignKey('build.Rebuild', related_name='flows',
-        null=True, blank=True)
+                                null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_FLOW_STATUSES,
-        default='queued')
+                              default='queued')
     flow = models.CharField(max_length=255, null=True, blank=True)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
@@ -352,7 +352,7 @@ class BuildFlow(models.Model):
 
     def __unicode__(self):
         return '{}: {} - {} - {}'.format(self.build.id, self.build.repo,
-            self.build.commit, self.flow)
+                                         self.build.commit, self.flow)
 
     def get_absolute_url(self):
         return reverse('build_detail', kwargs={
@@ -421,12 +421,12 @@ class BuildFlow(models.Model):
 
         # Get the class to look up options
         class_path = flow_config.config.get('class_path',
-            'cumulusci.core.flows.BaseFlow')
+                                            'cumulusci.core.flows.BaseFlow')
         flow_class = import_class(class_path)
 
         # Create the flow and handle initialization exceptions
         self.flow_instance = flow_class(project_config, flow_config,
-            org_config)
+                                        org_config)
 
         # Run the flow
         res = self.flow_instance()
@@ -502,9 +502,9 @@ class Rebuild(models.Model):
     build = models.ForeignKey('build.Build', related_name='rebuilds')
     user = models.ForeignKey('users.User', related_name='rebuilds')
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
-        related_name='rebuilds', null=True, blank=True)
+                                     related_name='rebuilds', null=True, blank=True)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES,
-        default='queued')
+                              default='queued')
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
