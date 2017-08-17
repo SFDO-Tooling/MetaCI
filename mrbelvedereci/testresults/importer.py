@@ -31,6 +31,22 @@ STATS_MAP = {
     'test_callouts': 'TESTING_LIMITS: Number of callouts',
 }
 
+LIMIT_TYPES = (
+            'email_invocations',
+            'soql_queries',
+            'future_calls',
+            'dml_rows',
+            'cpu_time',
+            'query_rows',
+            'dml_statements',
+            'mobile_apex_push',
+            'heap_size',
+            'sosl_queries',
+            'queueable_jobs',
+            'callouts',
+        )
+
+
 def import_test_results(build_flow, results):
     classes = {}
     methods = {}
@@ -68,31 +84,40 @@ def import_test_results(build_flow, results):
             stacktrace = result['StackTrace'],
             message = result['Message'],
             source_file = result['SourceFile']
-        ) 
+        )
+        populate_limit_fields(testresult, result['Stats'])
         testresult.save()
-
-
-        testresult.populate_limit_fields()
 
     return build_flow
 
-def get_value_from_stats(stats, field):
-    if not stats:
-        return
+def populate_limit_fields(testresult, code_unit):
+        for limit_type in LIMIT_TYPES:
+            try:
+                test_used = code_unit[STATS_MAP['test_%s' % limit_type]]['used']
+                test_allowed = code_unit[STATS_MAP['test_%s' % limit_type]]['allowed']
 
-    field_parts = field.split('_')
-    suffix = field_parts[-1]
-    key = '_'.join(field_parts[0:-1])
-    stats_key = STATS_MAP.get(key)
-    
-    if stats_key not in stats:
-        return
+                test_percent = None
 
-    value = stats[stats_key][suffix]
-    
-    try:
-        value = value.replace(' ******* CLOSE TO LIMIT', '')
-    except AttributeError:
-        pass
+                if test_used is not None and test_allowed:
+                    test_percent = (test_used * 100) / test_allowed
+            
+                setattr(testresult, 'test_%s_used' % limit_type,  test_used)
+                setattr(testresult, 'test_%s_allowed' % limit_type, test_allowed)
+                setattr(testresult, 'test_%s_percent' % limit_type, test_percent)
+            except KeyError:
+                continue
 
-    return int(value)
+        worst_limit_test = None
+        worst_limit_test_percent = None
+
+        for limit_type in LIMIT_TYPES:
+            percent_test = getattr(testresult, 'test_%s_percent' % limit_type)
+
+            if percent_test > worst_limit_test_percent:
+                worst_limit_test = 'test_%s_percent' % limit_type
+                worst_limit_test_percent = percent_test
+
+        testresult.worst_limit = worst_limit_test
+        testresult.worst_limit_percent = worst_limit_test_percent
+        testresult.worst_limit_test = worst_limit_test
+        testresult.worst_limit_test_percent = worst_limit_test_percent
