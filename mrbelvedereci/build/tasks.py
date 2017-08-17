@@ -2,6 +2,7 @@ import os
 import time
 
 from django import db
+from django.conf import settings
 from django.core.cache import cache
 import django_rq
 import requests
@@ -30,10 +31,10 @@ def run_build(build_id, lock_id=None):
     try:
         exception = None
         build.run()
-        if settings.GITHUB_CALLOUTS_ENABLED:
+        if settings.GITHUB_STATUS_UPDATES_ENABLED:
             res_status = set_github_status.delay(build_id) 
             build.task_id_status_end = res_status.id
-            
+
         build.save()
 
         build_complete.send(
@@ -45,7 +46,7 @@ def run_build(build_id, lock_id=None):
     except Exception as e:
         if lock_id:
             cache.delete(lock_id)
-        if settings.GITHUB_CALLOUTS_ENABLED:
+        if settings.GITHUB_STATUS_UPDATES_ENABLED:
             res_status = set_github_status.delay(build_id) 
             build.task_id_status_end = res_status.id
 

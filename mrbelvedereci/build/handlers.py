@@ -17,7 +17,7 @@ def queue_build(sender, **kwargs):
         return
 
     # Queue the pending status task
-    if settings.GITHUB_CALLOUTS_ENABLED:
+    if settings.GITHUB_STATUS_UPDATES_ENABLED:
         res_status = set_github_status.delay(build.id) 
         build.task_id_status_start = res_status.id
 
@@ -44,7 +44,7 @@ def queue_rebuild(sender, **kwargs):
     build.current_rebuild = rebuild
 
     # Queue the pending status task
-    if settings.GITHUB_CALLOUTS_ENABLED:
+    if settings.GITHUB_STATUS_UPDATES_ENABLED:
         res_status = set_github_status.delay(build.id) 
         build.task_id_status_start = res_status.id
 
