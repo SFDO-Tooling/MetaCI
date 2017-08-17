@@ -63,7 +63,7 @@
       "required": false
     },
     "SFDX_HUB_USERNAME": {
-      "description": "The username for the devhub org for Salesforce DX.  Required to use scratch orgs"
+      "description": "The username for the devhub org for Salesforce DX.  Required to use scratch orgs",
       "value": "",
       "required": false
     }
