@@ -63,7 +63,7 @@
       "required": false
     },
     "SFDX_HUB_USERNAME": {
-      "description": "The username for the devhub org for Salesforce DX.  Required to use scratch orgs",
+      "description": "The username for the devhub org for Salesforce DX.  Required to use scratch orgs"
       "value": "",
       "required": false
     }
@@ -91,8 +91,20 @@
     "sendgrid:starter"
   ],
   "buildpacks": [
-     {"url": "heroku/ruby"},
      {"url": "heroku/python"},
+     {"url": "heroku/ruby"},
      {"url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"}
-  ]
+  ],
+  "environments": {
+    "test": {
+      "scripts": {
+        "test-setup": "pip install --upgrade -r requirements/test.txt",
+        "test": "python manage.py test"
+      },
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "config.settings.test",
+        "DATABASE_URL": "sqlite:///test.db"
+      }
+    }
+  }
 }
