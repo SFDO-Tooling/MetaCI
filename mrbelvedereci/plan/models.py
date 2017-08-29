@@ -31,6 +31,7 @@ class Plan(models.Model):
     dashboard = models.CharField(max_length=8, choices=DASHBOARD_CHOICES, default=None, null=True, blank=True)
     junit_path = models.CharField(max_length=255, null=True, blank=True)
     sfdx_config = models.TextField(null=True, blank=True)
+    yaml_config = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ['name','repo__owner','repo__name', 'active', 'context']
