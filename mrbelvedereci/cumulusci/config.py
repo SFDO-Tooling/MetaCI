@@ -2,9 +2,13 @@ from cumulusci.core.config import YamlGlobalConfig
 from cumulusci.core.config import YamlProjectConfig
 
 class MrbelvedereProjectConfig(YamlProjectConfig):
-    def __init__(self, global_config_obj, build):
+    def __init__(self, global_config_obj, build, *args, **kwargs):
         self.build = build
-        super(MrbelvedereProjectConfig, self).__init__(global_config_obj)
+        
+        if not kwargs.has_key('additional_yaml'):
+            kwargs['additional_yaml'] = build.plan.yaml_config
+
+        super(MrbelvedereProjectConfig, self).__init__(global_config_obj, *args, **kwargs)
 
     @property
     def config_project_local_path(self):
