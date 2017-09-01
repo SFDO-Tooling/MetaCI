@@ -1,9 +1,13 @@
 from __future__ import unicode_literals
 import re
+import yaml
 
 from django.apps import apps
 from django.db import models
 from django.urls import reverse
+from django.core.exceptions import ValidationError
+
+
 
 TRIGGER_TYPES = (
     ('manual', 'Manual'),
@@ -16,6 +20,13 @@ DASHBOARD_CHOICES = (
     ('recent', '5 Most Recent Build'),
     ('branches', 'Latest Builds by Branch'),
 )
+
+def validate_yaml_field(value):
+    try:
+        zz = yaml.safe_load(value)
+    except yaml.YAMLError as err:
+        raise ValidationError('Error parsing additional YAML: {}'.format(err))
+
 
 class Plan(models.Model):
     name = models.CharField(max_length=255)
@@ -31,7 +42,7 @@ class Plan(models.Model):
     dashboard = models.CharField(max_length=8, choices=DASHBOARD_CHOICES, default=None, null=True, blank=True)
     junit_path = models.CharField(max_length=255, null=True, blank=True)
     sfdx_config = models.TextField(null=True, blank=True)
-    yaml_config = models.TextField(null=True, blank=True)
+    yaml_config = models.TextField(null=True, blank=True, validators=[validate_yaml_field])
 
     class Meta:
         ordering = ['name','repo__owner','repo__name', 'active', 'context']
