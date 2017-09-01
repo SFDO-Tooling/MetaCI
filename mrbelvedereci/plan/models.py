@@ -23,7 +23,7 @@ DASHBOARD_CHOICES = (
 
 def validate_yaml_field(value):
     try:
-        zz = yaml.safe_load(value)
+        yaml.safe_load(value)
     except yaml.YAMLError as err:
         raise ValidationError('Error parsing additional YAML: {}'.format(err))
 
