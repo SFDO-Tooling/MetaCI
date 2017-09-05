@@ -27,12 +27,27 @@
 
 {% block layout_header_buttons %}
 {% if not org.scratch %}
-      <a href="{{ org.get_absolute_url }}/login" target="_blank">
-        <button class="slds-button slds-button--brand">
-          Log In
-        </button>
-      </a>
-      {% endif %}
+{% if user.is_superuser %}
+{% if org.is_locked %}
+<a href="{{ org.get_absolute_url }}/unlock">
+  <button class="slds-button slds-button--destructive slds-m-horizontal--medium">
+    Unlock
+  </button>
+</a>
+{% else %}
+<a href="{{ org.get_absolute_url }}/lock">
+  <button class="slds-button slds-button--destructive slds-m-horizontal--medium">
+    Lock
+  </button>
+</a>
+{% endif %}
+{% endif %}
+<a href="{{ org.get_absolute_url }}/login" target="_blank">
+  <button class="slds-button slds-button--brand">
+    Log In
+  </button>
+</a>
+{% endif %}
 {% endblock %}
 
 {% block layout_body %}
