@@ -98,11 +98,9 @@ def check_queued_build(build_id):
 
     else:
         # For persistent orgs, use the cache to lock the org
-        status = cache.add(
-            org.lock_id,
-            'build-{}'.format(build_id),
-            timeout=BUILD_TIMEOUT,
-        )
+        lock_id = 'mrbelvedereci-org-lock-{}'.format(org.id)
+        status = cache.add(lock_id, 'build-{}'.format(build_id),
+                           timeout=BUILD_TIMEOUT)
 
         if status is True:
             # Lock successful, run the build
