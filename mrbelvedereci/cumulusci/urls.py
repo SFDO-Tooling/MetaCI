@@ -10,16 +10,6 @@ urlpatterns = [
         name='org_detail',
     ),
     url(
-        r'^(?P<org_id>\d+)/lock$',
-        views.org_lock,
-        name='org_lock',
-    ),
-    url(
-        r'^(?P<org_id>\d+)/unlock$',
-        views.org_unlock,
-        name='org_unlock',
-    ),
-    url(
         r'^(?P<org_id>\d+)/login$',
         views.org_login,
         name='org_login',
