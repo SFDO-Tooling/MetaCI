@@ -60,6 +60,11 @@
       "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
       "generator": "secret"
     },
+    "HIREFIRE_TOKEN": {
+      "description": "The token for integrating with Hirefire.io for auto-scaling worker dynos based on queued/running builds",
+      "value": "",
+      "required": "false",
+    },
     "SFDX_HUB_KEY": {
       "description": "The private key for the JWT authentication to the devhub for Salesforce DX.  Required to use scratch orgs",
       "value": "",
