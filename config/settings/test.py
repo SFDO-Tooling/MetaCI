@@ -39,9 +39,20 @@ CACHES = {
     }
 }
 
+# Add django_nose to INSTALLED_APPS
+INSTALLED_APPS = INSTALLED_APPS + (
+    'django_nose',
+)
+
 # TESTING
 # ------------------------------------------------------------------------------
-TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--with-tap',
+    '--tap-stream',
+    '--with-coverage',
+    '--cover-package=mrbelvedereci',
+]
 
 
 # PASSWORD HASHING
