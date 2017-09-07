@@ -17,7 +17,7 @@
       "value": ""
     },
     "DJANGO_ALLOWED_HOSTS": {
-      "description": "Heroku proxies web requests and Django needs to be configured to allow the forwards"
+      "description": "Heroku proxies web requests and Django needs to be configured to allow the forwards",
       "value": ".herokuapp.com"
     },
     "DJANGO_AWS_ACCESS_KEY_ID": {
