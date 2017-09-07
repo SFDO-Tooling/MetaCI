@@ -99,7 +99,7 @@
   },
   "image": "heroku/python",
   "addons": [
-    "heroku-postgres",
+    "heroku-postgresql",
     "heroku-redis",
     "sendgrid:starter"
   ],
