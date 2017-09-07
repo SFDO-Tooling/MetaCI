@@ -16,6 +16,10 @@
     "CONNECTED_APP_CLIENT_SECRET": { "description": "The Client Secret of the Salesforce Connected App. You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
       "value": ""
     },
+    "DJANGO_ALLOWED_HOSTS": {
+      "description": "Heroku proxies web requests and Django needs to be configured to allow the forwards"
+      "value": ".herokuapp.com"
+    },
     "DJANGO_AWS_ACCESS_KEY_ID": {
       "description": "The Amazon Web Services ID used for S3 storage of media",
       "value": ""
