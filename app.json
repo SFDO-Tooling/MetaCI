@@ -99,7 +99,8 @@
   },
   "image": "heroku/python",
   "addons": [
-    "heroku-redis:premium-2",
+    "heroku-postgres",
+    "heroku-redis",
     "sendgrid:starter"
   ],
   "buildpacks": [
