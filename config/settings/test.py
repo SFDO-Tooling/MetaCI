@@ -40,9 +40,9 @@ CACHES = {
 }
 
 # Add django_nose to INSTALLED_APPS
-INSTALLED_APPS = INSTALLED_APPS + [
+INSTALLED_APPS = INSTALLED_APPS + (
     'django_nose',
-]
+)
 
 # TESTING
 # ------------------------------------------------------------------------------
