@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import Http404
+from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
@@ -24,6 +26,22 @@ def org_detail(request, org_id):
     } 
     return render(request, 'cumulusci/org_detail.html', context=context)
     
+@user_passes_test(lambda u: u.is_superuser)
+def org_lock(request, org_id):
+    org = get_object_or_404(Org, id=org_id)
+    if org.scratch:
+        raise HttpResponseForbidden('Scratch orgs may not be locked/unlocked')
+    org.lock()
+    return HttpResponseRedirect(org.get_absolute_url())
+
+@user_passes_test(lambda u: u.is_superuser)
+def org_unlock(request, org_id):
+    org = get_object_or_404(Org, id=org_id)
+    if org.scratch:
+        raise HttpResponseForbidden('Scratch orgs may not be locked/unlocked')
+    org.unlock()
+    return HttpResponseRedirect(org.get_absolute_url())
+
 @staff_member_required
 def org_login(request, org_id, instance_id=None):
     org = get_object_or_404(Org, id=org_id)
