@@ -8,6 +8,8 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
 from mrbelvedereci.build.utils import view_queryset
+from mrbelvedereci.cumulusci.forms import OrgLockForm
+from mrbelvedereci.cumulusci.forms import OrgUnlockForm
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.cumulusci.models import ScratchOrgInstance
 from mrbelvedereci.cumulusci.utils import get_connected_app
@@ -26,21 +28,35 @@ def org_detail(request, org_id):
     } 
     return render(request, 'cumulusci/org_detail.html', context=context)
     
-@user_passes_test(lambda u: u.is_superuser)
-def org_lock(request, org_id):
+def org_lock_unlock(request, org_id, action):
     org = get_object_or_404(Org, id=org_id)
     if org.scratch:
         raise HttpResponseForbidden('Scratch orgs may not be locked/unlocked')
-    org.lock()
-    return HttpResponseRedirect(org.get_absolute_url())
+    if action == 'lock':
+        form_class = OrgLockForm
+        template = 'cumulusci/org_lock.html'
+    elif action == 'unlock':
+        form_class = OrgUnlockForm
+        template = 'cumulusci/org_unlock.html'
+    if request.method == 'POST':
+        form = form_class(request.POST)
+        if form.is_valid():
+            if request.POST['action'] == 'Lock':
+                org.lock()
+            elif request.POST['action'] == 'Unlock':
+                org.unlock()
+            return HttpResponseRedirect(org.get_absolute_url())
+    else:
+        form = form_class()
+    return render(request, template, context={'form': form, 'org': org})
+
+@user_passes_test(lambda u: u.is_superuser)
+def org_lock(request, org_id):
+    return org_lock_unlock(request, org_id, 'lock')
 
 @user_passes_test(lambda u: u.is_superuser)
 def org_unlock(request, org_id):
-    org = get_object_or_404(Org, id=org_id)
-    if org.scratch:
-        raise HttpResponseForbidden('Scratch orgs may not be locked/unlocked')
-    org.unlock()
-    return HttpResponseRedirect(org.get_absolute_url())
+    return org_lock_unlock(request, org_id, 'unlock')
 
 @staff_member_required
 def org_login(request, org_id, instance_id=None):

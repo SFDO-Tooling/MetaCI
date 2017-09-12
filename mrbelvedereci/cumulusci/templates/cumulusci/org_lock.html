@@ -1,0 +1,32 @@
+{% extends 'layout_full.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block layout_header_text %}Lock Org{% endblock %}
+
+{% block layout_body %}
+
+<h3 class="slds-text-heading--medium slds-m-bottom--medium">
+  Are you sure you want to lock this org? This may prevent some queued builds from running.
+</h3>
+<div class="slds-box slds-m-bottom--medium">
+  <table class="slds-table slds-no-row-hover">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Repository</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>{{ org.name }}</td>
+      <td>{{ org.repo }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+    {{ form.errors }}
+      {% crispy form form.helper %}
+
+{% endblock %}
