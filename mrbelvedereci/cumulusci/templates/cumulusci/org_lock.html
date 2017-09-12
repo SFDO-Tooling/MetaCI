@@ -10,17 +10,21 @@
   Are you sure you want to lock this org? This may prevent some queued builds from running.
 </h3>
 <div class="slds-box slds-m-bottom--medium">
-  <table class="slds-table slds-no-row-hover">
+  <table class="slds-table slds-table--cell-buffer">
     <thead>
-      <tr>
-        <th>Name</th>
-        <th>Repository</th>
+      <tr class="slds-text-title--caps">
+        <th scope="col">
+          <div class="slds-truncate" title="Org Name">Org Name</div>
+        </th>
+        <th scope="col">
+          <div class="slds-truncate" title="Repository">Repository</div>
+        </th>
       </tr>
     </thead>
     <tbody>
     <tr>
-      <td>{{ org.name }}</td>
-      <td>{{ org.repo }}</td>
+      <td data-label="Org Name">{{ org.name }}</td>
+      <td data-label="Repository">{{ org.repo }}</td>
     </tr>
     </tbody>
   </table>
