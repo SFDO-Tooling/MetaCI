@@ -27,8 +27,9 @@ def org_detail(request, org_id):
         'instances': instances,
     } 
     return render(request, 'cumulusci/org_detail.html', context=context)
-    
-def org_lock_unlock(request, org_id, action):
+
+# not wired to urlconf; called by org_lock and org_unlock
+def _org_lock_unlock(request, org_id, action):
     org = get_object_or_404(Org, id=org_id)
     if org.scratch:
         raise HttpResponseForbidden('Scratch orgs may not be locked/unlocked')
@@ -52,11 +53,11 @@ def org_lock_unlock(request, org_id, action):
 
 @user_passes_test(lambda u: u.is_superuser)
 def org_lock(request, org_id):
-    return org_lock_unlock(request, org_id, 'lock')
+    return _org_lock_unlock(request, org_id, 'lock')
 
 @user_passes_test(lambda u: u.is_superuser)
 def org_unlock(request, org_id):
-    return org_lock_unlock(request, org_id, 'unlock')
+    return _org_lock_unlock(request, org_id, 'unlock')
 
 @staff_member_required
 def org_login(request, org_id, instance_id=None):
