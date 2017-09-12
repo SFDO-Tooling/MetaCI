@@ -36,6 +36,7 @@ class Org(models.Model):
         if not self.scratch:
             return u'mrbelvedereci-org-lock-{}'.format(self.id)
 
+    @property
     def is_locked(self):
         if not self.scratch:
             return True if cache.get(self.lock_id) else False
