@@ -6,6 +6,7 @@ import os
 from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import OrgConfig
 from cumulusci.core.exceptions import ScratchOrgException
+from django.core.cache import cache
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -29,7 +30,26 @@ class Org(models.Model):
         org_config = json.loads(self.json)
 
         return OrgConfig(org_config)
-    
+
+    @property
+    def lock_id(self):
+        if not self.scratch:
+            return u'mrbelvedereci-org-lock-{}'.format(self.id)
+
+    @property
+    def is_locked(self):
+        if not self.scratch:
+            return True if cache.get(self.lock_id) else False
+
+    def lock(self):
+        if not self.scratch:
+            cache.add(self.lock_id, 'manually locked')
+
+    def unlock(self):
+        if not self.scratch:
+            cache.delete(self.lock_id)
+
+
 class ScratchOrgInstance(models.Model):
     org = models.ForeignKey('cumulusci.Org', related_name='instances')
     build = models.ForeignKey('build.Build', related_name='scratch_orgs', null=True, blank=True)

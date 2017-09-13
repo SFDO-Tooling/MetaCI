@@ -1,0 +1,36 @@
+{% extends 'layout_full.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block layout_header_text %}Unlock Org{% endblock %}
+
+{% block layout_body %}
+
+<h3 class="slds-text-heading--medium slds-m-bottom--medium">
+  Are you sure you want to unlock this org? This may result in multiple builds using this org at the same time.
+</h3>
+<div class="slds-box slds-m-bottom--medium">
+  <table class="slds-table slds-table--cell-buffer">
+    <thead>
+      <tr class="slds-text-title--caps">
+        <th scope="col">
+          <div class="slds-truncate" title="Org Name">Org Name</div>
+        </th>
+        <th scope="col">
+          <div class="slds-truncate" title="Repository">Repository</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td data-label="Org Name">{{ org.name }}</td>
+      <td data-label="Repository">{{ org.repo }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+    {{ form.errors }}
+      {% crispy form form.helper %}
+
+{% endblock %}

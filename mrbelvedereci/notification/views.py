@@ -79,7 +79,7 @@ def add_plan_notification(request):
 
 @login_required
 def delete_branch_notification(request, pk):
-    return delete_notification(
+    return _delete_notification(
         request,
         BranchNotification.objects.get(pk=pk),
     )
@@ -87,7 +87,7 @@ def delete_branch_notification(request, pk):
 
 @login_required
 def delete_plan_notification(request, pk):
-    return delete_notification(
+    return _delete_notification(
         request,
         PlanNotification.objects.get(pk=pk),
     )
@@ -95,13 +95,13 @@ def delete_plan_notification(request, pk):
 
 @login_required
 def delete_repository_notification(request, pk):
-    return delete_notification(
+    return _delete_notification(
         request,
         RepositoryNotification.objects.get(pk=pk),
     )
 
-
-def delete_notification(request, notification):
+# not wired to urlconf; called by delete_*_notification functions
+def _delete_notification(request, notification):
     if request.user != notification.user:
         return HttpResponseForbidden()
     if request.method == 'POST':
