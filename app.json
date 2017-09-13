@@ -99,7 +99,7 @@
     "test": {
       "scripts": {
         "test-setup": "pip install --upgrade -r requirements/test.txt",
-        "test": "python manage.py test"
+        "test": "./heroku_ci.sh"
       },
       "env": {
         "DJANGO_SETTINGS_MODULE": "config.settings.test",
