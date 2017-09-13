@@ -223,7 +223,7 @@ if SENTRY_DSN:
 # Add the HireFire middleware for monitoring queue to scale dynos
 # See: https://hirefire.readthedocs.io/
 HIREFIRE_PROCS = ['config.procs.WorkerProc']
-HIREFIRE_TOKEN = env('HIREFIRE_TOKEN')
+HIREFIRE_TOKEN = env('HIREFIRE_TOKEN', default=None)
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL')

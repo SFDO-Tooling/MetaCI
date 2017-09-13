@@ -5,12 +5,8 @@
   "logo": "https://avatars.githubusercontent.com/u/5545431?v=3&s=100",
   "keywords": ["ci", "python", "django", "salesforce", "github"],
   "env": {
-    "SITE_URL": {
-      "description": "The base url to the site.  Typically this should be https://<your_app>.herokuapp.com",
-      "value": ""
-    },
-    "FROM_EMAIL": {
-      "description": "The email address outbound mail should be sent from",
+    "CONNECTED_APP_CALLBACK_URL": {
+      "description": "The callback url configured for the Connected App.  You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
       "value": ""
     },
     "CONNECTED_APP_CLIENT_ID": {
@@ -20,8 +16,36 @@
     "CONNECTED_APP_CLIENT_SECRET": { "description": "The Client Secret of the Salesforce Connected App. You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
       "value": ""
     },
-    "CONNECTED_APP_CALLBACK_URL": {
-      "description": "The callback url configured for the Connected App.  You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
+    "DJANGO_ALLOWED_HOSTS": {
+      "description": "Heroku proxies web requests and Django needs to be configured to allow the forwards",
+      "value": ".herokuapp.com"
+    },
+    "DJANGO_AWS_ACCESS_KEY_ID": {
+      "description": "The Amazon Web Services ID used for S3 storage of media",
+      "value": ""
+    },
+    "DJANGO_AWS_SECRET_ACCESS_KEY": {
+      "description": "The Amazon Web Services secret access key used for S3 storage of media",
+      "value": ""
+    },
+    "DJANGO_AWS_STORAGE_BUCKET_NAME": {
+      "description": "The Amazon Web Services S3 storage bucket name the site should use",
+      "value": ""
+    },
+    "DJANGO_ADMIN_URL": {
+      "description": "The url path to the admin section of the site",
+      "value": "admin"
+    },
+    "DJANGO_SECRET_KEY": {
+      "description": "The url path to the admin section of the site",
+      "generator": "secret"
+    },
+    "DJANGO_SETTINGS_MODULE": {
+      "description": "The site settings to use",
+      "value": "config.settings.production"
+    },
+    "FROM_EMAIL": {
+      "description": "The email address outbound mail should be sent from",
       "value": ""
     },
     "GITHUB_USERNAME": {
@@ -40,19 +64,12 @@
       "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
       "generator": "secret"
     },
-    "DJANGO_ADMIN_URL": {
-      "description": "The url path to the admin section of the site",
-      "value": "admin"
+    "HIREFIRE_TOKEN": {
+      "description": "The token for integrating with Hirefire.io for auto-scaling worker dynos based on queued/running builds",
+      "value": "",
+      "required": "false"
     },
-    "DJANGO_SECRET_KEY": {
-      "description": "The url path to the admin section of the site",
-      "generator": "secret"
-    },
-    "DJANGO_SETTINGS_MODULE": {
-      "description": "The site settings to use",
-      "generator": "config.settings.production"
-    },
-    "SFDX_PRIVATE_KEY": {
+    "SFDX_HUB_KEY": {
       "description": "The private key for the JWT authentication to the devhub for Salesforce DX.  Required to use scratch orgs",
       "value": "",
       "required": false
@@ -66,6 +83,10 @@
       "description": "The username for the devhub org for Salesforce DX.  Required to use scratch orgs",
       "value": "",
       "required": false
+    },
+    "SITE_URL": {
+      "description": "The base url to the site.  Typically this should be https://<your_app>.herokuapp.com",
+      "value": ""
     }
   },
   "formation": {
@@ -87,7 +108,8 @@
   },
   "image": "heroku/python",
   "addons": [
-    "heroku-redis:premium-2",
+    "heroku-postgresql",
+    "heroku-redis",
     "sendgrid:starter"
   ],
   "buildpacks": [
