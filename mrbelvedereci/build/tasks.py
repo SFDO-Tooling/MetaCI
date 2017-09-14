@@ -106,7 +106,7 @@ def check_queued_build(build_id):
 
         if status is True:
             # Lock successful, run the build
-            res_run = run_build.delay(build.id, lock_id)
+            res_run = run_build.delay(build.id, org.lock_id)
             build.task_id_run = res_run.id
             build.save()
             return 'Got a lock on the org, running as task {}'.format(
@@ -116,11 +116,11 @@ def check_queued_build(build_id):
             build.task_id_check = None
             build.set_status('waiting')
             build.log = 'Waiting on build #{} to complete'.format(
-                cache.get(lock_id))
+                cache.get(org.lock_id))
             build.save()
             return ('Failed to get lock on org. ' +
                     '{} has the org locked. Queueing next check.'.format(
-                        cache.get(lock_id)))
+                        cache.get(org.lock_id)))
 
 
 @django_rq.job('short', timeout=60)
