@@ -7,6 +7,7 @@ from django.apps import apps
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 
 def paginate(build_list, request):
@@ -41,16 +42,20 @@ def view_queryset(request, query=None, status=None):
     builds = Build.objects.all()
     if query:
         builds = builds.filter(**query)
+    if status:
+        builds = builds.filter(
+            Q(
+                current_rebuild__isnull=True,
+                status=status,
+            ) | Q(
+                current_rebuild__isnull=False,
+                current_rebuild__status=status,
+            ),
+        )
 
     order_by = request.GET.get('order_by', '-time_queue')
     order_by = order_by.split(',')
     builds = builds.order_by(*order_by)
-    if status:
-        new_builds = []
-        for build in builds:
-            if build.get_status() == status.lower():
-                new_builds.append(build)
-        builds = new_builds
 
     builds = paginate(builds, request)
     return builds
