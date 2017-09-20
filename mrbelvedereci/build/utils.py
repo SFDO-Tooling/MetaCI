@@ -30,7 +30,7 @@ def set_build_info(build, **kwargs):
     build.save()
 
 
-def view_queryset(request, query=None):
+def view_queryset(request, query=None, status=None):
     if not query:
         query = {}
 
@@ -45,6 +45,12 @@ def view_queryset(request, query=None):
     order_by = request.GET.get('order_by', '-time_queue')
     order_by = order_by.split(',')
     builds = builds.order_by(*order_by)
+    if status:
+        new_builds = []
+        for build in builds:
+            if build.get_status() == status.lower():
+                new_builds.append(build)
+        builds = new_builds
 
     builds = paginate(builds, request)
     return builds

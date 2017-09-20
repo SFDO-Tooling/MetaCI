@@ -16,13 +16,10 @@ from mrbelvedereci.build.utils import view_queryset
 
 def build_list(request):
     query = {}
-    status = request.GET.get('status')
-    if status:
-        query['status'] = status
     repo = request.GET.get('repo')
     if repo:
         query['repo__name'] = repo
-    builds = view_queryset(request, query)
+    builds = view_queryset(request, query, request.GET.get('status'))
     return render(request, 'build/build_list.html', context={'builds': builds})
 
 
