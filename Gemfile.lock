@@ -97,11 +97,15 @@ PLATFORMS
 DEPENDENCIES
   SFDO-API
   cucumber
+  json
   page-object
   pry
   restforce
   rspec
   rubocop
 
+RUBY VERSION
+   ruby 2.2.6p396
+
 BUNDLED WITH
-   1.13.6
+   1.14.6
