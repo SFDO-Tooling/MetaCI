@@ -43,7 +43,7 @@ class Org(models.Model):
 
     def lock(self):
         if not self.scratch:
-            cache.add(self.lock_id, 'manually locked')
+            cache.add(self.lock_id, 'manually locked', timeout=None)
 
     def unlock(self):
         if not self.scratch:

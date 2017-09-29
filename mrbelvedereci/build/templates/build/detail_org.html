@@ -48,6 +48,21 @@
     </div>
     <div class="slds-col slds-no-flex slds-align-bottom">
       <div class="slds-button-group" role="group">
+        {% if user.is_superuser %}
+        {% if build.org.is_locked %}
+        <a href="{{ build.org.get_absolute_url }}/unlock">
+          <button class="slds-button slds-button--destructive slds-m-horizontal--medium">
+            Unlock
+          </button>
+        </a>
+        {% else %}
+        <a href="{{ build.org.get_absolute_url }}/lock">
+          <button class="slds-button slds-button--destructive slds-m-horizontal--medium">
+            Lock
+          </button>
+        </a>
+        {% endif %}
+        {% endif %}
         <a href="{{ build.org.get_absolute_url }}/login"><button class="slds-button slds-button--brand">Log In</button></a>
       </div>
     </div>
