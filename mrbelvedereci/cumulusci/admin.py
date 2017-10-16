@@ -3,14 +3,17 @@ from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.cumulusci.models import ScratchOrgInstance
 from mrbelvedereci.cumulusci.models import Service
 
+
 class OrgAdmin(admin.ModelAdmin):
-    list_display = ('name','repo','scratch')
+    list_display = ('name', 'repo', 'scratch')
     list_filter = ('name', 'scratch', 'repo')
 admin.site.register(Org, OrgAdmin)
+
 
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ('name',)
 admin.site.register(Service, ServiceAdmin)
+
 
 class ScratchOrgInstanceAdmin(admin.ModelAdmin):
     list_display = ('org', 'build', 'sf_org_id', 'username', 'deleted', 'time_created', 'time_deleted')

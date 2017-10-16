@@ -11,6 +11,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
+
 class Org(models.Model):
     name = models.CharField(max_length=255)
     json = models.TextField()
@@ -71,12 +72,12 @@ class ScratchOrgInstance(models.Model):
 
     def get_absolute_url(self):
         return reverse('org_instance_detail', kwargs={'org_id': self.org.id, 'instance_id': self.id})
-    
+
     def get_org_config(self):
         # Write the org json file to the filesystem for Salesforce DX to use
         dx_local_dir = os.path.join(os.path.expanduser('~'), '.local', '.sfdx')
         if not os.path.isdir(dx_local_dir):
-             dx_local_dir = os.path.join(os.path.expanduser('~'), '.sfdx')
+            dx_local_dir = os.path.join(os.path.expanduser('~'), '.sfdx')
         filename = os.path.join(dx_local_dir, '{}.json'.format(self.username))
         with open(filename, 'w') as f:
             f.write(self.json_dx)
@@ -88,7 +89,7 @@ class ScratchOrgInstance(models.Model):
     def delete_org(self, org_config=None):
         if org_config is None:
             org_config = self.get_org_config()
-    
+
         try:
             org_config.delete_org()
         except ScratchOrgException as e:
@@ -100,6 +101,7 @@ class ScratchOrgInstance(models.Model):
         self.time_deleted = timezone.now()
         self.deleted = True
         self.save()
+
 
 class Service(models.Model):
     name = models.CharField(max_length=255)
