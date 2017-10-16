@@ -32,10 +32,6 @@ class AboutView(TemplateView):
         match = re.match(r'sfdx-cli/(\d+.\d+.\d+)-.+', out)
         if match:
             context['SFDX_CLI_VERSION'] = match.group(1)
-        out = subprocess.check_output(['sfdx', 'plugins'])
-        match = re.match(r'salesforcedx (\d+.\d+.\d+)', out)
-        if match:
-            context['SFDX_PLUGIN_VERSION'] = match.group(1)
 
         # cumulusci
         context['CUMULUSCI_VERSION'] = get_installed_version('cumulusci')
