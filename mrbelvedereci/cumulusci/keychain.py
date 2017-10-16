@@ -12,6 +12,7 @@ from mrbelvedereci.cumulusci.models import ScratchOrgInstance
 from mrbelvedereci.cumulusci.models import Service
 from mrbelvedereci.cumulusci.utils import get_connected_app
 
+
 class MrbelvedereProjectKeychain(BaseProjectKeychain):
 
     def __init__(self, project_config, key, build):
@@ -37,18 +38,18 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
         try:
             service = Service.objects.get(name=service_name)
             service_config = json.loads(service.json)
-            return ServiceConfig(service_config) 
+            return ServiceConfig(service_config)
         except Service.DoesNotExist:
             raise ServiceNotConfigured(service_name)
 
     def set_service(self, service_name, service_config):
         try:
-            service = Service.objects.get(name = service_name)
+            service = Service.objects.get(name=service_name)
             service.json = json.dumps(service_config.config)
         except Service.DoesNotExist:
             service = Service(
-                name = service_name,
-                json = json.dumps(service_config.config),
+                name=service_name,
+                json=json.dumps(service_config.config),
             )
         service.save()
 
@@ -64,7 +65,7 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
     def get_org(self, org_name):
         org = Org.objects.get(repo=self.build.repo, name=org_name)
         org_config = json.loads(org.json)
-    
+
         if org.scratch:
             config = ScratchOrgConfig(org_config)
         else:
@@ -102,29 +103,28 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
 
         # Create a ScratchOrgInstance to store the org info
         instance = ScratchOrgInstance(
-            org = org_config.org,
-            build = self.build,
-            sf_org_id = info['org_id'],
-            username = info['username'],
-            json_dx = dx_json,
-            json = org_json,
+            org=org_config.org,
+            build=self.build,
+            sf_org_id=info['org_id'],
+            username=info['username'],
+            json_dx=dx_json,
+            json=org_json,
         )
         instance.save()
         org_config.org_instance = instance
 
         return org_config
-        
 
     def set_org(self, org_name, org_config):
         try:
-            org = Org.objects.get(repo = self.build.repo, name = org_name)
+            org = Org.objects.get(repo=self.build.repo, name=org_name)
             org.json = json.dumps(org_config.config)
         except Org.DoesNotExist:
             org = Org(
-                name = org_name,
-                json = json.dumps(org_config.config),
-                repo = self.build.repo,
+                name=org_name,
+                json=json.dumps(org_config.config),
+                repo=self.build.repo,
             )
-            
+
         org.scratch = isinstance(org_config, ScratchOrgConfig)
         org.save()

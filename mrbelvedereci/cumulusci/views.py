@@ -14,6 +14,7 @@ from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.cumulusci.models import ScratchOrgInstance
 from mrbelvedereci.cumulusci.utils import get_connected_app
 
+
 @staff_member_required
 def org_detail(request, org_id):
     org = get_object_or_404(Org, id=org_id)
@@ -25,10 +26,12 @@ def org_detail(request, org_id):
         'builds': builds,
         'org': org,
         'instances': instances,
-    } 
+    }
     return render(request, 'cumulusci/org_detail.html', context=context)
 
 # not wired to urlconf; called by org_lock and org_unlock
+
+
 def _org_lock_unlock(request, org_id, action):
     org = get_object_or_404(Org, id=org_id)
     if org.scratch:
@@ -51,13 +54,16 @@ def _org_lock_unlock(request, org_id, action):
         form = form_class()
     return render(request, template, context={'form': form, 'org': org})
 
+
 @user_passes_test(lambda u: u.is_superuser)
 def org_lock(request, org_id):
     return _org_lock_unlock(request, org_id, 'lock')
 
+
 @user_passes_test(lambda u: u.is_superuser)
 def org_unlock(request, org_id):
     return _org_lock_unlock(request, org_id, 'unlock')
+
 
 @staff_member_required
 def org_login(request, org_id, instance_id=None):
@@ -88,10 +94,11 @@ def org_login(request, org_id, instance_id=None):
 
     raise Http404()
 
+
 @staff_member_required
 def org_instance_delete(request, org_id, instance_id):
     instance = get_object_or_404(ScratchOrgInstance, org_id=org_id, id=instance_id)
-    
+
     context = {
         'instance': instance,
     }
@@ -104,6 +111,7 @@ def org_instance_delete(request, org_id, instance_id):
         pass
     return HttpResponseRedirect(instance.get_absolute_url())
 
+
 @staff_member_required
 def org_instance_detail(request, org_id, instance_id):
     instance = get_object_or_404(ScratchOrgInstance, org_id=org_id, id=instance_id)
@@ -113,5 +121,5 @@ def org_instance_detail(request, org_id, instance_id):
     context = {
         'builds': builds,
         'instance': instance,
-    } 
+    }
     return render(request, 'cumulusci/org_instance_detail.html', context=context)
