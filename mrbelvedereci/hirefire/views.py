@@ -13,11 +13,13 @@ from django_rq.queues import get_connection
 from django_rq.queues import get_queue_by_index
 from django_rq.settings import QUEUES_LIST
 
+
 def test(request):
     """
     Doesn't do much except telling the HireFire bot it's installed.
     """
     return HttpResponse('OK')
+
 
 def info(request, token):
     """
@@ -56,7 +58,7 @@ def info(request, token):
         queue_data['finished_jobs'] = len(finished_job_registry)
         queue_data['started_jobs'] = len(started_job_registry)
         queue_data['deferred_jobs'] = len(deferred_job_registry)
-        
+
         current_tasks += queue_data['jobs']
         current_tasks += queue_data['started_jobs']
 
