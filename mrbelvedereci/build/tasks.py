@@ -32,7 +32,7 @@ def run_build(build_id, lock_id=None):
         exception = None
         build.run()
         if settings.GITHUB_STATUS_UPDATES_ENABLED:
-            res_status = set_github_status.delay(build_id) 
+            res_status = set_github_status.delay(build_id)
             build.task_id_status_end = res_status.id
 
         build.save()
@@ -47,7 +47,7 @@ def run_build(build_id, lock_id=None):
         if lock_id:
             cache.delete(lock_id)
         if settings.GITHUB_STATUS_UPDATES_ENABLED:
-            res_status = set_github_status.delay(build_id) 
+            res_status = set_github_status.delay(build_id)
             build.task_id_status_end = res_status.id
 
         build.set_status('error')
