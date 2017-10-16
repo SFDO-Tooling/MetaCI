@@ -115,7 +115,7 @@
   "buildpacks": [
      {"url": "heroku/python"},
      {"url": "heroku/ruby"},
-     {"url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"}
+     {"url": "https://github.com/wadewegner/salesforce-cli-buildpack.git"}
   ],
   "environments": {
     "test": {
