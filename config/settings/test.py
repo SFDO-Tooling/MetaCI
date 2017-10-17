@@ -51,7 +51,7 @@ NOSE_ARGS = [
     '--with-tap',
     '--tap-stream',
     '--with-coverage',
-    '--cover-package=mrbelvedereci',
+    '--cover-package=metaci',
 ]
 
 

@@ -63,7 +63,7 @@ node_modules/
 local_setup.sh
 
 # User-uploaded media
-mrbelvedereci/media/
+metaci/media/
 
 
 # MailHog binary

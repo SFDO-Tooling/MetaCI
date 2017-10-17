@@ -1,2 +1,2 @@
-worker_short: python manage.py rqworkers short --workers 3 --worker-class mrbelvedereci.build.worker.RequeueingWorker
+worker_short: python manage.py rqworkers short --workers 3 --worker-class metaci.build.worker.RequeueingWorker
 worker_scheduler: python manage.py rqscheduler

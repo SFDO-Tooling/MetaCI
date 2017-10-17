@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Django settings for mrbelvedereci project.
+Django settings for metaci project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/dev/topics/settings/
@@ -12,8 +12,8 @@ from __future__ import absolute_import, unicode_literals
 
 import environ
 
-ROOT_DIR = environ.Path(__file__) - 3  # (mrbelvedereci/config/settings/common.py - 3 = mrbelvedereci/)
-APPS_DIR = ROOT_DIR.path('mrbelvedereci')
+ROOT_DIR = environ.Path(__file__) - 3  # (metaci/config/settings/common.py - 3 = metaci/)
+APPS_DIR = ROOT_DIR.path('metaci')
 
 env = environ.Env()
 env.read_env()
@@ -52,13 +52,13 @@ THIRD_PARTY_APPS = (
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    'mrbelvedereci.users.apps.UsersConfig',
-    'mrbelvedereci.build.apps.BuildConfig',
-    'mrbelvedereci.cumulusci.apps.CumulusCIConfig',
-    'mrbelvedereci.notification.apps.NotificationConfig',
-    'mrbelvedereci.plan.apps.PlanConfig',
-    'mrbelvedereci.repository.apps.RepositoryConfig',
-    'mrbelvedereci.testresults.apps.TestResultsConfig',
+    'metaci.users.apps.UsersConfig',
+    'metaci.build.apps.BuildConfig',
+    'metaci.cumulusci.apps.CumulusCIConfig',
+    'metaci.notification.apps.NotificationConfig',
+    'metaci.plan.apps.PlanConfig',
+    'metaci.repository.apps.RepositoryConfig',
+    'metaci.testresults.apps.TestResultsConfig',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -79,7 +79,7 @@ MIDDLEWARE = (
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------
 MIGRATION_MODULES = {
-    'sites': 'mrbelvedereci.contrib.sites.migrations'
+    'sites': 'metaci.contrib.sites.migrations'
 }
 
 # DEBUG
@@ -245,8 +245,8 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 ACCOUNT_ALLOW_REGISTRATION = env.bool('DJANGO_ACCOUNT_ALLOW_REGISTRATION', True)
-ACCOUNT_ADAPTER = 'mrbelvedereci.users.adapters.AccountAdapter'
-SOCIALACCOUNT_ADAPTER = 'mrbelvedereci.users.adapters.SocialAccountAdapter'
+ACCOUNT_ADAPTER = 'metaci.users.adapters.AccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'metaci.users.adapters.SocialAccountAdapter'
 
 # Custom user app defaults
 # Select the correct user model

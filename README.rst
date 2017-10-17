@@ -1,5 +1,5 @@
-mrbelvedereci
-=============
+MetaCI
+======
 
 A specialized lightweight CI server for building Salesforce projects from Github repositories using CumulusCI flows
 
@@ -13,7 +13,7 @@ A specialized lightweight CI server for building Salesforce projects from Github
 What is This?
 -------------
 
-`mrbelvedereci` started as an extension of the CumulusCI 2 (https://github.com/SalesforceFoundation/CumulusCI/tree/feature/2.0) project.  After spending almost a year trying to find a cloud hosted CI service that could handle our needs for Salesforce managed package builds, the crazy idea was born: why not just write our own CI server specific to our needs?
+`MetaCI` started as an extension of the CumulusCI 2 (https://github.com/SalesforceFoundation/CumulusCI/tree/feature/2.0) project.  After spending almost a year trying to find a cloud hosted CI service that could handle our needs for Salesforce managed package builds, the crazy idea was born: why not just write our own CI server specific to our needs?
 
 A few key things to point out that made this compelling:
 
@@ -22,7 +22,7 @@ A few key things to point out that made this compelling:
 * The available cloud CI options don't support burst pricing.  You pay to have X build containers reserved 24x7 for the month.  Our build patterns are far more burst oriented than that.  Maybe 80% of the time we're not building anything, 15% of the time we're building a few concurrent branches, and 5% of the time we're building lots at once and could need up to 25 concurrent builds.
 * Heroku is a great platform for burst capacity architectures but no available CI systems run well on Heroku.
 
-So, mrbelvedereci was started as a prototype of a crazy idea mid-November 2016, got prototype buy in mid-December 2016, and is going into production to replace Bamboo Cloud before January 31, 2017.
+So, MetaCI was started as a prototype of a crazy idea mid-November 2016, got prototype buy in mid-December 2016, and is going into production to replace Bamboo Cloud before January 31, 2017.
 
 Features
 --------
@@ -47,7 +47,7 @@ Prerequisites
 
 * A Github repository containing metadata for a managed package development project
 * The cumulusci python package installed and configured on your local system so you can run deploy commands against your repo locally.  See http://cumulusci.readthedocs.io/en/latest/tutorial.html for more details on setting up CumulusCI locally.
-* Optional, but highly recommended: Access to Salesforce DX.  If you configure the SFDX_CONFIG and SFDX_HUB_ORG config variables with the appropriate json you can use scratch orgs in your builds.  You'll need to configure your local environment to not use encryption when storing credentials in files so you can export the configs to mrbelvedereci.
+* Optional, but highly recommended: Access to Salesforce DX.  If you configure the SFDX_CONFIG and SFDX_HUB_ORG config variables with the appropriate json you can use scratch orgs in your builds.  You'll need to configure your local environment to not use encryption when storing credentials in files so you can export the configs to MetaCI.
 
 You can also fork the CumulusCI-Test repository and use that as a demo since it is already configured for CumulusCI.  
 
@@ -82,7 +82,7 @@ Check the Procfile to see the commands used to run the workers on Heroku.  You c
 
 .. code-block:: bash
 
-    python manage.py rqworkers default short --worker-class mrbelvedereci.build.worker.RequeueingWorker
+    python manage.py rqworkers default short --worker-class metaci.build.worker.RequeueingWorker
 
 Configuring Repositories
 ------------------------
@@ -94,7 +94,7 @@ Enter the repo name, owner name, and the url.  Currently only repositories on gi
 Configuring Orgs
 ----------------
 
-Any org you connect to your local CumulusCI keychain can be added to mrbelvedereci as a build org.  Go to CUMULUSCI -> Orgs -> Add and give the org a name, select the repo, and paste in the results of `cumulusci2 org info <org_name>` on your local system.  Remember that org names are already namespaced by their repository so rather than package_name_feature, just call the org feature.
+Any org you connect to your local CumulusCI keychain can be added to MetaCI as a build org.  Go to CUMULUSCI -> Orgs -> Add and give the org a name, select the repo, and paste in the results of `cumulusci2 org info <org_name>` on your local system.  Remember that org names are already namespaced by their repository so rather than package_name_feature, just call the org feature.
 
 
 Configuring Services
@@ -129,7 +129,7 @@ Click the bell icon at the top to view the My Notifications page (/notifications
 Scaling with Hirefire.io
 ------------------------
 
-Hirefire.io is a service that monitors your application and scales up/down Heroku dynos based on load.  There is an integration built in to mrbelvedereci that allows you to automatically scale down your build dynos to 0 when no builds are running and scale up to 100 dynos (configurable through Hirefire) when builds are needed.  When all jobs complete, all dynos are shut down within a minute.  Heroku only bills for the dyno seconds used.  Scaling with Hirefire can both save you money and give you a lot more concurrency for whatever your budget is and thus is highly recommended.
+Hirefire.io is a service that monitors your application and scales up/down Heroku dynos based on load.  There is an integration built in to MetaCI that allows you to automatically scale down your build dynos to 0 when no builds are running and scale up to 100 dynos (configurable through Hirefire) when builds are needed.  When all jobs complete, all dynos are shut down within a minute.  Heroku only bills for the dyno seconds used.  Scaling with Hirefire can both save you money and give you a lot more concurrency for whatever your budget is and thus is highly recommended.
 
 Configure Hirefire and then run `heroku config:set HIREFIRE_TOKEN=YOUR_TOKEN`
 
