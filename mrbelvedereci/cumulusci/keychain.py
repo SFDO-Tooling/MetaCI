@@ -56,7 +56,7 @@ class MrbelvedereProjectKeychain(BaseProjectKeychain):
     def list_orgs(self):
         orgs = Org.objects.filter(
             repo = self.build.repo,
-        ).order_by('name').value_list('name', flat=True)
+        ).order_by('name').values_list('name', flat=True)
         return orgs
 
     def get_default_org(self):
