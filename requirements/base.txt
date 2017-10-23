@@ -68,3 +68,7 @@ honcho>=0.7.1
 
 # Django REST Framework
 djangorestframework==3.6.3
+
+# Django Filters
+django-filters==0.2.1
+djangorestframework-filters==0.10.2

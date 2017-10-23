@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^search$', build_views.build_search, name='search'),
 
     # Your stuff: custom urls includes go here
+    url(r'^api/', include('mrbelvedereci.api.urls')),
     url(r'^builds/', include('mrbelvedereci.build.urls')),
     url(r'^notifications/', include('mrbelvedereci.notification.urls')),
     url(r'^tests/', include('mrbelvedereci.testresults.urls')),

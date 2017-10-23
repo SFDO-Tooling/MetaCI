@@ -48,11 +48,14 @@ THIRD_PARTY_APPS = (
     'django_slds_crispyforms',  # SLDS theme for crispyforms
     'watson', # Full text search
     'django_filters', # view helpers for filtering models
+    'rest_framework', # API
+    'rest_framework.authtoken',
 )
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'mrbelvedereci.users.apps.UsersConfig',
+    'mrbelvedereci.api.apps.ApiConfig',
     'mrbelvedereci.build.apps.BuildConfig',
     'mrbelvedereci.cumulusci.apps.CumulusCIConfig',
     'mrbelvedereci.notification.apps.NotificationConfig',
@@ -292,3 +295,17 @@ CONNECTED_APP_CLIENT_SECRET = None
 CONNECTED_APP_CALLBACK_URL = None
 
 GITHUB_STATUS_UPDATES_ENABLED = env.bool('GITHUB_STATUS_UPDATES_ENABLED', True)
+
+# Django REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAdminUser',
+    ),
+}
