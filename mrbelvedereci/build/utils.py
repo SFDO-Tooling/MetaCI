@@ -31,7 +31,7 @@ def set_build_info(build, **kwargs):
     build.save()
 
 
-def view_queryset(request, query=None, status=None):
+def view_queryset(request, query=None, status=None, filter_class=None):
     if not query:
         query = {}
 
@@ -57,8 +57,13 @@ def view_queryset(request, query=None, status=None):
     order_by = order_by.split(',')
     builds = builds.order_by(*order_by)
 
-    builds = paginate(builds, request)
-    return builds
+    if filter_class:
+        build_filter = filter_class(request.GET, builds)
+        paginated = paginate(build_filter.qs, request)
+        return build_filter, paginated
+    else:
+        builds = paginate(builds, request)
+        return builds
 
 
 def format_log(log):
