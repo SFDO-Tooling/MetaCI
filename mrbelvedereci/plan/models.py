@@ -50,7 +50,7 @@ class Plan(models.Model):
     yaml_config = models.TextField(null=True, blank=True, validators=[validate_yaml_field])
 
     class Meta:
-        ordering = ['name','repo__owner','repo__name', 'active', 'context']
+        ordering = ['name', 'active', 'context']
 
     def get_absolute_url(self):
         return reverse('plan_detail', kwargs={'plan_id': self.id})
