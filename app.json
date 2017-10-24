@@ -113,9 +113,8 @@
     "sendgrid:starter"
   ],
   "buildpacks": [
-     {"url": "heroku/python"},
-     {"url": "heroku/ruby"},
-     {"url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"}
+     {"url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"},
+     {"url": "heroku/python"}
   ],
   "environments": {
     "test": {
