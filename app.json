@@ -20,18 +20,6 @@
       "description": "Heroku proxies web requests and Django needs to be configured to allow the forwards",
       "value": ".herokuapp.com"
     },
-    "DJANGO_AWS_ACCESS_KEY_ID": {
-      "description": "The Amazon Web Services ID used for S3 storage of media",
-      "value": ""
-    },
-    "DJANGO_AWS_SECRET_ACCESS_KEY": {
-      "description": "The Amazon Web Services secret access key used for S3 storage of media",
-      "value": ""
-    },
-    "DJANGO_AWS_STORAGE_BUCKET_NAME": {
-      "description": "The Amazon Web Services S3 storage bucket name the site should use",
-      "value": ""
-    },
     "DJANGO_ADMIN_URL": {
       "description": "The url path to the admin section of the site",
       "value": "admin"

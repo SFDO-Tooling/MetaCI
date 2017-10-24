@@ -25,6 +25,8 @@ def info(request, token):
     """
     Return the HireFire json data needed to scale worker dynos
     """
+    if not settings.HIREFIRE_TOKEN:
+        return HttpResponseForbidden('Hirefire not configured.  Set the HIREFIRE_TOKEN environment variable on the app to use Hirefire for dyno scaling')
     if token != settings.HIREFIRE_TOKEN:
         return HttpResponseForbidden('Invalid token')
 
