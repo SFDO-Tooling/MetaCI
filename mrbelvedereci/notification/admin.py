@@ -15,5 +15,5 @@ admin.site.register(BranchNotification, BranchNotificationAdmin)
 
 class PlanNotificationAdmin(admin.ModelAdmin):
     list_display = ('plan', 'user')
-    list_filter = ('plan__repo', 'user')
+    list_filter = ('plan__repos', 'user')
 admin.site.register(PlanNotification, PlanNotificationAdmin)

@@ -1,0 +1,24 @@
+{% extends 'layout_full.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block layout_header_text %}
+Select repository to run plan {{ plan.id }} "{{ plan.name }}"
+{% endblock %}
+
+
+{% block layout_body %}
+
+  <div>
+    <ul>
+{% for repo in plan.repos %}
+      <li>
+        <a href="/plan/{{ plan.id }}/run/{{ repo.owner }}/{{ repo.name }}/">
+          {{ repo.owner }}/{{ repo.name }}
+        </a>
+      </li>
+{% endfor %}
+    </ul>
+  </div>
+
+{% endblock %}

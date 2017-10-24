@@ -7,6 +7,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 
+from mrbelvedereci.repository.models import Repository
 
 
 TRIGGER_TYPES = (
@@ -32,6 +33,11 @@ class Plan(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     repo = models.ForeignKey('repository.Repository', related_name="plans")
+    repos = models.ManyToManyField(
+        Repository,
+        through='PlanRepository',
+        through_fields=('plan', 'repo'),
+    )
     type = models.CharField(max_length=8, choices=TRIGGER_TYPES)
     regex = models.CharField(max_length=255, null=True, blank=True)
     flows = models.CharField(max_length=255)
@@ -51,7 +57,7 @@ class Plan(models.Model):
         return reverse('plan_detail', kwargs={'plan_id': self.id})
 
     def __unicode__(self):
-        return u'[{}] {}'.format(self.repo.name, self.name)
+        return u'{}'.format(self.name)
 
     def check_push(self, push):
         run_build = False
@@ -114,6 +120,15 @@ SCHEDULE_CHOICES=(
     ('hourly', 'Hourly'),
 )
 
+
+class PlanRepository(models.Model):
+    plan = models.ForeignKey(Plan)
+    repo = models.ForeignKey(Repository)
+
+    def __unicode__(self):
+        return u'{}:{}'.format(self.repo, self.plan)
+
+
 class PlanSchedule(models.Model):
     plan = models.ForeignKey(Plan)
     branch = models.ForeignKey('repository.branch')
@@ -122,7 +137,7 @@ class PlanSchedule(models.Model):
     def run(self):
         Build = apps.get_model('build', 'Build')
         build = Build(
-            repo = self.plan.repo,
+            repo = self.branch.repo,
             plan = self.plan,
             branch = self.branch,
             commit = self.branch.github_api.commit.sha,
