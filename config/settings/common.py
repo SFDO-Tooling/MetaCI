@@ -172,7 +172,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                # Your stuff: custom template context processors go here
+                'mrbelvedereci.users.context_processors.admin_url',
             ],
         },
     },
@@ -281,7 +281,8 @@ SITE_URL = None
 FROM_EMAIL = 'test@mailinator.com'
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
-ADMIN_URL = r'^admin/'
+ADMIN_URL = 'admin'
+ADMIN_URL_ROUTE = r'^{}/'.format(ADMIN_URL)
 
 # Github credentials
 GITHUB_USERNAME = None

@@ -17,7 +17,7 @@ urlpatterns = [
     url(r'^about/$', mbci_views.AboutView.as_view(template_name='pages/about.html'), name='about'),
 
     # Django Admin, use {% url 'admin:index' %}
-    url(settings.ADMIN_URL, admin.site.urls),
+    url(settings.ADMIN_URL_ROUTE, admin.site.urls),
 
     # User management
     url(r'^users/', include('mrbelvedereci.users.urls', namespace='users')),
