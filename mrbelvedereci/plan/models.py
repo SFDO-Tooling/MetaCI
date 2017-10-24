@@ -32,7 +32,6 @@ def validate_yaml_field(value):
 class Plan(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    repo = models.ForeignKey('repository.Repository', related_name="plans")
     repos = models.ManyToManyField(
         Repository,
         through='PlanRepository',
