@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from mrbelvedereci.build.utils import view_queryset
 from mrbelvedereci.plan.models import Plan
 from mrbelvedereci.plan.forms import RunPlanForm
+from mrbelvedereci.repository.models import Repository
 
 
 def plan_list(request):
