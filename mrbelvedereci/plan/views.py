@@ -8,8 +8,15 @@ from mrbelvedereci.plan.models import Plan
 from mrbelvedereci.plan.forms import RunPlanForm
 
 
-def plan_list(request, plan_id):
-    return ''
+def plan_list(request):
+    if request.user.is_staff:
+        plans = Plan.objects.all()
+    else:
+        plans = Plan.objects.filter(public=True)
+    context = {
+        'plans': plans,
+    }
+    return render(request, 'plan/list.html', context=context)
 
 def plan_detail(request, plan_id):
     query = {'id': plan_id}

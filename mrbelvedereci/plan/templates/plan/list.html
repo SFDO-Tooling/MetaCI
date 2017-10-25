@@ -1,0 +1,39 @@
+{% extends 'layout_full.html' %}
+{% load humanize %}
+
+{% block layout_parent_link %}{% endblock %}
+{% block layout_header_text %}Plans{% endblock %}
+
+{% block layout_body %}
+
+<div class="slds-box">
+  <div class="slds-box--body">
+    <table class="slds-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>RegEx</th>
+          <th>Repositories</th>
+          <th>Org</th>
+          <th>Flows</th>
+          <th>Active</th>
+        </tr>
+      </thead>
+      <tbody>
+{% for plan in plans %}
+        <tr>
+          <td><a href="/plans/{{ plan.id }}">{{ plan.name }}</a></td>
+          <td>{{ plan.type }}</td>
+          <td>{{ plan.regex }}</td>
+          <td>{{ plan.repo_names }}</td>
+          <td>{{ plan.org }}</td>
+          <td>{{ plan.flows }}</td>
+          <td>{{ plan.active }}</td>
+        </tr>
+{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>  
+{% endblock %}

@@ -58,6 +58,11 @@ class Plan(models.Model):
     def __unicode__(self):
         return u'{}'.format(self.name)
 
+    @property
+    def repo_names(self):
+        names = [repo.name for repo in self.repos.all()]
+        return ', '.join(names)
+
     def check_push(self, push):
         run_build = False
         commit = None
