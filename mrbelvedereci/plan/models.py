@@ -134,6 +134,9 @@ class PlanRepository(models.Model):
     plan = models.ForeignKey(Plan)
     repo = models.ForeignKey(Repository)
 
+    class Meta:
+        verbose_name_plural = 'PlanRepositories'
+
     def __unicode__(self):
         return u'{}:{}'.format(self.repo, self.plan)
 
