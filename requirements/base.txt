@@ -72,3 +72,6 @@ djangorestframework==3.6.3
 # Django Filters
 django-filters==0.2.1
 djangorestframework-filters==0.10.2
+
+# Core API for DRF schema generation
+coreapi==2.3.3
