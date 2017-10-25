@@ -63,6 +63,11 @@ class Plan(models.Model):
         names = [repo.name for repo in self.repos.all()]
         return ', '.join(names)
 
+    @property
+    def repos_iterator(self):
+        for repo in self.repos.all():
+            yield repo
+
     def check_push(self, push):
         run_build = False
         commit = None
