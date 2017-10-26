@@ -24,4 +24,9 @@ urlpatterns = [
         views.plan_detail,
         name='plan_detail',
     ),
+    url(
+        r'^(?P<plan_id>\w+)/(?P<repo_owner>\w+)/(?P<repo_name>\w+)/$',
+        views.plan_detail_repo,
+        name='plan_detail_repo',
+    ),
 ]

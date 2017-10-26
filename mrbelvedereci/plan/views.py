@@ -34,6 +34,21 @@ def plan_detail(request, plan_id):
     } 
     return render(request, 'plan/detail.html', context=context)
     
+def plan_detail_repo(request, plan_id, repo_owner, repo_name):
+    query = {'id': plan_id}
+    if not request.user.is_staff:
+        query['public'] = True
+    plan = get_object_or_404(Plan, **query)
+    repo = get_object_or_404(Repository, owner=repo_owner, name=repo_name)
+    query = {'plan': plan, 'repo': repo}
+    builds = view_queryset(request, query)
+
+    context = {
+        'builds': builds,
+        'plan': plan,
+    }
+    return render(request, 'plan/detail.html', context=context)
+
 @login_required
 def plan_run(request, plan_id):
     plan = get_object_or_404(Plan, id=plan_id)
