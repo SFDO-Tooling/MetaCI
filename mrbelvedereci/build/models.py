@@ -274,7 +274,7 @@ class Build(models.Model):
         return project_config
 
     def get_org(self, project_config, retries=3):
-        logger = init_logger(self)
+        self.logger = init_logger(self)
         attempt = 1
         while True:
             try:
@@ -285,8 +285,8 @@ class Build(models.Model):
                     e.message.startswith(FAILED_TO_CREATE_SCRATCH_ORG) and
                     attempt <= retries
                 ):
-                    logger.warning(e.message)
-                    logger.info('Retrying create scratch org ' +
+                    self.logger.warning(e.message)
+                    self.logger.info('Retrying create scratch org ' +
                         '(retry {} of {})'.format(attempt, retries))
                     attempt += 1
                     continue
