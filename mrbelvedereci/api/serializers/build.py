@@ -21,6 +21,7 @@ class BuildFlowSerializer(serializers.HyperlinkedModelSerializer):
             'error_message',
             'exception',
             'flow',
+            'log',
             'rebuild',
             'status',
             'tests_fail',
@@ -30,6 +31,13 @@ class BuildFlowSerializer(serializers.HyperlinkedModelSerializer):
             'time_queue',
             'time_start',
         )
+
+build_flow_related_fields = list(BuildFlowSerializer.Meta.fields)
+build_flow_related_fields.remove('log')
+class BuildFlowRelatedSerializer(BuildFlowSerializer):
+    class Meta(BuildFlowSerializer.Meta):
+        fields = build_flow_related_fields
+
         
 class RebuildSerializer(serializers.HyperlinkedModelSerializer):
     org_instance = ScratchOrgInstanceSerializer(read_only=True)
@@ -56,7 +64,7 @@ class BuildSerializer(serializers.HyperlinkedModelSerializer):
         source='branch',
         write_only=True
     )
-    flows = BuildFlowSerializer(many=True, read_only=True)
+    flows = BuildFlowRelatedSerializer(many=True, read_only=True)
     org = OrgSerializer(read_only=True)
     org_id = serializers.PrimaryKeyRelatedField(
         queryset=Org.objects.all(),
