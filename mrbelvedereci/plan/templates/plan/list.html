@@ -26,7 +26,11 @@
           <td><a href="/plans/{{ plan.id }}">{{ plan.name }}</a></td>
           <td>{{ plan.type }}</td>
           <td>{{ plan.regex }}</td>
+{% if request.user.is_staff %}
           <td>{{ plan.repo_names }}</td>
+{% else %}
+          <td>{{ plan.repo_names_public }}</td>
+{% endif %}
           <td>{{ plan.org }}</td>
           <td>{{ plan.flows }}</td>
           <td>{{ plan.active }}</td>

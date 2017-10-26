@@ -65,6 +65,11 @@ class Plan(models.Model):
         return ', '.join(names)
 
     @property
+    def repo_names_public(self):
+        names = [repo.name for repo in self.repos.filter(public=True)]
+        return ', '.join(names)
+
+    @property
     def repos_iterator(self):
         for repo in self.repos.all():
             yield repo
