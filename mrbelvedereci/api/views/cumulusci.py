@@ -4,7 +4,6 @@ from mrbelvedereci.api.serializers.cumulusci import ScratchOrgInstanceSerializer
 from mrbelvedereci.api.serializers.cumulusci import ServiceSerializer
 from mrbelvedereci.cumulusci.filters import OrgFilter
 from mrbelvedereci.cumulusci.filters import ScratchOrgInstanceFilter
-from mrbelvedereci.cumulusci.filters import ServiceFilter
 from mrbelvedereci.cumulusci.models import Org
 from mrbelvedereci.cumulusci.models import ScratchOrgInstance
 from mrbelvedereci.cumulusci.models import Service
@@ -32,4 +31,3 @@ class ServiceViewSet(viewsets.ModelViewSet):
     """
     serializer_class = ServiceSerializer
     queryset = Service.objects.all()
-    filter_class = ServiceFilter
