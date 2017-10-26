@@ -274,18 +274,24 @@ class Build(models.Model):
         return project_config
 
     def get_org(self, project_config, retries=3):
-        def get_org_config(attempt=None):
-            if not attempt:
-                attempt = 1
+        logger = init_logger(self)
+        attempt = 1
+        while True:
             try:
-                return project_config.keychain.get_org(self.plan.org)
+                org_config = project_config.keychain.get_org(self.plan.org)
+                break
             except ScratchOrgException as e:
-                if attempt > retries:
+                if (
+                    e.message.startswith(FAILED_TO_CREATE_SCRATCH_ORG) and
+                    attempt <= retries
+                ):
+                    logger.warning(e.message)
+                    logger.info('Retrying create scratch org ' +
+                        '(retry {} of {})'.format(attempt, retries))
+                    attempt += 1
+                    continue
+                else:
                     raise e
-                attempt += 1
-                if e.message.startswith(FAILED_TO_CREATE_SCRATCH_ORG):
-                    return get_org_config(attempt)
-        org_config = get_org_config()
         self.org = org_config.org
         if self.current_rebuild:
             self.current_rebuild.org_instance = org_config.org_instance
