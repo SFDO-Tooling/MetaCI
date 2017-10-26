@@ -2,6 +2,7 @@ from itertools import combinations
 
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+from django.db import transaction
 
 from mrbelvedereci.plan.models import Plan
 from mrbelvedereci.plan.models import PlanRepository
@@ -58,17 +59,18 @@ class Command(BaseCommand):
                 # swap plans (keep plan1)
                 plan1, plan2 = plan2, plan1
             # reassign builds to the plan we're keeping (plan1)
-            for build in plan2.builds.all():
-                self.stdout.write(self.style.WARNING(
-                    'Overwriting Plan ({} --> {}) for Build {}'.format(
-                        build.plan,
-                        plan1,
-                        build,
-                    ),
-                ))
-                build.plan = plan1
-                if not options['dry_run']:
-                    build.save()
+            with transaction.atomic():
+                for build in plan2.builds.select_for_update():
+                    self.stdout.write(self.style.WARNING(
+                        'Overwriting Plan ({} --> {}) for Build {}'.format(
+                            build.plan,
+                            plan1,
+                            build,
+                        ),
+                    ))
+                    build.plan = plan1
+                    if not options['dry_run']:
+                        build.save()
             # copy all repos to the plan we're keeping
             for repo in plan2.repos.all():
                 try:
