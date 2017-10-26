@@ -138,7 +138,7 @@ class PlanRepository(models.Model):
         verbose_name_plural = 'PlanRepositories'
 
     def __unicode__(self):
-        return u'{}:{}'.format(self.repo, self.plan)
+        return u'[{}] {}'.format(self.repo, self.plan)
 
 
 class PlanSchedule(models.Model):
