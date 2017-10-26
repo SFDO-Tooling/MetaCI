@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 from cumulusci.core.config import FlowConfig
+from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
 from cumulusci.core.exceptions import ApexTestException
 from cumulusci.core.exceptions import BrowserTestFailure
 from cumulusci.core.exceptions import FlowNotFoundError
@@ -271,8 +272,19 @@ class Build(models.Model):
         project_config.set_keychain(keychain)
         return project_config
 
-    def get_org(self, project_config):
-        org_config = project_config.keychain.get_org(self.plan.org)
+    def get_org(self, project_config, retries=3):
+        def get_org_config(attempt=None):
+            if not attempt:
+                attempt = 1
+            try:
+                return project_config.keychain.get_org(self.plan.org)
+            except ScratchOrgException as e:
+                if attempt > retries:
+                    raise e
+                attempt += 1
+                if e.message.startswith(FAILED_TO_CREATE_SCRATCH_ORG):
+                    return get_org_config(attempt)
+        org_config = get_org_config()
         self.org = org_config.org
         if self.current_rebuild:
             self.current_rebuild.org_instance = org_config.org_instance
