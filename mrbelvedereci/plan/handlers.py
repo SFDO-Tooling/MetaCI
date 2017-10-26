@@ -10,4 +10,6 @@ from mrbelvedereci.plan.tasks import create_github_webhook
 
 @receiver(post_save, sender=PlanRepository)
 def handle_planrepository_save(sender, **kwargs):
-    create_github_webhook.delay(kwargs['instance'].pk)
+    plan_repo = kwargs['instance']
+    if plan_repo.plan.type != 'manual':
+        create_github_webhook.delay(plan_repo.pk)

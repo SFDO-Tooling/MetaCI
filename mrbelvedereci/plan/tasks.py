@@ -38,8 +38,6 @@ def run_scheduled_hourly():
 def create_github_webhook(pk):
     """Create a webhook if it doesn't exist yet."""
     plan_repo = PlanRepository.objects.get(pk=pk)
-    if plan_repo.plan.type == 'manual':
-        return
     event = 'pull_request' if plan_repo.plan.type == 'pr' else 'push'
     callback_url = '{}/{}'.format(settings.GITHUB_WEBHOOK_BASE_URL, event)
     exists = False
