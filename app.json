@@ -80,15 +80,19 @@
   "formation": {
     "web": {
       "quantity": 1,
-      "size": "Standard-1X"
+      "size": "free"
+    },
+    "dev_worker": {
+      "quantity": 1,
+      "size": "free"
     },
     "worker": {
-      "quantity": 1,
-      "size": "Standard-1X"
+      "quantity": 0,
+      "size": "free"
     },
     "worker_short": {
-      "quantity": 1,
-      "size": "Standard-1X"
+      "quantity": 0,
+      "size": "free"
     }
   },
   "scripts": {
