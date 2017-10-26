@@ -20,7 +20,7 @@ router.register(r'plans', PlanViewSet, base_name='plan')
 router.register(r'rebuilds', RebuildViewSet, base_name='rebuild')
 router.register(r'repos', RepositoryViewSet, base_name='repo')
 router.register(r'scratch_orgs', ScratchOrgInstanceViewSet, base_name='scratch_org')
-router.register(r'services', OrgViewSet, base_name='service')
+router.register(r'services', ServiceViewSet, base_name='service')
 urlpatterns = router.urls
 
 schema_view = get_schema_view(title='MetaCI API')
