@@ -33,9 +33,10 @@ class Command(BaseCommand):
         admin = User(
             username = options['user'],
             email = options['email'],
-            password = password,
+            is_staff = True,
             is_superuser = True,
         )
+        admin.set_password(password)
         admin.save()
 
         self.stdout.write(self.style.SUCCESS('Created superuser named {user}'.format(**options)))
