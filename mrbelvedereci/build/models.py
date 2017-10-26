@@ -16,6 +16,7 @@ from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
 from cumulusci.core.exceptions import ApexTestException
 from cumulusci.core.exceptions import BrowserTestFailure
 from cumulusci.core.exceptions import FlowNotFoundError
+from cumulusci.core.exceptions import ScratchOrgException
 from cumulusci.core.utils import import_class
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.conf import settings
