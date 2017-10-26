@@ -34,6 +34,7 @@ class Plan(models.Model):
     description = models.TextField(null=True, blank=True)
     repos = models.ManyToManyField(
         Repository,
+        related_name='plans',
         through='PlanRepository',
         through_fields=('plan', 'repo'),
     )
@@ -135,7 +136,7 @@ class PlanRepository(models.Model):
     repo = models.ForeignKey(Repository)
 
     class Meta:
-        verbose_name_plural = 'PlanRepositories'
+        verbose_name_plural = 'Plan Repositories'
 
     def __unicode__(self):
         return u'[{}] {}'.format(self.repo, self.plan)
@@ -145,6 +146,9 @@ class PlanSchedule(models.Model):
     plan = models.ForeignKey(Plan)
     branch = models.ForeignKey('repository.branch')
     schedule = models.CharField(max_length=16, choices=SCHEDULE_CHOICES)
+
+    class Meta:
+        verbose_name_plural = 'Plan Schedules'
 
     def run(self):
         Build = apps.get_model('build', 'Build')
