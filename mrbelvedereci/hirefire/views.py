@@ -2,6 +2,7 @@ import json
 
 from django.conf import settings
 from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 
 from rq import Worker
@@ -25,6 +26,8 @@ def info(request, token):
     """
     Return the HireFire json data needed to scale worker dynos
     """
+    if not settings.HIREFIRE_TOKEN:
+        return HttpResponseBadRequest('Hirefire not configured.  Set the HIREFIRE_TOKEN environment variable on the app to use Hirefire for dyno scaling')
     if token != settings.HIREFIRE_TOKEN:
         return HttpResponseForbidden('Invalid token')
 
