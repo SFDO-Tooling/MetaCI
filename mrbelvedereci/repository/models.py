@@ -15,6 +15,7 @@ class Repository(models.Model):
 
     class Meta:
         ordering = ['name','owner']
+        verbose_name_plural = 'repositories'
 
     def get_absolute_url(self):
         return reverse('repo_detail', kwargs={'owner': self.owner, 'name': self.name})
@@ -35,6 +36,7 @@ class Branch(models.Model):
 
     class Meta:
         ordering = ['repo__name','repo__owner', 'name']
+        verbose_name_plural = 'branches'
 
     def get_absolute_url(self):
         return reverse('branch_detail', kwargs={'owner': self.repo.owner, 'name': self.repo.name, 'branch': self.name})
