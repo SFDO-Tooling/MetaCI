@@ -12,6 +12,7 @@ from mrbelvedereci.build.models import Build
 from mrbelvedereci.build.models import Rebuild
 from mrbelvedereci.build.tasks import run_build
 from mrbelvedereci.build.utils import view_queryset
+from mrbelvedereci.build.filters import BuildFilter
 
 
 def build_list(request):
@@ -19,8 +20,12 @@ def build_list(request):
     repo = request.GET.get('repo')
     if repo:
         query['repo__name'] = repo
-    builds = view_queryset(request, query, request.GET.get('status'))
-    return render(request, 'build/build_list.html', context={'builds': builds})
+    build_filter, builds = view_queryset(request, query, request.GET.get('status'), filter_class=BuildFilter)
+    context = {
+        'filter': build_filter,
+        'builds': builds,
+    }
+    return render(request, 'build/build_list.html', context=context)
 
 
 def build_detail(request, build_id, rebuild_id=None, tab=None):
