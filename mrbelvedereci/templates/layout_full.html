@@ -104,7 +104,7 @@
       </li>
       {% if request.user.is_staff %}
       <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-p-horizontal--large">
-        <a href="/{{ ADMIN_URL }}">
+        <a href="{% url 'admin:index' %}">
         <div class="slds-media">
           <div class="slds-media__figure">
             {% autoescape off %}
