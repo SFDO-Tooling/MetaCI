@@ -18,6 +18,6 @@ class Command(BaseCommand):
             }
         )
         if created:
-            self.stdout.write(self.style.SUCCESS('Created job check_waiting_builds'))
+            self.stdout.write(self.style.SUCCESS('Created job check_waiting_builds with id {}'.format(job.id)))
         else:
-            self.stdout.write(self.style.SUCCESS('Scheduled job check_waiting_builds already exists'))
+            self.stdout.write(self.style.SUCCESS('Scheduled job check_waiting_builds with id {} already exists and is {}.'.format(job.id, 'enabled' if job.enabled else 'disabled')))
