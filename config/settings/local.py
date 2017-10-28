@@ -37,7 +37,7 @@ EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND',
 
 # CACHING
 # ------------------------------------------------------------------------------
-REDIS_MAX_CONNECTIONS = env('REDIS_MAX_CONNECTIONS', default=20)
+REDIS_MAX_CONNECTIONS = env.int('REDIS_MAX_CONNECTIONS', default=1)
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
