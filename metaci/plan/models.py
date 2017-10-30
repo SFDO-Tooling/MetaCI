@@ -31,7 +31,7 @@ def validate_yaml_field(value):
 class Plan(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    repositories = models.ManyToManyField('repository.Repository', related_name="plans")
+    repo = models.ForeignKey('repository.Repository', related_name="plans")
     type = models.CharField(max_length=8, choices=TRIGGER_TYPES)
     regex = models.CharField(max_length=255, null=True, blank=True)
     flows = models.CharField(max_length=255)
