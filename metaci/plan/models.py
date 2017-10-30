@@ -120,17 +120,14 @@ class PlanSchedule(models.Model):
     schedule = models.CharField(max_length=16, choices=SCHEDULE_CHOICES)
 
     def run(self):
-        builds = []
-        for repo in plan.repositories.all():
-            Build = apps.get_model('build', 'Build')
-            build = Build(
-                repo = repo,
-                plan = self.plan,
-                branch = self.branch,
-                commit = self.branch.github_api.commit.sha,
-                schedule = self,
-                build_type = 'scheduled',
-            )
-            build.save()
-            builds.append(build)
-        return builds
+        Build = apps.get_model('build', 'Build')
+        build = Build(
+            repo = self.plan.repo,
+            plan = self.plan,
+            branch = self.branch,
+            commit = self.branch.github_api.commit.sha,
+            schedule = self,
+            build_type = 'scheduled',
+        )
+        build.save()
+        return build
