@@ -1,7 +1,7 @@
 import rest_framework_filters as filters
-from mrbelvedereci.repository.filters import RepositoryRelatedFilter
-from mrbelvedereci.plan.models import Plan
-from mrbelvedereci.repository.models import Repository
+from metaci.repository.filters import RepositoryRelatedFilter
+from metaci.plan.models import Plan
+from metaci.repository.models import Repository
 
 class PlanRelatedFilter(filters.FilterSet):
     repo = filters.RelatedFilter(RepositoryRelatedFilter, name='repo', queryset=Repository.objects.all())

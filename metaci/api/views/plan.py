@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from mrbelvedereci.api.serializers.plan import PlanSerializer
-from mrbelvedereci.plan.filters import PlanFilter
-from mrbelvedereci.plan.models import Plan
+from metaci.api.serializers.plan import PlanSerializer
+from metaci.plan.filters import PlanFilter
+from metaci.plan.models import Plan
 from rest_framework import viewsets
 
 class PlanViewSet(viewsets.ModelViewSet):

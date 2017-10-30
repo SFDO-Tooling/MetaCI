@@ -1,6 +1,6 @@
 import rest_framework_filters as filters
-from mrbelvedereci.repository.models import Branch
-from mrbelvedereci.repository.models import Repository
+from metaci.repository.models import Branch
+from metaci.repository.models import Repository
 
 class RepositoryRelatedFilter(filters.FilterSet):
     class Meta:

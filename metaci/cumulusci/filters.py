@@ -1,9 +1,9 @@
 import rest_framework_filters as filters
-from mrbelvedereci.cumulusci.models import Org
-from mrbelvedereci.cumulusci.models import ScratchOrgInstance
-from mrbelvedereci.cumulusci.models import Service
-from mrbelvedereci.repository.filters import RepositoryRelatedFilter
-from mrbelvedereci.repository.models import Repository
+from metaci.cumulusci.models import Org
+from metaci.cumulusci.models import ScratchOrgInstance
+from metaci.cumulusci.models import Service
+from metaci.repository.filters import RepositoryRelatedFilter
+from metaci.repository.models import Repository
 
 class OrgRelatedFilter(filters.FilterSet):
     repo = filters.RelatedFilter(

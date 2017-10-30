@@ -1,17 +1,16 @@
 from django.shortcuts import render
-from mrbelvedereci.api.pagination import RestrictedPagination
-from mrbelvedereci.api.serializers.build import BuildSerializer
-from mrbelvedereci.api.serializers.build import BuildFlowSerializer
-from mrbelvedereci.api.serializers.build import RebuildSerializer
-from mrbelvedereci.build.filters import BuildFilter
-from mrbelvedereci.build.filters import BuildFlowFilter
-from mrbelvedereci.build.filters import RebuildFilter
-from mrbelvedereci.build.models import Build
-from mrbelvedereci.build.models import BuildFlow
-from mrbelvedereci.build.models import Rebuild
+from metaci.api.pagination import RestrictedPagination
+from metaci.api.serializers.build import BuildSerializer
+from metaci.api.serializers.build import BuildFlowSerializer
+from metaci.api.serializers.build import RebuildSerializer
+from metaci.build.filters import BuildFilter
+from metaci.build.filters import BuildFlowFilter
+from metaci.build.filters import RebuildFilter
+from metaci.build.models import Build
+from metaci.build.models import BuildFlow
+from metaci.build.models import Rebuild
 from rest_framework import viewsets
 
-# mrbelvedereci.build
 class BuildViewSet(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing builds

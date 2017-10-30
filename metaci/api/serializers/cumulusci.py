@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from mrbelvedereci.api.serializers.repository import RepositorySerializer
-from mrbelvedereci.cumulusci.models import Org
-from mrbelvedereci.cumulusci.models import ScratchOrgInstance
-from mrbelvedereci.cumulusci.models import Service
-from mrbelvedereci.repository.models import Repository
+from metaci.api.serializers.repository import RepositorySerializer
+from metaci.cumulusci.models import Org
+from metaci.cumulusci.models import ScratchOrgInstance
+from metaci.cumulusci.models import Service
+from metaci.repository.models import Repository
 
 class OrgSerializer(serializers.HyperlinkedModelSerializer):
     repo = RepositorySerializer(read_only=True)

@@ -4,4 +4,4 @@ from django.apps import AppConfig
 
 
 class ApiConfig(AppConfig):
-    name = 'mrbelvedereci.api'
+    name = 'metaci.api'

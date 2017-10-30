@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from mrbelvedereci.users.models import User
+from metaci.users.models import User
 from rest_framework.authtoken.models import Token
 
 class Command(BaseCommand):

@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from mrbelvedereci.api.serializers.repository import RepositorySerializer
-from mrbelvedereci.plan.models import Plan
-from mrbelvedereci.repository.models import Repository
+from metaci.api.serializers.repository import RepositorySerializer
+from metaci.plan.models import Plan
+from metaci.repository.models import Repository
 
 class PlanSerializer(serializers.HyperlinkedModelSerializer):
     repo = RepositorySerializer(read_only=True)

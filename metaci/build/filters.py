@@ -1,17 +1,17 @@
 import rest_framework_filters as filters
-from mrbelvedereci.build.models import Build
-from mrbelvedereci.build.models import BuildFlow
-from mrbelvedereci.build.models import Rebuild
-from mrbelvedereci.cumulusci.filters import OrgRelatedFilter
-from mrbelvedereci.cumulusci.filters import ScratchOrgInstanceRelatedFilter
-from mrbelvedereci.cumulusci.models import Org
-from mrbelvedereci.cumulusci.models import ScratchOrgInstance
-from mrbelvedereci.plan.filters import PlanRelatedFilter
-from mrbelvedereci.plan.models import Plan
-from mrbelvedereci.repository.filters import BranchRelatedFilter
-from mrbelvedereci.repository.filters import RepositoryRelatedFilter
-from mrbelvedereci.repository.models import Branch
-from mrbelvedereci.repository.models import Repository
+from metaci.build.models import Build
+from metaci.build.models import BuildFlow
+from metaci.build.models import Rebuild
+from metaci.cumulusci.filters import OrgRelatedFilter
+from metaci.cumulusci.filters import ScratchOrgInstanceRelatedFilter
+from metaci.cumulusci.models import Org
+from metaci.cumulusci.models import ScratchOrgInstance
+from metaci.plan.filters import PlanRelatedFilter
+from metaci.plan.models import Plan
+from metaci.repository.filters import BranchRelatedFilter
+from metaci.repository.filters import RepositoryRelatedFilter
+from metaci.repository.models import Branch
+from metaci.repository.models import Repository
 
 class BuildRelatedFilter(filters.FilterSet):
     branch = filters.RelatedFilter(

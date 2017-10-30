@@ -1,6 +1,6 @@
 import os
 from django.core.management.base import BaseCommand, CommandError
-from mrbelvedereci.users.models import User
+from metaci.users.models import User
 
 class Command(BaseCommand):
     help = 'Auto-creates an admin user with the password from ADMINUSER_PASS env var or an auto generated random password.  If a random pass is generated, it is printed to the terminal.  No password is printed if using the env var.'

@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from mrbelvedereci.api.serializers.repository import BranchSerializer
-from mrbelvedereci.api.serializers.repository import RepositorySerializer
-from mrbelvedereci.repository.filters import BranchFilter
-from mrbelvedereci.repository.filters import RepositoryFilter
-from mrbelvedereci.repository.models import Branch
-from mrbelvedereci.repository.models import Repository
+from metaci.api.serializers.repository import BranchSerializer
+from metaci.api.serializers.repository import RepositorySerializer
+from metaci.repository.filters import BranchFilter
+from metaci.repository.filters import RepositoryFilter
+from metaci.repository.models import Branch
+from metaci.repository.models import Repository
 from rest_framework import viewsets
 
 class BranchViewSet(viewsets.ModelViewSet):

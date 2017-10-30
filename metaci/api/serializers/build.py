@@ -1,16 +1,16 @@
 from rest_framework import serializers
-from mrbelvedereci.api.serializers.cumulusci import OrgSerializer
-from mrbelvedereci.api.serializers.cumulusci import ScratchOrgInstanceSerializer
-from mrbelvedereci.api.serializers.repository import BranchSerializer
-from mrbelvedereci.api.serializers.repository import RepositorySerializer
-from mrbelvedereci.api.serializers.plan import PlanSerializer
-from mrbelvedereci.build.models import Build
-from mrbelvedereci.build.models import BuildFlow
-from mrbelvedereci.build.models import Rebuild
-from mrbelvedereci.cumulusci.models import Org
-from mrbelvedereci.plan.models import Plan
-from mrbelvedereci.repository.models import Branch
-from mrbelvedereci.repository.models import Repository
+from metaci.api.serializers.cumulusci import OrgSerializer
+from metaci.api.serializers.cumulusci import ScratchOrgInstanceSerializer
+from metaci.api.serializers.repository import BranchSerializer
+from metaci.api.serializers.repository import RepositorySerializer
+from metaci.api.serializers.plan import PlanSerializer
+from metaci.build.models import Build
+from metaci.build.models import BuildFlow
+from metaci.build.models import Rebuild
+from metaci.cumulusci.models import Org
+from metaci.plan.models import Plan
+from metaci.repository.models import Branch
+from metaci.repository.models import Repository
 
 class BuildFlowSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -56,7 +56,6 @@ class RebuildSerializer(serializers.HyperlinkedModelSerializer):
             'time_start',
         )
 
-# mrbelvedereci.build Models
 class BuildSerializer(serializers.HyperlinkedModelSerializer):
     branch = BranchSerializer(read_only=True)
     branch_id = serializers.PrimaryKeyRelatedField(

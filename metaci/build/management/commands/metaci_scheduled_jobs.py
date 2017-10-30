@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         job, created = RepeatableJob.objects.get_or_create(
-            callable = 'mrbelvedereci.build.tasks.check_waiting_builds',
+            callable = 'metaci.build.tasks.check_waiting_builds',
             enabled = True,
             name = 'check_waiting_builds',
             queue = 'short',
