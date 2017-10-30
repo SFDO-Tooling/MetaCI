@@ -4,9 +4,9 @@ from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import transaction
 
-from mrbelvedereci.plan.models import Plan
-from mrbelvedereci.plan.models import PlanRepository
-from mrbelvedereci.utils import is_attr_equal
+from metaci.plan.models import Plan
+from metaci.plan.models import PlanRepository
+from metaci.utils import is_attr_equal
 
 
 class Command(BaseCommand):
