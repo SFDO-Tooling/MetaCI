@@ -295,8 +295,6 @@ CONNECTED_APP_CLIENT_SECRET = None
 CONNECTED_APP_CALLBACK_URL = None
 
 GITHUB_STATUS_UPDATES_ENABLED = env.bool('GITHUB_STATUS_UPDATES_ENABLED', True)
-<<<<<<< HEAD
-=======
 
 # Django REST Framework
 REST_FRAMEWORK = {
@@ -311,4 +309,3 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAdminUser',
     ),
 }
->>>>>>> master
