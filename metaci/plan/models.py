@@ -7,7 +7,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 
-from mrbelvedereci.repository.models import Repository
+from metaci.repository.models import Repository
 
 
 TRIGGER_TYPES = (
