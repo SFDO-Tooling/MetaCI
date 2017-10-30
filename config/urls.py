@@ -7,9 +7,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
-from mrbelvedereci import views as mbci_views
-from mrbelvedereci.build import views as build_views
-from mrbelvedereci.repository.views import github_push_webhook
+from metaci import views as mbci_views
+from metaci.build import views as build_views
+from metaci.repository.views import github_push_webhook
 
 urlpatterns = [
     #url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
@@ -20,7 +20,7 @@ urlpatterns = [
     url(settings.ADMIN_URL_ROUTE, admin.site.urls),
 
     # User management
-    url(r'^users/', include('mrbelvedereci.users.urls', namespace='users')),
+    url(r'^users/', include('metaci.users.urls', namespace='users')),
     url(r'^accounts/', include('allauth.urls')),
 
     # django-rq
@@ -29,18 +29,15 @@ urlpatterns = [
     # search
     url(r'^search$', build_views.build_search, name='search'),
 
-    # Your stuff: custom urls includes go here
-    url(r'^api/', include('mrbelvedereci.api.urls')),
-    url(r'^builds/', include('mrbelvedereci.build.urls')),
-    url(r'^notifications/', include('mrbelvedereci.notification.urls')),
-    url(r'^tests/', include('mrbelvedereci.testresults.urls')),
-    url(r'^plans/', include('mrbelvedereci.plan.urls')),
-    url(r'^orgs/', include('mrbelvedereci.cumulusci.urls')),
-    url(r'^hirefire/', include('mrbelvedereci.hirefire.urls')),
-    url(r'^repo/', include('mrbelvedereci.repository.urls')),
+    url(r'^api/', include('metaci.api.urls')),
+    url(r'^builds/', include('metaci.build.urls')),
+    url(r'^notifications/', include('metaci.notification.urls')),
+    url(r'^tests/', include('metaci.testresults.urls')),
+    url(r'^plans/', include('metaci.plan.urls')),
+    url(r'^orgs/', include('metaci.cumulusci.urls')),
+    url(r'^hirefire/', include('metaci.hirefire.urls')),
+    url(r'^repo/', include('metaci.repository.urls')),
     url(r'^webhook/github/push$', github_push_webhook, name="github_push_webhook"),
-
-
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

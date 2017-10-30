@@ -1,7 +1,7 @@
 {
-  "name": "mrbelvedereci",
+  "name": "MetaCI",
   "description": "A lightweight CI server for Salesforce developers to automate running CumulusCI flows against Github repositories",
-  "repository": "https://github.com/SalesforceFoundation/mrbelvedereci",
+  "repository": "https://github.com/SalesforceFoundation/MetaCI",
   "logo": "https://avatars.githubusercontent.com/u/5545431?v=3&s=100",
   "keywords": ["ci", "python", "django", "salesforce", "github"],
   "env": {
