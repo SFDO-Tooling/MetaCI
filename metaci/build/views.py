@@ -8,6 +8,7 @@ from django.utils import timezone
 from watson import search as watson
 
 from metaci.build.exceptions import BuildError
+from metaci.build.filters import BuildFilter
 from metaci.build.models import Build
 from metaci.build.models import Rebuild
 from metaci.build.tasks import run_build
@@ -19,8 +20,12 @@ def build_list(request):
     repo = request.GET.get('repo')
     if repo:
         query['repo__name'] = repo
-    builds = view_queryset(request, query, request.GET.get('status'))
-    return render(request, 'build/build_list.html', context={'builds': builds})
+    build_filter, builds = view_queryset(request, query, request.GET.get('status'), filter_class=BuildFilter)
+    context = {
+        'filter': build_filter,
+        'builds': builds,
+    }
+    return render(request, 'build/build_list.html', context=context)
 
 
 def build_detail(request, build_id, rebuild_id=None, tab=None):

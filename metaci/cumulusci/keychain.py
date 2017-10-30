@@ -54,7 +54,10 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         service.save()
 
     def list_orgs(self):
-        raise NotImplementedError('list_orgs is not supported in this keychain')
+        orgs = Org.objects.filter(
+            repo = self.build.repo,
+        ).order_by('name').values_list('name', flat=True)
+        return orgs
 
     def get_default_org(self):
         raise NotImplementedError('get_default_org is not supported in this keychain')

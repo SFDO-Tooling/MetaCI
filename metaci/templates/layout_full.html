@@ -14,7 +14,7 @@
 {% block local_header %}
 {% if debug %}
 <div class="slds-notify_container">
-    <div class="slds-notify slds-notify--toast" role="alert">
+    <div class="slds-notify" role="alert">
       <span class="slds-assistive-text">Info</span>
 
       <div class="slds-notify__content">
@@ -100,6 +100,22 @@
         </div>
         </a>
       </li>
+      {% if request.user.is_staff %}
+      <li class="slds-dropdown-trigger slds-dropdown-trigger--click slds-p-horizontal--large">
+        <a href="{% url 'admin:index' %}">
+        <div class="slds-media">
+          <div class="slds-media__figure">
+            {% autoescape off %}
+            <svg class="slds-button__icon slds-global-header__icon" aria-hidden="true">
+              <use xlink:href="/static/slds/assets/icons/utility-sprite/svg/symbols.svg#settings"></use>
+            </svg>
+            {% endautoescape %}
+            <span class="slds-assistive-text">Admin</span>
+          </div>
+        </div>
+        </a>
+      </li>
+      {% endif %}
       <li class="slds-m-left--large">
         <a href="{% url 'users:detail' request.user.username  %}" class="slds-button" title="person name" aria-haspopup="true">
           <span class="slds-avatar slds-avatar--circle slds-avatar--medium">

@@ -12,9 +12,11 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 from cumulusci.core.config import FlowConfig
+from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
 from cumulusci.core.exceptions import ApexTestException
 from cumulusci.core.exceptions import BrowserTestFailure
 from cumulusci.core.exceptions import FlowNotFoundError
+from cumulusci.core.exceptions import ScratchOrgException
 from cumulusci.core.utils import import_class
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.conf import settings
@@ -271,8 +273,25 @@ class Build(models.Model):
         project_config.set_keychain(keychain)
         return project_config
 
-    def get_org(self, project_config):
-        org_config = project_config.keychain.get_org(self.plan.org)
+    def get_org(self, project_config, retries=3):
+        self.logger = init_logger(self)
+        attempt = 1
+        while True:
+            try:
+                org_config = project_config.keychain.get_org(self.plan.org)
+                break
+            except ScratchOrgException as e:
+                if (
+                    e.message.startswith(FAILED_TO_CREATE_SCRATCH_ORG) and
+                    attempt <= retries
+                ):
+                    self.logger.warning(e.message)
+                    self.logger.info('Retrying create scratch org ' +
+                        '(retry {} of {})'.format(attempt, retries))
+                    attempt += 1
+                    continue
+                else:
+                    raise e
         self.org = org_config.org
         if self.current_rebuild:
             self.current_rebuild.org_instance = org_config.org_instance

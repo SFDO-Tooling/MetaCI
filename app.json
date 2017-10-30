@@ -20,18 +20,6 @@
       "description": "Heroku proxies web requests and Django needs to be configured to allow the forwards",
       "value": ".herokuapp.com"
     },
-    "DJANGO_AWS_ACCESS_KEY_ID": {
-      "description": "The Amazon Web Services ID used for S3 storage of media",
-      "value": ""
-    },
-    "DJANGO_AWS_SECRET_ACCESS_KEY": {
-      "description": "The Amazon Web Services secret access key used for S3 storage of media",
-      "value": ""
-    },
-    "DJANGO_AWS_STORAGE_BUCKET_NAME": {
-      "description": "The Amazon Web Services S3 storage bucket name the site should use",
-      "value": ""
-    },
     "DJANGO_ADMIN_URL": {
       "description": "The url path to the admin section of the site",
       "value": "admin"
@@ -67,7 +55,7 @@
     "HIREFIRE_TOKEN": {
       "description": "The token for integrating with Hirefire.io for auto-scaling worker dynos based on queued/running builds",
       "value": "",
-      "required": "false"
+      "required": false
     },
     "SFDX_HUB_KEY": {
       "description": "The private key for the JWT authentication to the devhub for Salesforce DX.  Required to use scratch orgs",
@@ -92,15 +80,19 @@
   "formation": {
     "web": {
       "quantity": 1,
-      "size": "Standard-1X"
+      "size": "free"
+    },
+    "dev_worker": {
+      "quantity": 1,
+      "size": "free"
     },
     "worker": {
-      "quantity": 1,
-      "size": "Standard-1X"
+      "quantity": 0,
+      "size": "free"
     },
     "worker_short": {
-      "quantity": 1,
-      "size": "Standard-1X"
+      "quantity": 0,
+      "size": "free"
     }
   },
   "scripts": {
@@ -113,9 +105,8 @@
     "sendgrid:starter"
   ],
   "buildpacks": [
-     {"url": "heroku/python"},
-     {"url": "heroku/ruby"},
-     {"url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"}
+     {"url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"},
+     {"url": "heroku/python"}
   ],
   "environments": {
     "test": {

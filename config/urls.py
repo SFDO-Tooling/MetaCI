@@ -17,7 +17,7 @@ urlpatterns = [
     url(r'^about/$', mbci_views.AboutView.as_view(template_name='pages/about.html'), name='about'),
 
     # Django Admin, use {% url 'admin:index' %}
-    url(settings.ADMIN_URL, admin.site.urls),
+    url(settings.ADMIN_URL_ROUTE, admin.site.urls),
 
     # User management
     url(r'^users/', include('metaci.users.urls', namespace='users')),
@@ -29,7 +29,7 @@ urlpatterns = [
     # search
     url(r'^search$', build_views.build_search, name='search'),
 
-    # Your stuff: custom urls includes go here
+    url(r'^api/', include('metaci.api.urls')),
     url(r'^builds/', include('metaci.build.urls')),
     url(r'^notifications/', include('metaci.notification.urls')),
     url(r'^tests/', include('metaci.testresults.urls')),
@@ -38,8 +38,6 @@ urlpatterns = [
     url(r'^hirefire/', include('metaci.hirefire.urls')),
     url(r'^repo/', include('metaci.repository.urls')),
     url(r'^webhook/github/push$', github_push_webhook, name="github_push_webhook"),
-
-
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
