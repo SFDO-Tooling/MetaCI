@@ -1,15 +1,10 @@
 from rest_framework import serializers
 from metaci.api.serializers.repository import RepositorySerializer
 from metaci.plan.models import Plan
+from metaci.plan.models import PlanRepository
 from metaci.repository.models import Repository
 
 class PlanSerializer(serializers.HyperlinkedModelSerializer):
-    repo = RepositorySerializer(read_only=True)
-    repo_id = serializers.PrimaryKeyRelatedField(
-        queryset=Repository.objects.all(),
-        source='repo',
-        write_only=True
-    )
     class Meta:
         model = Plan
         fields = (
@@ -21,8 +16,29 @@ class PlanSerializer(serializers.HyperlinkedModelSerializer):
             'name',
             'org',
             'public',
-            'repo',
-            'repo_id',
             'regex',
             'type',
+        )
+
+class PlanRepositorySerializer(serializers.HyperlinkedModelSerializer):
+    plan = PlanSerializer(read_only=True)
+    plan_id = serializers.PrimaryKeyRelatedField(
+        queryset=Plan.objects.all(),
+        source='plan',
+        write_only=True
+    )
+    repo = RepositorySerializer(read_only=True)
+    repo_id = serializers.PrimaryKeyRelatedField(
+        queryset=Repository.objects.all(),
+        source='repo',
+        write_only=True
+    )
+    class Meta:
+        model = PlanRepository
+        fields = (
+            'id',
+            'plan',
+            'plan_id',
+            'repo',
+            'repo_id',
         )
