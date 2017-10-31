@@ -6,7 +6,7 @@ if __name__ == '__main__':
     if sys.argv[1] == 'test':
         settings_file = 'config.settings.test'
     else:
-        settings_file = 'config.settings.test'
+        settings_file = 'config.settings.local'
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_file)
 
     try:
