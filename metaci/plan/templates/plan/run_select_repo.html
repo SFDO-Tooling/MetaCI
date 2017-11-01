@@ -11,7 +11,7 @@ Select repository to run plan {{ plan.id }} "{{ plan.name }}"
 
   <div>
     <ul>
-{% for repo in plan.repos_iterator %}
+{% for repo in plan.get_repos %}
       <li>
         <a href="/plans/{{ plan.id }}/{{ repo.owner }}/{{ repo.name }}/run/">
           {{ repo.owner }}/{{ repo.name }}
