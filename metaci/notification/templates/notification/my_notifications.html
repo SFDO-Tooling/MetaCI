@@ -52,7 +52,6 @@
     <thead>
       <tr>
         <th>Plan</th>
-        <th>Repository</th>
         <th>On Success</th>
         <th>On Failure</th>
         <th>On Error</th>
@@ -63,7 +62,6 @@
     {% for notification in notifications.plan %}
       <tr>
         <td>{{ notification.plan }}</td>
-        <td>{{ notification.plan.repo }}</td>
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>

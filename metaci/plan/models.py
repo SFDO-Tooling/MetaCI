@@ -7,6 +7,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 
+from metaci.repository.models import Repository
 
 
 TRIGGER_TYPES = (
@@ -31,7 +32,12 @@ def validate_yaml_field(value):
 class Plan(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    repo = models.ForeignKey('repository.Repository', related_name="plans")
+    repos = models.ManyToManyField(
+        Repository,
+        related_name='plans',
+        through='PlanRepository',
+        through_fields=('plan', 'repo'),
+    )
     type = models.CharField(max_length=8, choices=TRIGGER_TYPES)
     regex = models.CharField(max_length=255, null=True, blank=True)
     flows = models.CharField(max_length=255)
@@ -45,13 +51,17 @@ class Plan(models.Model):
     yaml_config = models.TextField(null=True, blank=True, validators=[validate_yaml_field])
 
     class Meta:
-        ordering = ['name','repo__owner','repo__name', 'active', 'context']
+        ordering = ['name', 'active', 'context']
 
     def get_absolute_url(self):
         return reverse('plan_detail', kwargs={'plan_id': self.id})
 
     def __unicode__(self):
         return self.name
+
+    def get_repos(self):
+        for repo in self.repos.all():
+            yield repo
 
     def check_push(self, push):
         run_build = False
@@ -114,15 +124,30 @@ SCHEDULE_CHOICES=(
     ('hourly', 'Hourly'),
 )
 
+
+class PlanRepository(models.Model):
+    plan = models.ForeignKey(Plan)
+    repo = models.ForeignKey(Repository)
+
+    class Meta:
+        verbose_name_plural = 'Plan Repositories'
+
+    def __unicode__(self):
+        return u'[{}] {}'.format(self.repo, self.plan)
+
+
 class PlanSchedule(models.Model):
     plan = models.ForeignKey(Plan)
     branch = models.ForeignKey('repository.branch')
     schedule = models.CharField(max_length=16, choices=SCHEDULE_CHOICES)
 
+    class Meta:
+        verbose_name_plural = 'Plan Schedules'
+
     def run(self):
         Build = apps.get_model('build', 'Build')
         build = Build(
-            repo = self.plan.repo,
+            repo = self.branch.repo,
             plan = self.plan,
             branch = self.branch,
             commit = self.branch.github_api.commit.sha,

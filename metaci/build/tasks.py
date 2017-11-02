@@ -72,7 +72,11 @@ def check_queued_build(build_id):
     reset_database_connection()
 
     from metaci.build.models import Build
-    build = Build.objects.get(id=build_id)
+    try:
+        build = Build.objects.get(id=build_id)
+    except Build.DoesNotExist:
+        time.sleep(1)
+        build = Build.objects.get(id=build_id)
 
     # Check for concurrency blocking
     try:

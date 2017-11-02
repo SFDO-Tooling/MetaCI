@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from metaci.repository.models import Repository
 from metaci.plan.models import Plan
+from metaci.plan.models import PlanRepository
 
 
 class PlanTestCase(TestCase):
@@ -15,7 +16,6 @@ class PlanTestCase(TestCase):
         )
         self.commit_plan = Plan(
             name = 'Test Plan',
-            repo = self.repo, 
             type = 'commit',
             regex = 'test/.*',
             flows = 'test_flow',
@@ -24,7 +24,6 @@ class PlanTestCase(TestCase):
         )
         self.tag_plan = Plan(
             name = 'Test Plan',
-            repo = self.repo, 
             type = 'tag',
             regex = 'test/.*',
             flows = 'test_flow',
