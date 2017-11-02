@@ -57,6 +57,11 @@
       "value": "",
       "required": false
     },
+    "REDIS_MAX_CONNECTIONS": {
+      "description": "The number of Redis connections each process should keep in its pool.  Increase this value if you are running many workers and a paid Redis plan that can handle more connections.",
+      "value": "1",
+      "required": false
+    },
     "SFDX_HUB_KEY": {
       "description": "The private key for the JWT authentication to the devhub for Salesforce DX.  Required to use scratch orgs",
       "value": "",
