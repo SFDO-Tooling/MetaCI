@@ -1,0 +1,48 @@
+{% extends 'layout_full.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block layout_header_text %}Delete Notification{% endblock %}
+
+{% block layout_body %}
+
+<h3 class="slds-text-heading--medium slds-m-bottom--medium">
+  Are you sure you want to delete this {{ notification_type }} Notification?
+</h3>
+<div class="slds-box slds-m-bottom--medium">
+  <table class="slds-table slds-no-row-hover">
+    <thead>
+      <tr>
+        {% if notification_type == "Branch" %}
+          <th>Branch</th>
+        {% elif notification_type == "Plan" %}
+          <th>Plan</th>
+        {% endif %}
+        <th>Repository</th>
+        <th>On Success</th>
+        <th>On Failure</th>
+        <th>On Error</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+      {% if notification_type == "Branch" %}
+        <th>{{ notification.branch }}</th>
+        <th>{{ notification.branch.repo }}</th>
+      {% elif notification_type == "Plan" %}
+        <th>{{ notification.plan }}</th>
+      {% elif notification_type == "Repository" %}
+        <td>{{ notification.repo }}</td>
+      {% endif %}
+      <td>{{ notification.on_success }}</td>
+      <td>{{ notification.on_fail }}</td>
+      <td>{{ notification.on_error }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+    {{ form.errors }}
+      {% crispy form form.helper %}
+
+{% endblock %}
