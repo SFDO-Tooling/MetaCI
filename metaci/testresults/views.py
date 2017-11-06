@@ -13,6 +13,7 @@ from metaci.testresults.models import TestResult
 from metaci.testresults.filters import BuildFlowFilter
 from metaci.testresults.utils import find_buildflow
 
+
 def build_flow_tests(request, build_id, flow):
     build_flow = find_buildflow(request, build_id, flow)
     data = {'build_flow': build_flow}
@@ -96,17 +97,41 @@ def build_flow_tests(request, build_id, flow):
 
     return render(request, 'testresults/build_flow_tests.html', data)
 
+
+def test_method_peek(request, method_id):
+    method = get_object_or_404(TestMethod, id=method_id)
+    latest_fails = method.test_results.filter(
+        outcome='Fail'
+    ).order_by(
+        '-build_flow__time_end'
+    ).select_related(
+        'build_flow',
+        'build_flow__build',
+        'build_flow__build__repo',
+        'build_flow__build__plan',
+        'build_flow__build__branch',
+        'build_flow__build__branch__repo'
+    )
+    latest_fails = paginate(latest_fails, request)
+
+
+    data = {
+        'method': method,
+        'latest_fails': latest_fails
+    }
+
+    return render(request, 'testresults/test_method_peek.html', data)
+
 @login_required
 def test_method_trend(request, method_id):
     if not request.user.is_staff:
         return redirect('/login/?next=%s' % request.path)
 
     method = get_object_or_404(TestMethod, id=method_id)
-    
-    latest_results = method.test_results.order_by('-build_flow__time_end')
 
+    latest_results = method.test_results.order_by('-build_flow__time_end')
     latest_results = paginate(latest_results, request)
-    
+
     results_by_plan = {}
     i = 0
     for result in latest_results:
@@ -145,6 +170,7 @@ def test_method_trend(request, method_id):
         'headers': headers,
         'results': results,
         'all_results': latest_results,
+        'latest_fails': latest_fails
     }
 
     return render(request, 'testresults/test_method_trend.html', data)

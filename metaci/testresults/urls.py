@@ -20,6 +20,11 @@ urlpatterns = [
         name='test_method_trend',
     ),
     url(
+        r'^method/(?P<method_id>\d+)$',
+        views.test_method_peek,
+        name='test_method_peek'
+    ),
+    url(
         r'^compare/$', 
         views.build_flow_compare,
         name='build_flow_compare',

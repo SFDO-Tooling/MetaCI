@@ -1,0 +1,41 @@
+{% extends 'layout_full.html' %}
+{% load humanize %}
+
+{% block layout_header_text %}
+
+Failing Test History for {{ method.testclass }}.{{ method }} in {{ method.testclass.repo }}
+<a href="https://github.com/{{ method.testclass.repo }}/search?q={{method.testclass}}">(github search)</a>
+
+{% endblock %}
+
+{% block layout_header_details %}
+{% endblock %}
+
+{% block layout_body %}
+
+<table class="slds-table slds-table--bordered slds-table--cell-buffer">
+  <thead>
+    <tr class="slds-text-title--caps">
+      <th scope="col">Build</th><th scope="col">Date</th><th scope="col">Plan</th><th scope="col">Branch</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for result in latest_fails %}
+    <tr>
+      <td>{{result.build_flow.build.id}}</td> <td>{{result.build_flow.build.time_end|date:"Y-m-d"}}</td> <td>{{result.build_flow.build.plan}}</td> <td>{{result.build_flow.build.branch}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="">10 pages</div>
+<div class="slds-button-group slds-m-top--medium" role="group">
+    {% if latest_fails.has_previous %}
+      <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.previous_page_number }}">previous</a>
+    {% endif %}
+    
+    {% if latest_fails.has_next %}
+      <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.next_page_number }}">next</a>
+    {% endif %}
+  </div>
+{% endblock %}
