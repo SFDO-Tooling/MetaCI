@@ -39,6 +39,20 @@ CACHES = {
     }
 }
 
+# Use Redis for RQ queues instead of cache which uses LocMemCache
+RQ_QUEUES = {
+    'default': {
+        'URL': REDIS_URL,
+        'DEFAULT_TIMEOUT': 7200,
+        'AUTOCOMMIT': False,
+    },
+    'short': {
+        'URL': REDIS_URL,
+        'DEFAULT_TIMEOUT': 500,
+        'AUTOCOMMIT': False,
+    },
+}
+
 # Add django_nose to INSTALLED_APPS
 INSTALLED_APPS = INSTALLED_APPS + (
     'django_nose',
