@@ -16,13 +16,13 @@ Failing Test History for {{ method.testclass }}.{{ method }} in {{ method.testcl
 <table class="slds-table slds-table--bordered slds-table--cell-buffer">
   <thead>
     <tr class="slds-text-title--caps">
-      <th scope="col">Build</th><th scope="col">Date</th><th scope="col">Plan</th><th scope="col">Branch</th>
+      <th scope="col">Build</th><th scope="col">Date</th><th scope="col">Plan</th><th scope="col">Branch</th><th>Message</th>
     </tr>
   </thead>
   <tbody>
     {% for result in latest_fails %}
     <tr>
-      <td>{{result.build_flow.build.id}}</td> <td>{{result.build_flow.build.time_end|date:"Y-m-d"}}</td> <td>{{result.build_flow.build.plan}}</td> <td>{{result.build_flow.build.branch}}</td>
+      <td>{{result.build_flow.build.id}}</td> <td>{{result.build_flow.build.time_end|date:"Y-m-d"}}</td> <td>{{result.build_flow.build.plan}}</td> <td>{{result.build_flow.build.branch}}</td><td>{{result.message}}</td>
     </tr>
     {% endfor %}
   </tbody>
