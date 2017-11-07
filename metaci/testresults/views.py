@@ -170,7 +170,6 @@ def test_method_trend(request, method_id):
         'headers': headers,
         'results': results,
         'all_results': latest_results,
-        'latest_fails': latest_fails
     }
 
     return render(request, 'testresults/test_method_trend.html', data)
