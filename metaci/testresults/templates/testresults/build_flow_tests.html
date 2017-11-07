@@ -99,7 +99,9 @@
             <tbody>
             {% for result in class_results.results %}
               <tr>
-                <td><a href="/tests/trend/method/{{ result.result.method.id }}">{{ result.result.method.name }}</a></td>
+                <td><a href="/tests/method/{{ result.result.method.id }}">{{ result.result.method.name }}</a></td>
+                <td><a href="/tests/trend/method/{{ result.result.method.id }}">Trend</a></td>
+                
                 <td class="{% if result.result.outcome == 'Pass' %}success{% else %}danger{% endif %}">{{ result.result.outcome }}</td>
                 <td>{{ result.result.duration }}</td>
                 {% for column in result.columns %}
