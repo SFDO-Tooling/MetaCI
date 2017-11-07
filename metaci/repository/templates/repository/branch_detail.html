@@ -1,6 +1,6 @@
 {% extends 'layout_full.html' %}
 
-{% block layout_parent_link %}<a href="/repo/{{ branch.repo.owner }}/{{ branch.repo.name }}">{{ branch.repo }}</a>{% endblock %}
+{% block layout_parent_link %}<a href="/repos/{{ branch.repo.owner }}/{{ branch.repo.name }}">{{ branch.repo }}</a>{% endblock %}
 
 {% block layout_header_text %}{{ branch.name }}{% endblock %}
 

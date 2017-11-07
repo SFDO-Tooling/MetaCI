@@ -21,7 +21,7 @@
       <tbody>
 {% for repo in repos %}
         <tr>
-          <td><a href="/repo/{{ repo.owner }}/{{ repo.name }}">{{ repo.title }}</a></td>
+          <td><a href="/repos/{{ repo.owner }}/{{ repo.name }}">{{ repo.title }}</a></td>
           <td>{{ repo.build_count }}</td>
         {% for column in repo.columns %}
           <td>

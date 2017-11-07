@@ -36,7 +36,7 @@ urlpatterns = [
     url(r'^plans/', include('metaci.plan.urls')),
     url(r'^orgs/', include('metaci.cumulusci.urls')),
     url(r'^hirefire/', include('metaci.hirefire.urls')),
-    url(r'^repo/', include('metaci.repository.urls')),
+    url(r'^repos/', include('metaci.repository.urls')),
     url(r'^webhook/github/push$', github_push_webhook, name="github_push_webhook"),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
