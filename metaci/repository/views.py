@@ -39,7 +39,7 @@ def repo_list(request, owner=None):
             if plan.name not in columns:
                 columns.append(plan.name)
             builds = []
-            latest_builds = plan.builds.order_by('-time_queue')
+            latest_builds = plan.builds.filter(repo=repo).order_by('-time_queue')
             if plan.dashboard == 'last':
                 builds.extend(latest_builds[:1])
             elif plan.dashboard == 'recent':
