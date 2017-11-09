@@ -1,0 +1,12 @@
+<div class="slds-button-group slds-m-top--medium" role="group">
+{% if orgs.has_previous %}
+  <a class="slds-button slds-button--neutral" href="?page={{ orgs.previous_page_number }}">
+    Previous
+  </a>
+{% endif %}
+{% if orgs.has_next %}
+  <a class="slds-button slds-button--neutral" href="?page={{ orgs.next_page_number }}">
+    Next
+  </a>
+{% endif %}
+</div>
