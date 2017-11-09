@@ -166,9 +166,9 @@ CACHES = {
 }
 
 
-# Sentry Configuration
-SENTRY_DSN = env('DJANGO_SENTRY_DSN', default=None)
-SENTRY_CLIENT = env('DJANGO_SENTRY_CLIENT', default='raven.contrib.django.raven_compat.DjangoClient')
+# Logging configuration, heroku logfmt
+# 12FA logs to stdout only.
+# request_id injected into logstream for all lines
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -183,7 +183,7 @@ LOGGING = {
     },
     'formatters': {
         'standard': {
-            'format': '%(levelname)-8s [%(asctime)s] [%(request_id)s] %(name)s: %(message)s'
+            'format': 'at=%(levelname)-8s request_id=%(request_id)s module=%(name)s %(message)s'
         },
     },
     'handlers': {
@@ -217,6 +217,10 @@ LOGGING = {
         },
     },
 }
+
+# Sentry Configuration
+SENTRY_DSN = env('DJANGO_SENTRY_DSN', default=None)
+SENTRY_CLIENT = env('DJANGO_SENTRY_CLIENT', default='raven.contrib.django.raven_compat.DjangoClient')
 
 RAVEN_CONFIG = {}
 if SENTRY_DSN:
