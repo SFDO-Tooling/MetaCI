@@ -1,11 +1,17 @@
 <div class="slds-button-group slds-m-top--medium" role="group">
 {% if orgs.has_previous %}
-  <a class="slds-button slds-button--neutral" href="?page={{ orgs.previous_page_number }}">
+  <a
+    class="slds-button slds-button--neutral"
+    href="?page={{ orgs.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+  >
     Previous
   </a>
 {% endif %}
 {% if orgs.has_next %}
-  <a class="slds-button slds-button--neutral" href="?page={{ orgs.next_page_number }}">
+  <a
+    class="slds-button slds-button--neutral"
+    href="?page={{ orgs.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+  >
     Next
   </a>
 {% endif %}
