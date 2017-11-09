@@ -127,7 +127,15 @@ def org_instance_detail(request, org_id, instance_id):
 
 @staff_member_required
 def org_list(request):
-    orgs = Org.objects.all().order_by('id')
+    query = {}
+    repo = request.GET.get('repo')
+    if repo:
+        query['repo__name'] = repo
+    scratch = request.GET.get('scratch')
+    if scratch:
+        query['scratch'] = scratch
+    orgs = Org.objects.filter(**query)
+    orgs = orgs.order_by('id')
     orgs = paginate(orgs, request)
     context = {'orgs': orgs}
     return render(request, 'cumulusci/org_list.html', context=context)
