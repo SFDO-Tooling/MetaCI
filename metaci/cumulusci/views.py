@@ -123,3 +123,9 @@ def org_instance_detail(request, org_id, instance_id):
         'instance': instance,
     }
     return render(request, 'cumulusci/org_instance_detail.html', context=context)
+
+@staff_member_required
+def org_list(request):
+    orgs = Org.objects.all().order_by('id')
+    context = {'orgs': orgs}
+    return render(request, 'cumulusci/org_list.html', context=context)
