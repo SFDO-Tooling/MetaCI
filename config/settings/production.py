@@ -215,6 +215,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        "rq.worker": {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        }
     },
 }
 
