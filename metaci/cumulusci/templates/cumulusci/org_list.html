@@ -1,0 +1,33 @@
+{% extends 'layout_full.html' %}
+
+{% block layout_parent_link %}{% endblock %}
+{% block layout_header_text %}Orgs{% endblock %}
+
+{% block layout_body %}
+
+<div class="slds-box">
+  <div class="slds-box--body">
+    <table class="slds-table">
+      <thead class="slds-text-title--caps">
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Scratch</th>
+          <th>Repo</th>
+        </tr>
+      </thead>
+      <tbody>
+{% for org in orgs %}
+        <tr>
+          <td><a href="/orgs/{{ org.id }}">{{ org.id }}</a></td>
+          <td>{{ org.name }}</td>
+          <td>{{ org.scratch }}</td>
+          <td>{{ org.repo }}</td>
+        </tr>
+{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>  
+{% include 'cumulusci/org_pagination.html' %}
+{% endblock %}

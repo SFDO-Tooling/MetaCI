@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
+from metaci.build.utils import paginate
 from metaci.build.utils import view_queryset
 from metaci.cumulusci.forms import OrgLockForm
 from metaci.cumulusci.forms import OrgUnlockForm
@@ -123,3 +124,18 @@ def org_instance_detail(request, org_id, instance_id):
         'instance': instance,
     }
     return render(request, 'cumulusci/org_instance_detail.html', context=context)
+
+@staff_member_required
+def org_list(request):
+    query = {}
+    repo = request.GET.get('repo')
+    if repo:
+        query['repo__name'] = repo
+    scratch = request.GET.get('scratch')
+    if scratch:
+        query['scratch'] = scratch
+    orgs = Org.objects.filter(**query)
+    orgs = orgs.order_by('id')
+    orgs = paginate(orgs, request)
+    context = {'orgs': orgs}
+    return render(request, 'cumulusci/org_list.html', context=context)

@@ -39,4 +39,9 @@ urlpatterns = [
         views.org_instance_detail,
         name='org_instance_detail',
     ),
+    url(
+        r'^$',
+        views.org_list,
+        name='org_list',
+    ),
 ]
