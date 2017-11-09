@@ -70,6 +70,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = (
+    'log_request_id.middleware.RequestIDMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -309,3 +310,9 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAdminUser',
     ),
 }
+
+# log_request_id settings
+LOG_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID'
+LOG_REQUESTS = True
+GENERATE_REQUEST_ID_IF_NOT_IN_HEADER = True
+REQUEST_ID_RESPONSE_HEADER = "X-Request-ID"

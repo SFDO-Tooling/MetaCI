@@ -176,17 +176,22 @@ LOGGING = {
         'level': 'WARNING',
         'handlers': [],
     },
+    'filters': {
+        'request_id': {
+            '()': 'log_request_id.filters.RequestIDFilter'
+        }
+    },
     'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d %(message)s'
+        'standard': {
+            'format': '%(levelname)-8s [%(asctime)s] [%(request_id)s] %(name)s: %(message)s'
         },
     },
     'handlers': {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
+            'filters': ['request_id'],
+            'formatter': 'standard'
         }
     },
     'loggers': {
@@ -205,8 +210,14 @@ LOGGING = {
             'handlers': ['console',],
             'propagate': False,
         },
+        'log_request_id.middleware': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
     },
 }
+
 RAVEN_CONFIG = {}
 if SENTRY_DSN:
     RAVEN_CONFIG['DSN'] = SENTRY_DSN
