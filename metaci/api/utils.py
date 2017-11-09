@@ -1,7 +1,6 @@
 import re
 from rest_framework.generics import get_object_or_404
 
-
 class PkOrSlugMixin(object):
     """
     ViewSet Mixin that supports looking up an object by primary key
