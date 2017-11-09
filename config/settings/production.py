@@ -182,36 +182,45 @@ LOGGING = {
         }
     },
     'formatters': {
-        'standard': {
+        'logfmt': {
             'format': 'at=%(levelname)-8s request_id=%(request_id)s module=%(name)s %(message)s'
+        },
+        'simple': {
+            'format': 'at=%(levelname)-8s module=%(name)s msg=%(message)s'
         },
     },
     'handlers': {
+        'console_w_req': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'filters': ['request_id'],
+            'formatter': 'logfmt'
+        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'filters': ['request_id'],
-            'formatter': 'standard'
+            'formatter': 'simple'
         }
     },
     'loggers': {
         'django.db.backends': {
             'level': 'ERROR',
-            'handlers': ['console'],
+            'handlers': ['console_w_req'],
             'propagate': False,
         },
         'raven': {
             'level': 'DEBUG',
-            'handlers': ['console'],
+            'handlers': ['console_w_req'],
             'propagate': False,
         },
         'django.security.DisallowedHost': {
             'level': 'ERROR',
-            'handlers': ['console',],
+            'handlers': ['console_w_req',],
             'propagate': False,
         },
         'log_request_id.middleware': {
-            'handlers': ['console'],
+            'handlers': ['console_w_req'],
             'level': 'DEBUG',
             'propagate': False,
         },
