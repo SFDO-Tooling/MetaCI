@@ -166,9 +166,9 @@ CACHES = {
 }
 
 
-# Sentry Configuration
-SENTRY_DSN = env('DJANGO_SENTRY_DSN', default=None)
-SENTRY_CLIENT = env('DJANGO_SENTRY_CLIENT', default='raven.contrib.django.raven_compat.DjangoClient')
+# Logging configuration, heroku logfmt
+# 12FA logs to stdout only.
+# request_id injected into logstream for all lines
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -176,37 +176,66 @@ LOGGING = {
         'level': 'WARNING',
         'handlers': [],
     },
+    'filters': {
+        'request_id': {
+            '()': 'log_request_id.filters.RequestIDFilter'
+        }
+    },
     'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d %(message)s'
+        'logfmt': {
+            'format': 'at=%(levelname)-8s request_id=%(request_id)s module=%(name)s %(message)s'
+        },
+        'simple': {
+            'format': 'at=%(levelname)-8s module=%(name)s msg=%(message)s'
         },
     },
     'handlers': {
+        'console_w_req': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'filters': ['request_id'],
+            'formatter': 'logfmt'
+        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
+            'filters': ['request_id'],
+            'formatter': 'simple'
         }
     },
     'loggers': {
         'django.db.backends': {
             'level': 'ERROR',
-            'handlers': ['console'],
+            'handlers': ['console_w_req'],
             'propagate': False,
         },
         'raven': {
             'level': 'DEBUG',
-            'handlers': ['console'],
+            'handlers': ['console_w_req'],
             'propagate': False,
         },
         'django.security.DisallowedHost': {
             'level': 'ERROR',
-            'handlers': ['console',],
+            'handlers': ['console_w_req',],
             'propagate': False,
         },
+        'log_request_id.middleware': {
+            'handlers': ['console_w_req'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        "rq.worker": {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        }
     },
 }
+
+# Sentry Configuration
+SENTRY_DSN = env('DJANGO_SENTRY_DSN', default=None)
+SENTRY_CLIENT = env('DJANGO_SENTRY_CLIENT', default='raven.contrib.django.raven_compat.DjangoClient')
+
 RAVEN_CONFIG = {}
 if SENTRY_DSN:
     RAVEN_CONFIG['DSN'] = SENTRY_DSN
