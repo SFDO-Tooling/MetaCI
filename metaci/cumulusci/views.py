@@ -137,7 +137,10 @@ def org_list(request):
     org_type = request.GET.get('org_type')
     if org_type:
         query['org_type'] = org_type
-    orgs = Org.ci_orgs.filter(**query)
+    supertype = request.GET.get('supertype')
+    if supertype:
+        query['supertype'] = supertype
+    orgs = Org.objects.filter(**query)
     orgs = orgs.order_by('id')
     orgs = paginate(orgs, request)
     context = {'orgs': orgs}

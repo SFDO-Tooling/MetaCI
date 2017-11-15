@@ -14,6 +14,8 @@
           <th>Name</th>
           <th>Type</th>
           <th>Repo</th>
+          <th>Description</th>
+          <th>Release Cycle</th>
         </tr>
       </thead>
       <tbody>
@@ -23,6 +25,8 @@
           <td>{{ org.name }}</td>
           <td>{{ org.get_org_type_display }}</td>
           <td>{{ org.repo }}</td>
+          <td>{{ org.description }}</td>
+          <td>{{ org.release_cycle|default:'CI' }}</td>
         </tr>
 {% endfor %}
       </tbody>
