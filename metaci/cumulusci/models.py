@@ -22,12 +22,13 @@ class Org(models.Model):
     repo = models.ForeignKey('repository.Repository', related_name='orgs')
 
     # orgmart attributes
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name='registered_orgs',
-        null=True
+        null=True,
+        blank=True
     )
     supertype = models.CharField(
         max_length=50,
@@ -39,7 +40,7 @@ class Org(models.Model):
         choices=choices.ORGTYPE_CHOICES,
         default=choices.ORGTYPE_PRODUCTION
     )
-    last_deploy = models.DateTimeField(null=True)
+    last_deploy = models.DateTimeField(null=True, blank=True)
     last_deploy_version = models.CharField(max_length=255, null=True, blank=True)
     release_cycle = models.CharField(
         max_length=50,

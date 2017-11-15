@@ -5,8 +5,8 @@ from metaci.cumulusci.models import Service
 
 
 class OrgAdmin(admin.ModelAdmin):
-    list_display = ('name', 'repo', 'scratch')
-    list_filter = ('name', 'scratch', 'repo')
+    list_display = ('name', 'repo', 'scratch', 'supertype', 'org_type')
+    list_filter = ('name', 'scratch', 'repo', 'supertype', 'org_type')
 admin.site.register(Org, OrgAdmin)
 
 
