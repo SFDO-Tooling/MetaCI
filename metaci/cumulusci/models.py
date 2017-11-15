@@ -12,6 +12,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 
+from model_utils.managers import QueryManager
+
 import choices
 
 
@@ -48,6 +50,10 @@ class Org(models.Model):
         null=True,
         blank=True
     )
+
+    objects = models.Manager()
+    ci_orgs = QueryManager(supertype=choices.SUPERTYPE_CI)
+    registered_orgs = QueryManager(supertype=choices.SUPERTYPE_REGISTERED)
 
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']
