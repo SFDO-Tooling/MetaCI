@@ -9,13 +9,14 @@ from metaci.cumulusci import choices
 
 def classify_orgs(apps, schema_editor):
     # use order of ops in place of logic...
-    beta_orgs = Org.objects.filter(name__contains='beta')
+    orgs = Org.objects.all()
+    beta_orgs = orgs.filter(name__contains='beta')
     beta_orgs.update(org_type=choices.ORGTYPE_BETA)
-    unmanaged_orgs = Org.objects.filter(name__contains='unmanaged')
+    unmanaged_orgs = orgs.filter(name__contains='unmanaged')
     unmanaged_orgs.update(org_type=choices.ORGTYPE_UNMANAGED)
-    packaging_orgs = Org.objects.filter(name__contains='packaging')
+    packaging_orgs = orgs.filter(name__contains='packaging')
     packaging_orgs.update(org_type=choices.ORGTYPE_PACKAGING)
-    scratch_orgs = Org.objects.filter(scratch=True)
+    scratch_orgs = orgs.filter(scratch=True)
     scratch_orgs.update(org_type=choices.ORGTYPE_SCRATCH)
 
 

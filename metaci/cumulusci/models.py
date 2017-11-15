@@ -22,6 +22,7 @@ class Org(models.Model):
     json = models.TextField()
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey('repository.Repository', related_name='orgs')
+    org_id = models.CharField(max_length=18)
 
     # orgmart attributes
     description = models.TextField(null=True, blank=True)
