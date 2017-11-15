@@ -2,7 +2,7 @@ from django.conf.urls import url
 from metaci.api.views.build import BuildViewSet
 from metaci.api.views.build import BuildFlowViewSet
 from metaci.api.views.build import RebuildViewSet
-from metaci.api.views.cumulusci import OrgViewSet, RegisteredOrgViewSet, UserViewSet
+from metaci.api.views.cumulusci import OrgViewSet, RegisteredOrgViewSet
 from metaci.api.views.cumulusci import ScratchOrgInstanceViewSet
 from metaci.api.views.cumulusci import ServiceViewSet
 from metaci.api.views.plan import PlanViewSet
