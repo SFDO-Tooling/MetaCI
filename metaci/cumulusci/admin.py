@@ -10,7 +10,7 @@ class OrgAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            None, {'fields':('name','repo','supertype','org_type','last_deploy','last_deploy_version')}
+            None, {'fields':('name','repo','supertype','org_type', 'org_id', 'last_deploy','last_deploy_version')}
         ),
         (
             'DX/CCI Config', {'fields': ('json','scratch')}

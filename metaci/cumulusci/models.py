@@ -11,6 +11,7 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from model_utils.managers import QueryManager
 
@@ -22,7 +23,7 @@ class Org(models.Model):
     json = models.TextField()
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey('repository.Repository', related_name='orgs')
-    org_id = models.CharField(max_length=18)
+    org_id = models.CharField(max_length=18, blank=True, null=True)
 
     # orgmart attributes
     description = models.TextField(null=True, blank=True)
@@ -87,6 +88,11 @@ class Org(models.Model):
     def unlock(self):
         if not self.scratch:
             cache.delete(self.lock_id)
+
+    def clean(self):
+        super(Org, self).clean()
+        if not self.scratch and not self.org_id:
+            raise ValidationError('Org ID is required for non-scratch orgs.')
 
 
 class ScratchOrgInstance(models.Model):
