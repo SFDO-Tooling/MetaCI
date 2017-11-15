@@ -8,8 +8,11 @@ from cumulusci.core.config import OrgConfig
 from cumulusci.core.exceptions import ScratchOrgException
 from django.core.cache import cache
 from django.db import models
+from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
+
+import choices
 
 
 class Org(models.Model):
@@ -17,6 +20,33 @@ class Org(models.Model):
     json = models.TextField()
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey('repository.Repository', related_name='orgs')
+
+    # orgmart attributes
+    description = models.TextField(null=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='registered_orgs',
+        null=True
+    )
+    supertype = models.CharField(
+        max_length=50,
+        choices=choices.SUPERTYPE_CHOICES,
+        default=choices.SUPERTYPE_CI
+    )
+    org_type = models.CharField(
+        max_length=50,
+        choices=choices.ORGTYPE_CHOICES,
+        default=choices.ORGTYPE_PRODUCTION
+    )
+    last_deploy = models.DateTimeField(null=True)
+    last_deploy_version = models.CharField(max_length=255, null=True, blank=True)
+    release_cycle = models.CharField(
+        max_length=50,
+        choices=choices.RELEASE_CHOICES,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']
