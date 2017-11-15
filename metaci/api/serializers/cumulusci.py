@@ -26,7 +26,7 @@ class OrgSerializer(serializers.HyperlinkedModelSerializer):
 class ScratchOrgInstanceSerializer(serializers.HyperlinkedModelSerializer):
     org = OrgSerializer(read_only=True)
     org_id = serializers.PrimaryKeyRelatedField(
-        queryset=Org.objects.all(),
+        queryset=Org.ci_orgs.all(),
         source='org',
         write_only=True
     )

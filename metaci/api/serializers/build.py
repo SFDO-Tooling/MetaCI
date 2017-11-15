@@ -66,7 +66,7 @@ class BuildSerializer(serializers.HyperlinkedModelSerializer):
     flows = BuildFlowRelatedSerializer(many=True, read_only=True)
     org = OrgSerializer(read_only=True)
     org_id = serializers.PrimaryKeyRelatedField(
-        queryset=Org.objects.all(),
+        queryset=Org.ci_orgs.all(),
         source='org',
         write_only=True
     )

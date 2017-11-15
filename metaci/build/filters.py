@@ -22,7 +22,7 @@ class BuildRelatedFilter(filters.FilterSet):
     org = filters.RelatedFilter(
         OrgRelatedFilter,
         name='org',
-        queryset=Org.objects.all()
+        queryset=Org.ci_orgs.all()
     )
     plan = filters.RelatedFilter(
         PlanRelatedFilter,

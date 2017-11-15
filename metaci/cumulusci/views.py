@@ -134,7 +134,7 @@ def org_list(request):
     scratch = request.GET.get('scratch')
     if scratch:
         query['scratch'] = scratch
-    orgs = Org.objects.filter(**query)
+    orgs = Org.ci_orgs.filter(**query)
     orgs = orgs.order_by('id')
     orgs = paginate(orgs, request)
     context = {'orgs': orgs}

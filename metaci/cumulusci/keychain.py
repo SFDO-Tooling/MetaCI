@@ -54,7 +54,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         service.save()
 
     def list_orgs(self):
-        orgs = Org.objects.filter(
+        orgs = Org.ci_orgs.filter(
             repo = self.build.repo,
         ).order_by('name').values_list('name', flat=True)
         return orgs
@@ -66,7 +66,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         raise NotImplementedError('set_default_org is not supported in this keychain')
 
     def get_org(self, org_name):
-        org = Org.objects.get(repo=self.build.repo, name=org_name)
+        org = Org.ci_orgs.get(repo=self.build.repo, name=org_name)
         org_config = json.loads(org.json)
 
         if org.scratch:
@@ -120,7 +120,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
 
     def set_org(self, org_name, org_config):
         try:
-            org = Org.objects.get(repo=self.build.repo, name=org_name)
+            org = Org.ci_orgs.get(repo=self.build.repo, name=org_name)
             org.json = json.dumps(org_config.config)
         except Org.DoesNotExist:
             org = Org(

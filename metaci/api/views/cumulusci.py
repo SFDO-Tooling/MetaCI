@@ -14,7 +14,7 @@ class OrgViewSet(viewsets.ModelViewSet):
     A viewset for viewing and editing Orgs
     """
     serializer_class = OrgSerializer
-    queryset = Org.objects.all()
+    queryset = Org.ci_orgs.all()
     filter_class = OrgFilter
 
 class ScratchOrgInstanceViewSet(viewsets.ModelViewSet):
