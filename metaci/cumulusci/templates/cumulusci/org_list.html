@@ -12,7 +12,7 @@
         <tr>
           <th>ID</th>
           <th>Name</th>
-          <th>Scratch</th>
+          <th>Type</th>
           <th>Repo</th>
         </tr>
       </thead>
@@ -21,7 +21,7 @@
         <tr>
           <td><a href="/orgs/{{ org.id }}">{{ org.id }}</a></td>
           <td>{{ org.name }}</td>
-          <td>{{ org.scratch }}</td>
+          <td>{{ org.get_org_type_display }}</td>
           <td>{{ org.repo }}</td>
         </tr>
 {% endfor %}

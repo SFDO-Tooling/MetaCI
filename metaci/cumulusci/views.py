@@ -134,6 +134,9 @@ def org_list(request):
     scratch = request.GET.get('scratch')
     if scratch:
         query['scratch'] = scratch
+    org_type = request.GET.get('org_type')
+    if org_type:
+        query['org_type'] = org_type
     orgs = Org.ci_orgs.filter(**query)
     orgs = orgs.order_by('id')
     orgs = paginate(orgs, request)
