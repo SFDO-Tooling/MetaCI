@@ -26,7 +26,7 @@
           <td><a href="/orgs/{{ org.id }}">{{ org.name }}</a></td>
           <td>{{ org.get_org_type_display }}</td>
           <td>{{ org.repo }}</td>
-          <td>{{ org.org_id|default:'scratch def' }}</td>
+          <td>{{ org.org_id|default:"" }}</td>
           <td>{{ org.description }}</td>
           <td>{{ org.release_cycle|default:'CI' }}</td>
         </tr>
