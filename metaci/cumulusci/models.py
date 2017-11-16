@@ -56,6 +56,7 @@ class Org(models.Model):
 
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']
+        unique_together = ('repo', 'name')
 
     def __unicode__(self):
         return '{}: {}'.format(self.repo.name, self.name)

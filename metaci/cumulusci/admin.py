@@ -19,7 +19,7 @@ class OrgAdmin(admin.ModelAdmin):
             'DX/CCI Config', {'fields': ('json',)}
         ),
         (
-            'Registered Org Config', {'fields':('owner','release_cycle')}
+            'Registered Org Config', {'fields':('owner','push_schedule')}
         )
     )
 admin.site.register(Org, OrgAdmin)
