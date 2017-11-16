@@ -50,13 +50,14 @@ class Org(models.Model):
         blank=True
     )
 
-    objects = models.Manager()
-    ci_orgs = QueryManager(supertype=choices.SUPERTYPE_CI)
-    registered_orgs = QueryManager(supertype=choices.SUPERTYPE_REGISTERED)
-
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']
         unique_together = ('repo', 'name')
+
+    objects = models.Manager() # first manager declared on model is the one used by admin etc...
+    ci_orgs = QueryManager(supertype=choices.SUPERTYPE_CI)
+    registered_orgs = QueryManager(supertype=choices.SUPERTYPE_REGISTERED)
+
 
     def __unicode__(self):
         return '{}: {}'.format(self.repo.name, self.name)
