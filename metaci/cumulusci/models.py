@@ -21,11 +21,10 @@ import choices
 class Org(models.Model):
     name = models.CharField(max_length=255)
     json = models.TextField()
-    scratch = models.BooleanField(default=False)
+
     repo = models.ForeignKey('repository.Repository', related_name='orgs')
     org_id = models.CharField(max_length=18, blank=True, null=True)
 
-    # orgmart attributes
     description = models.TextField(null=True, blank=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -44,11 +43,9 @@ class Org(models.Model):
         choices=choices.ORGTYPE_CHOICES,
         default=choices.ORGTYPE_PRODUCTION
     )
-    last_deploy = models.DateTimeField(null=True, blank=True)
-    last_deploy_version = models.CharField(max_length=255, null=True, blank=True)
-    release_cycle = models.CharField(
+    push_schedule = models.CharField(
         max_length=50,
-        choices=choices.RELEASE_CHOICES,
+        choices=choices.PUSHSCHEDULE_CHOICES,
         null=True,
         blank=True
     )
@@ -67,9 +64,16 @@ class Org(models.Model):
         return reverse('org_detail', kwargs={'org_id': self.id})
 
     def get_org_config(self):
+        if self.supertype is not choices.SUPERTYPE_CI:
+            raise RuntimeError('Org is not a CI org and does not have an OrgConfig.')
+
         org_config = json.loads(self.json)
 
         return OrgConfig(org_config)
+
+    @property
+    def scratch(self):
+        return self.org_type == choices.ORGTYPE_SCRATCH
 
     @property
     def lock_id(self):
@@ -90,9 +94,25 @@ class Org(models.Model):
             cache.delete(self.lock_id)
 
     def clean(self):
-        super(Org, self).clean()
+        errors = {}
         if not self.scratch and not self.org_id:
-            raise ValidationError('Org ID is required for non-scratch orgs.')
+            errors['org_id'] = 'Org ID is required for non-scratch orgs.'
+
+        if self.supertype == choices.SUPERTYPE_CI:
+            try:
+                obj = json.loads(self.json)
+            except (TypeError, ValueError), e:
+                errors['json'] = 'OrgConfig invalid: {}'.format(e)
+                raise ValidationError(errors) #exit fast if its bad JSON.
+
+            if self.scratch and 'config_file' not in obj:
+                errors['json'] = 'Scratch org JSON must contain a config_file.' 
+
+            if not self.scratch and 'id' not in obj:
+                errors['json'] = 'Persistent org expected to have an id in its JSON!'
+        
+        if errors: 
+            raise ValidationError(errors)
 
 
 class ScratchOrgInstance(models.Model):

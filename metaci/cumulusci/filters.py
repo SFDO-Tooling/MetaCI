@@ -16,7 +16,6 @@ class OrgRelatedFilter(filters.FilterSet):
         fields = {
             'json': ['icontains'],
             'name': ['exact'],
-            'scratch': ['exact'],
             'org_type': ['exact'],
             'org_id': ['iexact']
         }
@@ -31,7 +30,7 @@ class RegisteredOrgFilter(OrgRelatedFilter):
             'name': ['exact'],
             'org_type': ['exact'],
             'org_id': ['iexact'],
-            'release_cycle': ['exact'],
+            'push_schedule': ['exact'],
         } 
 
 class ScratchOrgInstanceRelatedFilter(filters.FilterSet):

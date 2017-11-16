@@ -10,6 +10,8 @@ ORGTYPE_PACKAGING = 'PACKAGING'
 ORGTYPE_UNMANAGED = 'UNMANAGED'
 ORGTYPE_BETA = 'BETA'
 ORGTYPE_PRODUCTION = 'PRODUCTION'
+ORGTYPE_TRIAL = 'TRIAL'
+ORGTYPE_ADMIN = 'ADMIN'
 
 ORGTYPE_CHOICES = (
     (ORGTYPE_SCRATCH, 'Scratch Org Definition'),
@@ -17,14 +19,12 @@ ORGTYPE_CHOICES = (
     (ORGTYPE_UNMANAGED, 'Persistent Test Org (Unmanaged)'),
     (ORGTYPE_BETA, 'Persistent Test Org (Beta Package)'),
     (ORGTYPE_PRODUCTION, 'Persistent Test Org (Production Package)'),
+    (ORGTYPE_TRIAL, 'Trial Source Org (Production Package'),
+    (ORGTYPE_ADMIN, 'Administrative Org (no package)'),
 )
 
-RELEASE_QA = 'QA'
-RELEASE_SANDBOX = 'SANDBOX'
-RELEASE_PRODUCTION = 'PRODUCTION'
+PUSHSCHEDULE_QA = 'QA'
 
-RELEASE_CHOICES = (
-    (RELEASE_QA, 'QA Orgs'),
-    (RELEASE_SANDBOX, 'Sandboxes'),
-    (RELEASE_PRODUCTION, 'Production and Developer Orgs')
+PUSHSCHEDULE_CHOICES = (
+    (PUSHSCHEDULE_QA, 'QA Orgs'),
 )
