@@ -13,6 +13,9 @@ class OrgAdmin(admin.ModelAdmin):
             None, {'fields':('name','repo','supertype','org_type', 'org_id', 'last_deploy','last_deploy_version')}
         ),
         (
+            'Description', {'fields':('description',),}
+        ),
+        (
             'DX/CCI Config', {'fields': ('json','scratch')}
         ),
         (

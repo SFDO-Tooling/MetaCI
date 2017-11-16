@@ -23,7 +23,7 @@
 {% for org in orgs %}
         <tr>
           <td><a href="/orgs/{{ org.id }}">{{ org.id }}</a></td>
-          <td>{{ org.name }}</td>
+          <td><a href="/orgs/{{ org.id }}">{{ org.name }}</a></td>
           <td>{{ org.get_org_type_display }}</td>
           <td>{{ org.repo }}</td>
           <td>{{ org.org_id|default:'scratch def' }}</td>
