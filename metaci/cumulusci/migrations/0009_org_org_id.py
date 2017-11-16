@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='org',
             name='org_id',
-            field=models.CharField(default='00D000000000062', max_length=18),
+            field=models.CharField(blank=True, max_length=18, null=True),
             preserve_default=False,
         ),
         migrations.RunPython(find_org_id)
