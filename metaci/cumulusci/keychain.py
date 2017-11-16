@@ -6,6 +6,7 @@ from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import ServiceConfig
 from cumulusci.core.exceptions import ServiceNotConfigured
 from django.conf import settings
+from metaci.cumulusci import choices
 from metaci.cumulusci.logger import init_logger
 from metaci.cumulusci.models import Org
 from metaci.cumulusci.models import ScratchOrgInstance
@@ -54,7 +55,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         service.save()
 
     def list_orgs(self):
-        orgs = Org.objects.filter(
+        orgs = Org.ci_orgs.filter(
             repo = self.build.repo,
         ).order_by('name').values_list('name', flat=True)
         return orgs
@@ -66,13 +67,14 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         raise NotImplementedError('set_default_org is not supported in this keychain')
 
     def get_org(self, org_name):
-        org = Org.objects.get(repo=self.build.repo, name=org_name)
-        org_config = json.loads(org.json)
+        org = Org.ci_orgs.get(repo=self.build.repo, name=org_name)
+        json_org_config = json.loads(org.json)
 
         if org.scratch:
-            config = ScratchOrgConfig(org_config)
+            config = ScratchOrgConfig(json_org_config)
         else:
-            config = OrgConfig(org_config)
+            # if its a persistent org, use the org model method cause it works
+            config = org.get_org_config()
 
         # Attach the org model instance to the org config
         config.org = org
@@ -119,15 +121,22 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         return org_config
 
     def set_org(self, org_name, org_config):
+        # this method currently has no callers and if we ever seriously use it
+        # it should go through a model method. TODO refactor
         try:
-            org = Org.objects.get(repo=self.build.repo, name=org_name)
+            org = Org.ci_orgs.get(repo=self.build.repo, name=org_name)
             org.json = json.dumps(org_config.config)
         except Org.DoesNotExist:
             org = Org(
                 name=org_name,
                 json=json.dumps(org_config.config),
                 repo=self.build.repo,
+                supertype = choices.SUPERTYPE_CI
             )
 
-        org.scratch = isinstance(org_config, ScratchOrgConfig)
+        if isinstance(org_config, ScratchOrgConfig):
+            org.org_type=choices.ORGTYPE_SCRATCH
+        else:
+            org.org_type=choices.ORGTYPE_UNMANAGED
+
         org.save()

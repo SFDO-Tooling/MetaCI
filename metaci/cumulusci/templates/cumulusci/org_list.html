@@ -12,17 +12,23 @@
         <tr>
           <th>ID</th>
           <th>Name</th>
-          <th>Scratch</th>
+          <th>Type</th>
           <th>Repo</th>
+          <th>Org ID</th>
+          <th>Description</th>
+          <th>Release Cycle</th>
         </tr>
       </thead>
       <tbody>
 {% for org in orgs %}
         <tr>
           <td><a href="/orgs/{{ org.id }}">{{ org.id }}</a></td>
-          <td>{{ org.name }}</td>
-          <td>{{ org.scratch }}</td>
+          <td><a href="/orgs/{{ org.id }}">{{ org.name }}</a></td>
+          <td>{{ org.get_org_type_display }}</td>
           <td>{{ org.repo }}</td>
+          <td>{{ org.org_id|default:"" }}</td>
+          <td>{{ org.description }}</td>
+          <td>{{ org.release_cycle|default:'CI' }}</td>
         </tr>
 {% endfor %}
       </tbody>

@@ -16,11 +16,22 @@ class OrgRelatedFilter(filters.FilterSet):
         fields = {
             'json': ['icontains'],
             'name': ['exact'],
-            'scratch': ['exact'],
+            'org_type': ['exact'],
+            'org_id': ['iexact']
         }
 
 class OrgFilter(OrgRelatedFilter):
     pass
+
+class RegisteredOrgFilter(OrgRelatedFilter):
+    class Meta:
+        model = Org
+        fields = {
+            'name': ['exact'],
+            'org_type': ['exact'],
+            'org_id': ['iexact'],
+            'push_schedule': ['exact'],
+        } 
 
 class ScratchOrgInstanceRelatedFilter(filters.FilterSet):
     org = filters.RelatedFilter(

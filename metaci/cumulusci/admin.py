@@ -5,8 +5,23 @@ from metaci.cumulusci.models import Service
 
 
 class OrgAdmin(admin.ModelAdmin):
-    list_display = ('name', 'repo', 'scratch')
-    list_filter = ('name', 'scratch', 'repo')
+    list_display = ('name', 'repo', 'supertype', 'org_type')
+    list_filter = ('name', 'repo', 'supertype', 'org_type')
+
+    fieldsets = (
+        (
+            None, {'fields':('name','repo','supertype','org_type', 'org_id',)}
+        ),
+        (
+            'Description', {'fields':('description',),}
+        ),
+        (
+            'DX/CCI Config', {'fields': ('json',)}
+        ),
+        (
+            'Registered Org Config', {'fields':('owner','push_schedule')}
+        )
+    )
 admin.site.register(Org, OrgAdmin)
 
 

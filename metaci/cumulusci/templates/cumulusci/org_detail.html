@@ -8,18 +8,20 @@
   <ul class="slds-grid slds-page-header__detail-row">
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org Type">Org Type</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ org.scratch }}">
-      {% if org.scratch %}
-        <div class="slds-truncate slds-badge slds-theme--info" title="Scratch Config">Scratch Config</div>
-      {% else %}
-        <div class="slds-truncate slds-badge slds-theme--info" title="Persistent">Persistent Org</div>
-      {% endif %}
+      <p class="slds-text-body--regular slds-truncate" title="{{org.org_type}}">
+        <div class="slds-truncate slds-badge slds-theme--info" title="{{org.org_type}}">{{org.org_type}}</div>
       </p>
     </li>
     <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org Type">Repository</p>
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repository">Repository</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ org.repo }}">
         <a href="{{ org.repo.get_absolute_url }}">{{ org.repo }}</a>
+      </p>
+    </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org Type">Org ID</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ org.org_id }}">
+        <div class="slds-truncate slds-badge slds-theme--info" style="text-transform: initial;" title="{{org.org_id}}">{{org.org_id}}</div>
       </p>
     </li>
   </ul>

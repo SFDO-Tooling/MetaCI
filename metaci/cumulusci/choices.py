@@ -1,0 +1,30 @@
+SUPERTYPE_REGISTERED = 'REGISTERED'
+SUPERTYPE_CI = 'CI'
+SUPERTYPE_CHOICES = (
+    (SUPERTYPE_CI,'CI Test Org'),
+    (SUPERTYPE_REGISTERED, 'Registered Org')
+)
+
+ORGTYPE_SCRATCH = 'SCRATCH'
+ORGTYPE_PACKAGING = 'PACKAGING'
+ORGTYPE_UNMANAGED = 'UNMANAGED'
+ORGTYPE_BETA = 'BETA'
+ORGTYPE_PRODUCTION = 'PRODUCTION'
+ORGTYPE_TRIAL = 'TRIAL'
+ORGTYPE_ADMIN = 'ADMIN'
+
+ORGTYPE_CHOICES = (
+    (ORGTYPE_SCRATCH, 'Scratch Org Definition'),
+    (ORGTYPE_PACKAGING, 'Packaging Org'),
+    (ORGTYPE_UNMANAGED, 'Persistent Test Org (Unmanaged)'),
+    (ORGTYPE_BETA, 'Persistent Test Org (Beta Package)'),
+    (ORGTYPE_PRODUCTION, 'Persistent Test Org (Production Package)'),
+    (ORGTYPE_TRIAL, 'Trial Source Org (Production Package'),
+    (ORGTYPE_ADMIN, 'Administrative Org (no package)'),
+)
+
+PUSHSCHEDULE_QA = 'QA'
+
+PUSHSCHEDULE_CHOICES = (
+    (PUSHSCHEDULE_QA, 'QA Orgs'),
+)

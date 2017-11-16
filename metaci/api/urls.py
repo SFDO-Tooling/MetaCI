@@ -2,7 +2,7 @@ from django.conf.urls import url
 from metaci.api.views.build import BuildViewSet
 from metaci.api.views.build import BuildFlowViewSet
 from metaci.api.views.build import RebuildViewSet
-from metaci.api.views.cumulusci import OrgViewSet
+from metaci.api.views.cumulusci import OrgViewSet, RegisteredOrgViewSet
 from metaci.api.views.cumulusci import ScratchOrgInstanceViewSet
 from metaci.api.views.cumulusci import ServiceViewSet
 from metaci.api.views.plan import PlanViewSet
@@ -17,6 +17,7 @@ router.register(r'branches', BranchViewSet, base_name='branch')
 router.register(r'builds', BuildViewSet, base_name='build')
 router.register(r'build_flows', BuildFlowViewSet, base_name='build_flow')
 router.register(r'orgs', OrgViewSet, base_name='org')
+router.register(r'registered_orgs', RegisteredOrgViewSet, base_name='registered_org')
 router.register(r'plans', PlanViewSet, base_name='plan')
 router.register(r'plan_repos', PlanRepositoryViewSet, base_name='plan_repo')
 router.register(r'rebuilds', RebuildViewSet, base_name='rebuild')
