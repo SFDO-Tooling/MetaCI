@@ -10,7 +10,11 @@ def find_org_id(apps, schema_editor):
     Org = apps.get_model('cumulusci', 'Org')
     for org in Org.objects.all():
         if not org.scratch and org.json:
-            token_id = json.loads(org.json)['id']
+            try:
+                token_id = json.loads(org.json)['id']
+            except KeyError:
+                print('at=error message=badorgjson repo={} org={}'.format(org.repo, org.name))
+                continue
             org.sf_org_id = token_id.split('/')[-2]
             if len(org.sf_org_id) == 15 or len(org.sf_org_id) == 18:
                 org.save()
