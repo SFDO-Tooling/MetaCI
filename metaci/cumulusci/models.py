@@ -23,16 +23,17 @@ class Org(models.Model):
     json = models.TextField()
 
     repo = models.ForeignKey('repository.Repository', related_name='orgs')
+
     org_id = models.CharField(max_length=18, blank=True, null=True)
 
     description = models.TextField(null=True, blank=True)
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
-        related_name='registered_orgs',
-        null=True,
-        blank=True
-    )
+    #owner = models.ForeignKey(
+    #    settings.AUTH_USER_MODEL,
+    #    on_delete=models.PROTECT,
+    #    related_name='registered_orgs',
+    #    null=True,
+    #    blank=True
+    #)
     supertype = models.CharField(
         max_length=50,
         choices=choices.SUPERTYPE_CHOICES,
@@ -54,7 +55,7 @@ class Org(models.Model):
         ordering = ['name', 'repo__owner', 'repo__name']
         unique_together = ('repo', 'name')
 
-    objects = models.Manager() # first manager declared on model is the one used by admin etc...
+    objects = models.Manager() # first manager declared on model is the one used by admin etc
     ci_orgs = QueryManager(supertype=choices.SUPERTYPE_CI)
     registered_orgs = QueryManager(supertype=choices.SUPERTYPE_REGISTERED)
 
