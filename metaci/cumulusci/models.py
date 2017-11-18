@@ -27,13 +27,13 @@ class Org(models.Model):
     org_id = models.CharField(max_length=18, blank=True, null=True)
 
     description = models.TextField(null=True, blank=True)
-    #owner = models.ForeignKey(
-    #    settings.AUTH_USER_MODEL,
-    #    on_delete=models.PROTECT,
-    #    related_name='registered_orgs',
-    #    null=True,
-    #    blank=True
-    #)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='registered_orgs',
+        null=True,
+        blank=True
+    )
     supertype = models.CharField(
         max_length=50,
         choices=choices.SUPERTYPE_CHOICES,

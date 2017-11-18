@@ -39,12 +39,12 @@ class RegisteredOrgSerializer(serializers.HyperlinkedModelSerializer):
         source='repo',
         write_only=True
     )
-    #owner = UserSerializer(read_only=True)
-    #owner_id = serializers.PrimaryKeyRelatedField(
-    #    queryset=get_user_model().objects.all(),
-    #    source='owner',
-    #    write_only=True
-    #)
+    owner = UserSerializer(read_only=True)
+    owner_id = serializers.PrimaryKeyRelatedField(
+        queryset=get_user_model().objects.all(),
+        source='owner',
+        write_only=True
+    )
     class Meta:
         model = Org
         fields = (
@@ -52,7 +52,7 @@ class RegisteredOrgSerializer(serializers.HyperlinkedModelSerializer):
             'name',
             'repo', 'repo_id',
             'org_id', 'org_type', 'release_cycle',
-            'description',  #'owner', owner_id',
+            'description', 'owner', 'owner_id',
             'last_deploy', 'last_deploy_version'
         )
 

@@ -13,20 +13,11 @@ def find_org_id(apps, schema_editor):
     Org = apps.get_model('cumulusci', 'Org')
     for org in Org.objects.all():
         if not org.scratch and org.json:
-            try:
-                token_id = json.loads(org.json)['id']
-                org_id = token_id.split('/')[-2]
-                if len(org_id) == 15 or len(org_id) == 18:
-                    logline = 'updating org {} with {}' .format(org, org.org_id)
-                    print(logline)
-                    LOGGER.info(logline)
-                    org.save()
-            except:
-                logline = 'something went wrong {}'.format(org)
-                print(logline)
-                LOGGER.warn(logline)
-                continue
-
+            token_id = json.loads(org.json)['id']
+            org.org_id = token_id.split('/')[-2]
+            if len(org.org_id) == 15 or len(org.org_id) == 18:
+                org.save()
+                    
 def classify_orgs(apps, schema_editor):
     Org = apps.get_model('cumulusci', 'Org')
     orgs = Org.objects.all()
