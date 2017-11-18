@@ -14,8 +14,8 @@ def find_org_id(apps, schema_editor):
     for org in Org.objects.all():
         if not org.scratch and org.json:
             token_id = json.loads(org.json)['id']
-            org.org_id = token_id.split('/')[-2]
-            if len(org.org_id) == 15 or len(org.org_id) == 18:
+            org.sf_org_id = token_id.split('/')[-2]
+            if len(org.sf_org_id) == 15 or len(org.sf_org_id) == 18:
                 org.save()
                     
 def classify_orgs(apps, schema_editor):

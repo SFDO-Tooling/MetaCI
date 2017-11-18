@@ -132,9 +132,6 @@ def org_list(request):
     repo = request.GET.get('repo')
     if repo:
         query['repo__name'] = repo
-    scratch = request.GET.get('scratch')
-    if scratch:
-        query['scratch'] = scratch
     org_type = request.GET.get('org_type')
     if org_type:
         query['org_type'] = org_type
@@ -142,6 +139,8 @@ def org_list(request):
     if supertype:
         query['supertype'] = supertype
     orgs = Org.objects.filter(**query)
+    if not request.GET.get('scratch',True) :
+        orgs = orgs.exclude(org_type=choices.ORGTYPE_SCRATCH)
     orgs = orgs.order_by('id')
     orgs = paginate(orgs, request)
     context = {'orgs': orgs}

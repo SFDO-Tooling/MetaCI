@@ -19,34 +19,38 @@ import choices
 
 
 class Org(models.Model):
+    # Identity Fields
     name = models.CharField(max_length=255)
-    json = models.TextField()
-
     repo = models.ForeignKey('repository.Repository', related_name='orgs')
 
-    org_id = models.CharField(max_length=18, blank=True, null=True)
-
-    description = models.TextField(null=True, blank=True)
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
-        related_name='registered_orgs',
-        null=True,
-        blank=True
-    )
+    # Common Attributes 
+    sf_org_id = models.CharField(max_length=18, blank=True, null=True)
     supertype = models.CharField(
         max_length=50,
         choices=choices.SUPERTYPE_CHOICES,
         default=choices.SUPERTYPE_CI
     )
+    description = models.TextField(null=True, blank=True)
     org_type = models.CharField(
         max_length=50,
         choices=choices.ORGTYPE_CHOICES,
         default=choices.ORGTYPE_PRODUCTION
     )
+
+    # CI Orgs
+    json = models.TextField()
+
+    # Registered Orgs
     push_schedule = models.CharField(
         max_length=50,
         choices=choices.PUSHSCHEDULE_CHOICES,
+        null=True,
+        blank=True
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='orgs',
         null=True,
         blank=True
     )
@@ -58,7 +62,6 @@ class Org(models.Model):
     objects = models.Manager() # first manager declared on model is the one used by admin etc
     ci_orgs = QueryManager(supertype=choices.SUPERTYPE_CI)
     registered_orgs = QueryManager(supertype=choices.SUPERTYPE_REGISTERED)
-
 
     def __unicode__(self):
         return '{}: {}'.format(self.repo.name, self.name)
@@ -98,8 +101,8 @@ class Org(models.Model):
 
     def clean(self):
         errors = {}
-        if not self.scratch and not self.org_id:
-            errors['org_id'] = 'Org ID is required for non-scratch orgs.'
+        if not self.scratch and not self.sf_org_id:
+            errors['sf_org_id'] = 'SF Org ID is required for non-scratch orgs.'
 
         if self.supertype == choices.SUPERTYPE_CI:
             try:

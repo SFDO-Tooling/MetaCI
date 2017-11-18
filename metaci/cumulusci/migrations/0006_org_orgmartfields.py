@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='org',
-            name='org_id',
+            name='sf_org_id',
             field=models.CharField(blank=True, max_length=18, null=True),
         ),
         migrations.AddField(

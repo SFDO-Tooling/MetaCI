@@ -22,9 +22,8 @@ class OrgSerializer(serializers.HyperlinkedModelSerializer):
             'name',
             'repo',
             'repo_id',
-            'scratch',
             'org_type',
-            'org_id'
+            'sf_org_id'
         )
 
 class UserSerializer(serializers.ModelSerializer):
@@ -48,12 +47,9 @@ class RegisteredOrgSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Org
         fields = (
-            'id',
-            'name',
-            'repo', 'repo_id',
-            'org_id', 'org_type', 'release_cycle',
-            'description', 'owner', 'owner_id',
-            'last_deploy', 'last_deploy_version'
+            'id', 'name', 'repo', 'repo_id',
+            'sf_org_id', 'org_type', 'push_schedule',
+            'description', 'owner', 'owner_id'
         )
 
     def save(self, *args, **kwargs):

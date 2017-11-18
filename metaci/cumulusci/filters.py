@@ -17,7 +17,7 @@ class OrgRelatedFilter(filters.FilterSet):
             'json': ['icontains'],
             'name': ['exact'],
             'org_type': ['exact'],
-            'org_id': ['iexact']
+            'sf_org_id': ['iexact']
         }
 
 class OrgFilter(OrgRelatedFilter):
@@ -29,7 +29,7 @@ class RegisteredOrgFilter(OrgRelatedFilter):
         fields = {
             'name': ['exact'],
             'org_type': ['exact'],
-            'org_id': ['iexact'],
+            'sf_org_id': ['iexact'],
             'push_schedule': ['exact'],
         } 
 
