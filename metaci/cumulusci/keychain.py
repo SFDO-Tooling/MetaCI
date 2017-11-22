@@ -118,13 +118,13 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
 
         return org_config
 
-    def set_org(self, org_name, org_config):
+    def set_org(self, org_config):
         try:
-            org = Org.objects.get(repo=self.build.repo, name=org_name)
+            org = Org.objects.get(repo=self.build.repo, name=org_config.name)
             org.json = json.dumps(org_config.config)
         except Org.DoesNotExist:
             org = Org(
-                name=org_name,
+                name=org_config.name,
                 json=json.dumps(org_config.config),
                 repo=self.build.repo,
             )
