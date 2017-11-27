@@ -70,9 +70,9 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         org_config = json.loads(org.json)
 
         if org.scratch:
-            config = ScratchOrgConfig(org_config)
+            config = ScratchOrgConfig(org_config, org.name)
         else:
-            config = OrgConfig(org_config)
+            config = OrgConfig(org_config, org.name)
 
         # Attach the org model instance to the org config
         config.org = org

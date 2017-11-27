@@ -30,7 +30,7 @@ class Org(models.Model):
     def get_org_config(self):
         org_config = json.loads(self.json)
 
-        return OrgConfig(org_config)
+        return OrgConfig(org_config, self.name)
 
     @property
     def lock_id(self):
@@ -84,7 +84,7 @@ class ScratchOrgInstance(models.Model):
 
         org_config = json.loads(self.json)
 
-        return ScratchOrgConfig(org_config)
+        return ScratchOrgConfig(org_config, self.org.name)
 
     def delete_org(self, org_config=None):
         if org_config is None:
