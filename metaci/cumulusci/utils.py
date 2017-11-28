@@ -1,6 +1,6 @@
-from datetime import date, datetime
 from cumulusci.core.config import ConnectedAppOAuthConfig
 from django.conf import settings
+
 
 def get_connected_app():
     return ConnectedAppOAuthConfig({
