@@ -1,4 +1,3 @@
-from datetime import date, datetime
 from cumulusci.core.config import ConnectedAppOAuthConfig
 from django.conf import settings
 
