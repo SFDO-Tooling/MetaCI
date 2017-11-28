@@ -1,6 +1,7 @@
 from cumulusci.core.config import ConnectedAppOAuthConfig
 from django.conf import settings
 
+
 def get_connected_app():
     return ConnectedAppOAuthConfig({
         'callback_url': settings.CONNECTED_APP_CALLBACK_URL,
