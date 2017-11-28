@@ -6,6 +6,7 @@ from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import ServiceConfig
 from cumulusci.core.exceptions import ServiceNotConfigured
 from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 from metaci.cumulusci.logger import init_logger
 from metaci.cumulusci.models import Org
 from metaci.cumulusci.models import ScratchOrgInstance
@@ -49,7 +50,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         except Service.DoesNotExist:
             service = Service(
                 name=service_name,
-                json=json.dumps(service_config.config),
+                json=json.dumps(service_config.config, cls=DjangoJSONEncoder),
             )
         service.save()
 
@@ -119,15 +120,17 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         return org_config
 
     def set_org(self, org_config):
+        org_json = json.dumps(org_config.config, cls=DjangoJSONEncoder)
         try:
             org = Org.objects.get(repo=self.build.repo, name=org_config.name)
-            org.json = json.dumps(org_config.config)
+            org.json = org_json
         except Org.DoesNotExist:
             org = Org(
                 name=org_config.name,
-                json=json.dumps(org_config.config),
+                json=org_json,
                 repo=self.build.repo,
             )
 
         org.scratch = isinstance(org_config, ScratchOrgConfig)
-        org.save()
+        if not org.scratch:
+            org.save()
