@@ -103,7 +103,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         with open(json_path, 'r') as json_file:
             dx_json = json_file.read()
 
-        org_json = json.dumps(org_config.config)
+        org_json = json.dumps(org_config.config, cls=DjangoJSONEncoder)
 
         # Create a ScratchOrgInstance to store the org info
         instance = ScratchOrgInstance(
