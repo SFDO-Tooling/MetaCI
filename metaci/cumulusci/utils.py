@@ -8,11 +8,3 @@ def get_connected_app():
         'client_id': settings.CONNECTED_APP_CLIENT_ID,
         'client_secret': settings.CONNECTED_APP_CLIENT_SECRET,
     })
-
-def json_serial(obj):
-    """JSON serializer for objects not serializable by default json code"""
-
-    if isinstance(obj, (datetime, date)):
-        return obj.isoformat()
-    raise TypeError ("Type %s not serializable" % type(obj))
-
