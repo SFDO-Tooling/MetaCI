@@ -11,6 +11,7 @@ from metaci.cumulusci.models import Org
 from metaci.cumulusci.models import ScratchOrgInstance
 from metaci.cumulusci.models import Service
 from metaci.cumulusci.utils import get_connected_app
+from metaci.cumulusci.utils import json_serial
 
 
 class MetaCIProjectKeychain(BaseProjectKeychain):
@@ -125,9 +126,10 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         except Org.DoesNotExist:
             org = Org(
                 name=org_config.name,
-                json=json.dumps(org_config.config),
+                json=json.dumps(org_config.config, default=json_serial),
                 repo=self.build.repo,
             )
 
         org.scratch = isinstance(org_config, ScratchOrgConfig)
-        org.save()
+        if not org.scratch:
+            org.save()
