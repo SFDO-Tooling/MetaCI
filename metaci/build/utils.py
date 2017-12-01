@@ -37,6 +37,7 @@ def view_queryset(request, query=None, status=None, filter_class=None):
 
     if not request.user.is_staff:
         query['plan__public'] = True
+        query['repo__public'] = True
 
     Build = apps.get_model('build', 'Build')
     builds = Build.objects.all()
