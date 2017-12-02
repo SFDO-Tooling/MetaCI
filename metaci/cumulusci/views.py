@@ -48,9 +48,9 @@ def _org_lock_unlock(request, org_id, action):
         form = form_class(request.POST)
         if form.is_valid():
             if request.POST['action'] == 'Lock':
-                org.lock()
+                org.lock(request)
             elif request.POST['action'] == 'Unlock':
-                org.unlock()
+                org.unlock(request)
             return HttpResponseRedirect(org.get_absolute_url())
     else:
         form = form_class()
@@ -140,7 +140,7 @@ def org_list(request):
         query['supertype'] = supertype
     orgs = Org.objects.filter(**query)
     if not request.GET.get('scratch',True) :
-        orgs = orgs.exclude(org_type=choices.ORGTYPE_SCRATCH)
+        orgs = orgs.exclude(org_type=choices.ORGTYPES.scratch)
     orgs = orgs.order_by('id')
     orgs = paginate(orgs, request)
     context = {'orgs': orgs}

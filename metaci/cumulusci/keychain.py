@@ -131,12 +131,12 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
                 name=org_name,
                 json=json.dumps(org_config.config),
                 repo=self.build.repo,
-                supertype = choices.SUPERTYPE_CI
+                supertype = choices.SUPERTYPES.ci
             )
 
         if isinstance(org_config, ScratchOrgConfig):
-            org.org_type=choices.ORGTYPE_SCRATCH
+            org.org_type=choices.ORGTYPES.scratch
         else:
-            org.org_type=choices.ORGTYPE_UNMANAGED
+            org.org_type=choices.ORGTYPES.unmanaged
 
         org.save()

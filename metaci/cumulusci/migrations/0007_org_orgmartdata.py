@@ -23,13 +23,13 @@ def classify_orgs(apps, schema_editor):
     Org = apps.get_model('cumulusci', 'Org')
     orgs = Org.objects.all()
     beta_orgs = orgs.filter(name__contains='beta')
-    beta_orgs.update(org_type=choices.ORGTYPE_BETA)
+    beta_orgs.update(org_type=choices.ORGTYPES.beta)
     unmanaged_orgs = orgs.filter(name__contains='unmanaged')
-    unmanaged_orgs.update(org_type=choices.ORGTYPE_UNMANAGED)
+    unmanaged_orgs.update(org_type=choices.ORGTYPES.unmanaged)
     packaging_orgs = orgs.filter(name__contains='packaging')
-    packaging_orgs.update(org_type=choices.ORGTYPE_PACKAGING)
+    packaging_orgs.update(org_type=choices.ORGTYPES.packaging)
     scratch_orgs = orgs.filter(scratch=True)
-    scratch_orgs.update(org_type=choices.ORGTYPE_SCRATCH)
+    scratch_orgs.update(org_type=choices.ORGTYPES.scratch)
 
 
 class Migration(migrations.Migration):

@@ -1,30 +1,27 @@
-SUPERTYPE_REGISTERED = 'REGISTERED'
-SUPERTYPE_CI = 'CI'
-SUPERTYPE_CHOICES = (
-    (SUPERTYPE_CI,'CI Test Org'),
-    (SUPERTYPE_REGISTERED, 'Registered Org')
+from model_utils.choices import Choices
+
+SUPERTYPES = Choices(
+    ('ci', 'CI Test Org'),
+    ('registered', 'Registered Org'),
+)
+ORGTYPES = Choices(
+    ('scratch', 'Scratch Org Definition'),
+    ('packaging', 'Packaging Org'),
+    ('unmanaged', 'Persistent Test Org (Unmanaged)'),
+    ('beta', 'Persistent Test Org (Beta Package)'),
+    ('production', 'Persistent Test Org (Production Package)'),
+    ('trial', 'Trial Source Org (Production Package'),
+    ('admin', 'Administrative Org (no package)'),
 )
 
-ORGTYPE_SCRATCH = 'SCRATCH'
-ORGTYPE_PACKAGING = 'PACKAGING'
-ORGTYPE_UNMANAGED = 'UNMANAGED'
-ORGTYPE_BETA = 'BETA'
-ORGTYPE_PRODUCTION = 'PRODUCTION'
-ORGTYPE_TRIAL = 'TRIAL'
-ORGTYPE_ADMIN = 'ADMIN'
-
-ORGTYPE_CHOICES = (
-    (ORGTYPE_SCRATCH, 'Scratch Org Definition'),
-    (ORGTYPE_PACKAGING, 'Packaging Org'),
-    (ORGTYPE_UNMANAGED, 'Persistent Test Org (Unmanaged)'),
-    (ORGTYPE_BETA, 'Persistent Test Org (Beta Package)'),
-    (ORGTYPE_PRODUCTION, 'Persistent Test Org (Production Package)'),
-    (ORGTYPE_TRIAL, 'Trial Source Org (Production Package'),
-    (ORGTYPE_ADMIN, 'Administrative Org (no package)'),
+PUSHSCHEDULES = Choices(
+    ('QA', 'QA Orgs')
 )
 
-PUSHSCHEDULE_QA = 'QA'
-
-PUSHSCHEDULE_CHOICES = (
-    (PUSHSCHEDULE_QA, 'QA Orgs'),
+ORG_PERMISSIONS = Choices(
+        ('manage_locks', 'manage locks'),
+        ('run_builds', 'run builds'),
+        ('login', 'login'),
 )
+
+ORG_ACTION_FLAGS = Choices('lock', 'unlock', 'run', 'login', 'other')

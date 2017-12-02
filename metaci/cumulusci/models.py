@@ -12,11 +12,66 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.contrib.contenttypes.models import ContentType
 
 from model_utils.managers import QueryManager
+from model_utils.choices import Choices
 
 import choices
 
+
+class AdminEntryManager(models.Manager):
+    use_in_migrations = True
+
+    def log(self, user_id, org_id, change_message, action_flag=None, related_object=None):
+        if isinstance(change_message, list):
+            change_message = json.dumps(change_message)
+        log_obj = self.model(
+            user_id=user_id,
+            org_id=org_id,
+            change_message=change_message,
+            action_flag=action_flag,
+            action_time=timezone.now()
+        )
+        if related_object:
+            log_obj.related_object_object_id = related_object.id
+        
+        log_obj.save()
+        return log_obj
+    
+    
+class OrgAdminAction(models.Model):
+    # Attributes
+    ## who
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        models.PROTECT,
+    )
+    ## what
+    change_message = models.TextField()
+    action_flag = models.CharField(
+        choices=choices.ORG_ACTION_FLAGS, 
+        default=choices.ORG_ACTION_FLAGS.other, 
+        max_length=20
+    )
+    ## when
+    action_time = models.DateTimeField(
+        default=timezone.now,
+        editable=False,
+    )
+    ## where
+    org = models.ForeignKey('cumulusci.Org', models.PROTECT, related_name='admin_actions')
+    ## with
+    related_object_content_type = models.ForeignKey(
+        ContentType,
+        models.SET_NULL,
+        blank=True, null=True,
+    )
+    related_object_object_id = models.TextField(blank=True, null=True)
+    related_object_object_repr = models.CharField(max_length=200, blank=True, null=True)
+    
+    # Managers
+    objects = AdminEntryManager()
 
 class Org(models.Model):
     # Identity Fields
@@ -27,14 +82,14 @@ class Org(models.Model):
     sf_org_id = models.CharField(max_length=18, blank=True, null=True)
     supertype = models.CharField(
         max_length=50,
-        choices=choices.SUPERTYPE_CHOICES,
-        default=choices.SUPERTYPE_CI
+        choices=choices.SUPERTYPES,
+        default=choices.SUPERTYPES.ci
     )
     description = models.TextField(null=True, blank=True)
     org_type = models.CharField(
         max_length=50,
-        choices=choices.ORGTYPE_CHOICES,
-        default=choices.ORGTYPE_PRODUCTION
+        choices=choices.ORGTYPES,
+        default=choices.ORGTYPES.production
     )
 
     # CI Orgs
@@ -43,7 +98,7 @@ class Org(models.Model):
     # Registered Orgs
     push_schedule = models.CharField(
         max_length=50,
-        choices=choices.PUSHSCHEDULE_CHOICES,
+        choices=choices.PUSHSCHEDULES,
         null=True,
         blank=True
     )
@@ -58,10 +113,11 @@ class Org(models.Model):
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']
         unique_together = ('repo', 'name')
+        permissions = choices.ORG_PERMISSIONS
 
     objects = models.Manager() # first manager declared on model is the one used by admin etc
-    ci_orgs = QueryManager(supertype=choices.SUPERTYPE_CI)
-    registered_orgs = QueryManager(supertype=choices.SUPERTYPE_REGISTERED)
+    ci_orgs = QueryManager(supertype=choices.SUPERTYPES.ci)
+    registered_orgs = QueryManager(supertype=choices.SUPERTYPES.registered)
 
     def __unicode__(self):
         return '{}: {}'.format(self.repo.name, self.name)
@@ -70,7 +126,7 @@ class Org(models.Model):
         return reverse('org_detail', kwargs={'org_id': self.id})
 
     def get_org_config(self):
-        if self.supertype is not choices.SUPERTYPE_CI:
+        if self.supertype is not choices.SUPERTYPES.ci:
             raise RuntimeError('Org is not a CI org and does not have an OrgConfig.')
 
         org_config = json.loads(self.json)
@@ -79,7 +135,7 @@ class Org(models.Model):
 
     @property
     def scratch(self):
-        return self.org_type == choices.ORGTYPE_SCRATCH
+        return self.org_type == choices.ORGTYPES.scratch
 
     @property
     def lock_id(self):
@@ -91,20 +147,40 @@ class Org(models.Model):
         if not self.scratch:
             return True if cache.get(self.lock_id) else False
 
-    def lock(self):
-        if not self.scratch:
-            cache.add(self.lock_id, 'manually locked', timeout=None)
+    def lock(self, request=None):
+        if self.scratch:
+            return
 
-    def unlock(self):
-        if not self.scratch:
-            cache.delete(self.lock_id)
+        cache.add(self.lock_id, 'manually locked', timeout=None)
+        
+        if request:
+            OrgAdminAction.objects.log(
+                user_id = request.user.id,
+                org_id = self.id,
+                change_message = "Manually locked org with lock ID {}".format(self.lock_id),
+                action_flag = OrgAdminAction.ACTION_FLAGS.lock
+            )
+        
+    def unlock(self, request=None):
+        if self.scratch:
+            return
+        
+        cache.delete(self.lock_id)
+    
+        if request:
+            OrgAdminAction.objects.log(
+                user_id = request.user.id,
+                org_id = self.id,
+                change_message = "Manually unlocked org with lock ID {}".format(self.lock_id),
+                action_flag = OrgAdminAction.action_flags.unlock
+            )
 
     def clean(self):
         errors = {}
         if not self.scratch and not self.sf_org_id:
             errors['sf_org_id'] = 'SF Org ID is required for non-scratch orgs.'
 
-        if self.supertype == choices.SUPERTYPE_CI:
+        if self.supertype == choices.SUPERTYPES.ci:
             try:
                 obj = json.loads(self.json)
             except (TypeError, ValueError), e:
@@ -119,7 +195,6 @@ class Org(models.Model):
         
         if errors: 
             raise ValidationError(errors)
-
 
 class ScratchOrgInstance(models.Model):
     org = models.ForeignKey('cumulusci.Org', related_name='instances')

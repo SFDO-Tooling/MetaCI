@@ -28,17 +28,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='org',
             name='org_type',
-            field=models.CharField(choices=[(b'SCRATCH', b'Scratch Org Definition'), (b'PACKAGING', b'Packaging Org'), (b'UNMANAGED', b'Persistent Test Org (Unmanaged)'), (b'BETA', b'Persistent Test Org (Beta Package)'), (b'PRODUCTION', b'Persistent Test Org (Production Package)'), (b'TRIAL', b'Trial Source Org (Production Package'), (b'ADMIN', b'Administrative Org (no package)')], default=b'PRODUCTION', max_length=50),
+            field=models.CharField(choices=[(b'scratch', b'Scratch Org Definition'), (b'packaging', b'Packaging Org'), (b'unmanaged', b'Persistent Test Org (Unmanaged)'), (b'beta', b'Persistent Test Org (Beta Package)'), (b'production', b'Persistent Test Org (Production Package)'), (b'trial', b'Trial Source Org (Production Package'), (b'admin', b'Administrative Org (no package)')], default=b'production', max_length=50),
         ),
         migrations.AddField(
             model_name='org',
             name='push_schedule',
-            field=models.CharField(blank=True, choices=[(b'QA', b'QA Orgs')], max_length=50, null=True),
+            field=models.CharField(blank=True, choices=[(b'qa', b'QA Orgs')], max_length=50, null=True),
         ),
         migrations.AddField(
             model_name='org',
             name='supertype',
-            field=models.CharField(choices=[(b'CI', b'CI Test Org'), (b'REGISTERED', b'Registered Org')], default=b'CI', max_length=50),
+            field=models.CharField(choices=[(b'ci', b'CI Test Org'), (b'registered', b'Registered Org')], default=b'ci', max_length=50),
         ),
         migrations.AddField(
             model_name='org',

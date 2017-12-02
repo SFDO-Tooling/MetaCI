@@ -53,7 +53,7 @@ class RegisteredOrgSerializer(serializers.HyperlinkedModelSerializer):
         )
 
     def save(self, *args, **kwargs):
-        self.validated_data['supertype'] = choices.SUPERTYPE_REGISTERED
+        self.validated_data['supertype'] = choices.SUPERTYPES.registered
         super(RegisteredOrgSerializer, self).save(*args, **kwargs)
 
     
