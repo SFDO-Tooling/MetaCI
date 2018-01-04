@@ -74,10 +74,7 @@ class ScratchOrgInstance(models.Model):
         return reverse('org_instance_detail', kwargs={'org_id': self.org.id, 'instance_id': self.id})
 
     def get_org_config(self):
-        # Write the org json file to the filesystem for Salesforce DX to use
-        dx_local_dir = os.path.join(os.path.expanduser('~'), '.local', '.sfdx')
-        if not os.path.isdir(dx_local_dir):
-            dx_local_dir = os.path.join(os.path.expanduser('~'), '.sfdx')
+        dx_local_dir = os.path.join(os.path.expanduser('~'), '.sfdx')
         filename = os.path.join(dx_local_dir, '{}.json'.format(self.username))
         with open(filename, 'w') as f:
             f.write(self.json_dx)
