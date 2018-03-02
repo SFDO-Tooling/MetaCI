@@ -26,6 +26,7 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         return ScratchOrgInstance.objects.filter(deleted=False, build__user=self.object)
 
 
+
 class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 

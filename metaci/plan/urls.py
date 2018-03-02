@@ -29,4 +29,9 @@ urlpatterns = [
         views.plan_detail_repo,
         name='plan_detail_repo',
     ),
+    url(
+        r'^new_org_please/$',
+        views.new_org_please,
+        name='plan_new_org_please'
+    )
 ]

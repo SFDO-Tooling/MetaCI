@@ -1,0 +1,56 @@
+{% extends 'layout_full.html' %}
+
+{% block layout_body %}
+<article class="slds-card">
+  <div class="slds-card__header">
+    <header class="slds-media slds-media--center slds-has-flexi-truncate">
+      <div class="slds-media__figure">
+        <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+          <use xlink:href="/static/slds/assets/icons/standard-sprite/svg/symbols.svg#contact"></use>
+        </svg>
+      </div>
+      <div class="slds-media__body slds-truncate">
+        <h2>
+          <a href="javascript:void(0);" class="slds-text-link--reset">
+            <span class="slds-text-heading--small">Repositories ({{repos|length}})</span>
+          </a>
+        </h2>
+      </div>
+    </header>
+  </div>
+  <div class="slds-card__body">
+
+    <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer">
+      <thead class="slds-text-title--caps">
+        <tr>
+          <th>ID</th>
+          <th>Owner</th>
+          <th>Name</th>
+          <th>Time Created</th>
+          <th>Days</th>
+          <th>Repo</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+{% for soi in orgs %}
+        <tr class="slds-hint-parent">
+          <th scope="row"><a href="{% url 'org_instance_detail' soi.org_id soi.id %}">{{ soi.id }}</a></th>
+          <td>{{ soi.sf_org_id }}</td>
+          <td>{{ soi.username }}</td>
+          <td>{{ soi.time_created }}</td>
+          <td>{{ soi.days }} of {{ soi.days_alive }}</td>
+          <td>{{ soi.org.repo.name }}</td>
+          <td><div class="slds-shrink-none">
+            <div class="slds-button-group" role="group">
+              <button class="slds-button slds-button--neutral">Login</button>
+              <button class="slds-button slds-button--neutral">Delete</button>
+            </div>
+          </div></td>
+        </tr>
+{% endfor %}
+      </tbody>
+    </table>
+    </div>
+</article>
+{% endblock %}

@@ -72,3 +72,17 @@ def plan_run_repo(request, plan_id, repo_owner, repo_name):
         'repo': repo,
     }
     return render(request, 'plan/run.html', context=context)
+
+@login_required
+def new_org_please(request):
+    plans = Plan.objects.filter(public=False, active=True, type='manual').prefetch_related('repos')
+    repos = set()
+    for plan in plans:
+        for repo in plan.repos.all():
+            repos.add(repo)
+    
+    context = {
+        'plans': plans,
+        'repos': repos,
+    }
+    return render(request, 'plan/new_org_please.html', context=context)
