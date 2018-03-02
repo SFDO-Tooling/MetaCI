@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
 from metaci.build.utils import view_queryset
-from metaci.plan.models import Plan
+from metaci.plan.models import Plan, PlanRepository
 from metaci.plan.forms import RunPlanForm
 from metaci.repository.models import Repository
 
@@ -76,13 +76,10 @@ def plan_run_repo(request, plan_id, repo_owner, repo_name):
 @login_required
 def new_org_please(request):
     plans = Plan.objects.filter(public=False, active=True, type='manual').prefetch_related('repos')
-    repos = set()
-    for plan in plans:
-        for repo in plan.repos.all():
-            repos.add(repo)
+    plan_repos = PlanRepository.objects.filter(plan__in=plans)
     
     context = {
         'plans': plans,
-        'repos': repos,
+        'plan_repos': plan_repos,
     }
     return render(request, 'plan/new_org_please.html', context=context)
