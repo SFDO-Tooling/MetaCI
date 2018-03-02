@@ -76,7 +76,7 @@ def plan_run_repo(request, plan_id, repo_owner, repo_name):
 @login_required
 def new_org_please(request):
     plans = Plan.objects.filter(public=False, active=True, type='manual').prefetch_related('repos')
-    plan_repos = PlanRepository.objects.filter(plan__in=plans)
+    plan_repos = PlanRepository.objects.filter(plan__in=plans).order_by('repo__name','plan__name')
     
     context = {
         'plans': plans,

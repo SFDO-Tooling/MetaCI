@@ -97,8 +97,8 @@
           <td>{{ soi.org.repo.name }}</td>
           <td><div class="slds-shrink-none">
             <div class="slds-button-group" role="group">
-              <button class="slds-button slds-button--neutral">Login</button>
-              <button class="slds-button slds-button--neutral">Delete</button>
+              <a href="{% url 'org_instance_login' soi.org_id soi.id %}"><button class="slds-button slds-button--neutral">Login</button></a>
+              <a href="{% url 'org_instance_delete' soi.org_id soi.id %}"><button class="slds-button slds-button--neutral">Delete</button></a>
             </div>
           </div></td>
         </tr>

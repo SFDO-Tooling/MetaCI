@@ -6,6 +6,11 @@
 {% block layout_header_text %}New Org Please{% endblock %}
 
 {% block layout_body %}
+<div class="slds-box">
+  <h3 class="slds-heading slds-heading--large">Create a Scratch Org</h3>
+  <p>Select the repository and plan you wish to run. On the next screen, you'll confirm the branch. This will kick off a build that, when complete, can be logged into and used for testing.</p>
+</div>
+<br/>
 <article class="slds-card">
   <div class="slds-card__header">
     <header class="slds-media slds-media--center slds-has-flexi-truncate">
@@ -37,8 +42,8 @@
       <tbody>
 {% for pr in plan_repos %}
         <tr class="slds-hint-parent">
-          <th scope="row"><a href="{% url 'plan_detail' pr.plan.id %}">{{ pr.plan.name }}</a></th>
-          <td>{{ pr.repo.name }}</td>
+          <th scope="row"><a href="{% url 'repo_detail' pr.repo.owner pr.repo.name %}">{{ pr.repo.name }}</a></th>
+          <td>{{ pr.plan.name }}</td>
           <td>{{ pr.plan.flows }}</td>
           <td><div class="slds-shrink-none">
             <div class="slds-button-group" role="group">
@@ -51,4 +56,5 @@
     </table>
     </div>
 </article>
+
 {% endblock %}
