@@ -21,24 +21,20 @@
 
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Is Staff">Is Staff</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ object.name }}">
           <div
             class="slds-truncate slds-badge {% if object.is_staff %}slds-theme--success{% endif %}"
             title="{{ object.is_staff }}">
             {{ object.is_staff|yesno }}
           </div>
-        </td>
     </li>
 
     <li class="slds-page-header__detail-block">
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Is Admin">Is Admin</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ object.name }}">
         <div
             class="slds-truncate slds-badge {% if object.is_superuser %}slds-theme--success{% endif %}"
             title="{{ object.is_superuser }}">
             {{ object.is_superuser|yesno }}
           </div>
-      </p>
     </li>
   </ul>
 {% endblock %}
@@ -60,11 +56,11 @@
 
 {% block layout_body %}
 <article class="slds-card">
-  <div class="slds-card__header slds-grid">
+  <div class="slds-card__header">
     <header class="slds-media slds-media--center slds-has-flexi-truncate">
       <div class="slds-media__figure">
-        <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
-          <use xlink:href="/static/slds/assets/icons/standard-sprite/svg/symbols.svg#contact"></use>
+        <svg aria-hidden="true" class="slds-icon slds-icon-custom-custom44 slds-icon--small">
+          <use xlink:href="/static/slds/assets/icons/custom-sprite/svg/symbols.svg#custom44"></use>
         </svg>
       </div>
       <div class="slds-media__body slds-truncate">
@@ -109,9 +105,6 @@
 {% endfor %}
       </tbody>
     </table>
-  </div>
-</div>  
-</div>
+    </div>
 </article>
-
 {% endblock %}
