@@ -14,6 +14,7 @@ TRIGGER_TYPES = (
     ('manual', 'Manual'),
     ('commit', 'Commit'),
     ('tag', 'Tag'),
+    ('org', 'Org Request')
 )
 
 DASHBOARD_CHOICES = (
