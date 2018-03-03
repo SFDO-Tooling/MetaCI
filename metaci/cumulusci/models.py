@@ -16,7 +16,7 @@ class Org(models.Model):
     name = models.CharField(max_length=255)
     json = models.TextField()
     scratch = models.BooleanField(default=False)
-    repo = models.ForeignKey('repository.Repository', related_name='orgs')
+    repo = models.ForeignKey('repository.Repository', related_name='orgs', on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']
@@ -52,8 +52,8 @@ class Org(models.Model):
 
 
 class ScratchOrgInstance(models.Model):
-    org = models.ForeignKey('cumulusci.Org', related_name='instances')
-    build = models.ForeignKey('build.Build', related_name='scratch_orgs', null=True, blank=True)
+    org = models.ForeignKey('cumulusci.Org', related_name='instances', on_delete=models.CASCADE)
+    build = models.ForeignKey('build.Build', related_name='scratch_orgs', null=True, blank=True, on_delete=models.CASCADE)
     username = models.CharField(max_length=255)
     sf_org_id = models.CharField(max_length=32)
     deleted = models.BooleanField(default=False)

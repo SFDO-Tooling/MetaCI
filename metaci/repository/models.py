@@ -31,7 +31,7 @@ class Repository(models.Model):
 
 class Branch(models.Model):
     name = models.CharField(max_length=255)
-    repo = models.ForeignKey(Repository, related_name='branches')
+    repo = models.ForeignKey(Repository, related_name='branches', on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
 
     class Meta:
