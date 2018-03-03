@@ -1,40 +1,40 @@
  
 
 # Bleeding edge Django
-django==1.10.7
+django==1.11.10
 
 # Configuration
-django-environ==0.4.1
-whitenoise==3.2.2
+django-environ==0.4.4
+whitenoise==3.3.1
 
 
 # Forms
-django-braces==1.10.0
-django-crispy-forms==1.6.1
-django_filter==1.0.4
+django-braces==1.12.0
+django-crispy-forms==1.7.0
+django_filter==1.1.0
 
 # Models
-django-model-utils==2.6
+django-model-utils==3.1.1
 
 # Images
-Pillow==3.4.2
+Pillow==5.0.0
 
 # For user registration, either via email or social
 # Well-built with regular release cycles!
-django-allauth==0.29.0
+django-allauth==0.35.0
 
 
 # Python-PostgreSQL Database Adapter
-psycopg2==2.6.2
+psycopg2==2.7.4
 
 # Unicode slugification
 awesome-slugify==1.6.5
 
 # Time zones support
-pytz==2016.7
+pytz==2018.3
 
 # Redis support
-django-redis==4.6.0
+django-redis==4.9.0
 redis>=2.10.5
 
 # Django RQ
@@ -67,7 +67,7 @@ django-watson>=1.3.0
 honcho>=0.7.1
 
 # Django REST Framework
-djangorestframework==3.6.3
+djangorestframework==3.7.7
 djangorestframework-filters==0.10.2
 
 # Core API for DRF schema generation
