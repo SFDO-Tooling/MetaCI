@@ -1,36 +1,110 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends 'layout_full.html' %}
 
-{% block title %}User: {{ object.username }}{% endblock %}
+{% block layout_parent_link %}{% endblock %}
+{% block layout_header_text %}User Details{% endblock %}
 
-{% block content %}
-<div class="container">
+{% block layout_header_details %}
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Username">Username</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ object.username }}">
+        {{ object.username }}
+      </p>
+    </li>
 
-  <div class="row">
-    <div class="col-sm-12">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Name">Name</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ object.name }}">
+        {{ object.name }}
+      </p>
+    </li>
 
-      <h2>{{ object.username }}</h2>
-      {% if object.name %}
-        <p>{{ object.name }}</p>
-      {% endif %}
-    </div>
-  </div>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Is Staff">Is Staff</p>
+          <div
+            class="slds-truncate slds-badge {% if object.is_staff %}slds-theme--success{% endif %}"
+            title="{{ object.is_staff }}">
+            {{ object.is_staff|yesno }}
+          </div>
+    </li>
 
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Is Admin">Is Admin</p>
+        <div
+            class="slds-truncate slds-badge {% if object.is_superuser %}slds-theme--success{% endif %}"
+            title="{{ object.is_superuser }}">
+            {{ object.is_superuser|yesno }}
+          </div>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block layout_header_buttons %}
 {% if object == request.user %}
-<!-- Action buttons -->
-<div class="row">
-
-  <div class="col-sm-12">
-    <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
-    <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">E-Mail</a>
-    <!-- Your Stuff: Custom user template urls -->
-  </div>
-
-</div>
-<!-- End Action buttons -->
+<a href="{% url 'users:update' %}">
+  <button class="slds-button slds-m-horizontal--medium">
+    My Info
+  </button>
+</a>
+<a href="{% url 'account_email' %}">
+  <button class="slds-button slds-m-horizontal--medium">
+   Email
+  </button>
+</a>
 {% endif %}
+{% endblock %}
 
+{% block layout_body %}
+<article class="slds-card">
+  <div class="slds-card__header">
+    <header class="slds-media slds-media--center slds-has-flexi-truncate">
+      <div class="slds-media__figure">
+        <svg aria-hidden="true" class="slds-icon slds-icon-custom-custom44 slds-icon--small">
+          <use xlink:href="/static/slds/assets/icons/custom-sprite/svg/symbols.svg#custom44"></use>
+        </svg>
+      </div>
+      <div class="slds-media__body slds-truncate">
+        <h2>
+          <a href="javascript:void(0);" class="slds-text-link--reset">
+            <span class="slds-text-heading--small">Scratch Org Instances ({{orgs|length}})</span>
+          </a>
+        </h2>
+      </div>
+    </header>
+  </div>
+  <div class="slds-card__body">
 
-</div>
-{% endblock content %}
-
+    <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer">
+      <thead class="slds-text-title--caps">
+        <tr>
+          <th>ID</th>
+          <th>Org ID</th>
+          <th>Username</th>
+          <th>Time Created</th>
+          <th>Days</th>
+          <th>Repo</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+{% for soi in orgs %}
+        <tr class="slds-hint-parent">
+          <th scope="row"><a href="{% url 'org_instance_detail' soi.org_id soi.id %}">{{ soi.id }}</a></th>
+          <td>{{ soi.sf_org_id }}</td>
+          <td>{{ soi.username }}</td>
+          <td>{{ soi.time_created }}</td>
+          <td>{{ soi.days }} of {{ soi.days_alive }}</td>
+          <td>{{ soi.org.repo.name }}</td>
+          <td><div class="slds-shrink-none">
+            <div class="slds-button-group" role="group">
+              <a href="{% url 'org_instance_login' soi.org_id soi.id %}"><button class="slds-button slds-button--neutral">Login</button></a>
+              <a href="{% url 'org_instance_delete' soi.org_id soi.id %}"><button class="slds-button slds-button--neutral">Delete</button></a>
+            </div>
+          </div></td>
+        </tr>
+{% endfor %}
+      </tbody>
+    </table>
+    </div>
+</article>
+{% endblock %}

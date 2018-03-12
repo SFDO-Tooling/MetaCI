@@ -1,0 +1,60 @@
+{% extends 'layout_full.html' %}
+
+
+{% load crispy_forms_tags %}
+{% block layout_parent_link %}<a href="/repos/">Repos</a>{% endblock %}
+{% block layout_header_text %}New Org Please{% endblock %}
+
+{% block layout_body %}
+<div class="slds-box">
+  <h3 class="slds-heading slds-heading--large">Create a Scratch Org</h3>
+  <p>Select the repository and plan you wish to run. On the next screen, you'll confirm the branch. This will kick off a build that, when complete, can be logged into and used for testing.</p>
+</div>
+<br/>
+<article class="slds-card">
+  <div class="slds-card__header">
+    <header class="slds-media slds-media--center slds-has-flexi-truncate">
+      <div class="slds-media__figure">
+        <svg aria-hidden="true" class="slds-icon slds-icon-custom-custom66 slds-icon--small">
+          <use xlink:href="/static/slds/assets/icons/custom-sprite/svg/symbols.svg#custom66"></use>
+        </svg>
+      </div>
+      <div class="slds-media__body slds-truncate">
+        <h2>
+          <a href="javascript:void(0);" class="slds-text-link--reset">
+            <span class="slds-text-heading--small">Available Plans ({{plan_repos|length}})</span>
+          </a>
+        </h2>
+      </div>
+    </header>
+  </div>
+  <div class="slds-card__body">
+
+    <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer">
+      <thead class="slds-text-title--caps">
+        <tr>
+          <th>Plan</th>
+          <th>Repo</th>
+          <th>Flows</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+{% for pr in plan_repos %}
+        <tr class="slds-hint-parent">
+          <th scope="row"><a href="{% url 'repo_detail' pr.repo.owner pr.repo.name %}">{{ pr.repo.name }}</a></th>
+          <td>{{ pr.plan.name }}</td>
+          <td>{{ pr.plan.flows }}</td>
+          <td><div class="slds-shrink-none">
+            <div class="slds-button-group" role="group">
+              <a href="{% url 'plan_run_repo' pr.plan.id pr.repo.owner pr.repo.name %}?keep_org=True&branch=master"><button class="slds-button slds-button--neutral">Go</button></a>
+            </div>
+          </div></td>
+        </tr>
+{% endfor %}
+      </tbody>
+    </table>
+    </div>
+</article>
+
+{% endblock %}

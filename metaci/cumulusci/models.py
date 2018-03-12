@@ -10,7 +10,7 @@ from django.core.cache import cache
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-
+from django.utils.dateparse import parse_datetime
 
 class Org(models.Model):
     name = models.CharField(max_length=255)
@@ -73,6 +73,14 @@ class ScratchOrgInstance(models.Model):
     def get_absolute_url(self):
         return reverse('org_instance_detail', kwargs={'org_id': self.org.id, 'instance_id': self.id})
 
+    @property
+    def days(self):
+        return self.get_org_config().days
+
+    @property
+    def days_alive(self):
+        return self.get_org_config().days_alive
+
     def get_org_config(self):
         dx_local_dir = os.path.join(os.path.expanduser('~'), '.sfdx')
         filename = os.path.join(dx_local_dir, '{}.json'.format(self.username))
@@ -80,7 +88,7 @@ class ScratchOrgInstance(models.Model):
             f.write(self.json_dx)
 
         org_config = json.loads(self.json)
-
+        org_config['date_created'] = parse_datetime(org_config['date_created'])
         return ScratchOrgConfig(org_config, self.org.name)
 
     def delete_org(self, org_config=None):
