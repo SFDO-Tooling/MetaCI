@@ -8,7 +8,7 @@ from metaci.testresults.choices import OUTCOME_CHOICES
 
 class TestClass(models.Model):
     name = models.CharField(max_length=255, db_index=True)
-    repo = models.ForeignKey('repository.Repository', related_name='testclasses')
+    repo = models.ForeignKey('repository.Repository', related_name='testclasses', on_delete=models.CASCADE)
     
     class Meta:
         verbose_name = 'Test Class'
@@ -19,7 +19,7 @@ class TestClass(models.Model):
 
 class TestMethod(models.Model):
     name = models.CharField(max_length=255, db_index=True)
-    testclass = models.ForeignKey(TestClass, related_name='methods')
+    testclass = models.ForeignKey(TestClass, related_name='methods', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Test Method'
@@ -77,8 +77,8 @@ class TestResultManager(models.Manager):
         return diff
 
 class TestResult(models.Model):
-    build_flow = models.ForeignKey('build.BuildFlow', related_name='test_results')
-    method = models.ForeignKey(TestMethod, related_name='test_results')
+    build_flow = models.ForeignKey('build.BuildFlow', related_name='test_results', on_delete=models.CASCADE)
+    method = models.ForeignKey(TestMethod, related_name='test_results', on_delete=models.CASCADE)
     duration = models.FloatField(null=True, blank=True, db_index=True)
     outcome = models.CharField(max_length=16, choices=OUTCOME_CHOICES, db_index=True)
     stacktrace = models.TextField(null=True, blank=True)

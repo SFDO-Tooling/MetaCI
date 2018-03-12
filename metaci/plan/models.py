@@ -126,8 +126,8 @@ SCHEDULE_CHOICES=(
 
 
 class PlanRepository(models.Model):
-    plan = models.ForeignKey(Plan)
-    repo = models.ForeignKey(Repository)
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
+    repo = models.ForeignKey(Repository, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = 'Plan Repositories'
@@ -137,8 +137,8 @@ class PlanRepository(models.Model):
 
 
 class PlanSchedule(models.Model):
-    plan = models.ForeignKey(Plan)
-    branch = models.ForeignKey('repository.branch')
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
+    branch = models.ForeignKey('repository.branch', on_delete=models.CASCADE)
     schedule = models.CharField(max_length=16, choices=SCHEDULE_CHOICES)
 
     class Meta:

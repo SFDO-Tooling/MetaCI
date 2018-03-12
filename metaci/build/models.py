@@ -57,20 +57,20 @@ BUILD_TYPES = (
 
 
 class Build(models.Model):
-    repo = models.ForeignKey('repository.Repository', related_name='builds')
+    repo = models.ForeignKey('repository.Repository', related_name='builds', on_delete=models.CASCADE)
     branch = models.ForeignKey('repository.Branch', related_name='builds',
-                               null=True, blank=True)
+                               null=True, blank=True, on_delete=models.CASCADE)
     commit = models.CharField(max_length=64)
     commit_message = models.TextField(null=True, blank=True)
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
-    plan = models.ForeignKey('plan.Plan', related_name='builds')
+    plan = models.ForeignKey('plan.Plan', related_name='builds', on_delete=models.CASCADE)
     org = models.ForeignKey('cumulusci.Org', related_name='builds', null=True,
-                            blank=True)
+                            blank=True, on_delete=models.CASCADE)
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
-                                     related_name='builds', null=True, blank=True)
+                                     related_name='builds', null=True, blank=True, on_delete=models.CASCADE)
     schedule = models.ForeignKey('plan.PlanSchedule', related_name='builds',
-                                 null=True, blank=True)
+                                 null=True, blank=True, on_delete=models.CASCADE)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
@@ -83,7 +83,7 @@ class Build(models.Model):
     task_id_run = models.CharField(max_length=64, null=True, blank=True)
     task_id_status_end = models.CharField(max_length=64, null=True, blank=True)
     current_rebuild = models.ForeignKey('build.Rebuild',
-                                        related_name='current_builds', null=True, blank=True)
+                                        related_name='current_builds', null=True, blank=True, on_delete=models.CASCADE)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
@@ -353,9 +353,9 @@ class Build(models.Model):
 
 
 class BuildFlow(models.Model):
-    build = models.ForeignKey('build.Build', related_name='flows')
+    build = models.ForeignKey('build.Build', related_name='flows', on_delete=models.CASCADE)
     rebuild = models.ForeignKey('build.Rebuild', related_name='flows',
-                                null=True, blank=True)
+                                null=True, blank=True, on_delete=models.CASCADE)
     status = models.CharField(max_length=16, choices=BUILD_FLOW_STATUSES,
                               default='queued')
     flow = models.CharField(max_length=255, null=True, blank=True)
@@ -518,10 +518,10 @@ class BuildFlow(models.Model):
 
 
 class Rebuild(models.Model):
-    build = models.ForeignKey('build.Build', related_name='rebuilds')
-    user = models.ForeignKey('users.User', related_name='rebuilds')
+    build = models.ForeignKey('build.Build', related_name='rebuilds', on_delete=models.CASCADE)
+    user = models.ForeignKey('users.User', related_name='rebuilds', on_delete=models.CASCADE)
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
-                                     related_name='rebuilds', null=True, blank=True)
+                                     related_name='rebuilds', null=True, blank=True, on_delete=models.CASCADE)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES,
                               default='queued')
     exception = models.TextField(null=True, blank=True)
