@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import json
 import os
-import datetime
 
 from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import OrgConfig
