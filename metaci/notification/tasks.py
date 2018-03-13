@@ -12,6 +12,8 @@ from metaci.notification.models import RepositoryNotification
 from metaci.notification.models import BranchNotification
 from metaci.notification.models import PlanNotification
 from metaci.notification.models import PlanRepositoryNotification
+from metaci.plan.models import PlanRepository
+
 
 def reset_database_connection():
     db.connection.close()
