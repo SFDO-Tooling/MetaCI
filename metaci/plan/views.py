@@ -1,10 +1,10 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
 from metaci.build.utils import view_queryset
-from metaci.plan.models import Plan
+from metaci.plan.models import Plan, PlanRepository
 from metaci.plan.forms import RunPlanForm
 from metaci.repository.models import Repository
 
@@ -49,13 +49,13 @@ def plan_detail_repo(request, plan_id, repo_owner, repo_name):
     }
     return render(request, 'plan/detail.html', context=context)
 
-@login_required
+@staff_member_required
 def plan_run(request, plan_id):
     plan = get_object_or_404(Plan, id=plan_id)
     context = {'plan': plan}
     return render(request, 'plan/run_select_repo.html', context=context)
 
-@login_required
+@staff_member_required
 def plan_run_repo(request, plan_id, repo_owner, repo_name):
     plan = get_object_or_404(Plan, id=plan_id)
     repo = get_object_or_404(Repository, owner=repo_owner, name=repo_name)
@@ -65,10 +65,21 @@ def plan_run_repo(request, plan_id, repo_owner, repo_name):
             build = form.create_build()
             return HttpResponseRedirect(build.get_absolute_url())
     else:
-        form = RunPlanForm(plan, repo, request.user)
+        form = RunPlanForm(plan, repo, request.user, request.GET)
     context = {
         'form': form,
         'plan': plan,
         'repo': repo,
     }
     return render(request, 'plan/run.html', context=context)
+
+@staff_member_required
+def new_org_please(request):
+    plans = Plan.objects.filter(public=False, active=True, type='org').prefetch_related('repos')
+    plan_repos = PlanRepository.objects.filter(plan__in=plans).order_by('repo__name','plan__name')
+    
+    context = {
+        'plans': plans,
+        'plan_repos': plan_repos,
+    }
+    return render(request, 'plan/new_org_please.html', context=context)
