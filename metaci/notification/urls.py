@@ -20,11 +20,6 @@ urlpatterns = [
         name='add_branch_notification',
     ),
     url(
-        r'^add/planrepository',
-        views.add_planrepository_notification,
-        name='add_planrepository_notification',
-    ),
-    url(
         r'^add/plan',
         views.add_plan_notification,
         name='add_plan_notification',
@@ -38,11 +33,6 @@ urlpatterns = [
         r'^delete/plan/(?P<pk>\d+)$',
         views.delete_plan_notification,
         name='delete_plan_notification',
-    ),
-    url(
-        r'^delete/planrepository/(?P<pk>\d+)$',
-        views.delete_planrepository_notification,
-        name='delete_planrepository_notification',
     ),
     url(
         r'^delete/repository/(?P<pk>\d+)$',

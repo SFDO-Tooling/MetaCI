@@ -8,7 +8,6 @@ from django import forms
 
 from metaci.notification.models import BranchNotification
 from metaci.notification.models import PlanNotification
-from metaci.notification.models import PlanRepositoryNotification
 from metaci.notification.models import RepositoryNotification
 
 
@@ -120,43 +119,6 @@ class AddPlanNotificationForm(forms.ModelForm):
     class Meta:
         model = PlanNotification
         fields = ['plan', 'user', 'on_success', 'on_fail', 'on_error']
-        widgets = {'user': forms.HiddenInput()}
-
-
-class AddPlanRepositoryNotificationForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super(AddPlanRepositoryNotificationForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'form-vertical'
-        self.helper.form_id = 'add-planrepository-notification-form'
-        self.helper.form_method = 'post'
-        self.helper.layout = Layout(
-            Fieldset(
-                'Select the plan/repository combination you want to receive notification for',
-                Field('planrepository', css_class='slds-input'),
-                Field('user', css_class='slds-input'),
-                css_class='slds-form-element',
-            ),
-            Fieldset(
-                'Select the build statuses that should trigger a notification',
-                Field('on_success', css_class='slds-input'),
-                Field('on_fail', css_class='slds-input'),
-                Field('on_error', css_class='slds-input'),
-                css_class='slds-form-element',
-            ),
-            FormActions(
-                Submit(
-                    'submit',
-                    'Submit',
-                    css_class='slds-button slds-button--brand',
-                ),
-            ),
-        )
-
-    class Meta:
-        model = PlanRepositoryNotification
-        fields = ['planrepository', 'user', 'on_success', 'on_fail', 'on_error']
         widgets = {'user': forms.HiddenInput()}
 
 

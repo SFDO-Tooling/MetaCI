@@ -10,13 +10,6 @@ class PlanNotification(models.Model):
     on_fail = models.BooleanField(default=True)
     on_error = models.BooleanField(default=True)
 
-class PlanRepositoryNotification(models.Model):
-    user = models.ForeignKey('users.User', related_name='planrepository_notifications')
-    planrepository = models.ForeignKey('plan.PlanRepository', related_name='notifications')
-    on_success = models.BooleanField(default=False)
-    on_fail = models.BooleanField(default=True)
-    on_error = models.BooleanField(default=True)
-
 class BranchNotification(models.Model):
     user = models.ForeignKey('users.User', related_name='branch_notifications', on_delete=models.CASCADE)
     branch = models.ForeignKey('repository.Branch', related_name='notifications', on_delete=models.CASCADE)

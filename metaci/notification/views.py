@@ -5,12 +5,10 @@ from django.shortcuts import render
 
 from metaci.notification.forms import AddBranchNotificationForm
 from metaci.notification.forms import AddPlanNotificationForm
-from metaci.notification.forms import AddPlanRepositoryNotificationForm
 from metaci.notification.forms import AddRepositoryNotificationForm
 from metaci.notification.forms import DeleteNotificationForm
 from metaci.notification.models import BranchNotification
 from metaci.notification.models import PlanNotification
-from metaci.notification.models import PlanRepositoryNotification
 from metaci.notification.models import RepositoryNotification
 
 
@@ -18,7 +16,6 @@ from metaci.notification.models import RepositoryNotification
 def my_notifications(request):
     notifications = {
         'plan': request.user.plan_notifications.all(),
-        'planrepository': request.user.planrepository_notifications.all(),
         'repo': request.user.repo_notifications.all(),
         'branch': request.user.branch_notifications.all(),
     }
@@ -81,23 +78,6 @@ def add_plan_notification(request):
 
 
 @login_required
-def add_planrepository_notification(request):
-    initial = {'user': request.user.id}
-    if request.method == 'POST':
-        form = AddPlanRepositoryNotificationForm(request.POST, initial=initial)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/notifications')
-    else:
-        form = AddPlanRepositoryNotificationForm(initial=initial)
-    return render(
-        request,
-        'notification/add_planrepository_notification.html',
-        context={'form': form},
-    )
-
-
-@login_required
 def delete_branch_notification(request, pk):
     return _delete_notification(
         request,
@@ -110,14 +90,6 @@ def delete_plan_notification(request, pk):
     return _delete_notification(
         request,
         PlanNotification.objects.get(pk=pk),
-    )
-
-
-@login_required
-def delete_planrepository_notification(request, pk):
-    return _delete_notification(
-        request,
-        PlanRepositoryNotification.objects.get(pk=pk),
     )
 
 

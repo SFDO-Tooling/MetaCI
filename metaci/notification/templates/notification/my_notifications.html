@@ -85,45 +85,6 @@
 <a class="slds-button" href="/notifications/add/plan">Add Plan Notification</a>
 
 <div class="slds-box slds-m-top--large">
-  <h3 class="slds-text-heading--large">PlanRepositories</h3>
-
-  <table class="slds-table">
-    <thead>
-      <tr>
-        <th>PlanRepository</th>
-        <th>On Success</th>
-        <th>On Failure</th>
-        <th>On Error</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for notification in notifications.planrepository %}
-      <tr>
-        <td>{{ notification.planrepository }}</td>
-        <td>{{ notification.on_success }}</td>
-        <td>{{ notification.on_fail }}</td>
-        <td>{{ notification.on_error }}</td>
-        <td>
-          <a href="/notifications/delete/planrepository/{{ notification.id }}">
-            <button class="slds-button slds-button_icon" title="Delete notification">
-              {% autoescape off %}
-              <svg class="slds-button__icon slds-theme--default" aria-hidden="true">
-                <use xlink:href="/static/slds/assets/icons/action-sprite/svg/symbols.svg#delete"></use>
-              </svg>
-              {% endautoescape %}
-              <span class="slds-assistive-text">Delete notification</span>
-            </button>
-          </a>
-        </td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-</div>
-<a class="slds-button" href="/notifications/add/planrepository">Add PlanRepository Notification</a>
-
-<div class="slds-box slds-m-top--large">
   <h3 class="slds-text-heading--large">Branches</h3>
   <table class="slds-table">
     <thead>
