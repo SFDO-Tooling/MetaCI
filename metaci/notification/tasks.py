@@ -4,7 +4,7 @@ from django import db
 from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import send_mail
-from django.template.loader import render_to_string
+from django.template.loader import get_template
 from django.template import Context
 from metaci.users.models import User
 from metaci.build.models import Build
@@ -75,13 +75,16 @@ def send_notification_message(build_id, user_id):
         log_lines = build.log.split('\n')
     log_lines = '\n'.join(log_lines[-25:])
 
+    template_txt = get_template('build/email.txt')
+    template_html = get_template('build/email.html')
+
     context = {
         'build': build,
         'log_lines': log_lines,
     }
 
     subject = '[{}] Build #{} of {} {} - {}'.format(build.repo.name, build.id, build.branch.name, build.plan.name, build.get_status().upper())
-    message = render_to_string('build/email.txt', context)
-    html_message = render_to_string('build/email.html', context)
+    message = template_txt.render(context)
+    html_message = template_html.render(context)
 
     return send_mail(subject, message, settings.FROM_EMAIL, [user.email], html_message=html_message)
