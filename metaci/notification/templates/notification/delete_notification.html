@@ -15,10 +15,14 @@
       <tr>
         {% if notification_type == "Branch" %}
           <th>Branch</th>
+          <th>Repository</th>
         {% elif notification_type == "Plan" %}
           <th>Plan</th>
+        {% elif notification_type == "PlanRepository" %}
+          <th>PlanRepository</th>
+        {% elif notification_type == "Repository" %}
+          <th>Repository</th>
         {% endif %}
-        <th>Repository</th>
         <th>On Success</th>
         <th>On Failure</th>
         <th>On Error</th>
@@ -31,6 +35,8 @@
         <th>{{ notification.branch.repo }}</th>
       {% elif notification_type == "Plan" %}
         <th>{{ notification.plan }}</th>
+      {% elif notification_type == "PlanRepository" %}
+        <th>{{ notification.planrepository }}</th>
       {% elif notification_type == "Repository" %}
         <td>{{ notification.repo }}</td>
       {% endif %}
