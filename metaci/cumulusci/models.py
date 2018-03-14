@@ -2,7 +2,12 @@ from __future__ import unicode_literals
 
 import json
 import os
+from calendar import timegm
+from datetime import datetime
+from urllib.parse import urljoin
 
+import jwt
+import requests
 from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import OrgConfig
 from cumulusci.core.exceptions import ScratchOrgException
@@ -13,11 +18,6 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.conf import settings
 
-from calendar import timegm
-from datetime import datetime
-import jwt
-from urllib.parse import urljoin
-import requests
 
 class Org(models.Model):
     name = models.CharField(max_length=255)

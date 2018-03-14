@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
@@ -14,9 +16,6 @@ from metaci.cumulusci.forms import OrgUnlockForm
 from metaci.cumulusci.models import Org
 from metaci.cumulusci.models import ScratchOrgInstance
 from metaci.cumulusci.utils import get_connected_app
-
-from urllib.parse import urljoin
-
 
 
 @staff_member_required
