@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.template.loader import get_template
-from django.template import Context
 from metaci.users.models import User
 from metaci.build.models import Build
 from metaci.notification.models import RepositoryNotification
@@ -76,7 +75,7 @@ def send_notification_message(build_id, user_id):
     }
 
     subject = '[{}] Build #{} of {} {} - {}'.format(build.repo.name, build.id, build.branch.name, build.plan.name, build.get_status().upper())
-    message = template_txt.render(Context(context))
-    html_message = template_html.render(Context(context))
+    message = template_txt.render(context)
+    html_message = template_html.render(context)
 
     return send_mail(subject, message, settings.FROM_EMAIL, [user.email], html_message=html_message)
