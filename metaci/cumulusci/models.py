@@ -66,7 +66,6 @@ class ScratchOrgInstance(models.Model):
     deleted = models.BooleanField(default=False)
     delete_error = models.TextField(null=True, blank=True)
     json = models.TextField()
-    json_dx = models.TextField()
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
 
@@ -89,11 +88,6 @@ class ScratchOrgInstance(models.Model):
         return self._get_org_config().days_alive
 
     def get_org_config(self):
-        dx_local_dir = os.path.join(os.path.expanduser('~'), '.sfdx')
-        filename = os.path.join(dx_local_dir, '{}.json'.format(self.username))
-        with open(filename, 'w') as f:
-            f.write(self.json_dx)
-
         return self._get_org_config()
 
     def _get_org_config(self):
