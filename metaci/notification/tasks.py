@@ -10,6 +10,9 @@ from metaci.build.models import Build
 from metaci.notification.models import RepositoryNotification
 from metaci.notification.models import BranchNotification
 from metaci.notification.models import PlanNotification
+from metaci.notification.models import PlanRepositoryNotification
+from metaci.plan.models import PlanRepository
+
 
 def reset_database_connection():
     db.connection.close()
@@ -35,10 +38,13 @@ def queue_build_notifications(build_id):
     repo_notifications = RepositoryNotification.objects.filter(repo = build.repo, **status_query).values('user__id').distinct()
     branch_notifications = BranchNotification.objects.filter(branch = build.branch, **status_query).values('user__id').distinct()
     plan_notifications = PlanNotification.objects.filter(plan = build.plan, **status_query).values('user__id').distinct()
+    planrepository = PlanRepository.objects.filter(plan=build.plan, repo=build.repo)[0]
+    planrepository_notifications = PlanRepositoryNotification.objects.filter(planrepository=planrepository, **status_query).values('user__id').distinct()
 
     users_repo = [user['user__id'] for user in repo_notifications]
     users_branch = [user['user__id'] for user in branch_notifications]
     users_plan = [user['user__id'] for user in plan_notifications]
+    users_planrepository = [user['user__id'] for user in planrepository_notifications]
 
     users = set()
     if users_repo:
@@ -47,6 +53,8 @@ def queue_build_notifications(build_id):
         users.update(users_branch)
     if users_plan:
         users.update(users_plan)
+    if users_planrepository:
+        users.update(users_planrepository)
 
     for user_id in users:
         send_notification_message.delay(build_id, user_id)
