@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
@@ -90,8 +92,15 @@ def org_login(request, org_id, instance_id=None):
             raise Http404("Cannot log in: the org instance is already deleted")
 
         # Log into the scratch org
-        org_config = get_org_config(instance)
-        return HttpResponseRedirect(org_config.start_url)
+        # org_config = get_org_config(instance)
+        # return HttpResponseRedirect(org_config.start_url)
+        session = instance.get_jwt_based_session()
+        return HttpResponseRedirect(
+            urljoin(
+                str(session['instance_url']),
+                'secur/frontdoor.jsp?sid={}'.format(session['access_token'])
+            )
+        )
 
     raise Http404()
 

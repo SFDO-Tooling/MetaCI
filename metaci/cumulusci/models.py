@@ -2,7 +2,12 @@ from __future__ import unicode_literals
 
 import json
 import os
+from calendar import timegm
+from datetime import datetime
+from urllib.parse import urljoin
 
+import jwt
+import requests
 from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import OrgConfig
 from cumulusci.core.exceptions import ScratchOrgException
@@ -11,6 +16,46 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from django.conf import settings
+from simple_salesforce import Salesforce as SimpleSalesforce
+from simple_salesforce.exceptions import SalesforceError
+
+
+def jwt_session(url=None, username=None):
+    if url is None:
+        url = 'https://login.salesforce.com'
+
+    payload = {
+        'alg': 'RS256',
+        'iss': settings.SFDX_CLIENT_ID,
+        'sub': username,
+        'aud': url, #jwt aud is NOT mydomain
+        'exp': timegm(datetime.utcnow().utctimetuple()),
+    }
+    encoded_jwt = jwt.encode(
+        payload,
+        settings.SFDX_HUB_KEY,
+        algorithm='RS256',
+    )
+    data = {
+        'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        'assertion': encoded_jwt,
+    }
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    auth_url = urljoin(url, 'services/oauth2/token')
+    response = requests.post(url=auth_url, data=data, headers=headers)
+    response.raise_for_status()
+
+    return response.json()
+
+def sf_session(jwt):
+    return SimpleSalesforce(
+            instance_url=jwt['instance_url'],
+            session_id=jwt['access_token'],
+            client_id='metaci',
+            version='42.0'
+    )
+
 
 class Org(models.Model):
     name = models.CharField(max_length=255)
@@ -59,7 +104,6 @@ class ScratchOrgInstance(models.Model):
     deleted = models.BooleanField(default=False)
     delete_error = models.TextField(null=True, blank=True)
     json = models.TextField()
-    json_dx = models.TextField()
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
 
@@ -75,29 +119,38 @@ class ScratchOrgInstance(models.Model):
 
     @property
     def days(self):
-        return self.get_org_config().days
+        return self._get_org_config().days
 
     @property
     def days_alive(self):
-        return self.get_org_config().days_alive
+        return self._get_org_config().days_alive
 
     def get_org_config(self):
-        dx_local_dir = os.path.join(os.path.expanduser('~'), '.sfdx')
-        filename = os.path.join(dx_local_dir, '{}.json'.format(self.username))
-        with open(filename, 'w') as f:
-            f.write(self.json_dx)
+        return self._get_org_config()
 
+    def _get_org_config(self):
         org_config = json.loads(self.json)
         org_config['date_created'] = parse_datetime(org_config['date_created'])
         return ScratchOrgConfig(org_config, self.org.name)
+
+    def get_jwt_based_session(self):
+        return jwt_session('https://test.salesforce.com', self.username)
 
     def delete_org(self, org_config=None):
         if org_config is None:
             org_config = self.get_org_config()
 
         try:
-            org_config.delete_org()
-        except ScratchOrgException as e:
+            # connect to SFDX Hub
+            sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
+            sf = sf_session(sfjwt)
+            # query ActiveScratchOrg via OrgId
+            aso = sf.query(
+                'SELECT ID FROM ActiveScratchOrg WHERE ScratchOrg=\'{}\''.format(self.sf_org_id)
+            )['records'][0]['Id']
+            # delete ActiveScratchOrg
+            r = sf.ActiveScratchOrg.delete(aso)
+        except SalesforceError as e:
             self.delete_error = e.message
             self.deleted = False
             self.save()

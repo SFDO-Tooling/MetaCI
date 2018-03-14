@@ -96,13 +96,6 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         # Create the scratch org and get its info
         info = org_config.scratch_info
 
-        # Get the contents of the org's json file from Salesforce DX
-        json_path = os.path.join(os.path.expanduser('~'), '.sfdx', info['username'] + '.json')
-        if not os.path.isfile(json_path):
-            json_path = os.path.join(os.path.expanduser('~'), '.local', '.sfdx', info['username'] + '.json')
-        with open(json_path, 'r') as json_file:
-            dx_json = json_file.read()
-
         org_json = json.dumps(org_config.config, cls=DjangoJSONEncoder)
 
         # Create a ScratchOrgInstance to store the org info
@@ -111,7 +104,6 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
             build=self.build,
             sf_org_id=info['org_id'],
             username=info['username'],
-            json_dx=dx_json,
             json=org_json,
         )
         instance.save()
