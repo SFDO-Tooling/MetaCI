@@ -17,6 +17,44 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.conf import settings
+from simple_salesforce import Salesforce as SimpleSalesforce
+from simple_salesforce.exceptions import SalesforceError
+
+
+def jwt_session(url=None, username=None):
+    if url is None:
+        url = 'https://login.salesforce.com'
+
+    payload = {
+        'alg': 'RS256',
+        'iss': settings.SFDX_CLIENT_ID,
+        'sub': username,
+        'aud': url, #jwt aud is NOT mydomain
+        'exp': timegm(datetime.utcnow().utctimetuple()),
+    }
+    encoded_jwt = jwt.encode(
+        payload,
+        settings.SFDX_HUB_KEY,
+        algorithm='RS256',
+    )
+    data = {
+        'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        'assertion': encoded_jwt,
+    }
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    auth_url = urljoin(url, 'services/oauth2/token')
+    response = requests.post(url=auth_url, data=data, headers=headers)
+    response.raise_for_status()
+
+    return response.json()
+
+def sf_session(jwt):
+    return SimpleSalesforce(
+            instance_url=jwt['instance_url'],
+            session_id=jwt['access_token'],
+            client_id='metaci',
+            version='42.0'
+    )
 
 
 class Org(models.Model):
@@ -95,42 +133,24 @@ class ScratchOrgInstance(models.Model):
         org_config['date_created'] = parse_datetime(org_config['date_created'])
         return ScratchOrgConfig(org_config, self.org.name)
 
-    def get_jwt_based_session(self):    
-        config = self._get_org_config()
-        # jwt code lovingly ripped from sfdoc - thx chris
-        url = config.instance_url
-        payload = {
-            'alg': 'RS256',
-            'iss': settings.SFDX_CLIENT_ID,
-            'sub': config.username,
-            'aud': 'https://test.salesforce.com', #jwt aud is NOT mydomain
-            'exp': timegm(datetime.utcnow().utctimetuple()),
-        }
-        encoded_jwt = jwt.encode(
-            payload,
-            settings.SFDX_HUB_KEY,
-            algorithm='RS256',
-        )
-        data = {
-            'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-            'assertion': encoded_jwt,
-        }
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        auth_url = urljoin(url, 'services/oauth2/token')
-        response = requests.post(url=auth_url, data=data, headers=headers)
-        response.raise_for_status()
-        response_data = response.json()
-        
-        return response_data
-
+    def get_jwt_based_session(self):
+        return jwt_session('https://test.salesforce.com', self.username)
 
     def delete_org(self, org_config=None):
         if org_config is None:
             org_config = self.get_org_config()
 
         try:
-            org_config.delete_org()
-        except ScratchOrgException as e:
+            # connect to SFDX Hub
+            sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
+            sf = sf_session(sfjwt)
+            # query ActiveScratchOrg via OrgId
+            aso = sf.query(
+                'SELECT ID FROM ActiveScratchOrg WHERE ScratchOrg=\'{}\''.format(self.sf_org_id)
+            )['records'][0]['Id']
+            # delete ActiveScratchOrg
+            r = sf.ActiveScratchOrg.delete(aso)
+        except SalesforceError as e:
             self.delete_error = e.message
             self.deleted = False
             self.save()
