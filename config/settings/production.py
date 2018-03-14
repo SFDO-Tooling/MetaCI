@@ -127,7 +127,7 @@ elif SENDGRID_USERNAME and SENDGRID_PASSWORD:
     ANYMAIL["SENDGRID_USERNAME"] = SENDGRID_USERNAME
     ANYMAIL["SENDGRID_PASSWORD"] = SENDGRID_PASSWORD
 
-EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+EMAIL_BACKEND = "anymail.backends.sendgrid_v2.EmailBackend"
 
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
