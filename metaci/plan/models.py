@@ -131,6 +131,7 @@ class PlanRepository(models.Model):
     repo = models.ForeignKey(Repository, on_delete=models.CASCADE)
 
     class Meta:
+        ordering = ['repo', 'plan']
         verbose_name_plural = 'Plan Repositories'
 
     def __unicode__(self):
