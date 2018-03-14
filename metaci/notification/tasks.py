@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.template.loader import get_template
-from django.template import Context
 from metaci.users.models import User
 from metaci.build.models import Build
 from metaci.notification.models import RepositoryNotification
