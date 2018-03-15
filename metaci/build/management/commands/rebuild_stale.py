@@ -13,6 +13,7 @@ class Command(BaseCommand):
         user = AnonymousUser()
         for rebuild in Rebuild.objects.filter(status='running'):
             rebuild.status = 'error'
+            rebuild.error_message = 'Interrupted by dyno restart while running'
             rebuild.save()
             Rebuild.objects.create(
                 build=rebuild.build,
@@ -21,6 +22,7 @@ class Command(BaseCommand):
             )
         for build in Build.objects.filter(status='running'):
             build.status = 'error'
+            build.error_message = 'Interrupted by dyno restart while running'
             build.save()
             Rebuild.objects.create(
                 build=build,
