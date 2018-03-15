@@ -101,7 +101,7 @@
     }
   },
   "scripts": {
-    "postdeploy": "python manage.py migrate --noinput"
+    "postdeploy": "./postdeploy.sh"
   },
   "image": "heroku/python",
   "addons": [
