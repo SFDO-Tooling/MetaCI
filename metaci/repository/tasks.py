@@ -1,3 +1,4 @@
+from django import db
 from django_rq import job
 
 from metaci.repository.models import Branch
@@ -5,6 +6,7 @@ from metaci.repository.models import Branch
 
 @job('short')
 def prune_branches():
+    db.connection.close()
     pruned = []
     for branch in Branch.objects.all():
         if not branch.github_api:
