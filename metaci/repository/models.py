@@ -33,7 +33,6 @@ class Repository(models.Model):
 class Branch(SoftDeletableModel):
     name = models.CharField(max_length=255)
     repo = models.ForeignKey(Repository, related_name='branches', on_delete=models.CASCADE)
-    deleted = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['repo__name','repo__owner', 'name']
