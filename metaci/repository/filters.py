@@ -23,7 +23,6 @@ class BranchRelatedFilter(filters.FilterSet):
         fields = [
             'id',
             'name',
-            'deleted',
         ]
 
 class BranchFilter(BranchRelatedFilter):
