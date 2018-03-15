@@ -73,7 +73,6 @@
     </header>
   </div>
   <div class="slds-card__body">
-
     <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer">
       <thead class="slds-text-title--caps">
         <tr>
@@ -93,11 +92,11 @@
           <td>{{ soi.sf_org_id }}</td>
           <td>{{ soi.username }}</td>
           <td>{{ soi.time_created }}</td>
-          <td>{{ soi.days }} of {{ soi.days_alive }}</td>
+          <td>{{ soi.days_alive }} of {{ soi.days }}</td>
           <td>{{ soi.org.repo.name }}</td>
           <td><div class="slds-shrink-none">
             <div class="slds-button-group" role="group">
-              <a href="{% url 'org_instance_login' soi.org_id soi.id %}"><button class="slds-button slds-button--neutral">Login</button></a>
+              <a href="{% url 'org_instance_login' soi.org_id soi.id %}" target="_blank"><button class="slds-button slds-button--neutral">Login</button></a>
               <a href="{% url 'org_instance_delete' soi.org_id soi.id %}"><button class="slds-button slds-button--neutral">Delete</button></a>
             </div>
           </div></td>
