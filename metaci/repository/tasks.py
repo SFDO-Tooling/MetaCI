@@ -7,5 +7,4 @@ from metaci.repository.models import Branch
 def prune_branches():
     for branch in Branch.objects.all():
         if not branch.github_api:
-            branch.deleted = True
-            branch.save()
+            branch.delete()

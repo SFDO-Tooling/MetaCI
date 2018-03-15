@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from github3 import login
 from django.conf import settings
+from model_utils.models import SoftDeletableModel
 
 class Repository(models.Model):
     name = models.CharField(max_length=255)
@@ -29,15 +30,10 @@ class Repository(models.Model):
         repo = gh.repository(self.owner, self.name)
         return repo
 
-class BranchManager(models.Manager):
-    def get_queryset(self):
-        return super(BranchManager, self).get_queryset().filter(deleted=False)
-
-class Branch(models.Model):
+class Branch(SoftDeletableModel):
     name = models.CharField(max_length=255)
     repo = models.ForeignKey(Repository, related_name='branches', on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
-    objects = BranchManager()
 
     class Meta:
         ordering = ['repo__name','repo__owner', 'name']
