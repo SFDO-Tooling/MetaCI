@@ -180,6 +180,10 @@ def github_push_webhook(request):
 
     if branch_name:
         branch, created = Branch.objects.get_or_create(repo=repo, name=branch_name)
+        if branch.is_removed:
+            # resurrect the soft deleted branch
+            branch.is_removed = False
+            branch.save()
 
     for plan in repo.plans.filter(type__in=['commit', 'tag'], active=True):
         run_build, commit, commit_message = plan.check_push(push)
