@@ -10,22 +10,11 @@ class Command(BaseCommand):
     help = 'Rebuild all builds/rebuilds with status "running"'
 
     def handle(self, *args, **options):
-        user = AnonymousUser()
         for rebuild in Rebuild.objects.filter(status='running'):
             rebuild.status = 'error'
             rebuild.error_message = 'Interrupted by dyno restart while running'
             rebuild.save()
-            Rebuild.objects.create(
-                build=rebuild.build,
-                user=user,
-                status='queued',
-            )
         for build in Build.objects.filter(status='running'):
             build.status = 'error'
             build.error_message = 'Interrupted by dyno restart while running'
             build.save()
-            Rebuild.objects.create(
-                build=build,
-                user=user,
-                status='queued',
-            )
