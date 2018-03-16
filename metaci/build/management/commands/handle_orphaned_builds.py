@@ -12,9 +12,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for rebuild in Rebuild.objects.filter(status='running'):
             rebuild.status = 'error'
-            rebuild.error_message = 'Interrupted by dyno restart while running'
+            rebuild.error_message = 'System restarted while build was running'
             rebuild.save()
         for build in Build.objects.filter(status='running'):
             build.status = 'error'
-            build.error_message = 'Interrupted by dyno restart while running'
+            build.error_message = 'System restarted while build was running'
             build.save()
