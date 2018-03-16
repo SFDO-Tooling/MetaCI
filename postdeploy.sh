@@ -1,2 +1,2 @@
 python manage.py migrate --noinput
-python manage.py rebuild_stale
+python manage.py handle_orphaned_builds
