@@ -67,6 +67,10 @@ class RunPlanForm(forms.Form):
             repo=self.repo,
             name=self.cleaned_data['branch'],
         )
+        if branch.is_removed:
+            # resurrect the soft deleted branch
+            branch.is_removed = False
+            branch.save()
             
         keep_org = self.cleaned_data.get('keep_org')
 
