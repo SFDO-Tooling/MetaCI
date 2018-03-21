@@ -25,7 +25,6 @@ class BranchSerializer(serializers.HyperlinkedModelSerializer):
         model = Branch
         fields = (
             'id',
-            'deleted',
             'name',
             'repo',
             'repo_id',
