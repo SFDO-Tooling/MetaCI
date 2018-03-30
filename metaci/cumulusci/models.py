@@ -100,6 +100,12 @@ class ActiveOrgManager(models.Manager):
             deleted=False, expiration_date__gt=timezone.now()
         )
 
+class ExpiredOrgManager(models.Manager):
+    def get_queryset(self):
+        return super(ExpiredOrgManager, self).get_queryset().filter(
+            deleted=False, expiration_date__lte=timezone.now()
+        )
+
 class ScratchOrgInstance(models.Model):
     org = models.ForeignKey('cumulusci.Org', related_name='instances', on_delete=models.CASCADE)
     build = models.ForeignKey('build.Build', related_name='scratch_orgs', null=True, blank=True, on_delete=models.CASCADE)
@@ -114,6 +120,7 @@ class ScratchOrgInstance(models.Model):
 
     objects = models.Manager() # the first manager is used by admin
     active = ActiveOrgManager()
+    expired = ExpiredOrgManager()
 
     def __unicode__(self):
         if self.username:
