@@ -94,6 +94,11 @@ class Org(models.Model):
         if not self.scratch:
             cache.delete(self.lock_id)
 
+class ActiveOrgManager(models.Manager):
+    def get_queryset(self):
+        return super(ActiveOrgManager, self).get_queryset().filter(
+            deleted=False, expiration_date__gt=timezone.now()
+        )
 
 class ScratchOrgInstance(models.Model):
     org = models.ForeignKey('cumulusci.Org', related_name='instances', on_delete=models.CASCADE)
@@ -106,6 +111,9 @@ class ScratchOrgInstance(models.Model):
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
+
+    objects = models.Manager() # the first manager is used by admin
+    active = ActiveOrgManager()
 
     def __unicode__(self):
         if self.username:
