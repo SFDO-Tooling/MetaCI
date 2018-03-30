@@ -20,7 +20,6 @@ from django.conf import settings
 from simple_salesforce import Salesforce as SimpleSalesforce
 from simple_salesforce.exceptions import SalesforceError
 
-
 def jwt_session(url=None, username=None):
     if url is None:
         url = 'https://login.salesforce.com'
@@ -106,6 +105,7 @@ class ScratchOrgInstance(models.Model):
     json = models.TextField()
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
+    expiration_date = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         if self.username:
