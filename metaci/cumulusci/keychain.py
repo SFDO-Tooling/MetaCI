@@ -97,7 +97,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         info = org_config.scratch_info
 
         org_json = json.dumps(org_config.config, cls=DjangoJSONEncoder)
-
+        
         # Create a ScratchOrgInstance to store the org info
         instance = ScratchOrgInstance(
             org=org_config.org,
@@ -105,6 +105,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
             sf_org_id=info['org_id'],
             username=info['username'],
             json=org_json,
+            expiration_date = org_config.expires
         )
         instance.save()
         org_config.org_instance = instance
