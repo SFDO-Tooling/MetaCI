@@ -18,4 +18,5 @@ admin.site.register(Service, ServiceAdmin)
 class ScratchOrgInstanceAdmin(admin.ModelAdmin):
     list_display = ('org', 'build', 'sf_org_id', 'username', 'deleted', 'time_created', 'time_deleted')
     list_filter = ('deleted', 'org')
+    raw_id_fields = ('build',)
 admin.site.register(ScratchOrgInstance, ScratchOrgInstanceAdmin)
