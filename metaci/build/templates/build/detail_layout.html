@@ -69,6 +69,14 @@
         </a>
       </p>
     </li>
+    {% if build.user %}
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="User">User</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.user }}">
+          {{ build.user }}
+      </p>
+    </li>
+    {% endif %}
   </ul>
 {% endblock %}
 
