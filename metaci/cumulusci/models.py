@@ -168,7 +168,7 @@ class ScratchOrgInstance(models.Model):
                 # delete ActiveScratchOrg
                 sf.ActiveScratchOrg.delete(aso)
             else:
-                self.delete_error = 'Org already deleted.'
+                self.delete_error = 'Org did not exist when deleted.'
         except SalesforceError as e:
             self.delete_error = e.message
             self.deleted = False
