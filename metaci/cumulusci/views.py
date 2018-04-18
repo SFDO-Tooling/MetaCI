@@ -115,10 +115,7 @@ def org_instance_delete(request, org_id, instance_id):
     if instance.deleted:
         raise Http404("Cannot delete: this org instance is already deleted")
 
-    try:
-        instance.delete_org()
-    except Exception as e:
-        pass
+    instance.delete_org()
     return HttpResponseRedirect(instance.get_absolute_url())
 
 

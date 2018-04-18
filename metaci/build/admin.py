@@ -15,7 +15,10 @@ class BuildAdmin(admin.ModelAdmin):
         'time_start',
         'time_end',
     )
-    list_filter = ('repo', 'plan', 'branch')
+    list_filter = ('repo', 'plan')
+    list_select_related = ('branch','repo','plan')
+
+    raw_id_fields = ('branch', 'plan', 'repo', 'org', 'org_instance', 'current_rebuild')
 admin.site.register(Build, BuildAdmin)
 
 

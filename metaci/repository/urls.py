@@ -25,6 +25,11 @@ urlpatterns = [
         name='repo_plans',
     ),
     url(
+        r'(?P<owner>\w+)/(?P<name>[^/].*)/orgs',
+        repository_views.repo_orgs,
+        name='repo_orgs',
+    ),
+    url(
         r'(?P<owner>\w+)/(?P<name>[^/].*)/*$',
         repository_views.repo_detail,
         name='repo_detail',

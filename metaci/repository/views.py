@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.contrib.admin.views.decorators import staff_member_required
 from metaci.repository.models import Branch
 from metaci.repository.models import Repository
 from metaci.plan.models import Plan
@@ -107,6 +108,19 @@ def repo_plans(request, owner, name):
         'repo': repo,
     }
     return render(request, 'repository/repo_plans.html', context=context)
+
+@staff_member_required
+def repo_orgs(request, owner, name):
+    query = {
+        'owner': owner,
+        'name': name,
+    }
+    repo = get_object_or_404(Repository, **query)
+
+    context = {
+        'repo': repo,
+    }
+    return render(request, 'repository/repo_orgs.html', context=context)
 
 def branch_detail(request, owner, name, branch):
     query = {

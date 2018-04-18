@@ -23,7 +23,7 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         return context
 
     def _get_active_orgs(self):
-        return ScratchOrgInstance.objects.filter(deleted=False, build__user=self.object)
+        return ScratchOrgInstance.active.filter(build__user=self.object)
 
 
 

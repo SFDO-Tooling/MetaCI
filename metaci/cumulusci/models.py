@@ -20,7 +20,6 @@ from django.conf import settings
 from simple_salesforce import Salesforce as SimpleSalesforce
 from simple_salesforce.exceptions import SalesforceError
 
-
 def jwt_session(url=None, username=None):
     if url is None:
         url = 'https://login.salesforce.com'
@@ -95,6 +94,17 @@ class Org(models.Model):
         if not self.scratch:
             cache.delete(self.lock_id)
 
+class ActiveOrgManager(models.Manager):
+    def get_queryset(self):
+        return super(ActiveOrgManager, self).get_queryset().filter(
+            deleted=False, expiration_date__gt=timezone.now()
+        )
+
+class ExpiredOrgManager(models.Manager):
+    def get_queryset(self):
+        return super(ExpiredOrgManager, self).get_queryset().filter(
+            deleted=False, expiration_date__lte=timezone.now()
+        )
 
 class ScratchOrgInstance(models.Model):
     org = models.ForeignKey('cumulusci.Org', related_name='instances', on_delete=models.CASCADE)
@@ -106,6 +116,11 @@ class ScratchOrgInstance(models.Model):
     json = models.TextField()
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
+    expiration_date = models.DateTimeField(null=True, blank=True)
+
+    objects = models.Manager() # the first manager is used by admin
+    active = ActiveOrgManager()
+    expired = ExpiredOrgManager()
 
     def __unicode__(self):
         if self.username:
@@ -145,11 +160,15 @@ class ScratchOrgInstance(models.Model):
             sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
             sf = sf_session(sfjwt)
             # query ActiveScratchOrg via OrgId
-            aso = sf.query(
+            asos = sf.query(
                 'SELECT ID FROM ActiveScratchOrg WHERE ScratchOrg=\'{}\''.format(self.sf_org_id)
-            )['records'][0]['Id']
-            # delete ActiveScratchOrg
-            r = sf.ActiveScratchOrg.delete(aso)
+            )
+            if asos['totalSize'] > 0:
+                aso = asos['records'][0]['Id']
+                # delete ActiveScratchOrg
+                sf.ActiveScratchOrg.delete(aso)
+            else:
+                self.delete_error = 'Org did not exist when deleted.'
         except SalesforceError as e:
             self.delete_error = e.message
             self.deleted = False
