@@ -77,11 +77,12 @@
       <thead class="slds-text-title--caps">
         <tr>
           <th>ID</th>
+          <th>Repo</th>
+          <th>Branch/Tag</th>
           <th>Org ID</th>
           <th>Username</th>
           <th>Time Created</th>
           <th>Days</th>
-          <th>Repo</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -89,11 +90,12 @@
 {% for soi in orgs %}
         <tr class="slds-hint-parent">
           <th scope="row"><a href="{% url 'org_instance_detail' soi.org_id soi.id %}">{{ soi.id }}</a></th>
+          <td>{{ soi.org.repo.name }}</td>
+          <td>{{ soi.build.branch.name }}</td>
           <td>{{ soi.sf_org_id }}</td>
           <td>{{ soi.username }}</td>
           <td>{{ soi.time_created }}</td>
           <td>{{ soi.days_alive }} of {{ soi.days }}</td>
-          <td>{{ soi.org.repo.name }}</td>
           <td><div class="slds-shrink-none">
             <div class="slds-button-group" role="group">
               <a href="{% url 'org_instance_login' soi.org_id soi.id %}" target="_blank"><button class="slds-button slds-button--neutral">Login</button></a>
