@@ -160,11 +160,15 @@ class ScratchOrgInstance(models.Model):
             sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
             sf = sf_session(sfjwt)
             # query ActiveScratchOrg via OrgId
-            aso = sf.query(
+            asos = sf.query(
                 'SELECT ID FROM ActiveScratchOrg WHERE ScratchOrg=\'{}\''.format(self.sf_org_id)
-            )['records'][0]['Id']
-            # delete ActiveScratchOrg
-            r = sf.ActiveScratchOrg.delete(aso)
+            )
+            if asos['totalSize'] > 0:
+                aso = asos['records'][0]['Id']
+                # delete ActiveScratchOrg
+                sf.ActiveScratchOrg.delete(aso)
+            else:
+                self.delete_error = 'Org already deleted.'
         except SalesforceError as e:
             self.delete_error = e.message
             self.deleted = False
