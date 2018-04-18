@@ -36,7 +36,7 @@ def create_default_plans(apps, schema_editor):
         org='packaging',
         context='Upload Beta',
     )
-    # Upload Beta
+    # Beta Test
     Plan.objects.create(
         name='Beta Test',
         description=(
@@ -48,6 +48,43 @@ def create_default_plans(apps, schema_editor):
         flows='ci_beta',
         org='beta',
         context='Beta Test',
+    )
+    # Upload Release
+    Plan.objects.create(
+        name='Upload Release',
+        description=(
+            'Deploy the metadata to the packaging org, upload a production '
+            'version, and create a GitHub release with release notes'
+        ),
+        type='manual',
+        flows='ci_master,release_production',
+        org='packaging',
+        context='Upload Release',
+    )
+    # Release Test
+    Plan.objects.create(
+        name='Release Test',
+        description=(
+            'Installs the latest release in the standard release test org and '
+            'runs apex tests'
+        ),
+        type='tag',
+        regex='rel/.*',
+        flows='ci_release',
+        org='release',
+        context='Release Test',
+    )
+    # Dev Org
+    Plan.objects.create(
+        name='Dev Org',
+        description=(
+            'Runs the dev_org flow against the dev scratch org config.  This '
+            'plan is used by the New Org Please feature'
+        ),
+        type='org',
+        flows='dev_org',
+        org='dev',
+        public=False,
     )
 
 
