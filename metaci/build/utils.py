@@ -68,7 +68,7 @@ def view_queryset(request, query=None, status=None, filter_class=None):
 
 
 def format_log(log):
-    conv = Ansi2HTMLConverter(dark_bg=False, scheme='solarized')
+    conv = Ansi2HTMLConverter(dark_bg=False, scheme='solarized', markup_lines=True)
     headers = conv.produce_headers()
     content = conv.convert(log, full=False)
     content = '<pre class="ansi2html-content">{}</pre>'.format(
@@ -76,10 +76,6 @@ def format_log(log):
     # content = '<div class="body_foreground body_background">{}</div>'.format(
     #    content)
     return headers + content
-
-    previous_dev_hub = ''.join(previous_dev_hub)
-    previous_dev_hub = previous_dev_hub.strip()
-
 
 def run_command(command, env=None, cwd=None):
     kwargs = {}
