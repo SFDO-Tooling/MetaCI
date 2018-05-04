@@ -18,6 +18,9 @@
           <div class="slds-truncate" title="Name">Name</div>
         </th>
         <th scope="col">
+            <div class="slds-truncate" title="Name">Description</div>
+          </th>
+        <th scope="col">
             <div class="slds-truncate" title="Time Start">Time Start</div>
         </th>
         <th scope="col">
@@ -37,6 +40,9 @@
           <td data-label="Task Name">
             <div class="slds-truncate" title="{{ task.name }}">{{ task.name }}</div>
           </td>
+          <td data-label="Description">
+              <div class="slds-truncate">{{ task.description }}</div>
+            </td>
           <td data-label="Time Start">
               <div class="slds-truncate" title="{{ task.time_start }}">{{ task.time_start|time:"f:s"  }}</div>
           </td>
