@@ -37,6 +37,7 @@ admin.site.register(BuildFlow, BuildFlowAdmin)
 class FlowTaskAdmin(admin.ModelAdmin):
     list_display = ('id', 'build_flow', 'stepnum', 'name', 'status')
     list_filter = ('build_flow__build__repo',)
+    raw_id_fields = ['build_flow']
 admin.site.register(FlowTask, FlowTaskAdmin)
 
 
