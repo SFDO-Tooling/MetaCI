@@ -1,6 +1,7 @@
 from django.contrib import admin
 from metaci.build.models import Build
 from metaci.build.models import BuildFlow
+from metaci.build.models import FlowTask
 from metaci.build.models import Rebuild
 
 
@@ -32,6 +33,11 @@ class BuildFlowAdmin(admin.ModelAdmin):
     )
     list_filter = ('build__repo', 'build')
 admin.site.register(BuildFlow, BuildFlowAdmin)
+
+class FlowTaskAdmin(admin.ModelAdmin):
+    list_display = ('id', 'build_flow', 'stepnum', 'name', 'status')
+    list_filter = ('build_flow__build__repo',)
+admin.site.register(FlowTask, FlowTaskAdmin)
 
 
 class RebuildAdmin(admin.ModelAdmin):
