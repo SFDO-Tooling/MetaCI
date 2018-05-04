@@ -10,6 +10,7 @@ import sys
 import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
+import decimal
 
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
@@ -554,10 +555,12 @@ class Rebuild(models.Model):
 
 class FlowTaskManager(models.Manager):
     def find_task(self, build_flow_id, task_name, step_num):
+        step_num = decimal.Decimal(*step_num.version)
         try:
-            return self.get(build_flow_id=build_flow_id, task_name=task_name, step_num=step_num)
+            return self.get(build_flow_id=build_flow_id, name=task_name, stepnum=step_num)
+            
         except ObjectDoesNotExist:
-            return FlowTask(build_flow_id=build_flow_id, task_name=task_name, step_num=step_num)
+            return FlowTask(build_flow_id=build_flow_id, name=task_name, stepnum=step_num)
 
 class FlowTask(models.Model):
     """ A FlowTask holds the result of a task execution during a BuildFlow. """
