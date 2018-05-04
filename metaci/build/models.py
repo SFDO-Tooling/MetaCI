@@ -445,9 +445,13 @@ class BuildFlow(models.Model):
             raise FlowNotFoundError('Flow not found: {}'.format(self.flow))
         flow_config = FlowConfig(flow)
 
-        # Get the class to look up options
-        class_path = flow_config.config.get('class_path',
-                                            'cumulusci.core.flows.BaseFlow')
+        if settings.METACI_FLOW_SUBCLASS_ENABLED:
+            class_path = 'metaci.build.flows.MetaCIFlow'
+        else:
+            # Get the class to look up options
+            class_path = flow_config.config.get('class_path',
+                                                'cumulusci.core.flows.BaseFlow')
+
         flow_class = import_class(class_path)
 
         # Create the flow and handle initialization exceptions
