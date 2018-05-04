@@ -558,7 +558,6 @@ class FlowTaskManager(models.Manager):
         step_num = decimal.Decimal(*step_num.version)
         try:
             return self.get(build_flow_id=build_flow_id, name=task_name, stepnum=step_num)
-            
         except ObjectDoesNotExist:
             return FlowTask(build_flow_id=build_flow_id, name=task_name, stepnum=step_num)
 
