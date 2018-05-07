@@ -27,7 +27,7 @@
             <div class="slds-truncate" title="Time End">Time End</div>
         </th>
         <th scope="col">
-            <div class="slds-truncate" title="Result">Result</div>
+            <div class="slds-truncate" title="Status">Status</div>
         </th>
       </tr>
     </thead>
@@ -49,18 +49,13 @@
           <td data-label="Time End">
               <div class="slds-truncate" title="{{ task.time_end }}">{{ task.time_end|time:"f:s" }}</div>
           </td> 
-          <td data-label="Result">
-              <div class="slds-truncate" >{{ task.result }}</div>
+          <td data-label="Status">
+              <div class="slds-truncate" >{{ task.status }}</div>
           </td>
         </tr>
       {% endfor %}
     </tbody>
     </table>
 
-    <div class="slds-box">
-        {% autoescape off %}
-        {{ flow.get_log_html }}
-        {% endautoescape %}
-      </div>
 {% endfor %}
 {% endblock %}
