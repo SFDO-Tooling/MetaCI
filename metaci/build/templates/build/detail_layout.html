@@ -143,20 +143,8 @@
   </a>
 </li>
 {% endif %}
-{% if request.user.is_staff %}
-  <li class="slds-tabs--default__item{% if tab == 'org' %} slds-active{% endif %}"
-  title="Org" role="presentation">
-    <a class="slds-tabs--default__link"
-      href="{% if original_build %}{{ build.get_absolute_url }}/rebuilds/original{% elif rebuild %}{{ rebuild.get_absolute_url }}{% else %}{{ build.get_absolute_url }}{% endif %}/org"
-      role="tab"
-      tabindex="{% if tab == 'org' %}0{% else %}-1{% endif %}"
-      aria-selected="false"
-      aria-controls="tab-default-5"
-      id="tab-default-5__item"
-      >Org
-  </a>
-</li>
-{% endif %}
+
+
 </ul>
 
 

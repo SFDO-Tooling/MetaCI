@@ -1,6 +1,3 @@
-{% extends "build/detail_layout.html" %}
-
-{% block tab_content %}
 {% if org_instance %}
 <div class="slds-box">
   <div class="slds-grid">
@@ -40,6 +37,7 @@
     <p>{{ org_instance.delete_error|linebreaks }}</p>
     {% endif %}
   {% endif %}
+  </div>
 {% elif build.org %}
 <div class="slds-box">
   <div class="slds-grid">
@@ -79,6 +77,6 @@
       </dl>
     </div>
   </div>
+  </div>
 {% else %}
 {% endif %}
-{% endblock %}

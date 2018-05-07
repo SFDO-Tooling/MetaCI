@@ -1,29 +1,24 @@
 {% extends "build/detail_layout.html" %}
 {% block tab_content %}
+
+{% if request.user.is_staff %}
+{% include 'build/detail_org.html' %}
+{% endif %}
+
 {% if build.get_status == 'fail' or build.get_status == 'error' %}
 <div class="slds-box slds-theme--warning slds-m-bottom--large">
   <h3 class="slds-text-heading--large">Build Exception: {{ build.get_exception }}</h3>
   <p>{{ build.get_error_message|linebreaks }}</p>
 </div>
 {% endif %}
-<div class="slds-box">
+<div class="slds-box slds-m-top--small">
   <h3 class="slds-text-heading--large slds-m-bottom--medium">Build Log</h3>
   {% autoescape off %}
   {{ build.get_log_html }}
   {% endautoescape %}
 </div>
 
-{% for flow in flows %}
+{% include 'build/detail_flow_block.html' %}
 
-<div class="slds-box slds-m-top--small">
-    <a name="flow-{{ flow.flow }}"></a>
-    <h3 class="slds-text-heading--large slds-m-bottom--medium">
-      {{ flow.flow }}
-    </h3>
-    {% autoescape off %}
-    {{ flow.get_log_html }}
-    {% endautoescape %}
-</div>
 
-  {% endfor %}
 {% endblock %}
