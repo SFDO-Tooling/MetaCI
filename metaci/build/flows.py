@@ -16,6 +16,7 @@ class MetaCIFlow(BaseFlow):
         flowtask.description = task.task_config.description
         flowtask.time_start = timezone.now()
         flowtask.options = task.options
+        flowtask.class_path = task.__class__.__name__
         flowtask.status = 'running'
         flowtask.save()
 

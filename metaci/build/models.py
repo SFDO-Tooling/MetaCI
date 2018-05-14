@@ -554,6 +554,8 @@ class Rebuild(models.Model):
             'build_id': str(self.build.id), 'rebuild_id': str(self.id)})
 
 class FlowTaskManager(models.Manager):
+    
+# TODO: refactor to use step strings?
     def find_task(self, build_flow_id, task_name, step_num):
         step_num = decimal.Decimal(*step_num.version)
         try:
@@ -570,6 +572,8 @@ class FlowTask(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     stepnum = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='step number')
+    step_string = models.CharField(max_length=255,)
+    class_path = models.TextField(null=True, blank=True)
     options = JSONField(null=True, blank=True)
     result = JSONField(null=True, blank=True)
     return_values = JSONField(null=True, blank=True)
