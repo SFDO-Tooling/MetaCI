@@ -10,6 +10,7 @@ import sys
 import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
+import decimal
 
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
@@ -21,8 +22,10 @@ from cumulusci.core.utils import import_class
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.conf import settings
 from django.db import models
+from django.contrib.postgres.fields import JSONField
 from django.urls import reverse
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 import requests
 
 from metaci.build.utils import format_log
@@ -47,6 +50,12 @@ BUILD_FLOW_STATUSES = (
     ('success', 'Success'),
     ('error', 'Error'),
     ('fail', 'Failed'),
+)
+FLOW_TASK_STATUSES = (
+    ('initializing', 'Initializing'),
+    ('running', 'Running'),
+    ('complete', 'Completed'),
+    ('error', 'Error')
 )
 BUILD_TYPES = (
     ('manual', 'Manual'),
@@ -438,14 +447,21 @@ class BuildFlow(models.Model):
             raise FlowNotFoundError('Flow not found: {}'.format(self.flow))
         flow_config = FlowConfig(flow)
 
-        # Get the class to look up options
-        class_path = flow_config.config.get('class_path',
-                                            'cumulusci.core.flows.BaseFlow')
+        if settings.METACI_FLOW_SUBCLASS_ENABLED:
+            class_path = 'metaci.build.flows.MetaCIFlow'
+        else:
+            # Get the class to look up options
+            class_path = flow_config.config.get('class_path',
+                                                'cumulusci.core.flows.BaseFlow')
+
         flow_class = import_class(class_path)
 
         # Create the flow and handle initialization exceptions
         self.flow_instance = flow_class(project_config, flow_config,
                                         org_config)
+
+        if settings.METACI_FLOW_SUBCLASS_ENABLED:
+            self.flow_instance.buildflow_id = self.pk
 
         # Run the flow
         res = self.flow_instance()
@@ -536,3 +552,46 @@ class Rebuild(models.Model):
     def get_absolute_url(self):
         return reverse('build_rebuild_detail', kwargs={
             'build_id': str(self.build.id), 'rebuild_id': str(self.id)})
+
+class FlowTaskManager(models.Manager):
+    
+# TODO: refactor to use step strings?
+    def find_task(self, build_flow_id, task_name, step_num):
+        step_num = decimal.Decimal(*step_num.version)
+        try:
+            return self.get(build_flow_id=build_flow_id, name=task_name, stepnum=step_num)
+        except ObjectDoesNotExist:
+            return FlowTask(build_flow_id=build_flow_id, name=task_name, stepnum=step_num)
+
+class FlowTask(models.Model):
+    """ A FlowTask holds the result of a task execution during a BuildFlow. """
+    time_start = models.DateTimeField(null=True, blank=True)
+    time_end = models.DateTimeField(null=True, blank=True)
+    # time_initialize = models.DateTimeField(null=True, blank=True)
+
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    stepnum = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='step number')
+    step_string = models.CharField(max_length=255,)
+    class_path = models.TextField(null=True, blank=True)
+    options = JSONField(null=True, blank=True)
+    result = JSONField(null=True, blank=True)
+    return_values = JSONField(null=True, blank=True)
+    exception = models.CharField(max_length=255, null=True, blank=True)
+    exception_value = JSONField(null=True, blank=True)
+
+    status = models.CharField(max_length=16, choices=FLOW_TASK_STATUSES,
+                              default='queued')
+
+
+    build_flow = models.ForeignKey('build.BuildFlow', related_name='tasks', on_delete=models.CASCADE)
+
+    objects = FlowTaskManager()
+
+    def __str__(self):
+        return "{}: {} - {}".format(self.build_flow_id, self.stepnum, self.name)
+
+    class Meta:
+        ordering = ["-build_flow", "stepnum"]
+        verbose_name = 'Flow Task'
+        verbose_name_plural = 'Flow Tasks'

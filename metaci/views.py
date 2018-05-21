@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 import django
+from django.conf import settings
 from django.views.generic.base import TemplateView
 from pip.utils import get_installed_version
 
@@ -49,5 +50,7 @@ class AboutView(TemplateView):
         for var in heroku_env_vars:
             context[var] = os.environ.get(var,
                 'Heroku dyno metadata not found')
+
+        context['METACI_FLOW_SUBCLASS_ENABLED'] = settings.METACI_FLOW_SUBCLASS_ENABLED
 
         return context

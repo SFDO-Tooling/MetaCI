@@ -1,2 +1,2 @@
-worker_dev: python manage.py rqworkers default short --workers 2 --worker-class metaci.build.worker.RequeueingWorker
-worker_scheduler: python manage.py rqscheduler
+worker_dev: python manage.py rqworkers default short --workers 2 --worker-class metaci.build.worker.RequeueingWorker 
+worker_scheduler: python manage.py rqscheduler 
