@@ -51,10 +51,19 @@ Prerequisites
 
 You can also fork the CumulusCI-Test repository and use that as a demo since it is already configured for CumulusCI.  
 
-Deploy to Heroku
-----------------
+Getting Started
+---------------
 
-Dive right in:
+The recommended way to deploy and configure `MetaCI` is via the `MetaCI-CLI` project which can access your local CumulusCI project configurations including repo info and org configs to quickly get you up and running with `MetaCI`.
+
+Full documentation on launching and configuring `MetaCI` on Heroku using the `MetaCI-CLI`:
+http://metaci-cli.readthedocs.io/
+
+You can also reference the following session recordings showing live demos of how to configure `CumulusCI` and `MetaCI` for projects:
+https://www.youtube.com/watch?v=CgvYKDqb6Ng
+https://www.youtube.com/watch?v=TN-e785MqBA
+
+Or, if you feel like deploying manually and configuring through the Admin interface:
 
 .. image:: https://www.herokucdn.com/deploy/button.svg
    :target: https://heroku.com/deploy
