@@ -458,7 +458,7 @@ class BuildFlow(models.Model):
 
         # Create the flow and handle initialization exceptions
         self.flow_instance = flow_class(project_config, flow_config,
-                                        org_config)
+                                        org_config, name=self.flow)
 
         if settings.METACI_FLOW_SUBCLASS_ENABLED:
             self.flow_instance.buildflow_id = self.pk
