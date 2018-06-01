@@ -6,7 +6,7 @@ import sys
 import django
 from django.conf import settings
 from django.views.generic.base import TemplateView
-from cumulusci import __version__ as cciversion
+import cumulusci 
 
 class AboutView(TemplateView):
 
@@ -34,7 +34,7 @@ class AboutView(TemplateView):
             context['SFDX_CLI_VERSION'] = match.group(1)
 
         # cumulusci
-        context['CUMULUSCI_VERSION'] = cciversion
+        context['CUMULUSCI_VERSION'] = cumulusci.__version__
 
         # heroku
         heroku_env_vars = [
