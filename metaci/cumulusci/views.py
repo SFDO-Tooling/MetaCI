@@ -8,6 +8,7 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
 
 from metaci.build.utils import paginate
 from metaci.build.utils import view_queryset
@@ -71,6 +72,10 @@ def org_unlock(request, org_id):
 @staff_member_required
 def org_login(request, org_id, instance_id=None):
     org = get_object_or_404(Org, id=org_id)
+
+    if org.management_group is not None:
+        if not request.user.groups.filter(pk=org.management_group_id).exists():
+            raise PermissionDenied('You are not a member of the management group.')
 
     def get_org_config(org):
         org_config = org.get_org_config()
