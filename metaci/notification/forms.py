@@ -32,6 +32,7 @@ class AddRepositoryNotificationForm(forms.ModelForm):
                 Field('on_success', css_class='slds-input'),
                 Field('on_fail', css_class='slds-input'),
                 Field('on_error', css_class='slds-input'),
+                Field('follow', css_class='slds-input'),
                 css_class='slds-form-element',
             ),
             FormActions(
@@ -69,6 +70,7 @@ class AddBranchNotificationForm(forms.ModelForm):
                 Field('on_success', css_class='slds-input'),
                 Field('on_fail', css_class='slds-input'),
                 Field('on_error', css_class='slds-input'),
+                Field('follow', css_class='slds-input'),
                 css_class='slds-form-element',
             ),
             FormActions(
@@ -106,6 +108,7 @@ class AddPlanNotificationForm(forms.ModelForm):
                 Field('on_success', css_class='slds-input'),
                 Field('on_fail', css_class='slds-input'),
                 Field('on_error', css_class='slds-input'),
+                Field('follow', css_class='slds-input'),
                 css_class='slds-form-element',
             ),
             FormActions(
@@ -143,6 +146,7 @@ class AddPlanRepositoryNotificationForm(forms.ModelForm):
                 Field('on_success', css_class='slds-input'),
                 Field('on_fail', css_class='slds-input'),
                 Field('on_error', css_class='slds-input'),
+                Field('follow', css_class='slds-input'),
                 css_class='slds-form-element',
             ),
             FormActions(
