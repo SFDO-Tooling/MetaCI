@@ -40,7 +40,11 @@
   </table>
 </div>
 
-    {{ form.errors }}
-      {% crispy form form.helper %}
+<form method="post">{% csrf_token %}
+  <input type="submit" value="Confirm" class="slds-button slds-button--destructive" />
+  <a href="{{ view.get_success_url }}" class="slds-button slds-button--neutral">Cancel</a>
+
+</form>
+
 
 {% endblock %}

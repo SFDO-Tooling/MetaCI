@@ -38,27 +38,3 @@ class AddNotificationForm(forms.ModelForm):
         )
     class Meta:
         fields = ['target', 'on_success', 'on_error', 'on_fail', 'follow']
-
-
-class DeleteNotificationForm(forms.Form):
-
-    def __init__(self, *args, **kwargs):
-        super(DeleteNotificationForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_class = 'form-vertical'
-        self.helper.form_id = 'delete-notification-form'
-        self.helper.form_method = 'post'
-        self.helper.layout = Layout(
-            FormActions(
-                Submit(
-                    'action',
-                    'Cancel',
-                    css_class='slds-button slds-button--neutral',
-                ),
-                Submit(
-                    'action',
-                    'Delete',
-                    css_class='slds-button slds-button--destructive',
-                ),
-            ),
-        )
