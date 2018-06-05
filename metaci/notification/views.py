@@ -2,12 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.views.generic import CreateView
+from django.forms import modelform_factory
 
-from metaci.notification.forms import AddBranchNotificationForm
-from metaci.notification.forms import AddPlanNotificationForm
-from metaci.notification.forms import AddPlanRepositoryNotificationForm
-from metaci.notification.forms import AddRepositoryNotificationForm
 from metaci.notification.forms import DeleteNotificationForm
+from metaci.notification.forms import AddNotificationForm
 from metaci.notification.models import BranchNotification
 from metaci.notification.models import PlanNotification
 from metaci.notification.models import PlanRepositoryNotification
@@ -28,73 +27,39 @@ def my_notifications(request):
         context={'notifications': notifications},
     )
 
+class AddNotificationBaseView(CreateView):
+    # subviews will define a Model
+    # it should create a generic add notification form
+    # it should render the add_notification.html template
+    # it requires login access
+    template_name = 'notification/add_notification.html'
+    success_url = '/notifications'
+    
+    def get_form_class(self):
+        return modelform_factory(self.model, form=AddNotificationForm)
 
-@login_required
-def add_repository_notification(request):
-    initial = {'user': request.user.id}
-    if request.method == 'POST':
-        form = AddRepositoryNotificationForm(request.POST, initial=initial)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/notifications')
-    else:
-        form = AddRepositoryNotificationForm(initial=initial)
-    return render(
-        request,
-        'notification/add_repository_notification.html',
-        context={'form': form},
-    )
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(AddNotificationBaseView, self).form_valid(form)
 
-
-@login_required
-def add_branch_notification(request):
-    initial = {'user': request.user.id}
-    if request.method == 'POST':
-        form = AddBranchNotificationForm(request.POST, initial=initial)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/notifications')
-    else:
-        form = AddBranchNotificationForm(initial=initial)
-    return render(
-        request,
-        'notification/add_branch_notification.html',
-        context={'form': form},
-    )
+    def get_context_data(self, **kwargs):
+        context = super(AddNotificationBaseView, self).get_context_data(**kwargs)
+        # populate notification_type for template w/ model verbose name
+        context['notification_type'] = self.model._meta.verbose_name.title()
+        return context
 
 
-@login_required
-def add_plan_notification(request):
-    initial = {'user': request.user.id}
-    if request.method == 'POST':
-        form = AddPlanNotificationForm(request.POST, initial=initial)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/notifications')
-    else:
-        form = AddPlanNotificationForm(initial=initial)
-    return render(
-        request,
-        'notification/add_plan_notification.html',
-        context={'form': form},
-    )
+class AddPlanRepositoryNotification(AddNotificationBaseView):
+    model = PlanRepositoryNotification
 
+class AddPlanNotification(AddNotificationBaseView):
+    model = PlanNotification
 
-@login_required
-def add_planrepository_notification(request):
-    initial = {'user': request.user.id}
-    if request.method == 'POST':
-        form = AddPlanRepositoryNotificationForm(request.POST, initial=initial)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/notifications')
-    else:
-        form = AddPlanRepositoryNotificationForm(initial=initial)
-    return render(
-        request,
-        'notification/add_planrepository_notification.html',
-        context={'form': form},
-    )
+class AddRepositoryNotification(AddNotificationBaseView):
+    model = RepositoryNotification
+
+class AddBranchNotification(AddNotificationBaseView):
+    model = BranchNotification
 
 
 @login_required
