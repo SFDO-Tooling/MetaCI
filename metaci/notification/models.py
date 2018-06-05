@@ -7,7 +7,6 @@ class AbstractNotification(models.Model):
     on_success = models.BooleanField(default=False)
     on_fail = models.BooleanField(default=True)
     on_error = models.BooleanField(default=True)
-    follow = models.BooleanField(default=True)
 
     class Meta:
         abstract = True

@@ -25,7 +25,6 @@ class AddNotificationForm(forms.ModelForm):
                 Field('on_success', css_class='slds-input'),
                 Field('on_fail', css_class='slds-input'),
                 Field('on_error', css_class='slds-input'),
-                Field('follow', css_class='slds-input'),
                 css_class='slds-form-element',
             ),
             FormActions(
