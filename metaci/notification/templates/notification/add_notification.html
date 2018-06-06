@@ -2,11 +2,11 @@
 
 {% load crispy_forms_tags %}
 
-{% block layout_header_text %}Add Repository Notification{% endblock %}
+{% block layout_header_text %}Add {{ notification_type }}{% endblock %}
 
 {% block layout_body %}
 
     {{ form.errors }}
-      {% crispy form form.helper %}
+    {% crispy form  %}
 
 {% endblock %}
