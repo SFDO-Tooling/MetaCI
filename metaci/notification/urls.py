@@ -11,42 +11,42 @@ urlpatterns = [
     ),
     url(
         r'^add/repository',
-        views.add_repository_notification,
+        views.AddRepositoryNotification.as_view(),
         name='add_repository_notification',
     ),
     url(
         r'^add/branch',
-        views.add_branch_notification,
+        views.AddBranchNotification.as_view(),
         name='add_branch_notification',
     ),
     url(
         r'^add/planrepository',
-        views.add_planrepository_notification,
+        views.AddPlanRepositoryNotification.as_view(),
         name='add_planrepository_notification',
     ),
     url(
         r'^add/plan',
-        views.add_plan_notification,
+        views.AddPlanNotification.as_view(),
         name='add_plan_notification',
     ),
     url(
         r'^delete/branch/(?P<pk>\d+)$',
-        views.delete_branch_notification,
+        views.DeleteBranchNotification.as_view(),
         name='delete_branch_notification',
     ),
     url(
         r'^delete/plan/(?P<pk>\d+)$',
-        views.delete_plan_notification,
+        views.DeletePlanNotification.as_view(),
         name='delete_plan_notification',
     ),
     url(
         r'^delete/planrepository/(?P<pk>\d+)$',
-        views.delete_planrepository_notification,
+        views.DeletePlanRepositoryNotification.as_view(),
         name='delete_planrepository_notification',
     ),
     url(
         r'^delete/repository/(?P<pk>\d+)$',
-        views.delete_repository_notification,
+        views.DeleteRepositoryNotification.as_view(),
         name='delete_repository_notification',
     ),
 ]
