@@ -79,8 +79,10 @@ def org_login(request, org_id, instance_id=None):
 
     def get_org_config(org):
         org_config = org.get_org_config()
-        connected_app = get_connected_app()
-        org_config.refresh_oauth_token(connected_app)
+        
+        org_config.refresh_oauth_token(
+            keychain=None, connected_app=get_connected_app()
+        )
         return org_config
 
     # For non-scratch orgs, just log into the org
@@ -97,8 +99,6 @@ def org_login(request, org_id, instance_id=None):
             raise Http404("Cannot log in: the org instance is already deleted")
 
         # Log into the scratch org
-        # org_config = get_org_config(instance)
-        # return HttpResponseRedirect(org_config.start_url)
         session = instance.get_jwt_based_session()
         return HttpResponseRedirect(
             urljoin(
