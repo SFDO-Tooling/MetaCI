@@ -35,11 +35,11 @@ def queue_build_notifications(build_id):
     elif build.get_status() == 'error':
         status_query['on_error'] = True
     
-    repo_notifications = RepositoryNotification.objects.filter(repo = build.repo, **status_query).values('user__id').distinct()
-    branch_notifications = BranchNotification.objects.filter(branch = build.branch, **status_query).values('user__id').distinct()
-    plan_notifications = PlanNotification.objects.filter(plan = build.plan, **status_query).values('user__id').distinct()
+    repo_notifications = RepositoryNotification.objects.filter(target = build.repo, **status_query).values('user__id').distinct()
+    branch_notifications = BranchNotification.objects.filter(target = build.branch, **status_query).values('user__id').distinct()
+    plan_notifications = PlanNotification.objects.filter(target = build.plan, **status_query).values('user__id').distinct()
     planrepository = PlanRepository.objects.filter(plan=build.plan, repo=build.repo)[0]
-    planrepository_notifications = PlanRepositoryNotification.objects.filter(planrepository=planrepository, **status_query).values('user__id').distinct()
+    planrepository_notifications = PlanRepositoryNotification.objects.filter(target=planrepository, **status_query).values('user__id').distinct()
 
     users_repo = [user['user__id'] for user in repo_notifications]
     users_branch = [user['user__id'] for user in branch_notifications]
