@@ -36,4 +36,4 @@ class AddNotificationForm(forms.ModelForm):
             ),
         )
     class Meta:
-        fields = ['target', 'on_success', 'on_error', 'on_fail', 'follow']
+        fields = ['target', 'on_success', 'on_error', 'on_fail',]
