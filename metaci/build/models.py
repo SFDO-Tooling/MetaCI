@@ -16,6 +16,7 @@ from cumulusci.core.config import FlowConfig
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
 from cumulusci.core.exceptions import ApexTestException
 from cumulusci.core.exceptions import BrowserTestFailure
+from cumulusci.core.exceptions import RobotTestFailure
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.exceptions import ScratchOrgException
 from cumulusci.core.utils import import_class
@@ -63,6 +64,12 @@ BUILD_TYPES = (
     ('auto', 'Auto'),
     ('scheduled', 'Scheduled'),
     ('legacy', 'Legacy - Probably Automatic')
+)
+FAIL_EXCEPTIONS = (
+    ApexTestException,
+    BrowserTestFailure,
+    MetadataComponentFailure,
+    RobotTestFailure,
 )
 
 
@@ -419,16 +426,7 @@ class BuildFlow(models.Model):
             exception = None
             status = 'success'
 
-        except MetadataComponentFailure as e:
-            exception = e
-            status = 'fail'
-
-        except ApexTestException as e:
-            exception = e
-            self.load_test_results()
-            status = 'fail'
-
-        except BrowserTestFailure as e:
+        except FAIL_EXCEPTIONS as e:
             exception = e
             self.load_test_results()
             status = 'fail'
