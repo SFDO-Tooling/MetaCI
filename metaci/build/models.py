@@ -65,6 +65,12 @@ BUILD_TYPES = (
     ('scheduled', 'Scheduled'),
     ('legacy', 'Legacy - Probably Automatic')
 )
+FAIL_EXCEPTIONS = (
+    ApexTestException,
+    BrowserTestFailure,
+    MetadataComponentFailure,
+    RobotTestFailure,
+)
 
 
 
@@ -420,21 +426,7 @@ class BuildFlow(models.Model):
             exception = None
             status = 'success'
 
-        except MetadataComponentFailure as e:
-            exception = e
-            status = 'fail'
-
-        except ApexTestException as e:
-            exception = e
-            self.load_test_results()
-            status = 'fail'
-
-        except BrowserTestFailure as e:
-            exception = e
-            self.load_test_results()
-            status = 'fail'
-
-        except RobotTestFailure as e:
+        except FAIL_EXCEPTIONS as e:
             exception = e
             self.load_test_results()
             status = 'fail'
