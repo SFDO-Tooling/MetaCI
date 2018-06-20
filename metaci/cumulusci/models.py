@@ -62,6 +62,14 @@ class Org(models.Model):
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey('repository.Repository', related_name='orgs', on_delete=models.CASCADE)
 
+    management_group = models.ForeignKey(
+        'auth.Group',
+        related_name='protected_orgs',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']
 

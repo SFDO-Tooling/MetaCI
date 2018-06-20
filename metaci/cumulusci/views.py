@@ -8,6 +8,7 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
 
 from metaci.build.utils import paginate
 from metaci.build.utils import view_queryset
@@ -72,10 +73,16 @@ def org_unlock(request, org_id):
 def org_login(request, org_id, instance_id=None):
     org = get_object_or_404(Org, id=org_id)
 
+    if org.management_group is not None:
+        if not request.user.groups.filter(pk=org.management_group_id).exists():
+            raise PermissionDenied('You are not a member of the management group.')
+
     def get_org_config(org):
         org_config = org.get_org_config()
-        connected_app = get_connected_app()
-        org_config.refresh_oauth_token(connected_app)
+        
+        org_config.refresh_oauth_token(
+            keychain=None, connected_app=get_connected_app()
+        )
         return org_config
 
     # For non-scratch orgs, just log into the org
@@ -92,8 +99,6 @@ def org_login(request, org_id, instance_id=None):
             raise Http404("Cannot log in: the org instance is already deleted")
 
         # Log into the scratch org
-        # org_config = get_org_config(instance)
-        # return HttpResponseRedirect(org_config.start_url)
         session = instance.get_jwt_based_session()
         return HttpResponseRedirect(
             urljoin(

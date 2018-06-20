@@ -24,6 +24,7 @@ from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.conf import settings
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
@@ -64,6 +65,16 @@ BUILD_TYPES = (
     ('scheduled', 'Scheduled'),
     ('legacy', 'Legacy - Probably Automatic')
 )
+
+
+
+class GnarlyEncoder(DjangoJSONEncoder):
+    """ A Very Gnarly Encoder that serializes a repr() if it can't get anything else.... """
+    def default(self, obj): # pylint: disable=W0221, E0202
+        try:
+            return super().default(obj)
+        except TypeError:
+            return repr(obj)
 
 
 class Build(models.Model):
@@ -580,11 +591,11 @@ class FlowTask(models.Model):
     stepnum = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='step number')
     step_string = models.CharField(max_length=255,)
     class_path = models.TextField(null=True, blank=True)
-    options = JSONField(null=True, blank=True)
-    result = JSONField(null=True, blank=True)
-    return_values = JSONField(null=True, blank=True)
+    options = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
+    result = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
+    return_values = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
     exception = models.CharField(max_length=255, null=True, blank=True)
-    exception_value = JSONField(null=True, blank=True)
+    exception_value = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
 
     status = models.CharField(max_length=16, choices=FLOW_TASK_STATUSES,
                               default='queued')

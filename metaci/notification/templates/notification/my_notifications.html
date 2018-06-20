@@ -22,7 +22,7 @@
     <tbody>
     {% for notification in notifications.repo %}
       <tr>
-        <td>{{ notification.repo }}</td>
+        <td>{{ notification.target }}</td>
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>
@@ -61,7 +61,7 @@
     <tbody>
     {% for notification in notifications.plan %}
       <tr>
-        <td>{{ notification.plan }}</td>
+        <td>{{ notification.target }}</td>
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>
@@ -100,7 +100,7 @@
     <tbody>
     {% for notification in notifications.planrepository %}
       <tr>
-        <td>{{ notification.planrepository }}</td>
+        <td>{{ notification.target }}</td>
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
         <td>{{ notification.on_error }}</td>
@@ -139,7 +139,7 @@
     <tbody>
     {% for notification in notifications.branch %}
       <tr>
-        <td>{{ notification.branch }}</td>
+        <td>{{ notification.target }}</td>
         <td>{{ notification.branch.repo }}</td>
         <td>{{ notification.on_success }}</td>
         <td>{{ notification.on_fail }}</td>
