@@ -199,17 +199,21 @@ def github_push_webhook(request):
             branch.is_removed = False
             branch.save()
 
-    for plan in repo.plans.filter(type__in=['commit', 'tag'], active=True):
+    for plan_repo in repo.planrepository_set.filter(plan__type__in=['commit','tag'], active=True):
+        plan = plan_repo.plan
         run_build, commit, commit_message = plan.check_push(push)
+
         if run_build:
-            build = Build(
-                repo = repo,
-                plan = plan,
-                commit = commit,
-                commit_message = commit_message,
-                branch = branch,
-                build_type = 'auto',
-            )
-            build.save() 
+            for org in plan_repo.get_orgs():
+                build = Build(
+                    repo = repo,
+                    plan = plan,
+                    commit = commit,
+                    commit_message = commit_message,
+                    branch = branch,
+                    build_type = 'auto', #FIXME: make this a constant ref
+                    org = org
+                )
+                build.save() 
 
     return HttpResponse('OK')
