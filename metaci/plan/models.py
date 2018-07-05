@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import re
 import yaml
+import fnmatch
 
 from django.apps import apps
 from django.db import models
@@ -29,6 +30,8 @@ def validate_yaml_field(value):
     except yaml.YAMLError as err:
         raise ValidationError('Error parsing additional YAML: {}'.format(err))
 
+def pg_glob(str):
+    return fnmatch.translate(str).replace('\\Z(?ms)', '$')
 
 class Plan(models.Model):
     name = models.CharField(max_length=255)
@@ -136,6 +139,11 @@ class PlanRepository(models.Model):
 
     def __unicode__(self):
         return u'[{}] {}'.format(self.repo, self.plan)
+
+    def get_orgs(self):
+        """ parses the glob expression in Plan.org into a list of orgs that are valid for this project keychain. """
+        return self.repo.orgs.filter(name__iregex = pg_glob(self.plan.org))
+
 
 
 class PlanSchedule(models.Model):
