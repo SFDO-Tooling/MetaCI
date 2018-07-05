@@ -125,6 +125,13 @@ class Build(models.Model):
     def __unicode__(self):
         return '{}: {} - {}'.format(self.id, self.repo, self.commit)
 
+
+    def save(self, *args, **kwargs):
+        # populate the org_name
+        if not self.org_name:
+            self.org_name = self.plan.org
+        super(Build, self).save(*args, **kwargs)  # Call the "real" save() method.
+
     def get_log_html(self):
         if self.log:
             return format_log(self.log)
@@ -302,11 +309,15 @@ class Build(models.Model):
         return project_config
 
     def get_org(self, project_config, retries=3):
+        if self.pk is None:
+            # we overrode Build.save() in order to make sure that Build.org_name is populated.
+            # if save() hasn't been called yet.... no bueno!
+            raise RuntimeError('Attempted to load the org for this build before it was db persisted. See the code.')
         self.logger = init_logger(self)
         attempt = 1
         while True:
             try:
-                org_config = project_config.keychain.get_org(self.plan.org)
+                org_config = project_config.keychain.get_org(self.org_name)
                 break
             except ScratchOrgException as e:
                 if (
