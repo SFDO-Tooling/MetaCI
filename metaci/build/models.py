@@ -128,7 +128,7 @@ class Build(models.Model):
 
     def save(self, *args, **kwargs):
         # populate the org_name
-        if not self.org_name or not self.org:
+        if (not self.org) and (not self.org_name):
             self.org_name = self.plan.org
         super(Build, self).save(*args, **kwargs)  # Call the "real" save() method.
 
@@ -309,6 +309,13 @@ class Build(models.Model):
         return project_config
 
     def get_org(self, project_config, retries=3):
+        if self.org and not self.current_rebuild:
+            org_config = self.org.get_org_config()
+            if self.current_rebuild:
+                #FIXME: refactor out into the rebuild process. doesn't belong here.
+                self.current_rebuild.org_instance = org_config.org_instance
+                self.current_rebuild.save()
+            return org_config
         if self.pk is None:
             # we overrode Build.save() in order to make sure that Build.org_name is populated.
             # if save() hasn't been called yet.... no bueno!
