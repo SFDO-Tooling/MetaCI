@@ -16,6 +16,7 @@ class RunPlanForm(forms.Form):
     branch = forms.ChoiceField(choices=(), label='Branch')
     commit = forms.CharField(required=False)
     keep_org = forms.BooleanField(required=False)
+    org_name = forms.CharField(max_length=255, required=False, label='Org Name')
 
     def __init__(self, plan, repo, user, *args, **kwargs):
         self.plan = plan
@@ -43,6 +44,16 @@ class RunPlanForm(forms.Form):
                 Field('keep_org', css_class='slds-checkbox'),
                 css_class='slds-form-element',
             ),
+        )
+        if 'advanced_mode' in args[0]:
+            self.helper.layout.append(
+                Fieldset(
+                    'Optionally enter an org name.',
+                    Field('org_name', css_class='slds-input'),
+                    css_class='slds-form-element',
+                ),
+            )
+        self.helper.layout.append(
             FormActions(
                 Submit('submit', 'Submit',
                        css_class='slds-button slds-button--brand')
@@ -71,7 +82,7 @@ class RunPlanForm(forms.Form):
             # resurrect the soft deleted branch
             branch.is_removed = False
             branch.save()
-            
+
         keep_org = self.cleaned_data.get('keep_org')
 
         build = Build(
@@ -81,8 +92,9 @@ class RunPlanForm(forms.Form):
             commit=commit,
             keep_org=keep_org,
             build_type='manual',
-            user=self.user
+            user=self.user,
+            org_name = self.cleaned_data.get('org_name')
         )
         build.save()
-        
+
         return build
