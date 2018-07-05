@@ -128,7 +128,7 @@ class Build(models.Model):
 
     def save(self, *args, **kwargs):
         # populate the org_name
-        if not self.org_name:
+        if not self.org_name or not self.org:
             self.org_name = self.plan.org
         super(Build, self).save(*args, **kwargs)  # Call the "real" save() method.
 
