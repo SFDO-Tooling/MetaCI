@@ -22,6 +22,9 @@ class RunPlanForm(forms.Form):
         self.plan = plan
         self.repo = repo
         self.user = user
+        self.advanced_mode = False
+        if 'advanced_mode' in args[0]:
+            self.advanced_mode = (args[0]['advanced_mode'] == "1")
         super(RunPlanForm, self).__init__(*args, **kwargs)
         self.fields['branch'].choices = self._get_branch_choices()
         self.helper = FormHelper()
@@ -35,24 +38,25 @@ class RunPlanForm(forms.Form):
                 css_class='slds-form-element',
             ),
             Fieldset(
-                'Enter the commit you want to build.  The HEAD commit on the branch will be used if you do not specify a commit',
-                Field('commit', css_class='slds-input'),
-                css_class='slds-form-element',
-            ),
-            Fieldset(
                 'Keep org? (scratch orgs only)',
                 Field('keep_org', css_class='slds-checkbox'),
                 css_class='slds-form-element',
             ),
         )
-        if 'advanced_mode' in args[0]:
-            self.helper.layout.append(
+        if self.advanced_mode:
+            self.helper.layout.extend([
+                Fieldset(
+                    'Enter the commit you want to build.  The HEAD commit on the branch will be used if you do not specify a commit',
+                    Field('commit', css_class='slds-input'),
+                    css_class='slds-form-element',
+                ),
+
                 Fieldset(
                     'Optionally enter an org name.',
                     Field('org_name', css_class='slds-input'),
                     css_class='slds-form-element',
                 ),
-            )
+            ])
         self.helper.layout.append(
             FormActions(
                 Submit('submit', 'Submit',
