@@ -84,12 +84,12 @@ def check_queued_build(build_id):
         org = build.org
     except Org.DoesNotExist:
         message = 'Could not find org configuration for org {}'.format(
-            build.plan.org)
+            build.org)
         build.log = message
         build.set_status('error')
         build.save()
         return 'Could not find org configuration for org {}'.format(
-            build.plan.org)
+            build.org)
 
     if org.scratch:
         # For scratch orgs, we don't need concurrency blocking logic, just run
