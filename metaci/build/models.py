@@ -265,18 +265,12 @@ class Build(models.Model):
         set_build_info(build, status='success', time_end=timezone.now())
 
     def checkout(self):
-        zip_url = '{}/archive/{}.zip'.format(
-            self.repo.url,
-            self.commit,
-        )
-        self.logger.info('-- Download commit from URL: {}'.format(zip_url))
-        self.save()
-        kwargs = {'auth': (settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)}
-        resp = requests.get(zip_url, **kwargs)
+        # get the ref
+        zip_content = StringIO.StringIO()
+        self.repo.github_api.archive('zipball', zip_content, ref=self.commit)
         build_dir = tempfile.mkdtemp()
         self.logger.info('-- Extracting zip to temp dir {}'.format(build_dir))
         self.save()
-        zip_content = StringIO.StringIO(resp.content)
         zip_file = zipfile.ZipFile(zip_content)
         zip_file.extractall(build_dir)
         build_dir += '/{}-{}'.format(self.repo.name, self.commit)
