@@ -265,13 +265,13 @@ class Build(models.Model):
         set_build_info(build, status='success', time_end=timezone.now())
 
     def checkout(self):
-        _,zippath = tempfile.mkstemp()
         # get the ref
-        self.repo.github_api.archive('zipball', zippath, ref=self.commit)
+        zip_content = StringIO.StringIO()
+        self.repo.github_api.archive('zipball', zip_content, ref=self.commit)
         build_dir = tempfile.mkdtemp()
         self.logger.info('-- Extracting zip to temp dir {}'.format(build_dir))
         self.save()
-        zip_file = zipfile.ZipFile(zippath)
+        zip_file = zipfile.ZipFile(zip_content)
         zip_file.extractall(build_dir)
         build_dir += '/{}-{}'.format(self.repo.name, self.commit)
         self.logger.info('-- Commit extracted to build dir: {}'.format(
