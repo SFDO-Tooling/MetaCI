@@ -273,7 +273,8 @@ class Build(models.Model):
         self.save()
         zip_file = zipfile.ZipFile(zip_content)
         zip_file.extractall(build_dir)
-        build_dir += '/{}-{}'.format(self.repo.name, self.commit)
+        # assume the zipfile has a single child dir with the repo
+        build_dir = os.join(build_dir, os.listdir(build_dir)[0])
         self.logger.info('-- Commit extracted to build dir: {}'.format(
             build_dir))
         self.save()
