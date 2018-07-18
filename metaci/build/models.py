@@ -299,7 +299,7 @@ class Build(models.Model):
         attempt = 1
         while True:
             try:
-                org_config = project_config.keychain.get_org(self.org.name)
+                org_config = project_config.keychain.get_org(self.plan.org)
                 break
             except ScratchOrgException as e:
                 if (
@@ -313,8 +313,7 @@ class Build(models.Model):
                     continue
                 else:
                     raise e
-        if self.org is None:
-            self.org = org_config.org
+        self.org = org_config.org
         if self.current_rebuild:
             self.current_rebuild.org_instance = org_config.org_instance
             self.current_rebuild.save()

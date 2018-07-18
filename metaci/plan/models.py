@@ -129,7 +129,6 @@ SCHEDULE_CHOICES=(
 class PlanRepository(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     repo = models.ForeignKey(Repository, on_delete=models.CASCADE)
-    org = models.ForeignKey('cumulusci.Org', on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['repo', 'plan']
