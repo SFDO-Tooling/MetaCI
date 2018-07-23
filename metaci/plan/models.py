@@ -50,6 +50,7 @@ class Plan(models.Model):
     junit_path = models.CharField(max_length=255, null=True, blank=True)
     sfdx_config = models.TextField(null=True, blank=True)
     yaml_config = models.TextField(null=True, blank=True, validators=[validate_yaml_field])
+    test_dashboard = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['name', 'active', 'context']
