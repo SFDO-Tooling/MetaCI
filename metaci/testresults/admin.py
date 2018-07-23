@@ -9,5 +9,5 @@ admin.site.register(TestResult, TestResultAdmin)
 
 class TestMethodAdmin(admin.ModelAdmin):
     list_display = ('name', 'testclass')
-    list_filter = ('testclass__repo', 'testclass')
+    list_filter = ('testclass__repo', 'testclass', 'test_dashboard')
 admin.site.register(TestMethod, TestMethodAdmin)

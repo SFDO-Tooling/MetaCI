@@ -205,3 +205,7 @@ def build_flow_compare_to(request, build_id, flow):
     
     data = {'build_flow': build_flow, 'filter': comparison_filter, 'records': records}
     return render(request, 'testresults/build_flow_compare_to.html', data)
+
+def test_dashboard(request, repo):
+    """ display a dashboard of test results from preconfigured methods """
+    pass
