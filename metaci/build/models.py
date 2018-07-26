@@ -533,11 +533,12 @@ class BuildFlow(models.Model):
                 if element.tag not in ['failure', 'error']:
                     continue
                 result['Outcome'] = 'Fail'
-                result['StackTrace'] += element.text + '\n'
+                if element.text:
+                    result['StackTrace'] += element.text + '\n'
                 message = element.attrib['type']
-                if 'message' in element.attrib:
+                if 'message' in element.attrib and element.attrib['message']:
                     message += ': ' + element.attrib['message']
-                result['Message'] += message + '\n'
+                    result['Message'] += message + '\n'
             results.append(result)
         return results
 
