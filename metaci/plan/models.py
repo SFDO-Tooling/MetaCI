@@ -85,7 +85,7 @@ class Plan(models.Model):
             if commit == '0000000000000000000000000000000000000000':
                 run_build = False
                 commit = None
-            return run_build, commit, commit_message
+                return run_build, commit, commit_message
 
             for commit_info in push.get('commits',[]):
                 if commit_info['id'] == commit:
