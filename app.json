@@ -111,7 +111,9 @@
   ],
   "buildpacks": [
      {"url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"},
-     {"url": "heroku/python"}
+     {"url": "heroku/python"},
+     {"url": "https://github.com/heroku/heroku-buildpack-google-chrome"},
+     {"url": "https://github.com/heroku/heroku-buildpack-chromedriver"}
   ],
   "environments": {
     "test": {
