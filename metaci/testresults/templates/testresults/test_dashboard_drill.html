@@ -1,0 +1,57 @@
+{% extends 'layout_full.html' %}
+{% load humanize %}
+
+{% block layout_header_text %}
+
+Test Dashboard for {{ repo.name }} - {{ method.name }}
+
+{% endblock %}
+
+{% block layout_header_details %}
+<p>Inserts 200 contacts with an affiliation to an org. This test can help identify potential issues with basic contact insert. If your runtime is significantly larger than 500ms.... </p>
+{% endblock %}
+
+
+{% block layout_body %}
+
+<table class="slds-table slds-table--bordered slds-table--cell-buffer">
+  <thead>
+    <tr class="slds-text-title--caps">
+      <th scope="col">Version</th>
+      <th scope="col">Apex Time</th>
+      <th scope="col">+/-</th>
+    </tr>
+  </thead>
+  <tbody>
+
+
+    <tr>
+      <td>3.135</td>
+      <td>308 ms</td>
+      <td>---</td>
+    </tr>
+    <tr>
+        <td>3.134</td>
+        <td>307 ms</td>
+        <td>---</td>
+      </tr>
+
+      <tr>
+          <td>3.133</td>
+          <td>310 ms</td>
+          <td>---</td>
+        </tr>
+  </tbody>
+</table>
+
+<div class=""> pages</div>
+<div class="slds-button-group slds-m-top--medium" role="group">
+    {% if latest_fails.has_previous %}
+      <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.previous_page_number }}">previous</a>
+    {% endif %}
+    
+    {% if latest_fails.has_next %}
+      <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.next_page_number }}">next</a>
+    {% endif %}
+  </div>
+{% endblock %}
