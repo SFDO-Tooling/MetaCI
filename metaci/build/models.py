@@ -410,7 +410,7 @@ class BuildFlow(models.Model):
 
         # Update github status
         if settings.GITHUB_STATUS_UPDATES_ENABLED:
-            set_github_status.delay(self.id)
+            set_github_status.delay(self.build_id)
 
         # Set up logger
         self.logger = init_logger(self)
