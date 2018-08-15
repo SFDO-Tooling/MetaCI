@@ -9,7 +9,7 @@ from model_utils.models import StatusModel
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 class Release(StatusModel):
-    STATUS = Choices('draft', 'published')
+    STATUS = Choices('draft', 'published', 'hidden')
     created = AutoCreatedField(_('created'))
     modified = AutoLastModifiedField(_('modified'))
 
