@@ -201,13 +201,16 @@ def github_push_webhook(request):
             branch.save()
 
     # Check if the event was triggered by a tag
-    if push['ref'].startswith('refs/tags/'):
+    if push['ref'].startswith('refs/tags/') and repo.release_tag_regex:
         tag = push['ref'][10:]
         # Check the tag against regex
-        if re.match(repo.release_tag_regex, tag) and not push['head_commit']:
-            before = push['before']
-
-            release, _ = Release.objects.get_or_create(repo=repo, git_tag=tag)
+        if re.match(repo.release_tag_regex, tag) and push['head_commit']:
+            release, _ = Release.objects.get_or_create(
+                repo=repo,
+                git_tag=tag,
+                created_from_commit=push["head_commit"]["id"],
+                status='draft'
+            )
 
     for plan in repo.plans.filter(type__in=['commit', 'tag'], active=True):
         run_build, commit, commit_message = plan.check_push(push)
@@ -219,6 +222,7 @@ def github_push_webhook(request):
                 commit_message = commit_message,
                 branch = branch,
                 build_type = 'auto',
+                # release = release if release
             )
             build.save() 
 
