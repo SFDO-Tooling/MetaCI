@@ -14,6 +14,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
 from metaci.repository.models import Branch
 from metaci.repository.models import Repository
+from metaci.release.models import Release
 from metaci.plan.models import Plan
 from metaci.build.models import Build
 from metaci.build.utils import view_queryset
@@ -198,6 +199,15 @@ def github_push_webhook(request):
             # resurrect the soft deleted branch
             branch.is_removed = False
             branch.save()
+
+    # Check if the event was triggered by a tag
+    if push['ref'].startswith('refs/tags/'):
+        tag = push['ref'][10:]
+        # Check the tag against regex
+        if re.match(repo.release_tag_regex, tag) and not push['head_commit']:
+            before = push['before']
+
+            release, _ = Release.objects.get_or_create(repo=repo, git_tag=tag)
 
     for plan in repo.plans.filter(type__in=['commit', 'tag'], active=True):
         run_build, commit, commit_message = plan.check_push(push)
