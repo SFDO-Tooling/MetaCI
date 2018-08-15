@@ -66,6 +66,10 @@ BUILD_TYPES = (
     ('scheduled', 'Scheduled'),
     ('legacy', 'Legacy - Probably Automatic')
 )
+RELEASE_REL_TYPES = (
+    ('test', 'Release Test'),
+    ('automation', 'Release Automation')
+)
 FAIL_EXCEPTIONS = (
     ApexTestException,
     BrowserTestFailure,
@@ -118,6 +122,9 @@ class Build(models.Model):
 
     build_type = models.CharField(max_length=16, choices=BUILD_TYPES, default='legacy')
     user = models.ForeignKey('users.User', related_name='builds', null=True, on_delete=models.PROTECT)
+
+    release_relationship_type = models.CharField(max_length=50, choices=RELEASE_REL_TYPES, null=True, blank=True)
+    release = models.ForeignKey('release.Release', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ['-time_queue']

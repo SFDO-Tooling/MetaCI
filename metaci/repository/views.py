@@ -224,8 +224,10 @@ def github_push_webhook(request):
                 commit_message = commit_message,
                 branch = branch,
                 build_type = 'auto',
-                # release = release if release
             )
+            if release:
+                build.release = release
+                build.release_relationship_type = 'test'
             build.save() 
 
     return HttpResponse('OK')
