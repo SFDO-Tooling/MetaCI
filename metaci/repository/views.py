@@ -200,6 +200,7 @@ def github_push_webhook(request):
             branch.is_removed = False
             branch.save()
 
+    release = None
     # Check if the event was triggered by a tag
     if push['ref'].startswith('refs/tags/') and repo.release_tag_regex:
         tag = push['ref'][10:]
