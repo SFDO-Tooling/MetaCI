@@ -208,8 +208,10 @@ def github_push_webhook(request):
             release, _ = Release.objects.get_or_create(
                 repo=repo,
                 git_tag=tag,
-                created_from_commit=push["head_commit"]["id"],
-                status='draft'
+                defaults = {
+                    'created_from_commit': push["head_commit"]["id"],
+                    'status': 'draft'
+                }
             )
 
     for plan in repo.plans.filter(type__in=['commit', 'tag'], active=True):

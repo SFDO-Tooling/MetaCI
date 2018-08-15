@@ -8,7 +8,6 @@ from model_utils import Choices
 from model_utils.models import StatusModel
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
-
 class Release(StatusModel):
     STATUS = Choices('draft', 'published')
     created = AutoCreatedField(_('created'))
@@ -35,3 +34,4 @@ class Release(StatusModel):
         ordering = ['-production_push_date']
         verbose_name = _('release')
         verbose_name_plural = _('releases')
+        unique_together = ('repo', 'git_tag')
