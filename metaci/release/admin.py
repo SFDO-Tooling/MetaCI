@@ -27,6 +27,8 @@ class ReleaseAdmin(admin.ModelAdmin):
     list_select_related = ('repo', )
     save_as = True
     search_fields = ['^package_version_id', '^git_tag']
+    empty_value_display = '-empty-'
+
 
 
 admin.site.register(Release, ReleaseAdmin,)
