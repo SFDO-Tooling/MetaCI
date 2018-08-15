@@ -30,5 +30,4 @@ class ReleaseAdmin(admin.ModelAdmin):
     empty_value_display = '-empty-'
 
 
-
 admin.site.register(Release, ReleaseAdmin,)
