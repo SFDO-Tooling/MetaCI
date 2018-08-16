@@ -79,7 +79,6 @@ class RunPlanForm(forms.Form):
             commit = gh_branch.commit.sha
 
         release = self.cleaned_data.get('release')
-        import pdb; pdb.set_trace()
 
         branch, created = Branch.objects.get_or_create(
             repo=self.repo,
