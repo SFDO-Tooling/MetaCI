@@ -16,6 +16,7 @@ class RunPlanForm(forms.Form):
     branch = forms.ChoiceField(choices=(), label='Branch')
     commit = forms.CharField(required=False)
     keep_org = forms.BooleanField(required=False)
+    release = forms.ModelChoiceField(None, required=False)
 
     def __init__(self, plan, repo, user, *args, **kwargs):
         self.plan = plan
@@ -23,6 +24,7 @@ class RunPlanForm(forms.Form):
         self.user = user
         super(RunPlanForm, self).__init__(*args, **kwargs)
         self.fields['branch'].choices = self._get_branch_choices()
+        self.fields['release'].queryset = self.repo.releases
         self.helper = FormHelper()
         self.helper.form_class = 'form-vertical'
         self.helper.form_id = 'run-build-form'
@@ -48,7 +50,12 @@ class RunPlanForm(forms.Form):
                     'Enter the commit you want to build.  The HEAD commit on the branch will be used if you do not specify a commit',
                     Field('commit', css_class='slds-input'),
                     css_class='slds-form-element',
-                )
+                ),
+                Fieldset(
+                    'What release is this connected to?',
+                    Field('release', css_class='slds-input'),
+                    css_class='slds-form-element',
+                ),
             ])
         self.helper.layout.append(
             FormActions(
@@ -71,6 +78,9 @@ class RunPlanForm(forms.Form):
             gh_branch = gh_repo.branch(self.cleaned_data['branch'])
             commit = gh_branch.commit.sha
 
+        release = self.cleaned_data.get('release')
+        import pdb; pdb.set_trace()
+
         branch, created = Branch.objects.get_or_create(
             repo=self.repo,
             name=self.cleaned_data['branch'],
@@ -89,8 +99,11 @@ class RunPlanForm(forms.Form):
             commit=commit,
             keep_org=keep_org,
             build_type='manual',
-            user=self.user
+            user=self.user,
+            release=release,
+            release_relationship_type='manual'
         )
+        
         build.save()
         
         return build

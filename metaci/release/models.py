@@ -35,3 +35,6 @@ class Release(StatusModel):
         verbose_name = _('release')
         verbose_name_plural = _('releases')
         unique_together = ('repo', 'git_tag')
+
+    def __unicode__(self):
+        return "{}: {}".format(self.repo, self.version_name)

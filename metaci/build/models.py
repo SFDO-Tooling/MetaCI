@@ -68,7 +68,8 @@ BUILD_TYPES = (
 )
 RELEASE_REL_TYPES = (
     ('test', 'Release Test'),
-    ('automation', 'Release Automation')
+    ('automation', 'Release Automation'),
+    ('manual', 'Manual Release Activity')
 )
 FAIL_EXCEPTIONS = (
     ApexTestException,
