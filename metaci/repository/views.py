@@ -203,7 +203,7 @@ def github_push_webhook(request):
     release = None
     # Check if the event was triggered by a tag
     if push['ref'].startswith('refs/tags/') and repo.release_tag_regex:
-        tag = push['ref'][10:]
+        tag = push['ref'][len('refs/tags/'):]
         # Check the tag against regex
         if re.match(repo.release_tag_regex, tag) and push['head_commit']:
             release, _ = Release.objects.get_or_create(

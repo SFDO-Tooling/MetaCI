@@ -22,6 +22,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='build',
             name='release_relationship_type',
-            field=models.CharField(blank=True, choices=[('test', 'Release Test'), ('automation', 'Release Automation')], max_length=50, null=True),
+            field=models.CharField(blank=True, choices=[('test', 'Release Test'), ('automation', 'Release Automation'), ('manual', 'Manual Release Activity')], max_length=50, null=True),
         ),
     ]
