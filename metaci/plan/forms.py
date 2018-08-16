@@ -16,6 +16,7 @@ class RunPlanForm(forms.Form):
     branch = forms.ChoiceField(choices=(), label='Branch')
     commit = forms.CharField(required=False)
     keep_org = forms.BooleanField(required=False)
+    release = forms.ModelChoiceField(None, required=False)
 
     def __init__(self, plan, repo, user, *args, **kwargs):
         self.plan = plan
@@ -23,10 +24,14 @@ class RunPlanForm(forms.Form):
         self.user = user
         super(RunPlanForm, self).__init__(*args, **kwargs)
         self.fields['branch'].choices = self._get_branch_choices()
+        self.fields['release'].queryset = self.repo.releases
         self.helper = FormHelper()
         self.helper.form_class = 'form-vertical'
         self.helper.form_id = 'run-build-form'
         self.helper.form_method = 'post'
+        self.advanced_mode = False
+        if 'advanced_mode' in args[0]:
+            self.advanced_mode = (args[0]['advanced_mode'] == "1")
         self.helper.layout = Layout(
             Fieldset(
                 'Choose the branch you want to build',
@@ -34,19 +39,29 @@ class RunPlanForm(forms.Form):
                 css_class='slds-form-element',
             ),
             Fieldset(
-                'Enter the commit you want to build.  The HEAD commit on the branch will be used if you do not specify a commit',
-                Field('commit', css_class='slds-input'),
-                css_class='slds-form-element',
-            ),
-            Fieldset(
                 'Keep org? (scratch orgs only)',
                 Field('keep_org', css_class='slds-checkbox'),
                 css_class='slds-form-element',
             ),
+        )
+        if self.advanced_mode:
+            self.helper.layout.extend([
+                Fieldset(
+                    'Enter the commit you want to build.  The HEAD commit on the branch will be used if you do not specify a commit',
+                    Field('commit', css_class='slds-input'),
+                    css_class='slds-form-element',
+                ),
+                Fieldset(
+                    'What release is this connected to?',
+                    Field('release', css_class='slds-input'),
+                    css_class='slds-form-element',
+                ),
+            ])
+        self.helper.layout.append(
             FormActions(
                 Submit('submit', 'Submit',
                        css_class='slds-button slds-button--brand')
-            ),
+            )
         )
 
     def _get_branch_choices(self):
@@ -62,6 +77,8 @@ class RunPlanForm(forms.Form):
             gh_repo = self.repo.github_api
             gh_branch = gh_repo.branch(self.cleaned_data['branch'])
             commit = gh_branch.commit.sha
+
+        release = self.cleaned_data.get('release')
 
         branch, created = Branch.objects.get_or_create(
             repo=self.repo,
@@ -81,8 +98,11 @@ class RunPlanForm(forms.Form):
             commit=commit,
             keep_org=keep_org,
             build_type='manual',
-            user=self.user
+            user=self.user,
+            release=release,
+            release_relationship_type='manual'
         )
+        
         build.save()
         
         return build
