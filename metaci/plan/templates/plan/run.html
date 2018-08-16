@@ -17,7 +17,7 @@
       {% if form.advanced_mode %}
         <a href="{% relative_url '0' 'advanced_mode' request.GET.urlencode %}">Simple Mode</a>
       {% else %}
-      <a href="{% relative_url '1' 'advanced_mode' request.GET.urlencode %}">Advanced Mode</a>
+        <a href="{% relative_url '1' 'advanced_mode' request.GET.urlencode %}">Advanced Mode</a>
       {% endif %}
     </div>
 
