@@ -20,6 +20,16 @@ urlpatterns = [
         name='build_rebuild',
     ),
     url(
+        r'^(?P<build_id>\w+)/rebuilds/(?P<rebuild_id>\w+)/flow_log$',
+        views.flow_log_ajax,
+        name='flow_log_rebuild_ajax',
+    ),
+    url(
+        r'^(?P<build_id>\w+)/flow_log$',
+        views.flow_log_ajax,
+        name='flow_log_ajax'
+    ),
+    url(
         r'^(?P<build_id>\w+)/rebuilds/(?P<rebuild_id>\w+)/(?P<tab>\w+)$',
         views.build_detail,
         name='build_rebuild_detail_tab',
@@ -39,4 +49,5 @@ urlpatterns = [
         views.build_detail,
         name='build_detail',
     ),
+
 ]

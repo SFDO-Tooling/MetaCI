@@ -1,18 +1,8 @@
 {% extends 'build/detail_layout.html' %}
 
 {% block tab_content %}
-{% for flow in flows %}
-<div class="slds-box slds-m-bottom--large">
-  <a name="flow-{{ flow.flow }}"></a>
-  <h3 class="slds-text-heading--large slds-m-bottom--medium">
-    {{ flow.flow }}
-  </h3>
-
-  <div class="slds-box--body">
-    {% autoescape off %}
-    {{ flow.get_log_html }}
-    {% endautoescape %}
+  
+  <div id="log_block" ic-poll="1s" ic-src="{% url 'flow_log_ajax' build.id %}">
+    {% include 'build/flow_log.html' %}
   </div>
-</div>
-{% endfor %}
 {% endblock %}

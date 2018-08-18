@@ -27,19 +27,8 @@ def build_list(request):
     }
     return render(request, 'build/build_list.html', context=context)
 
-
-def build_detail(request, build_id, rebuild_id=None, tab=None):
-    build = get_object_or_404(Build, id=build_id)
+def _flows_for_build_or_rebuild(build, rebuild_id=None):
     rebuild = None
-
-    if not request.user.is_staff:
-        if not build.plan.public:
-            return HttpResponseForbidden(
-                'You are not authorized to view this build')
-        if tab == 'org':
-            return HttpResponseForbidden(
-                "You are not authorized to view this build's org info")
-
     if not rebuild_id:
         if build.current_rebuild:
             flows = build.current_rebuild.flows
@@ -53,7 +42,22 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
                                         id=rebuild_id)
             flows = rebuild.flows
 
-    flows = flows.order_by('time_queue')
+    return flows.order_by('time_queue'), rebuild
+
+
+def build_detail(request, build_id, rebuild_id=None, tab=None):
+    build = get_object_or_404(Build, id=build_id)
+    rebuild = None
+
+    if not request.user.is_staff:
+        if not build.plan.public:
+            return HttpResponseForbidden(
+                'You are not authorized to view this build')
+        if tab == 'org':
+            return HttpResponseForbidden(
+                "You are not authorized to view this build's org info")
+
+    flows, rebuild = _flows_for_build_or_rebuild(build, rebuild_id)
 
     tests = {
         'total': 0,
@@ -99,6 +103,19 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
     else:
         raise BuildError('Unsupported value for "tab": {}'.format(tab))
 
+def flow_log_ajax(request, build_id, rebuild_id=None):
+    build = get_object_or_404(Build, id=build_id)
+    flows, rebuild = _flows_for_build_or_rebuild(build, rebuild_id)
+    context = {
+        'build': build,
+        'rebuild': rebuild,
+        'original_build': rebuild_id == 'original',
+        'flows': flows,
+    }
+    resp = render(request, 'build/flow_log.html', context=context)
+    if build.status not in ('running','queued','waiting'):
+        resp['X-IC-CancelPolling'] = 'true'
+    return resp
 
 def build_rebuild(request, build_id):
     build = get_object_or_404(Build, id=build_id)
