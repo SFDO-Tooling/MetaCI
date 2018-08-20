@@ -24,7 +24,7 @@
   </a>
 {% endif %}
 
-{% if org_instance %}
+{% if org_instance and not org_instance.deleted %}
 <a href="{{ org_instance.get_absolute_url }}/login" target="_blank">
   <button class="slds-button slds-button--brand">Log In to Org</button>
 </a>
