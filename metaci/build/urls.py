@@ -20,22 +20,7 @@ urlpatterns = [
         name='build_rebuild',
     ),
     url(
-        r'^(?P<build_id>\w+)/rebuilds/(?P<rebuild_id>\w+)/(?P<tab>\w+)$',
-        views.build_detail,
-        name='build_rebuild_detail_tab',
-    ),
-    url(
-        r'^(?P<build_id>\w+)/rebuilds/(?P<rebuild_id>\w+)$',
-        views.build_detail,
-        name='build_rebuild_detail',
-    ),
-    url(
-        r'^(?P<build_id>\w+)/(?P<tab>\w+)$',
-        views.build_detail,
-        name='build_detail_tab',
-    ),
-    url(
-        r'^(?P<build_id>\w+)$',
+        r'^(?P<build_id>\d+)(?:/rebuilds/(?P<rebuild_id>[\d]+|original))?(?:/(?P<tab>\w+))?$',
         views.build_detail,
         name='build_detail',
     ),
