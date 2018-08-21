@@ -14,15 +14,24 @@
 
 {% block layout_header_buttons %}
 {% if request.user.is_staff %}
-{% if build.get_status == 'error' or build.get_status == 'fail' %}
+
 <div class="slds-button-group" role="group">
+{% if build.get_status == 'error' or build.get_status == 'fail' %}
   <a href="{{ build.get_absolute_url }}/rebuild">
     <button class="slds-button slds-button--neutral">
       Rebuild
     </button>
   </a>
-</div>
 {% endif %}
+
+{% if org_instance and not org_instance.deleted %}
+<a href="{{ org_instance.get_absolute_url }}/login" target="_blank">
+  <button class="slds-button slds-button--brand">Log In to Org</button>
+</a>
+
+{% endif %}
+</div>
+
 {% endif %}
 {% endblock %}
 

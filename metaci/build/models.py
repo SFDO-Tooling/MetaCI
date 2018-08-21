@@ -568,7 +568,7 @@ class Rebuild(models.Model):
         ordering = ['-id']
 
     def get_absolute_url(self):
-        return reverse('build_rebuild_detail', kwargs={
+        return reverse('build_detail', kwargs={
             'build_id': str(self.build.id), 'rebuild_id': str(self.id)})
 
 class FlowTaskManager(models.Manager):
