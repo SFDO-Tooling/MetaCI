@@ -72,4 +72,4 @@ coreapi==2.3.3
 # log-request-id for X-Request-Id header
 django-log-request-id==1.3.2
 
-psycopg2-binary==2.7.6
+psycopg2-binary==2.7.5
