@@ -15,5 +15,3 @@ ipdb==0.10.1
 
 pytest-django==3.1.1
 pytest-sugar==0.7.1
-
-psycopg2-binary
