@@ -1,18 +1,23 @@
+import os
+from tempfile import mkstemp
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
+from robot import rebot
 
 from metaci.build.models import Build
 from metaci.build.models import BuildFlow
 from metaci.build.utils import paginate
+from metaci.build.utils import view_queryset
+from metaci.testresults.importer import STATS_MAP
 from metaci.testresults.models import TestMethod
 from metaci.testresults.models import TestResult
 
 from metaci.testresults.filters import BuildFlowFilter
 from metaci.testresults.utils import find_buildflow
-
 
 def build_flow_tests(request, build_id, flow):
     build_flow = find_buildflow(request, build_id, flow)
@@ -97,11 +102,64 @@ def build_flow_tests(request, build_id, flow):
 
     return render(request, 'testresults/build_flow_tests.html', data)
 
+def test_result_detail(request, result_id):
+    build_qs = view_queryset(request)
+    result = get_object_or_404(
+        TestResult,
+        id=result_id,
+        build_flow__build__in=build_qs,
+    )
+    data = {'result': result}
+    if result.method.testclass.test_type == 'Apex':
+        stats = STATS_MAP.keys()
+        stats.sort()
+        test_stats = []
+        test_stats.append({
+            'limit': 'Duration',
+            'used': result.duration,
+            'allowed': 'N/A',
+            'percent': 'N/A',
+        })
+        for stat in stats:
+            used = getattr(result, '{}_used'.format(stat), None)
+            if not used:
+                continue
+            test_stats.append({
+                'limit': STATS_MAP[stat],
+                'used': used,
+                'allowed': getattr(result, '{}_allowed'.format(stat), None),
+                'percent': getattr(result, '{}_percent'.format(stat), None),
+            })
+        data['test_stats'] = test_stats
+        
+    return render(request, 'testresults/test_result_detail.html', data)
+
+def test_result_robot(request, result_id):
+    build_qs = view_queryset(request)
+    result = get_object_or_404(
+        TestResult,
+        id=result_id,
+        build_flow__build__in=build_qs,
+    )
+
+    if result.robot_xml:
+        source = mkstemp()[1]
+        log = mkstemp('.html')[1]
+        with open(source, 'w') as f:
+            f.write(result.robot_xml)
+        rebot(source, log=log, output=None, report=None)
+        with open(log, 'r') as f:
+            log_html = f.read()
+        os.remove(source)
+        os.remove(log)
+    return HttpResponse(log_html)
 
 def test_method_peek(request, method_id):
+    build_qs = view_queryset(request)
     method = get_object_or_404(TestMethod, id=method_id)
     latest_fails = method.test_results.filter(
-        outcome='Fail'
+        outcome='Fail',
+        build_flow__build__in=build_qs,
     ).order_by(
         '-build_flow__time_end'
     ).select_related(
@@ -124,12 +182,12 @@ def test_method_peek(request, method_id):
 
 @login_required
 def test_method_trend(request, method_id):
-    if not request.user.is_staff:
-        return redirect('/login/?next=%s' % request.path)
-
+    build_qs = view_queryset(request)
     method = get_object_or_404(TestMethod, id=method_id)
 
-    latest_results = method.test_results.order_by('-build_flow__time_end')
+    latest_results = method.test_results.filter(
+        build_flow__build__in=build_qs,
+    ).order_by('-build_flow__time_end')
     latest_results = paginate(latest_results, request)
 
     results_by_plan = {}

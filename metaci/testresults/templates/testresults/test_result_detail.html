@@ -1,0 +1,142 @@
+{% extends 'layout_full.html' %}
+{% load humanize %}
+
+{% block layout_parent_link %}<a href="/tests/{{ result.build_flow.build.id }}/{{ result.build_flow.flow }}">Test Results</a>{% endblock %}
+
+
+{% block layout_header_text %}
+Test Details for {{ result.method.testclass }}.{{ result.method }} on Build #{{ result.build_flow.build.id }}
+{% endblock %}
+
+{% block layout_header_buttons %}
+<div class="slds-button-group" role="group">
+  <a href="/tests/trend/method/{{ result.method.id }}">
+    <button class="slds-button slds-button--neutral">
+      Trend
+    </button>
+  </a>
+</div>
+{% endblock %}
+
+{% block layout_header_details %}
+{% with result.build_flow.build as build %}
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">Status</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.get_status }}">
+        <div
+          class="slds-badge {% if result.outcome == 'Fail' or result.outcome == 'CompileFail' %}slds-theme--error{% elif result.outcome == 'Pass' %}slds-theme--success{% endif %}">
+          {{ result.outcome }}
+        </div>
+      </p>
+    </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Plan">Plan</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.plan.name }}">
+        <a href="{{ build.plan.get_absolute_url }}">
+          {{ build.plan.name }}
+        </a>
+      </p>
+    </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repo">Repo</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.repo }}">
+        <a href="{{ build.repo.get_absolute_url }}">
+          {{ build.repo }}
+        </a>
+      </p>
+    </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Branch">Branch</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.branch.name }}">
+        <a href="{{ build.branch.get_absolute_url }}">
+          {{ build.branch.name }}
+        </a>
+      </p>
+    </li>
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Commit">Commit</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.commit }}">
+        <a href="{{ build.repo.get_absolute_url }}/commit/{{ build.commit }}">
+          {{ build.commit }}
+        </a>
+      </p>
+    </li>
+    {% if build.user %}
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="User">User</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ build.user }}">
+          {{ build.user }}
+      </p>
+    </li>
+    {% endif %}
+  </ul>
+{% endwith %}
+{% endblock %}
+
+{% block layout_body %}
+{% if result.method.testclass.test_type == 'Apex' %}
+<div class="slds-box slds-m-bottom--large">
+  <h3 class="slds-text-heading--large slds-m-bottom--medium">
+    Apex Test Details
+  </h3>
+  <div class="slds-box--body">
+    {% if result.stacktrace %}
+    <div class="slds-box slds-m-bottom--large">
+      <h5 class="slds-text-heading--large slds-m-bottom--medium">
+          Stacktrace
+      </h5>
+      <div class="slds-box--body">
+        {{ result.stacktrace }}
+      </div>
+    </div>
+    {% endif %}
+    {% if result.message %}
+    <div class="slds-box slds-m-bottom--large">
+      <h5 class="slds-text-heading--large slds-m-bottom--medium">
+          Message
+      </h5>
+      <div class="slds-box--body">
+        {{ result.message }}
+      </div>
+    </div>
+    {% endif %}
+    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+      <thead>
+        <tr class="slds-text-title--caps">
+          <th>Limit</th>
+          <th>Used</th>
+          <th>Allowed</th>
+          <th>Percent</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for stat in test_stats %}
+        <tr>
+          <td>{{ stat.limit }}</td>
+          <td>{{ stat.used }}</td>
+          <td>{{ stat.allowed }}</td>
+          <td>{{ stat.percent }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if result.robot_xml %}
+<div class="slds-box slds-m-bottom--large">
+  <h3 class="slds-text-heading--large slds-m-bottom--medium">
+    Robot Test Details
+  </h3>
+
+  <div class="slds-box--body">
+    <div class="iframe-container">
+      <iframe src="{{ result.get_robot_url }}" frameborder="0"></iframe>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -10,6 +10,8 @@ def find_buildflow(request, build_id, flow):
 
     if not build.plan.public and not request.user.is_staff:
         raise PermissionDenied()
+    if not build.repo.public and not request.user.is_staff:
+        raise PermissionDenied()
     query = {'build_id': build_id, 'flow': flow}
     if build.current_rebuild:
         query['rebuild_id'] = build.current_rebuild
