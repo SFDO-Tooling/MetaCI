@@ -38,6 +38,7 @@ from metaci.cumulusci.config import MetaCIProjectConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
 from metaci.testresults.importer import import_test_results
+from metaci.testresults.importer import import_robot_test_results
 
 BUILD_STATUSES = (
     ('queued', 'Queued'),
@@ -491,6 +492,13 @@ class BuildFlow(models.Model):
         self.save()
 
     def load_test_results(self):
+        has_results = False
+
+        # Handle robotframework's output.xml if found
+        if os.path.isfile('output.xml'):
+            has_results = True
+            import_robot_test_results(self, 'output.xml')
+
         results = []
         if self.build.plan.junit_path:
             for filename in iglob(self.build.plan.junit_path):
@@ -511,15 +519,17 @@ class BuildFlow(models.Model):
                 results.extend(self.load_junit(results_filename))
             except IOError as e:
                 pass
-        if not results:
-            return
-        import_test_results(self, results)
 
-        self.tests_total = self.test_results.count()
-        self.tests_pass = self.test_results.filter(outcome='Pass').count()
-        self.tests_fail = self.test_results.filter(
-            outcome__in=['Fail', 'CompileFail']).count()
-        self.save()
+        if results:
+            has_results = True
+            import_test_results(self, results)
+
+        if has_results:
+            self.tests_total = self.test_results.count()
+            self.tests_pass = self.test_results.filter(outcome='Pass').count()
+            self.tests_fail = self.test_results.filter(
+                outcome__in=['Fail', 'CompileFail']).count()
+            self.save()
 
     def load_junit(self, filename):
         results = []
