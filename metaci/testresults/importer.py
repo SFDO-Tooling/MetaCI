@@ -51,7 +51,7 @@ LIMIT_TYPES = (
         )
 
 
-def import_test_results(build_flow, results):
+def import_test_results(build_flow, results, test_type):
     classes = {}
     methods = {}
 
@@ -63,7 +63,7 @@ def import_test_results(build_flow, results):
             testclass, created = TestClass.objects.get_or_create(
                 name = result['suite']['name'],
                 repo=build_flow.build.repo,
-                test_type='Apex',
+                test_type=test_type,
             )
             classes[result['ClassName']] = testclass
 
@@ -181,9 +181,9 @@ def get_robot_tests(root, elem, parents=[]):
             'file': suite_file,
             'elem': elem,
             'name': '/'.join([suite.attrib['name'] for suite in parents]),
-            'setup': elem.find("kw[type='setup']"),
+            'setup': elem.find("kw[@type='setup']"),
             'status': elem.find('status'),
-            'teardown': elem.find("kw[type='teardown']"),
+            'teardown': elem.find("kw[@type='teardown']"),
         }
         for test in elem.iter('test'):
             status = test.find('status')

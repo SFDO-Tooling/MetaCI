@@ -494,11 +494,12 @@ class BuildFlow(models.Model):
     def load_test_results(self):
         has_results = False
 
-        # Handle robotframework's output.xml if found
+        # Load robotframework's output.xml if found
         if os.path.isfile('output.xml'):
             has_results = True
             import_robot_test_results(self, 'output.xml')
 
+        # Load JUnit
         results = []
         if self.build.plan.junit_path:
             for filename in iglob(self.build.plan.junit_path):
@@ -507,6 +508,12 @@ class BuildFlow(models.Model):
                 self.logger.warning('No results found at JUnit path {}'.format(
                     self.build.plan.junit_path
                 ))
+        if results:
+            has_results = True
+            import_test_results(self, results, 'JUnit')
+
+        # Load from test_results.json
+        results = []
         try:
             results_filename = 'test_results.json'
             with open(results_filename, 'r') as f:
@@ -522,7 +529,7 @@ class BuildFlow(models.Model):
 
         if results:
             has_results = True
-            import_test_results(self, results)
+            import_test_results(self, results, 'Apex')
 
         if has_results:
             self.tests_total = self.test_results.count()

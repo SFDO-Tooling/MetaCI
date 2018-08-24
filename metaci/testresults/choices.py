@@ -7,6 +7,7 @@ OUTCOME_CHOICES = (
 
 TEST_TYPE_CHOICES = (
     ('Apex', 'Apex'),
+    ('JUnit', 'JUnit'),
     ('Robot', 'Robot'),
     ('Other', 'Other'),
 )
