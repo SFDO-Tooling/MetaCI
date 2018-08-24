@@ -99,8 +99,18 @@
             <tbody>
             {% for result in class_results.results %}
               <tr>
-                <td><a href="/tests/method/{{ result.result.method.id }}">{{ result.result.method.name }}</a></td>
-                <td><a href="/tests/trend/method/{{ result.result.method.id }}">Trend</a></td>
+                <td><a href="{{ result.result.get_absolute_url }}">{{ result.result.method.name }}</a>
+                    <a href="/tests/trend/method/{{ result.result.method.id }}" title="Trend">
+                      <span class="slds-icon_container slds-icon-standard-metric" title="Trend">
+                        {% autoescape off %}
+                        <svg aria-hidden="true" class="slds-icon">
+                          <use xlink:href="/static/slds/assets/icons/standard-sprite/svg/symbols.svg#metrics"></use>
+                        </svg>
+                        {% endautoescape %}
+                        <span class="slds-assistive-text">Like</span>
+                      </span>
+                    </a>
+                </td>
                 
                 <td class="{% if result.result.outcome == 'Pass' %}success{% else %}danger{% endif %}">{{ result.result.outcome }}</td>
                 <td>{{ result.result.duration }}</td>

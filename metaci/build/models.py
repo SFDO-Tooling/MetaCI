@@ -8,7 +8,6 @@ import re
 import shutil
 import sys
 import tempfile
-import xml.etree.ElementTree as ET
 import zipfile
 import decimal
 
@@ -20,6 +19,7 @@ from cumulusci.core.exceptions import RobotTestFailure
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.exceptions import ScratchOrgException
 from cumulusci.core.utils import import_class
+from cumulusci.utils import elementtree_parse_file
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.conf import settings
 from django.db import models
@@ -38,6 +38,7 @@ from metaci.cumulusci.config import MetaCIProjectConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
 from metaci.testresults.importer import import_test_results
+from metaci.testresults.importer import import_robot_test_results
 
 BUILD_STATUSES = (
     ('queued', 'Queued'),
@@ -491,6 +492,14 @@ class BuildFlow(models.Model):
         self.save()
 
     def load_test_results(self):
+        has_results = False
+
+        # Load robotframework's output.xml if found
+        if os.path.isfile('output.xml'):
+            has_results = True
+            import_robot_test_results(self, 'output.xml')
+
+        # Load JUnit
         results = []
         if self.build.plan.junit_path:
             for filename in iglob(self.build.plan.junit_path):
@@ -499,6 +508,12 @@ class BuildFlow(models.Model):
                 self.logger.warning('No results found at JUnit path {}'.format(
                     self.build.plan.junit_path
                 ))
+        if results:
+            has_results = True
+            import_test_results(self, results, 'JUnit')
+
+        # Load from test_results.json
+        results = []
         try:
             results_filename = 'test_results.json'
             with open(results_filename, 'r') as f:
@@ -511,19 +526,21 @@ class BuildFlow(models.Model):
                 results.extend(self.load_junit(results_filename))
             except IOError as e:
                 pass
-        if not results:
-            return
-        import_test_results(self, results)
 
-        self.tests_total = self.test_results.count()
-        self.tests_pass = self.test_results.filter(outcome='Pass').count()
-        self.tests_fail = self.test_results.filter(
-            outcome__in=['Fail', 'CompileFail']).count()
-        self.save()
+        if results:
+            has_results = True
+            import_test_results(self, results, 'Apex')
+
+        if has_results:
+            self.tests_total = self.test_results.count()
+            self.tests_pass = self.test_results.filter(outcome='Pass').count()
+            self.tests_fail = self.test_results.filter(
+                outcome__in=['Fail', 'CompileFail']).count()
+            self.save()
 
     def load_junit(self, filename):
         results = []
-        tree = ET.parse(filename)
+        tree = elementtree_parse_file(filename)
         testsuite = tree.getroot()
         for testcase in testsuite.iter('testcase'):
             result = {

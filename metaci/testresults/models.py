@@ -4,10 +4,13 @@ import dateutil.parser
 from collections import OrderedDict
 from django.db import models
 from django import forms
+from django.urls import reverse
 from metaci.testresults.choices import OUTCOME_CHOICES
+from metaci.testresults.choices import TEST_TYPE_CHOICES
 
 class TestClass(models.Model):
     name = models.CharField(max_length=255, db_index=True)
+    test_type = models.CharField(max_length=32, choices=TEST_TYPE_CHOICES, db_index=True)
     repo = models.ForeignKey('repository.Repository', related_name='testclasses', on_delete=models.CASCADE)
     
     class Meta:
@@ -84,6 +87,7 @@ class TestResult(models.Model):
     stacktrace = models.TextField(null=True, blank=True)
     message = models.TextField(null=True, blank=True)
     source_file = models.CharField(max_length=255)
+    robot_xml = models.TextField(null=True, blank=True)
     email_invocations_used = models.IntegerField(null=True, blank=True, db_index=True)
     email_invocations_allowed = models.IntegerField(null=True, blank=True, db_index=True)
     email_invocations_percent = models.IntegerField(null=True, blank=True, db_index=True)
@@ -171,3 +175,9 @@ class TestResult(models.Model):
 
     def __unicode__(self):
         return '%s.%s' % (self.method.testclass, self.method.name)
+
+    def get_absolute_url(self):
+        return reverse('test_result_detail', kwargs={'result_id': str(self.id)})
+
+    def get_robot_url(self):
+        return reverse('test_result_robot', kwargs={'result_id': str(self.id)})
