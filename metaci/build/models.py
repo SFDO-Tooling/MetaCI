@@ -39,6 +39,7 @@ from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
 from metaci.testresults.importer import import_test_results
 from metaci.testresults.importer import import_robot_test_results
+from metaci.utils import generate_hash
 
 BUILD_STATUSES = (
     ('queued', 'Queued'),
@@ -401,6 +402,8 @@ class BuildFlow(models.Model):
     tests_total = models.IntegerField(null=True, blank=True)
     tests_pass = models.IntegerField(null=True, blank=True)
     tests_fail = models.IntegerField(null=True, blank=True)
+    asset_hash = models.CharField(max_length=64, unique=True, default=generate_hash)
+
 
     def __unicode__(self):
         return '{}: {} - {} - {}'.format(self.build.id, self.build.repo,

@@ -80,3 +80,6 @@ venv
 
 # backup
 *.bak
+
+# pyenv
+.python-version

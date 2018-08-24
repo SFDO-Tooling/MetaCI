@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import os
 import dateutil.parser
 from collections import OrderedDict
 from django.db import models
@@ -181,3 +182,11 @@ class TestResult(models.Model):
 
     def get_robot_url(self):
         return reverse('test_result_robot', kwargs={'result_id': str(self.id)})
+
+def asset_upload_to(instance, filename):
+    folder = instance.result.build_flow.asset_hash
+    return os.path.join(folder, filename)
+
+class TestResultAsset(models.Model):
+    result = models.ForeignKey(TestResult, related_name="assets")
+    asset = models.FileField(upload_to=asset_upload_to)
