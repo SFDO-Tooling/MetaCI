@@ -222,4 +222,5 @@ def render_robot_test_xml(root, test):
         suite.append(test['suite']['teardown'])
     suite.append(test['suite']['status'])
     test_xml = ET.tostring(testroot)
-    return re.sub(r'sid=.*<', 'sid=<masked>', test_xml)
+    return re.sub(r'sid=.*<', 'sid=MASKED<', test_xml)
+    
