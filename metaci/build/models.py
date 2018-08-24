@@ -18,8 +18,8 @@ from cumulusci.core.exceptions import BrowserTestFailure
 from cumulusci.core.exceptions import RobotTestFailure
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.exceptions import ScratchOrgException
-from cumulusci.core.utils import elementtree_parse_file
 from cumulusci.core.utils import import_class
+from cumulusci.utils import elementtree_parse_file
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.conf import settings
 from django.db import models
