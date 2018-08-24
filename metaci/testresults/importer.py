@@ -5,9 +5,11 @@ import urllib
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from cumulusci.utils import elementtree_parse_file
+from django.core.files.base import ContentFile
 from metaci.testresults.models import TestClass
 from metaci.testresults.models import TestMethod
 from metaci.testresults.models import TestResult
+from metaci.testresults.models import TestResultAsset
 
 STATS_MAP = {
     'email_invocations': 'Number of Email Invocations',
@@ -148,6 +150,9 @@ def import_robot_test_results(build_flow, path):
             )
             methods[class_and_method] = method
 
+        robot_xml = result['xml']
+
+
         testresult = TestResult(
             build_flow = build_flow,
             method = method,
@@ -157,6 +162,26 @@ def import_robot_test_results(build_flow, path):
             robot_xml = result['xml'],
         )
         testresult.save()
+
+        if result['screenshots']:
+            dirname = os.path.dirname(path)
+            for screenshot in result['screenshots']:
+                screenshot_path = screenshot
+                if dirname:
+                    screenshot_path = '{}/{}'.format(dirname, screenshot)
+                with open(screenshot_path, 'r') as f:
+                    asset = TestResultAsset(
+                        result = testresult,
+                        asset = ContentFile(f.read(), screenshot),
+                    )
+                    asset.save()
+                    testresult.robot_xml = testresult.robot_xml.replace(
+                        '"{}"'.format(screenshot),
+                        asset.asset.url,
+                    )
+                os.remove(screenshot_path)
+            testresult.save()
+            
 
 def parse_robot_output(path):
     """ Parses a robotframework output.xml file into individual test xml files """
@@ -193,10 +218,18 @@ def get_robot_tests(root, elem, parents=[]):
                 'name': test.attrib['name'],
                 'elem': test,
                 'status': 'Pass' if status.attrib['status'] == 'PASS' else 'Fail',
+                'screenshots': [],
             }
             start = datetime.strptime(status.attrib['starttime'], '%Y%m%d %H:%M:%S.%f')
             end = datetime.strptime(status.attrib['endtime'], '%Y%m%d %H:%M:%S.%f')
             delta = end - start
+           
+            # Process screenshots
+            for msg in test.findall(".//msg[@html='yes']"):
+                txt=''.join([text for text in msg.itertext()])
+                for screenshot in re.findall(r'href="([\w.-]+)">', txt):
+                    test_info['screenshots'].append(screenshot)
+
             test_info['duration'] = float('{}.{}'.format(delta.seconds, delta.microseconds))
             test_info['xml'] = render_robot_test_xml(root, test_info)
             tests.append(test_info)
@@ -215,10 +248,10 @@ def render_robot_test_xml(root, test):
         'name': test['suite']['name'],
         'source': test['suite']['file'],
     })
-    if test['suite']['setup']:
+    if test['suite']['setup'] is not None:
         suite.append(test['suite']['setup'])
     suite.append(test['elem'])
-    if test['suite']['teardown']:
+    if test['suite']['teardown'] is not None:
         suite.append(test['suite']['teardown'])
     suite.append(test['suite']['status'])
     test_xml = ET.tostring(testroot)

@@ -24,6 +24,18 @@
       "description": "The url path to the admin section of the site",
       "value": "admin"
     },
+    "DJANGO_AWS_ACCESS_KEY_ID": {
+      "description": "Amazon AWS Access ID for access to S3 for storing build assets",
+      "value": ""
+    },
+    "DJANGO_AWS_SECRET_ACCESS_KEY": {
+      "description": "Amazon AWS Secret Key",
+      "value": ""
+    },
+    "DJANGO_AWS_STORAGE_BUCKET_NAME": {
+      "description": "Amazon S3 Bucket Name used for storing build assets.  The user of the AWS Access Id should have rights to this bucket",
+      "value": ""
+    },
     "DJANGO_SECRET_KEY": {
       "description": "The url path to the admin section of the site",
       "generator": "secret"
