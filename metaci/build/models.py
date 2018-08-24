@@ -230,7 +230,7 @@ class Build(models.Model):
                     flow=flow,
                 )
                 build_flow.save()
-                build_flow.run(project_config, org_config, self)
+                build_flow.run(project_config, org_config, self.root_dir)
 
                 if build_flow.status != 'success':
                     self.logger = init_logger(self)
@@ -414,8 +414,8 @@ class BuildFlow(models.Model):
         if self.log:
             return format_log(self.log)
 
-    def run(self, project_config, org_config, build):
-        self.build_instance = build
+    def run(self, project_config, org_config, root_dir):
+        self.root_dir = root_dir
         # Record the start
         set_build_info(self, status='running', time_start=timezone.now())
 
@@ -497,7 +497,7 @@ class BuildFlow(models.Model):
         has_results = False
 
         root_dir_robot_path = '{}/output.xml'.format(
-            self.build_instance.root_dir,
+            self.root_dir,
         )
         # Load robotframework's output.xml if found
         if os.path.isfile('output.xml'):
