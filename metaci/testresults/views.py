@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
+from django.views.decorators.clickjacking import xframe_options_exempt
 from robot import rebot
 
 from metaci.build.models import Build
@@ -134,6 +135,7 @@ def test_result_detail(request, result_id):
         
     return render(request, 'testresults/test_result_detail.html', data)
 
+@xframe_options_exempt
 def test_result_robot(request, result_id):
     build_qs = view_queryset(request)
     result = get_object_or_404(
