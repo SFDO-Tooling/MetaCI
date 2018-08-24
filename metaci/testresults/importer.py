@@ -4,6 +4,7 @@ import re
 import urllib
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from cumulusci.utils import elementtree_parse_file
 from metaci.testresults.models import TestClass
 from metaci.testresults.models import TestMethod
 from metaci.testresults.models import TestResult
@@ -160,7 +161,7 @@ def import_robot_test_results(build_flow, path):
 def parse_robot_output(path):
     """ Parses a robotframework output.xml file into individual test xml files """
     
-    tree = ET.parse(path)
+    tree = elementtree_parse_file(path)
     root = tree.getroot()
     return get_robot_tests(root, root)
 

@@ -8,7 +8,6 @@ import re
 import shutil
 import sys
 import tempfile
-import xml.etree.ElementTree as ET
 import zipfile
 import decimal
 
@@ -19,6 +18,7 @@ from cumulusci.core.exceptions import BrowserTestFailure
 from cumulusci.core.exceptions import RobotTestFailure
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.exceptions import ScratchOrgException
+from cumulusci.core.utils import elementtree_parse_file
 from cumulusci.core.utils import import_class
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.conf import settings
@@ -540,7 +540,7 @@ class BuildFlow(models.Model):
 
     def load_junit(self, filename):
         results = []
-        tree = ET.parse(filename)
+        tree = elementtree_parse_file(filename)
         testsuite = tree.getroot()
         for testcase in testsuite.iter('testcase'):
             result = {
