@@ -62,7 +62,7 @@ def import_test_results(build_flow, results, test_type):
         testclass = classes.get(result['ClassName'], None)
         if not testclass:
             testclass, created = TestClass.objects.get_or_create(
-                name = result['suite']['name'],
+                name = result['ClassName'],
                 repo=build_flow.build.repo,
                 test_type=test_type,
             )
@@ -71,7 +71,7 @@ def import_test_results(build_flow, results, test_type):
         method = methods.get(class_and_method, None)
         if not method:
             method, created = TestMethod.objects.get_or_create(
-                testclass = testclass, name = result['name']
+                testclass = testclass, name = result['Method']
             )
             methods[result['Method']] = method
 
