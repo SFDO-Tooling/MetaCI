@@ -9,6 +9,7 @@ from watson import search as watson
 
 from metaci.build.exceptions import BuildError
 from metaci.build.filters import BuildFilter
+from metaci.build.forms import QATestingForm
 from metaci.build.models import Build
 from metaci.build.models import Rebuild
 from metaci.build.tasks import run_build
@@ -39,6 +40,9 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
         if tab == 'org':
             return HttpResponseForbidden(
                 "You are not authorized to view this build's org info")
+        if tab == 'qa':
+            return HttpResponseForbidden(
+                "You are not authorized to view this build's QA info")
 
     if not rebuild_id:
         if build.current_rebuild:
@@ -96,6 +100,17 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
         return render(request, 'build/detail_rebuilds.html', context=context)
     elif tab == 'org':
         return render(request, 'build/detail_org.html', context=context)
+    elif tab == 'qa':
+        if request.method == 'POST':
+            form = QATestingForm(build, request.user, request.POST)
+            if form.is_valid():
+                form.save()
+                build = Build.objects.get(id=build.id)
+                context['build'] = build
+        else:
+            form = QATestingForm(build, request.user)
+        context['form'] = form
+        return render(request, 'build/detail_qa.html', context=context)
     else:
         raise BuildError('Unsupported value for "tab": {}'.format(tab))
 

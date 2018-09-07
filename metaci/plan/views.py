@@ -74,7 +74,7 @@ def plan_run_repo(request, plan_id, repo_owner, repo_name):
     return render(request, 'plan/run.html', context=context)
 
 @staff_member_required
-def new_org_please(request):
+def scratch_org(request):
     plans = Plan.objects.filter(public=False, active=True, type='org').prefetch_related('repos')
     plan_repos = PlanRepository.objects.filter(plan__in=plans).order_by('repo__name','plan__name')
     
@@ -82,4 +82,15 @@ def new_org_please(request):
         'plans': plans,
         'plan_repos': plan_repos,
     }
-    return render(request, 'plan/new_org_please.html', context=context)
+    return render(request, 'plan/scratch_org.html', context=context)
+
+@staff_member_required
+def qa_testing(request):
+    plans = Plan.objects.filter(active=True, type='qa').prefetch_related('repos')
+    plan_repos = PlanRepository.objects.filter(plan__in=plans).order_by('repo__name','plan__name')
+    
+    context = {
+        'plans': plans,
+        'plan_repos': plan_repos,
+    }
+    return render(request, 'plan/qa_testing.html', context=context)

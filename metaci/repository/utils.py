@@ -19,6 +19,9 @@ def create_status(build):
     if build.get_status() == 'running':
         state = 'pending'
         description = 'The build is running'
+    if build.get_status() == 'qa':
+        state = 'pending'
+        description = '{} is testing'.format(build.user)
     if build.get_status() == 'success':
         state = 'success'
         description = 'The build was successful'
@@ -27,7 +30,10 @@ def create_status(build):
         description = 'An error occurred during build'
     elif build.get_status() == 'fail':
         state = 'failure'
-        description = 'Tests failed'
+        if build.plan.type == 'qa':
+            description = 'Failed QA testing. See build for QA comments'
+        else:
+            description = 'Tests failed'
 
     response = repo.create_status(
         sha=build.commit,

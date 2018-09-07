@@ -30,8 +30,13 @@ urlpatterns = [
         name='plan_detail_repo',
     ),
     url(
-        r'^new_org_please/$',
-        views.new_org_please,
-        name='plan_new_org_please'
-    )
+        r'^scratch_org/$',
+        views.scratch_org,
+        name='plan_scratch_org',
+    ),
+    url(
+        r'^qa_testing/$',
+        views.qa_testing,
+        name='plan_qa_testing',
+    ),
 ]

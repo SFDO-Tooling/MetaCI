@@ -2,8 +2,13 @@
 {% block tab_content %}
 {% if build.get_status == 'fail' or build.get_status == 'error' %}
 <div class="slds-box slds-theme--warning slds-m-bottom--large">
+{% if build.plan.type == 'qa' %}
+  <h3 class="slds-text-heading--large">QA Comment by {{ build.get_qa_user }}</h3>
+  <p>{{ build.get_qa_comment|linebreaks }}</p>
+{% else %}
   <h3 class="slds-text-heading--large">Build Exception: {{ build.get_exception }}</h3>
   <p>{{ build.get_error_message|linebreaks }}</p>
+{% endif %}
 </div>
 {% endif %}
 <div class="slds-box">

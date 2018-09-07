@@ -2,13 +2,13 @@
 
 
 {% load crispy_forms_tags %}
-{% block layout_parent_link %}<a href="/repos/">Repos</a>{% endblock %}
-{% block layout_header_text %}New Org Please{% endblock %}
+{% block layout_parent_link %}<a href="/create-org/">Create Org</a>{% endblock %}
+{% block layout_header_text %}Create Scratch Org{% endblock %}
 
 {% block layout_body %}
 <div class="slds-box">
   <h3 class="slds-heading slds-heading--large">Create a Scratch Org</h3>
-  <p>Select the repository and plan you wish to run. On the next screen, you'll confirm the branch. This will kick off a build that, when complete, can be logged into and used for testing.</p>
+  <p>Select the repository and plan you wish to run. On the next screen, you'll confirm the branch. This will kick off a build that, when complete, can be logged into and used for evaluating the branch.</p>
 </div>
 <br/>
 <article class="slds-card">
@@ -33,8 +33,8 @@
     <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer">
       <thead class="slds-text-title--caps">
         <tr>
-          <th>Plan</th>
           <th>Repo</th>
+          <th>Plan</th>
           <th>Flows</th>
           <th>Actions</th>
         </tr>

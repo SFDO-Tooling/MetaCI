@@ -13,7 +13,7 @@ Select repository to run plan {{ plan.id }} "{{ plan.name }}"
     <ul>
 {% for repo in plan.get_repos %}
       <li>
-        <a href="/plans/{{ plan.id }}/{{ repo.owner }}/{{ repo.name }}/run/">
+        <a href="/plans/{{ plan.id }}/{{ repo.owner }}/{{ repo.name }}/run/?branch=master">
           {{ repo.owner }}/{{ repo.name }}
         </a>
       </li>

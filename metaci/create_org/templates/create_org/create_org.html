@@ -1,0 +1,37 @@
+{% extends 'layout_full.html' %}
+{% block layout_parent_link %}{% endblock %}
+{% block layout_header_text %}Create Org{% endblock %}
+
+{% block layout_body %}
+
+<div class="slds-box slds-m-bottom--medium">
+  <h3 class="slds-text-heading--large slds-m-bottom--medium">
+    Create Scratch Org
+  </h3>
+  <div class="slds-box--body">
+    <p>Use this section to create a scratch org from a branch for general feedback purposes.  For example, if you want to look at a feature in development to provide feedback to the developer.</p>
+    <a href="{% url 'create_org_scratch' %}">
+      <button class="slds-button slds-button--brand slds-m-top--small">
+        Create Scratch Org
+      </button>
+    </a>
+  </div>
+</div>  
+<div class="slds-box">
+  <h3 class="slds-text-heading--large slds-m-bottom--medium">
+    Create QA Org
+  </h3>
+  <div class="slds-box--body">
+    <p>Use this section to start a formal QA process on a branch in a fresh scratch org.  This will set a Github Commit Status on the commit being tested, and the build's QA tab provides a mechanism to record the manual QA status and comments.</p>
+      <div class="slds-notify slds-notify--alert slds-theme--alert-texture slds-m-top--small" role="alert">
+        <span class="slds-assistive-text">Info</span>
+        <h2>This will set a commit status in Github.  Only use for formal QA.  Please use the regular Scratch Org option for non-formal evaluation.</h2>
+      </div>
+    <a href="{% url 'create_org_qa' %}">
+      <button class="slds-button slds-button--brand slds-m-top--small">
+        New QA Org
+      </button>
+    </a>
+  </div>
+</div>  
+{% endblock %}

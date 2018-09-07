@@ -48,6 +48,7 @@ BUILD_STATUSES = (
     ('success', 'Success'),
     ('error', 'Error'),
     ('fail', 'Failed'),
+    ('qa', 'QA Testing'),
 )
 BUILD_FLOW_STATUSES = (
     ('queued', 'Queued'),
@@ -109,6 +110,8 @@ class Build(models.Model):
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
+    qa_comment = models.TextField(null=True, blank=True)
+    qa_user = models.ForeignKey('users.User', related_name='builds_qa', null=True, on_delete=models.PROTECT)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES,
                               default='queued')
     keep_org = models.BooleanField(default=False)
@@ -122,6 +125,8 @@ class Build(models.Model):
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
+    time_qa_start = models.DateTimeField(null=True, blank=True)
+    time_qa_end = models.DateTimeField(null=True, blank=True)
 
     build_type = models.CharField(max_length=16, choices=BUILD_TYPES, default='legacy')
     user = models.ForeignKey('users.User', related_name='builds', null=True, on_delete=models.PROTECT)
@@ -163,6 +168,12 @@ class Build(models.Model):
     def get_error_message(self):
         return self.get_build_attr('error_message')
 
+    def get_qa_comment(self):
+        return self.get_build_attr('qa_comment')
+
+    def get_qa_user(self):
+        return self.get_build_attr('qa_user')
+
     def get_time_queue(self):
         return self.get_build_attr('time_queue')
 
@@ -171,6 +182,12 @@ class Build(models.Model):
 
     def get_time_end(self):
         return self.get_build_attr('time_end')
+
+    def get_time_qa_start(self):
+        return self.get_build_attr('time_qa_start')
+
+    def get_time_qa_end(self):
+        return self.get_build_attr('time_qa_end')
 
     def set_status(self, status):
         build = self.get_build()
@@ -269,12 +286,25 @@ class Build(models.Model):
             self.flush_log()
             return
 
-        if org_config.created:
+        if self.plan.type == 'qa':
+            self.logger.info(
+                'Build complete, org is now ready for QA testing'
+            )
+        elif org_config.created:
             self.delete_org(org_config)
 
         self.delete_build_dir()
         self.flush_log()
-        set_build_info(build, status='success', time_end=timezone.now())
+
+        if self.plan.type == 'qa':
+            set_build_info(
+                build,
+                status='qa',
+                time_end=timezone.now(),
+                time_qa_start=timezone.now(),
+            )
+        else:
+            set_build_info(build, status='success', time_end=timezone.now())
 
     def checkout(self):
         # get the ref
@@ -593,9 +623,13 @@ class Rebuild(models.Model):
                               default='queued')
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
+    qa_comment = models.TextField(null=True, blank=True)
+    qa_user = models.ForeignKey('users.User', related_name='rebuilds_qa', null=True, on_delete=models.PROTECT)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
+    time_qa_start = models.DateTimeField(null=True, blank=True)
+    time_qa_end = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-id']
