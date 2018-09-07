@@ -166,6 +166,20 @@
   </a>
 </li>
 {% endif %}
+{% if request.user.is_staff and build.plan.type == 'qa' and build.time_end %}
+  <li class="slds-tabs--default__item{% if tab == 'qa' %} slds-active{% endif %}"
+  title="QA" role="presentation">
+    <a class="slds-tabs--default__link"
+      href="{% if original_build %}{{ build.get_absolute_url }}/rebuilds/original{% elif rebuild %}{{ rebuild.get_absolute_url }}{% else %}{{ build.get_absolute_url }}{% endif %}/qa"
+      role="tab"
+      tabindex="{% if tab == 'qa' %}0{% else %}-1{% endif %}"
+      aria-selected="false"
+      aria-controls="tab-default-6"
+      id="tab-default-6__item"
+      >QA
+  </a>
+</li>
+{% endif %}
 </ul>
 
 
@@ -179,6 +193,8 @@
 <div id="tab-default-4" class="slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-4__item">
 {% elif tab == 'org' %}
 <div id="tab-default-5" class="slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-5__item">
+{% elif tab == 'qa' %}
+<div id="tab-default-6" class="slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-6__item">
 {% endif %}
 
 {% block tab_content %}

@@ -38,14 +38,15 @@ class RunPlanForm(forms.Form):
                 Field('branch', css_class='slds-input'),
                 css_class='slds-form-element',
             ),
-            Fieldset(
-                'Keep org? (scratch orgs only)',
-                Field('keep_org', css_class='slds-checkbox'),
-                css_class='slds-form-element',
-            ),
         )
         if self.advanced_mode:
+            self.fields['keep_org'].widget = forms.HiddenInput()
             self.helper.layout.extend([
+                Fieldset(
+                    'Keep org? (scratch orgs only)',
+                    Field('keep_org', css_class='slds-checkbox'),
+                    css_class='slds-form-element',
+                ),
                 Fieldset(
                     'Enter the commit you want to build.  The HEAD commit on the branch will be used if you do not specify a commit',
                     Field('commit', css_class='slds-input'),
@@ -56,6 +57,10 @@ class RunPlanForm(forms.Form):
                     Field('release', css_class='slds-input'),
                     css_class='slds-form-element',
                 ),
+            ])
+        else:
+            self.helper.layout.extend([
+                Field('keep_org'),
             ])
         self.helper.layout.append(
             FormActions(
