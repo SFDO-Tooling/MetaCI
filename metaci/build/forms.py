@@ -5,7 +5,9 @@ from crispy_forms.layout import Fieldset
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 from django import forms
+from django.conf import settings
 from django.utils import timezone
+from metaci.build.tasks import set_github_status
 
 
 QA_CHOICES = (
@@ -57,4 +59,6 @@ class QATestingForm(forms.Form):
         build.save()
         if delete_org:
             build.org_instance.delete_org()
+        if settings.GITHUB_STATUS_UPDATES_ENABLED:
+            set_github_status.delay(self.build.id)
         return build

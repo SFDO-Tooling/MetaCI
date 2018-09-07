@@ -1,4 +1,5 @@
 from ansi2html import Ansi2HTMLConverter
+from django.db import transaction
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
@@ -28,7 +29,7 @@ def build_list(request):
     }
     return render(request, 'build/build_list.html', context=context)
 
-
+@transaction.non_atomic_requests
 def build_detail(request, build_id, rebuild_id=None, tab=None):
     build = get_object_or_404(Build, id=build_id)
     rebuild = None

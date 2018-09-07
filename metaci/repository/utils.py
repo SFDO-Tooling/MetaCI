@@ -10,6 +10,8 @@ def create_status(build):
     github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
     repo = github.repository(build.repo.owner, build.repo.name)
 
+    print build.get_status()
+
     if build.get_status() == 'queued':
         state = 'pending'
         description = 'The build is queued'
@@ -24,14 +26,17 @@ def create_status(build):
         description = '{} is testing'.format(build.user)
     if build.get_status() == 'success':
         state = 'success'
-        description = 'The build was successful'
+        if build.plan.type == 'qa':
+            description = '{} approved. See details for QA comments'.format(build.qa_user)
+        else:
+            description = 'Tests failed'
     elif build.get_status() == 'error':
         state = 'error'
         description = 'An error occurred during build'
     elif build.get_status() == 'fail':
         state = 'failure'
         if build.plan.type == 'qa':
-            description = 'Failed QA testing. See build for QA comments'
+            description = '{} rejected. See details for QA comments'.format(build.qa_user)
         else:
             description = 'Tests failed'
 
