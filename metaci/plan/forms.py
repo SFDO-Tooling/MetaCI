@@ -32,8 +32,6 @@ class RunPlanForm(forms.Form):
         self.advanced_mode = False
         if 'advanced_mode' in args[0]:
             self.advanced_mode = (args[0]['advanced_mode'] == "1")
-        else:
-            self.fields['keep_org'].widget = forms.HiddenInput()
         self.helper.layout = Layout(
             Fieldset(
                 'Choose the branch you want to build',
@@ -42,6 +40,7 @@ class RunPlanForm(forms.Form):
             ),
         )
         if self.advanced_mode:
+            self.fields['keep_org'].widget = forms.HiddenInput()
             self.helper.layout.extend([
                 Fieldset(
                     'Keep org? (scratch orgs only)',

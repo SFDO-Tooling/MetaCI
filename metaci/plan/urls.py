@@ -29,14 +29,4 @@ urlpatterns = [
         views.plan_detail_repo,
         name='plan_detail_repo',
     ),
-    url(
-        r'^scratch_org/$',
-        views.scratch_org,
-        name='plan_scratch_org',
-    ),
-    url(
-        r'^qa_testing/$',
-        views.qa_testing,
-        name='plan_qa_testing',
-    ),
 ]

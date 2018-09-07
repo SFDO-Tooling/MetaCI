@@ -49,7 +49,7 @@ class QATestingForm(forms.Form):
         comment = self.cleaned_data.get('comment')
         delete_org = self.cleaned_data.get('delete_org')
         if self.build.current_rebuild:
-            build = self.build.current_rebuildQ
+            build = self.build.current_rebuild
         else:
             build = self.build
         build.status = result

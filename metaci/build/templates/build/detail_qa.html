@@ -3,7 +3,7 @@
 
 {% block tab_content %}
 <div class="slds-box">
-{% if build.status == 'qa' %}
+{% if build.get_status == 'qa' %}
   <h3 class="slds-text-heading--large slds-m-bottom--medium">Submit QA Test Result</h3>
   {% crispy form form.helper %}
 {% else %}
