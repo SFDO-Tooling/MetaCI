@@ -1,0 +1,26 @@
+{% extends "build/detail_layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block tab_content %}
+<div class="slds-box">
+{% if build.get_status == 'qa' %}
+  <h3 class="slds-text-heading--large slds-m-bottom--medium">Submit QA Test Result</h3>
+  {% crispy form form.helper %}
+{% else %}
+  <h3 class="slds-text-heading--large slds-m-bottom--medium">QA Result</h3>
+  <div class="slds-tile slds-m-bottom--medium">
+    <div class="slds-tile__detail">
+      <dl class="slds-list--horizontal slds-wrap">
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="User">User:</dt>
+        <dd class="slds-item--detail slds-truncate">{{ build.get_qa_user }}</a></dd>
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Started">Started:</dt>
+        <dd class="slds-item--detail slds-truncate">{{ build.get_time_qa_start }}</dd>
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Completed">Completed:</dt>
+        <dd class="slds-item--detail slds-truncate">{{ build.get_time_qa_end }}</dd>
+        <dt class="slds-item--label slds-text-color--weak slds-truncate" title="Comment">Comment:</dt>
+        <dd class="slds-item--detail slds-truncate">{{ build.get_qa_comment }}</dd>
+      </dl>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

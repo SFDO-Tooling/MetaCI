@@ -8,7 +8,6 @@ import re
 import shutil
 import sys
 import tempfile
-import xml.etree.ElementTree as ET
 import zipfile
 import decimal
 
@@ -20,6 +19,7 @@ from cumulusci.core.exceptions import RobotTestFailure
 from cumulusci.core.exceptions import FlowNotFoundError
 from cumulusci.core.exceptions import ScratchOrgException
 from cumulusci.core.utils import import_class
+from cumulusci.utils import elementtree_parse_file
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.conf import settings
 from django.db import models
@@ -30,6 +30,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import requests
 
+from metaci.build.tasks import set_github_status
 from metaci.build.utils import format_log
 from metaci.build.utils import set_build_info
 from metaci.cumulusci.config import MetaCIGlobalConfig
@@ -37,6 +38,8 @@ from metaci.cumulusci.config import MetaCIProjectConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
 from metaci.testresults.importer import import_test_results
+from metaci.testresults.importer import import_robot_test_results
+from metaci.utils import generate_hash
 
 BUILD_STATUSES = (
     ('queued', 'Queued'),
@@ -45,6 +48,7 @@ BUILD_STATUSES = (
     ('success', 'Success'),
     ('error', 'Error'),
     ('fail', 'Failed'),
+    ('qa', 'QA Testing'),
 )
 BUILD_FLOW_STATUSES = (
     ('queued', 'Queued'),
@@ -64,6 +68,11 @@ BUILD_TYPES = (
     ('auto', 'Auto'),
     ('scheduled', 'Scheduled'),
     ('legacy', 'Legacy - Probably Automatic')
+)
+RELEASE_REL_TYPES = (
+    ('test', 'Release Test'),
+    ('automation', 'Release Automation'),
+    ('manual', 'Manual Release Activity')
 )
 FAIL_EXCEPTIONS = (
     ApexTestException,
@@ -101,6 +110,8 @@ class Build(models.Model):
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
+    qa_comment = models.TextField(null=True, blank=True)
+    qa_user = models.ForeignKey('users.User', related_name='builds_qa', null=True, on_delete=models.PROTECT)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES,
                               default='queued')
     keep_org = models.BooleanField(default=False)
@@ -114,9 +125,14 @@ class Build(models.Model):
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
+    time_qa_start = models.DateTimeField(null=True, blank=True)
+    time_qa_end = models.DateTimeField(null=True, blank=True)
 
     build_type = models.CharField(max_length=16, choices=BUILD_TYPES, default='legacy')
     user = models.ForeignKey('users.User', related_name='builds', null=True, on_delete=models.PROTECT)
+
+    release_relationship_type = models.CharField(max_length=50, choices=RELEASE_REL_TYPES, null=True, blank=True)
+    release = models.ForeignKey('release.Release', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ['-time_queue']
@@ -152,6 +168,12 @@ class Build(models.Model):
     def get_error_message(self):
         return self.get_build_attr('error_message')
 
+    def get_qa_comment(self):
+        return self.get_build_attr('qa_comment')
+
+    def get_qa_user(self):
+        return self.get_build_attr('qa_user')
+
     def get_time_queue(self):
         return self.get_build_attr('time_queue')
 
@@ -160,6 +182,12 @@ class Build(models.Model):
 
     def get_time_end(self):
         return self.get_build_attr('time_end')
+
+    def get_time_qa_start(self):
+        return self.get_build_attr('time_qa_start')
+
+    def get_time_qa_end(self):
+        return self.get_build_attr('time_qa_end')
 
     def set_status(self, status):
         build = self.get_build()
@@ -184,6 +212,7 @@ class Build(models.Model):
         try:
             # Extract the repo to a temp build dir
             self.build_dir = self.checkout()
+            self.root_dir = os.getcwd()
 
             # Change directory to the build_dir
             os.chdir(self.build_dir)
@@ -219,7 +248,7 @@ class Build(models.Model):
                     flow=flow,
                 )
                 build_flow.save()
-                build_flow.run(project_config, org_config)
+                build_flow.run(project_config, org_config, self.root_dir)
 
                 if build_flow.status != 'success':
                     self.logger = init_logger(self)
@@ -257,12 +286,25 @@ class Build(models.Model):
             self.flush_log()
             return
 
-        if org_config.created:
+        if self.plan.type == 'qa':
+            self.logger.info(
+                'Build complete, org is now ready for QA testing'
+            )
+        elif org_config.created:
             self.delete_org(org_config)
 
         self.delete_build_dir()
         self.flush_log()
-        set_build_info(build, status='success', time_end=timezone.now())
+
+        if self.plan.type == 'qa':
+            set_build_info(
+                build,
+                status='qa',
+                time_end=timezone.now(),
+                time_qa_start=timezone.now(),
+            )
+        else:
+            set_build_info(build, status='success', time_end=timezone.now())
 
     def checkout(self):
         # get the ref
@@ -390,6 +432,8 @@ class BuildFlow(models.Model):
     tests_total = models.IntegerField(null=True, blank=True)
     tests_pass = models.IntegerField(null=True, blank=True)
     tests_fail = models.IntegerField(null=True, blank=True)
+    asset_hash = models.CharField(max_length=64, unique=True, default=generate_hash)
+
 
     def __unicode__(self):
         return '{}: {} - {} - {}'.format(self.build.id, self.build.repo,
@@ -403,9 +447,14 @@ class BuildFlow(models.Model):
         if self.log:
             return format_log(self.log)
 
-    def run(self, project_config, org_config):
+    def run(self, project_config, org_config, root_dir):
+        self.root_dir = root_dir
         # Record the start
         set_build_info(self, status='running', time_start=timezone.now())
+
+        # Update github status
+        if settings.GITHUB_STATUS_UPDATES_ENABLED:
+            set_github_status.delay(self.build_id)
 
         # Set up logger
         self.logger = init_logger(self)
@@ -478,6 +527,25 @@ class BuildFlow(models.Model):
         self.save()
 
     def load_test_results(self):
+        has_results = False
+
+        root_dir_robot_path = '{}/output.xml'.format(
+            self.root_dir,
+        )
+        # Load robotframework's output.xml if found
+        if os.path.isfile('output.xml'):
+            has_results = True
+            import_robot_test_results(self, 'output.xml')
+
+        elif os.path.isfile(root_dir_robot_path):
+            # FIXME: Not sure why robot stopped writing into the cwd
+            # (build temp dir) but this should handle it so long as
+            # only one build runs at a time
+            has_results = True
+            import_robot_test_results(self, root_dir_robot_path)
+            os.remove(root_dir_robot_path)
+
+        # Load JUnit
         results = []
         if self.build.plan.junit_path:
             for filename in iglob(self.build.plan.junit_path):
@@ -486,6 +554,12 @@ class BuildFlow(models.Model):
                 self.logger.warning('No results found at JUnit path {}'.format(
                     self.build.plan.junit_path
                 ))
+        if results:
+            has_results = True
+            import_test_results(self, results, 'JUnit')
+
+        # Load from test_results.json
+        results = []
         try:
             results_filename = 'test_results.json'
             with open(results_filename, 'r') as f:
@@ -498,19 +572,21 @@ class BuildFlow(models.Model):
                 results.extend(self.load_junit(results_filename))
             except IOError as e:
                 pass
-        if not results:
-            return
-        import_test_results(self, results)
 
-        self.tests_total = self.test_results.count()
-        self.tests_pass = self.test_results.filter(outcome='Pass').count()
-        self.tests_fail = self.test_results.filter(
-            outcome__in=['Fail', 'CompileFail']).count()
-        self.save()
+        if results:
+            has_results = True
+            import_test_results(self, results, 'Apex')
+
+        if has_results:
+            self.tests_total = self.test_results.count()
+            self.tests_pass = self.test_results.filter(outcome='Pass').count()
+            self.tests_fail = self.test_results.filter(
+                outcome__in=['Fail', 'CompileFail']).count()
+            self.save()
 
     def load_junit(self, filename):
         results = []
-        tree = ET.parse(filename)
+        tree = elementtree_parse_file(filename)
         testsuite = tree.getroot()
         for testcase in testsuite.iter('testcase'):
             result = {
@@ -528,11 +604,12 @@ class BuildFlow(models.Model):
                 if element.tag not in ['failure', 'error']:
                     continue
                 result['Outcome'] = 'Fail'
-                result['StackTrace'] += element.text + '\n'
-                message = element.attrib['type']
-                if 'message' in element.attrib:
-                    message += ': ' + element.attrib['message']
-                result['Message'] += message + '\n'
+                if element.text:
+                    result['StackTrace'] += element.text + '\n'
+                message = element.get('type', '')
+                if element.get('message'):
+                    message += ': ' + element.get('message', '')
+                    result['Message'] += message + '\n'
             results.append(result)
         return results
 
@@ -546,15 +623,19 @@ class Rebuild(models.Model):
                               default='queued')
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
+    qa_comment = models.TextField(null=True, blank=True)
+    qa_user = models.ForeignKey('users.User', related_name='rebuilds_qa', null=True, on_delete=models.PROTECT)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
+    time_qa_start = models.DateTimeField(null=True, blank=True)
+    time_qa_end = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-id']
 
     def get_absolute_url(self):
-        return reverse('build_rebuild_detail', kwargs={
+        return reverse('build_detail', kwargs={
             'build_id': str(self.build.id), 'rebuild_id': str(self.id)})
 
 class FlowTaskManager(models.Manager):

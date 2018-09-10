@@ -25,13 +25,8 @@ urlpatterns = [
         name='plan_detail',
     ),
     url(
-        r'^(?P<plan_id>\w+)/(?P<repo_owner>[\w-]+)/(?P<repo_name>[\w-]+)/$',
+         r'^(?P<plan_id>\w+)/(?P<repo_owner>[\w-]+)/(?P<repo_name>[\w-]+)$',
         views.plan_detail_repo,
         name='plan_detail_repo',
     ),
-    url(
-        r'^new_org_please/$',
-        views.new_org_please,
-        name='plan_new_org_please'
-    )
 ]

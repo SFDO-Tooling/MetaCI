@@ -57,11 +57,13 @@ LOCAL_APPS = (
     'metaci.users.apps.UsersConfig',
     'metaci.api.apps.ApiConfig',
     'metaci.build.apps.BuildConfig',
+    'metaci.create_org.apps.CreateOrgConfig',
     'metaci.cumulusci.apps.CumulusCIConfig',
     'metaci.notification.apps.NotificationConfig',
     'metaci.plan.apps.PlanConfig',
     'metaci.repository.apps.RepositoryConfig',
     'metaci.testresults.apps.TestResultsConfig',
+    'metaci.release.apps.ReleaseConfig'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -300,7 +302,7 @@ SFDX_HUB_USERNAME = None
 
 # Application Behaviors
 GITHUB_STATUS_UPDATES_ENABLED = env.bool('GITHUB_STATUS_UPDATES_ENABLED', True)
-METACI_FLOW_SUBCLASS_ENABLED = env.bool('METACI_FLOW_SUBCLASS_ENABLED', False)
+METACI_FLOW_SUBCLASS_ENABLED = env.bool('METACI_FLOW_SUBCLASS_ENABLED', True)
 
 # Django REST Framework
 REST_FRAMEWORK = {

@@ -54,6 +54,27 @@
   <p>{{ plan.description }}</p>
 </div>
 {% endif %}
+
+<table class="slds-table slds-table--bordered slds-table--cell-buffer">
+  <thead>
+    <tr class="slds-text-title--caps">
+
+      <th scope="col">
+        <div class="slds-truncate" title="">Repository</div>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+      {% for pr in plan.planrepository_set.all %}
+      <tr>
+        <th data-label="Repository">
+          <div class="slds-truncate" title="{{ pr.repo.name }}"><a href="{{ pr.get_absolute_url }}">{{ pr.repo.name }}</a></div>
+        </th>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
 <table class="slds-table slds-table--bordered slds-table--cell-buffer">
   <thead>
     <tr class="slds-text-title--caps">

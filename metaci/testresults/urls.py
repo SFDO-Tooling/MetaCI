@@ -22,7 +22,17 @@ urlpatterns = [
     url(
         r'^method/(?P<method_id>\d+)$',
         views.test_method_peek,
-        name='test_method_peek'
+        name='test_method_peek',
+    ),
+    url(
+        r'^result/(?P<result_id>\d+)$',
+        views.test_result_detail,
+        name='test_result_detail',
+    ),
+    url(
+        r'^result/(?P<result_id>\d+)/robot$',
+        views.test_result_robot,
+        name='test_result_robot',
     ),
     url(
         r'^compare/$', 

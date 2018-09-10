@@ -31,6 +31,7 @@ urlpatterns = [
 
     url(r'^api/', include('metaci.api.urls')),
     url(r'^builds/', include('metaci.build.urls')),
+    url(r'^create-org/', include('metaci.create_org.urls')),
     url(r'^notifications/', include('metaci.notification.urls')),
     url(r'^tests/', include('metaci.testresults.urls')),
     url(r'^plans/', include('metaci.plan.urls')),

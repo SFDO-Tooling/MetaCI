@@ -14,7 +14,8 @@ TRIGGER_TYPES = (
     ('manual', 'Manual'),
     ('commit', 'Commit'),
     ('tag', 'Tag'),
-    ('org', 'Org Request')
+    ('org', 'Org Request'),
+    ('qa', 'QA Testing'),
 )
 
 DASHBOARD_CHOICES = (
@@ -134,9 +135,20 @@ class PlanRepository(models.Model):
     class Meta:
         ordering = ['repo', 'plan']
         verbose_name_plural = 'Plan Repositories'
+        #unique_together = ('plan', 'repo')
 
     def __unicode__(self):
         return u'[{}] {}'.format(self.repo, self.plan)
+
+    def get_absolute_url(self):
+        return reverse(
+            "plan_detail_repo",
+            kwargs={
+                "plan_id": self.plan.id,
+                "repo_owner": self.repo.owner,
+                "repo_name": self.repo.name,
+            },
+        )
 
 
 class PlanSchedule(models.Model):

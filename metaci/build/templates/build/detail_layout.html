@@ -14,15 +14,24 @@
 
 {% block layout_header_buttons %}
 {% if request.user.is_staff %}
-{% if build.get_status == 'error' or build.get_status == 'fail' %}
+
 <div class="slds-button-group" role="group">
+{% if build.get_status == 'error' or build.get_status == 'fail' %}
   <a href="{{ build.get_absolute_url }}/rebuild">
     <button class="slds-button slds-button--neutral">
       Rebuild
     </button>
   </a>
-</div>
 {% endif %}
+
+{% if org_instance and not org_instance.deleted %}
+<a href="{{ org_instance.get_absolute_url }}/login" target="_blank">
+  <button class="slds-button slds-button--brand">Log In to Org</button>
+</a>
+
+{% endif %}
+</div>
+
 {% endif %}
 {% endblock %}
 
@@ -157,6 +166,20 @@
   </a>
 </li>
 {% endif %}
+{% if request.user.is_staff and build.plan.type == 'qa' and build.time_end %}
+  <li class="slds-tabs--default__item{% if tab == 'qa' %} slds-active{% endif %}"
+  title="QA" role="presentation">
+    <a class="slds-tabs--default__link"
+      href="{% if original_build %}{{ build.get_absolute_url }}/rebuilds/original{% elif rebuild %}{{ rebuild.get_absolute_url }}{% else %}{{ build.get_absolute_url }}{% endif %}/qa"
+      role="tab"
+      tabindex="{% if tab == 'qa' %}0{% else %}-1{% endif %}"
+      aria-selected="false"
+      aria-controls="tab-default-6"
+      id="tab-default-6__item"
+      >QA
+  </a>
+</li>
+{% endif %}
 </ul>
 
 
@@ -170,6 +193,8 @@
 <div id="tab-default-4" class="slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-4__item">
 {% elif tab == 'org' %}
 <div id="tab-default-5" class="slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-5__item">
+{% elif tab == 'qa' %}
+<div id="tab-default-6" class="slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-6__item">
 {% endif %}
 
 {% block tab_content %}
