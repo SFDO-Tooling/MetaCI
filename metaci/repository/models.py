@@ -31,7 +31,7 @@ class Repository(models.Model):
         gh = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
         repo = gh.repository(self.owner, self.name)
         return repo
-
+        
 class Branch(SoftDeletableModel):
     name = models.CharField(max_length=255)
     repo = models.ForeignKey(Repository, related_name='branches', on_delete=models.CASCADE)
