@@ -33,14 +33,6 @@ class TestMethod(models.Model):
     def __unicode__(self):
         return self.name
 
-    def last_run(self):
-        rv = TestMethod
-        pass
-
-    def trailing_five(self):
-        pass
-
-
 
 class TestResultManager(models.Manager):
     def update_summary_fields(self):
