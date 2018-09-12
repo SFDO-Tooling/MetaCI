@@ -8,20 +8,20 @@ Test Dashboard for {{ repo.name }}
 {% endblock %}
 
 {% block layout_header_details %}
-  <ul class="slds-grid slds-page-header__detail-row">
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Plan">Current Version</p>
-      <p class="slds-text-body--regular slds-truncate" title="3.135">
-          3.135
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Date">Date</p>
-      <p class="slds-text-body--regular slds-truncate" title="July 24, 2018">
-            July 24, 2018
-      </p>
-    </li>
-  </ul>
+<ul class="slds-grid slds-page-header__detail-row">
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Current Version">Current Version</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{repo.latest_release.version_name}}">
+      {{repo.latest_release.version_name}}
+    </p>
+  </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Date">Date</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{repo.latest_release.release_creation_date}}">
+      {{repo.latest_release.release_creation_date}}
+    </p>
+  </li>
+</ul>
 {% endblock %}
 
 
@@ -54,12 +54,12 @@ Test Dashboard for {{ repo.name }}
 
 <div class=""> pages</div>
 <div class="slds-button-group slds-m-top--medium" role="group">
-    {% if latest_fails.has_previous %}
-      <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.previous_page_number }}">previous</a>
-    {% endif %}
-    
-    {% if latest_fails.has_next %}
-      <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.next_page_number }}">next</a>
-    {% endif %}
-  </div>
+  {% if latest_fails.has_previous %}
+  <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.previous_page_number }}">previous</a>
+  {% endif %}
+
+  {% if latest_fails.has_next %}
+  <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.next_page_number }}">next</a>
+  {% endif %}
+</div>
 {% endblock %}

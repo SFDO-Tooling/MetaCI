@@ -44,10 +44,4 @@ urlpatterns = [
         views.test_dashboard,
         name='test_dashboard'
     ),
-    url(
-        r'dashboard/(?P<repo_owner>[\w-]+)/(?P<repo_name>[\w-]+)/(?P<test_method_id>\d+)$',
-        views.test_dashboard_drill,
-        name='test_dashboard'
-    )
-
 ]

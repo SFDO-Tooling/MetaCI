@@ -31,6 +31,13 @@ class Repository(models.Model):
         gh = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
         repo = gh.repository(self.owner, self.name)
         return repo
+
+    @property
+    def latest_release(self):
+        try:
+            return self.releases.latest()
+        except Repository.DoesNotExist:
+            return None
         
 class Branch(SoftDeletableModel):
     name = models.CharField(max_length=255)

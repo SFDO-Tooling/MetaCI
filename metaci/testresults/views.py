@@ -1,6 +1,7 @@
 import os
 from tempfile import mkstemp
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import Http404
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -267,15 +268,10 @@ def build_flow_compare_to(request, build_id, flow):
     data = {'build_flow': build_flow, 'filter': comparison_filter, 'records': records}
     return render(request, 'testresults/build_flow_compare_to.html', data)
 
+@staff_member_required
 def test_dashboard(request, repo_owner, repo_name):
     """ display a dashboard of test results from preconfigured methods """
     repo = get_object_or_404(Repository, name=repo_name, owner=repo_owner)
     methods = TestMethod.objects.filter(testclass__repo=repo, test_dashboard=True)
     data = {'repo': repo, 'methods': methods }
     return render(request, 'testresults/test_dashboard.html', data)
-
-def test_dashboard_drill(request, repo_owner, repo_name, test_method_id):
-    repo = get_object_or_404(Repository, name=repo_name, owner=repo_owner)
-    method = get_object_or_404(TestMethod, id=test_method_id)
-    data = {'repo': repo, 'method': method }
-    return render(request, 'testresults/test_dashboard_drill.html', data)
