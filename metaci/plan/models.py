@@ -125,6 +125,7 @@ class Plan(models.Model):
 class PlanRepository(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     repo = models.ForeignKey(Repository, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['repo', 'plan']
