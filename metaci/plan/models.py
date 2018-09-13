@@ -121,11 +121,6 @@ class Plan(models.Model):
     
         return run_build, commit, commit_message
 
-SCHEDULE_CHOICES=(
-    ('daily', 'Daily'),
-    ('hourly', 'Hourly'),
-)
-
 
 class PlanRepository(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
@@ -149,24 +144,3 @@ class PlanRepository(models.Model):
             },
         )
 
-
-class PlanSchedule(models.Model):
-    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
-    branch = models.ForeignKey('repository.branch', on_delete=models.CASCADE)
-    schedule = models.CharField(max_length=16, choices=SCHEDULE_CHOICES)
-
-    class Meta:
-        verbose_name_plural = 'Plan Schedules'
-
-    def run(self):
-        Build = apps.get_model('build', 'Build')
-        build = Build(
-            repo = self.branch.repo,
-            plan = self.plan,
-            branch = self.branch,
-            commit = self.branch.github_api.commit.sha,
-            schedule = self,
-            build_type = 'scheduled',
-        )
-        build.save()
-        return build
