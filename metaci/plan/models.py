@@ -125,7 +125,7 @@ class Plan(models.Model):
 class PlanRepositoryManager(models.Manager):
     def get_queryset(self):
         return super(PlanRepositoryManager, self).get_queryset().annotate(
-            _alive=models.ExpressionWrapper(models.Q(active=True) & models.Q(plan__active=True), output_field=models.BooleanField())
+            alive=models.ExpressionWrapper(models.Q(active=True) & models.Q(plan__active=True), output_field=models.BooleanField())
         )
 
 class PlanRepository(models.Model):
@@ -159,4 +159,9 @@ class PlanRepository(models.Model):
             return self._alive # if we came from the default manager, this is already calculated.
         else:
             return (self.active and self.plan.active)
+    
+    @alive.setter
+    def alive(self, val):
+        # figure out to only allow this from the query set?
+        self._alive = val
 
