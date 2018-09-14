@@ -142,7 +142,7 @@ class PlanRepository(models.Model):
         ordering = ['repo', 'plan']
         verbose_name_plural = 'Plan Repositories'
         base_manager_name = 'objects'
-        #unique_together = ('plan', 'repo')
+        unique_together = ('plan', 'repo')
 
     def __unicode__(self):
         return u'[{}] {}'.format(self.repo, self.plan)

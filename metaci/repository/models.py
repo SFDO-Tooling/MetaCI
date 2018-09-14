@@ -32,6 +32,13 @@ class Repository(models.Model):
         repo = gh.repository(self.owner, self.name)
         return repo
 
+    @property
+    def latest_release(self):
+        try:
+            return self.releases.latest()
+        except Repository.DoesNotExist:
+            return None
+        
 class Branch(SoftDeletableModel):
     name = models.CharField(max_length=255)
     repo = models.ForeignKey(Repository, related_name='branches', on_delete=models.CASCADE)

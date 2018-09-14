@@ -39,5 +39,9 @@ urlpatterns = [
         views.build_flow_compare,
         name='build_flow_compare',
     ),
-
+    url(
+        r'dashboard/(?P<repo_owner>[\w-]+)/(?P<repo_name>[\w-]+)/$',
+        views.test_dashboard,
+        name='test_dashboard'
+    ),
 ]
