@@ -24,13 +24,14 @@ class TestClass(models.Model):
 class TestMethod(models.Model):
     name = models.CharField(max_length=255, db_index=True)
     testclass = models.ForeignKey(TestClass, related_name='methods', on_delete=models.CASCADE)
+    test_dashboard = models.BooleanField(default=False)
+    description = models.CharField(max_length=1024, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Test Method'
 
     def __unicode__(self):
         return self.name
-
 
 
 class TestResultManager(models.Manager):

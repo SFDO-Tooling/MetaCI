@@ -1,0 +1,65 @@
+{% extends 'layout_full.html' %}
+{% load humanize %}
+
+{% block layout_header_text %}
+
+Test Dashboard for {{ repo.name }}
+
+{% endblock %}
+
+{% block layout_header_details %}
+<ul class="slds-grid slds-page-header__detail-row">
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Current Version">Current Version</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{repo.latest_release.version_name}}">
+      {{repo.latest_release.version_name}}
+    </p>
+  </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Date">Date</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{repo.latest_release.release_creation_date}}">
+      {{repo.latest_release.release_creation_date}}
+    </p>
+  </li>
+</ul>
+{% endblock %}
+
+
+{% block layout_body %}
+
+<table class="slds-table slds-table--bordered slds-table--cell-buffer">
+  <thead>
+    <tr class="slds-text-title--caps">
+      <th scope="col">Test Method</th>
+      <th scope="col">Description</th>
+      <th scope="col">Apex Time (Last Run)</th>
+      <th scope="col">Apex Time (Trailing 5)</th>
+      <th scope="col">+/-</th>
+    </tr>
+  </thead>
+  <tbody>
+
+
+    {% for method in methods %}
+    <tr>
+      <td><a href="{{method.id}}">{{method.name}}</a></td>
+      <td>Inserts 200 contacts with an affiliation to an org. This test can...</td>
+      <td>308 ms</td>
+      <td>315 ms</td>
+      <td>-15</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class=""> pages</div>
+<div class="slds-button-group slds-m-top--medium" role="group">
+  {% if latest_fails.has_previous %}
+  <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.previous_page_number }}">previous</a>
+  {% endif %}
+
+  {% if latest_fails.has_next %}
+  <a class="slds-button slds-button--neutral" href="?page={{ latest_fails.next_page_number }}">next</a>
+  {% endif %}
+</div>
+{% endblock %}
