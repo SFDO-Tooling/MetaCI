@@ -141,6 +141,7 @@ class PlanRepository(models.Model):
     class Meta:
         ordering = ['repo', 'plan']
         verbose_name_plural = 'Plan Repositories'
+        base_manager_name = 'objects'
         #unique_together = ('plan', 'repo')
 
     def __unicode__(self):
