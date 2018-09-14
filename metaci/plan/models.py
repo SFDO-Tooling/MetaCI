@@ -125,7 +125,10 @@ class Plan(models.Model):
 class PlanRepositoryManager(models.Manager):
     def get_queryset(self):
         return super(PlanRepositoryManager, self).get_queryset().annotate(
-            alive=models.ExpressionWrapper(models.Q(active=True) & models.Q(plan__active=True), output_field=models.BooleanField())
+            alive=models.ExpressionWrapper(
+                models.Q(active=True) & models.Q(plan__active=True),
+                output_field=models.BooleanField()
+            )
         )
 
 class PlanRepository(models.Model):
