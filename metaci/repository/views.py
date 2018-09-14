@@ -215,7 +215,7 @@ def github_push_webhook(request):
                 }
             )
 
-    for plan in repo.plans.filter(type__in=['commit', 'tag'], active=True):
+    for plan in repo.plans.filter(type__in=['commit', 'tag'], active=True, planrepository__active=True):
         run_build, commit, commit_message = plan.check_push(push)
         if run_build:
             build = Build(
