@@ -122,10 +122,18 @@ class Plan(models.Model):
         return run_build, commit, commit_message
 
 
+class PlanRepositoryManager(models.Manager):
+    def get_queryset(self):
+        return super(PlanRepositoryManager, self).get_queryset().annotate(
+            _alive=models.ExpressionWrapper(models.Q(active=True) & models.Q(plan__active=True), output_field=models.BooleanField())
+        )
+
 class PlanRepository(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     repo = models.ForeignKey(Repository, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
+    
+    objects = PlanRepositoryManager()
 
     class Meta:
         ordering = ['repo', 'plan']
@@ -144,4 +152,11 @@ class PlanRepository(models.Model):
                 "repo_name": self.repo.name,
             },
         )
+
+    @property
+    def alive(self):
+        if self._alive is not None:
+            return self._alive # if we came from the default manager, this is already calculated.
+        else:
+            return (self.active and self.plan.active)
 
