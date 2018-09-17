@@ -53,13 +53,15 @@ def plan_detail_repo(request, plan_id, repo_owner, repo_name):
 @staff_member_required
 def plan_run(request, plan_id):
     plan = get_object_or_404(Plan, id=plan_id)
-    context = {'plan': plan, 'repos': plan.repos.all()}
+    context = {'plan': plan, 'planrepos': plan.planrepository_set.should_run().all()}
     return render(request, 'plan/run_select_repo.html', context=context)
 
 @staff_member_required
 def plan_run_repo(request, plan_id, repo_owner, repo_name):
     plan = get_object_or_404(Plan, id=plan_id)
     repo = get_object_or_404(Repository, owner=repo_owner, name=repo_name)
+    # this is a little hackish, but it will cause a 404 if the planrepo or the plan are inactive, preventing runplanform from ever occuring.
+    planrepo = get_object_or_404(PlanRepository, plan_id=plan.id, repo_id=repo.id, active=True, plan__active=True)
     if request.method == 'POST':
         form = RunPlanForm(plan, repo, request.user, request.POST)
         if form.is_valid():
