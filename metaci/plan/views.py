@@ -53,7 +53,7 @@ def plan_detail_repo(request, plan_id, repo_owner, repo_name):
 @staff_member_required
 def plan_run(request, plan_id):
     plan = get_object_or_404(Plan, id=plan_id)
-    context = {'plan': plan, 'repos': plan.repos.filter(planrepository__alive=True).all()}
+    context = {'plan': plan, 'planrepos': plan.planrepository_set.all()}
     return render(request, 'plan/run_select_repo.html', context=context)
 
 @staff_member_required

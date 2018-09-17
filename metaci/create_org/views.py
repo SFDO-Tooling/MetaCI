@@ -13,7 +13,7 @@ def create_org(request):
 @staff_member_required
 def scratch_org(request):
     plans = Plan.objects.filter(public=False, active=True, type='org').prefetch_related('repos')
-    plan_repos = PlanRepository.objects.filter(plan__in=plans, alive=True).order_by('repo__name','plan__name')
+    plan_repos = PlanRepository.objects.should_run().filter(plan__in=plans).order_by('repo__name','plan__name')
     
     context = {
         'plans': plans,
@@ -24,7 +24,7 @@ def scratch_org(request):
 @staff_member_required
 def qa_org(request):
     plans = Plan.objects.filter(active=True, type='qa').prefetch_related('repos')
-    plan_repos = PlanRepository.objects.filter(plan__in=plans, alive=True).order_by('repo__name','plan__name')
+    plan_repos = PlanRepository.objects.should_run().filter(plan__in=plans).order_by('repo__name','plan__name')
     
     context = {
         'plans': plans,

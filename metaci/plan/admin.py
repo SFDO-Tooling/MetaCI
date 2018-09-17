@@ -29,6 +29,6 @@ class PlanAdmin(admin.ModelAdmin):
 admin.site.register(Plan, PlanAdmin)
 
 class PlanRepositoryAdmin(admin.ModelAdmin):
-    list_display = ('repo', 'plan', 'active', 'alive')
+    list_display = ('repo', 'plan', 'active')
     list_filter = ('repo', 'plan', 'active')
 admin.site.register(PlanRepository, PlanRepositoryAdmin)
