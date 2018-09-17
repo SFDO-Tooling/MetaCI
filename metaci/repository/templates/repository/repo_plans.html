@@ -60,8 +60,7 @@
         {% with plan=planrepo.plan %}
         <tr>
           <th data-label="Plan">
-            <div class="slds-truncate" title="{{ plan.name }}"><a href="{{ planrepo.get_absolute_url }}">{{ plan.name
-                }}</a></div>
+            <div class="slds-truncate" title="{{ plan.name }}"><a href="{{ planrepo.get_absolute_url }}">{{ plan.name }}</a></div>
           </th>
           <th data-label="Type">
             <div class="slds-truncate"><span>{{ plan.type }}</span></div>
