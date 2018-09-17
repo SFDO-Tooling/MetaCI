@@ -77,7 +77,7 @@ class RunPlanForm(forms.Form):
         return tuple(choices)
 
     def create_build(self):
-        # TODO: check that plan and planrepo are both active
+        
         commit = self.cleaned_data.get('commit')
         if not commit:
             gh_repo = self.repo.github_api
