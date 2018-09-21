@@ -29,7 +29,7 @@ def create_status(build):
         if build.plan.type == 'qa':
             description = '{} approved. See details for QA comments'.format(build.qa_user)
         else:
-            description = 'Tests failed'
+            description = 'The build was successful'
     elif build.get_status() == 'error':
         state = 'error'
         description = 'An error occurred during build'
