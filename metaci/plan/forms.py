@@ -70,10 +70,13 @@ class RunPlanForm(forms.Form):
         )
 
     def _get_branch_choices(self):
-        choices = []
         gh_repo = self.repo.github_api
+        choices = [
+            (gh_repo.default_branch, gh_repo.default_branch)
+        ]
         for branch in gh_repo.iter_branches():
-            choices.append((branch.name, branch.name))
+            if branch != gh_repo.default_branch:
+                choices.append((branch.name, branch.name))
         return tuple(choices)
 
     def create_build(self):
