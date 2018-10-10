@@ -32,6 +32,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # raven sentry client
 # See https://docs.getsentry.com/hosted/clients/python/integrations/django/
 INSTALLED_APPS += ('raven.contrib.django.raven_compat', )
+INSTALLED_APPS += ('defender', )
 
 # Use Whitenoise to serve static files
 # See: https://whitenoise.readthedocs.io/
@@ -39,6 +40,8 @@ WHITENOISE_MIDDLEWARE = ('whitenoise.middleware.WhiteNoiseMiddleware', )
 MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
 RAVEN_MIDDLEWARE = ('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware', )
 MIDDLEWARE = RAVEN_MIDDLEWARE + MIDDLEWARE
+DEFENDER_MIDDLEWARE = ['defender.middleware.FailedLoginMiddleware']
+MIDDLEWARE = MIDDLEWARE + DEFENDER_MIDDLEWARE
 
 
 # SECURITY CONFIGURATION
@@ -277,3 +280,6 @@ CONNECTED_APP_CALLBACK_URL = env('CONNECTED_APP_CALLBACK_URL')
 SFDX_CLIENT_ID = env('SFDX_CLIENT_ID')
 SFDX_HUB_KEY = env('SFDX_HUB_KEY')
 SFDX_HUB_USERNAME = env('SFDX_HUB_USERNAME')
+
+# django-defender configuration
+DEFENDER_REDIS_NAME='default'
