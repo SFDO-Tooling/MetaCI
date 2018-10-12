@@ -40,7 +40,7 @@ WHITENOISE_MIDDLEWARE = ('whitenoise.middleware.WhiteNoiseMiddleware', )
 MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
 RAVEN_MIDDLEWARE = ('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware', )
 MIDDLEWARE = RAVEN_MIDDLEWARE + MIDDLEWARE
-DEFENDER_MIDDLEWARE = ['defender.middleware.FailedLoginMiddleware']
+DEFENDER_MIDDLEWARE = ('defender.middleware.FailedLoginMiddleware',)
 MIDDLEWARE = MIDDLEWARE + DEFENDER_MIDDLEWARE
 
 
