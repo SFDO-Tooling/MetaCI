@@ -41,7 +41,6 @@ class RunPlanForm(forms.Form):
             ),
         )
         if self.advanced_mode:
-            self.fields['keep_org'].widget = forms.HiddenInput()
             self.helper.layout.extend([
                 Fieldset(
                     'Keep org? (scratch orgs only)',
