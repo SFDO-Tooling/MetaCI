@@ -22,6 +22,8 @@ class RunPlanForm(forms.Form):
         self.plan = plan
         self.repo = repo
         self.user = user
+        org = kwargs.pop('org', None)
+        self.org = org
         super(RunPlanForm, self).__init__(*args, **kwargs)
         self.fields['branch'].choices = self._get_branch_choices()
         self.fields['release'].queryset = self.repo.releases
@@ -40,7 +42,6 @@ class RunPlanForm(forms.Form):
             ),
         )
         if self.advanced_mode:
-            self.fields['keep_org'].widget = forms.HiddenInput()
             self.helper.layout.extend([
                 Fieldset(
                     'Keep org? (scratch orgs only)',
@@ -103,6 +104,7 @@ class RunPlanForm(forms.Form):
         build = Build(
             repo=self.repo,
             plan=self.plan,
+            org=self.org,
             branch=branch,
             commit=commit,
             keep_org=keep_org,
