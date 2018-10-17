@@ -18,10 +18,11 @@ class RunPlanForm(forms.Form):
     keep_org = forms.BooleanField(required=False)
     release = forms.ModelChoiceField(None, required=False)
 
-    def __init__(self, plan, repo, user, *args, org=None, **kwargs):
+    def __init__(self, plan, repo, user, *args, **kwargs):
         self.plan = plan
         self.repo = repo
         self.user = user
+        org = kwargs.pop('org', None)
         self.org = org
         super(RunPlanForm, self).__init__(*args, **kwargs)
         self.fields['branch'].choices = self._get_branch_choices()
