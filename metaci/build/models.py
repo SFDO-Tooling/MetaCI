@@ -334,9 +334,14 @@ class Build(models.Model):
     def get_org(self, project_config, retries=3):
         self.logger = init_logger(self)
         attempt = 1
+        if self.org:
+            # If the build's org was already set, keep using it
+            org_name = self.org.name
+        else:
+            org_name = self.plan.org
         while True:
             try:
-                org_config = project_config.keychain.get_org(self.plan.org)
+                org_config = project_config.keychain.get_org(org_name)
                 break
             except ScratchOrgException as e:
                 if (
