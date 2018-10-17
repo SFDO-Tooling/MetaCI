@@ -80,7 +80,7 @@ def check_queued_build(build_id):
 
     # Check for concurrency blocking
     try:
-        org = Org.objects.get(name=build.plan.org, repo=build.repo)
+        org = build.org or Org.objects.get(name=build.plan.org, repo=build.repo)
     except Org.DoesNotExist:
         message = 'Could not find org configuration for org {}'.format(
             build.plan.org)
