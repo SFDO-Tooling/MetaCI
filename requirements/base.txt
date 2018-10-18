@@ -1,7 +1,7 @@
 setuptools 
 
-# Bleeding edge Django
-django==1.11.10
+# Django
+django==1.11.15
 
 # Configuration
 django-environ==0.4.4
