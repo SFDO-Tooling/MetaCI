@@ -35,12 +35,8 @@ def view_queryset(request, query=None, status=None, filter_class=None):
     if not query:
         query = {}
 
-    if not request.user.is_staff:
-        query['plan__public'] = True
-        query['repo__public'] = True
-
     Build = apps.get_model('build', 'Build')
-    builds = Build.objects.all()
+    builds = Build.objects.for_user(request.user, 'plan.view_builds')
     if query:
         builds = builds.filter(**query)
     if status:

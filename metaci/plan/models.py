@@ -125,6 +125,7 @@ class Plan(models.Model):
 class PlanRepositoryQuerySet(models.QuerySet):
     def should_run(self):
         return self.filter(active=True, plan__active=True)
+    
 
 class PlanRepository(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
@@ -138,6 +139,12 @@ class PlanRepository(models.Model):
         verbose_name_plural = 'Plan Repositories'
         base_manager_name = 'objects'
         unique_together = ('plan', 'repo')
+        permissions = (
+            ('run_plan', 'Run Plan'),
+            ('view_builds', 'View Builds'),
+            ('rebuild_builds', 'Rebuild Builds'),
+            ('qa_builds', 'QA Builds'),
+        )
 
     def __unicode__(self):
         return u'[{}] {}'.format(self.repo, self.plan)

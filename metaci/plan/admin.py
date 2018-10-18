@@ -1,6 +1,6 @@
 from django.contrib import admin
 from metaci.plan.models import Plan, PlanRepository
-
+from guardian.admin import GuardedModelAdmin
 
 class PlanRepositoryInline(admin.TabularInline):
     model = PlanRepository
@@ -28,7 +28,7 @@ class PlanAdmin(admin.ModelAdmin):
     ]
 admin.site.register(Plan, PlanAdmin)
 
-class PlanRepositoryAdmin(admin.ModelAdmin):
+class PlanRepositoryAdmin(GuardedModelAdmin):
     list_display = ('repo', 'plan', 'active')
     list_filter = ('repo', 'plan', 'active')
 admin.site.register(PlanRepository, PlanRepositoryAdmin)

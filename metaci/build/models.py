@@ -21,6 +21,7 @@ from cumulusci.core.exceptions import ScratchOrgException
 from cumulusci.core.utils import import_class
 from cumulusci.utils import elementtree_parse_file
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
+from django.apps import apps
 from django.conf import settings
 from django.db import models
 from django.contrib.postgres.fields import JSONField
@@ -28,6 +29,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
+from guardian.shortcuts import get_objects_for_user
 import requests
 
 from metaci.build.tasks import set_github_status
@@ -91,6 +93,18 @@ class GnarlyEncoder(DjangoJSONEncoder):
         except TypeError:
             return repr(obj)
 
+class BuildQuerySet(models.QuerySet):
+    def for_user(self, user, perms=None, **kwargs):
+        if perms is None:
+            perms = 'plan.view_builds'
+        PlanRepository = apps.get_model('plan.PlanRepository')
+        planrepos = get_objects_for_user(
+            user,
+            perms,
+            PlanRepository,
+            **kwargs
+        )
+        return self.filter(planrepo__in = planrepos)
 
 class Build(models.Model):
     repo = models.ForeignKey('repository.Repository', related_name='builds', on_delete=models.CASCADE)
@@ -101,6 +115,7 @@ class Build(models.Model):
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     plan = models.ForeignKey('plan.Plan', related_name='builds', on_delete=models.CASCADE)
+    planrepo = models.ForeignKey('plan.PlanRepository', related_name='builds', on_delete=models.CASCADE)
     org = models.ForeignKey('cumulusci.Org', related_name='builds', null=True,
                             blank=True, on_delete=models.CASCADE)
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
@@ -131,6 +146,8 @@ class Build(models.Model):
 
     release_relationship_type = models.CharField(max_length=50, choices=RELEASE_REL_TYPES, null=True, blank=True)
     release = models.ForeignKey('release.Release', on_delete=models.SET_NULL, null=True, blank=True)
+
+    objects = BuildQuerySet.as_manager()
 
     class Meta:
         ordering = ['-time_queue']
