@@ -36,20 +36,21 @@ DJANGO_APPS = (
     'django.contrib.admin',
 )
 THIRD_PARTY_APPS = (
-    'crispy_forms',  # Form layouts
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
     'allauth.socialaccount.providers.github', # github
+    'crispy_forms',  # Form layouts
+    'django_filters', # view helpers for filtering models
     'django_rq',
-    'scheduler', # django-rq-scheduler
     'django_rq_wrapper',
     'django_slds',  # Salesforce Lightning Design System
     'django_slds_crispyforms',  # SLDS theme for crispyforms
-    'watson', # Full text search
-    'django_filters', # view helpers for filtering models
+    'guardian', # Per Object Permissions via django-guardian
     'rest_framework', # API
     'rest_framework.authtoken',
+    'scheduler', # django-rq-scheduler
+    'watson', # Full text search
 )
 
 # Apps specific for this project go here.
@@ -242,6 +243,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'guardian.backends.ObjectPermissionBackend',
 )
 
 # Some really nice defaults
