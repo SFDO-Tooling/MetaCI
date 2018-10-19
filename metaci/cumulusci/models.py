@@ -11,12 +11,14 @@ import requests
 from cumulusci.core.config import ScratchOrgConfig
 from cumulusci.core.config import OrgConfig
 from cumulusci.core.exceptions import ScratchOrgException
+from django.apps import apps
 from django.core.cache import cache
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.conf import settings
+from guardian.shortcuts import get_objects_for_user
 from simple_salesforce import Salesforce as SimpleSalesforce
 from simple_salesforce.exceptions import SalesforceError
 
@@ -55,6 +57,17 @@ def sf_session(jwt):
             version='42.0'
     )
 
+class OrgQuerySet(models.QuerySet):
+    def for_user(self, user, perms=None):
+        if perms is None:
+            perms = 'plan.view_builds_org'
+        PlanRepository = apps.get_model('plan.PlanRepository')
+        planrepos = PlanRepository.objects.for_user(user, perms)
+        planrepos = planrepos.values('plan__org', 'repo')
+        q = models.Q()
+        for plan_org in planrepos:
+            q.add(models.Q(name=plan_org['plan__org'], repo_id=plan_org['repo']), models.Q.OR)
+        return self.filter(q)
 
 class Org(models.Model):
     name = models.CharField(max_length=255)
@@ -62,13 +75,7 @@ class Org(models.Model):
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey('repository.Repository', related_name='orgs', on_delete=models.CASCADE)
 
-    management_group = models.ForeignKey(
-        'auth.Group',
-        related_name='protected_orgs',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    objects = OrgQuerySet.as_manager()
 
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']

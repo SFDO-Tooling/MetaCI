@@ -4,8 +4,18 @@ from django.db import models
 from django.urls import reverse
 
 from github3 import login
+from django.apps import apps
 from django.conf import settings
 from model_utils.models import SoftDeletableModel
+
+class RepositoryQuerySet(models.QuerySet):
+    def for_user(self, user, perms=None):
+        if perms is None:
+            perms = 'plan.view_builds'
+        PlanRepository = apps.get_model('plan.PlanRepository')
+        return self.filter(
+            planrepository__in = PlanRepository.objects.for_user(user, perms),
+        ).distinct()
 
 class Repository(models.Model):
     name = models.CharField(max_length=255)
@@ -14,6 +24,8 @@ class Repository(models.Model):
     url = models.URLField(max_length=255)
 
     release_tag_regex = models.CharField(max_length=255, blank=True, null=True)
+
+    objects = RepositoryQuerySet.as_manager()
 
     class Meta:
         ordering = ['name','owner']

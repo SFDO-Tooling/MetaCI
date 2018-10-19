@@ -35,12 +35,9 @@ class PlanQuerySet(models.QuerySet):
     def for_user(self, user, perms=None):
         if perms is None:
             perms = 'plan.view_builds'
-        planrepos = get_objects_for_user(
-            user,
-            perms,
-            PlanRepository,
-        )
-        return self.filter(planrepository__in = planrepos).distinct()
+        return self.filter(
+            planrepository__in = PlanRepository.objects.for_user(user, perms),
+        ).distinct()
 
 class Plan(models.Model):
     name = models.CharField(max_length=255)

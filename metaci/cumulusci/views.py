@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
-from django.db.models import Q
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
@@ -22,13 +21,10 @@ from metaci.plan.models import PlanRepository
 
 @login_required
 def org_detail(request, org_id):
-    org = get_object_or_404(Org, id=org_id)
-
-    # Verify access
-    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
-    planrepos = planrepos.filter(repo=org.repo, plan__org=org.name)
-    if not planrepos.exists():
-        return HttpResponseForbidden('You are not authorized to view this org')
+    try:
+        org = Org.objects.for_user(request.user).get(id=org_id)
+    except Org.DoesNotExist:
+        raise Http404
 
     # Get builds
     query = {'org': org}
@@ -82,13 +78,10 @@ def org_unlock(request, org_id):
 
 @login_required
 def org_login(request, org_id, instance_id=None):
-    org = get_object_or_404(Org, id=org_id)
-
-    # Verify access
-    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
-    planrepos = planrepos.filter(repo=org.repo, plan__org=org.name)
-    if not planrepos.exists():
-        return HttpResponseForbidden('You are not authorized to view this org')
+    try:
+        org = Org.objects.for_user(request.user).get(id=org_id)
+    except Org.DoesNotExist:
+        raise Http404
 
     def get_org_config(org):
         org_config = org.get_org_config()
@@ -128,9 +121,9 @@ def org_instance_delete(request, org_id, instance_id):
     instance = get_object_or_404(ScratchOrgInstance, org_id=org_id, id=instance_id)
 
     # Verify access
-    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
-    planrepos = planrepos.filter(repo=instance.org.repo, plan__org=instance.org.name)
-    if not planrepos.exists():
+    try:
+        org = Org.objects.for_user(request.user).get(id=org_id)
+    except Org.DoesNotExist:
         return HttpResponseForbidden('You are not authorized to view this org')
 
     context = {
@@ -147,9 +140,9 @@ def org_instance_detail(request, org_id, instance_id):
     instance = get_object_or_404(ScratchOrgInstance, org_id=org_id, id=instance_id)
 
     # Verify access
-    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
-    planrepos = planrepos.filter(repo=instance.org.repo, plan__org=instance.org.name)
-    if not planrepos.exists():
+    try:
+        org = Org.objects.for_user(request.user).get(id=org_id)
+    except Org.DoesNotExist:
         return HttpResponseForbidden('You are not authorized to view this org')
 
     # Get builds
@@ -164,11 +157,6 @@ def org_instance_detail(request, org_id, instance_id):
 
 @login_required
 def org_list(request):
-    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
-    planrepos = planrepos.values('plan__org', 'repo')
-    if not planrepos:
-        return HttpResponseForbidden('You are not authorized to view any orgs')
-
     query = {}
     repo = request.GET.get('repo')
     if repo:
@@ -177,11 +165,7 @@ def org_list(request):
     if scratch:
         query['scratch'] = scratch
 
-    orgs = Org.objects.filter(**query)
-    q = Q()
-    for plan_org in planrepos:
-        q.add(Q(name=plan_org['plan__org'], repo_id=plan_org['repo']), Q.OR)
-    orgs = orgs.filter(q)
+    orgs = Org.objects.for_user(request.user).filter(**query)
     orgs = orgs.order_by('id')
 
     orgs = paginate(orgs, request)
