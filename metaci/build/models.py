@@ -29,7 +29,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from guardian.shortcuts import get_objects_for_user
 import requests
 
 from metaci.build.tasks import set_github_status
@@ -94,17 +93,13 @@ class GnarlyEncoder(DjangoJSONEncoder):
             return repr(obj)
 
 class BuildQuerySet(models.QuerySet):
-    def for_user(self, user, perms=None, **kwargs):
+    def for_user(self, user, perms=None):
         if perms is None:
             perms = 'plan.view_builds'
         PlanRepository = apps.get_model('plan.PlanRepository')
-        planrepos = get_objects_for_user(
-            user,
-            perms,
-            PlanRepository,
-            **kwargs
+        return self.filter(
+            planrepo__in = PlanRepository.objects.for_user(user, perms),
         )
-        return self.filter(planrepo__in = planrepos)
 
 class Build(models.Model):
     repo = models.ForeignKey('repository.Repository', related_name='builds', on_delete=models.CASCADE)
