@@ -149,7 +149,7 @@ def build_detail_qa(request, build_id, rebuild_id=None):
 def build_rebuild(request, build_id):
     build = get_object_or_404(Build, id=build_id)
 
-    if not request.user.has_perm('plan.qa_builds', build.planrepo):
+    if not request.user.has_perm('plan.rebuild_builds', build.planrepo):
         return HttpResponseForbidden(
             'You are not authorized to rebuild this build')
 
