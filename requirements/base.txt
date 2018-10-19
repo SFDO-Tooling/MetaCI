@@ -1,7 +1,7 @@
 setuptools 
 
-# Bleeding edge Django
-django==1.11.10
+# Django
+django==1.11.15
 
 # Configuration
 django-environ==0.4.4
@@ -42,7 +42,7 @@ django-rq-wrapper>=1.4
 django-rq-scheduler>=1.1.1
 
 # CumulusCI
-cumulusci==2.1.0b1
+cumulusci==2.1.1b1
 
 # Salesforce Lightning Design System for Django
 django-slds
@@ -83,3 +83,6 @@ django-storages==1.6.5
 
 # JSON web token
 PyJWT==1.4.0
+
+# Django Defender
+django-defender==0.5.5
