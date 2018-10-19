@@ -28,7 +28,8 @@ def create_groups_and_migrate_users(apps, schema_editor):
 
     view_group = Group.objects.create(name='View All Builds')
     view_group.permissions.add(
-        Permission.objects.get(codename='view_builds')
+        Permission.objects.get(codename='view_builds'),
+        Permission.objects.get(codename='search_builds'),
     )
 
     rebuild_group = Group.objects.create(name='Rebuild All Builds')
