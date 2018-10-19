@@ -1,4 +1,6 @@
 {% extends 'layout_full.html' %}
+{% load guardian_tags %}
+{% get_obj_perms request.user for build.planrepo as "obj_perms" %}
 
 {% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
 
@@ -13,7 +15,7 @@
 {% endblock %}
 
 {% block layout_header_buttons %}
-{% if request.user.is_staff %}
+{% if 'rebuild_builds' in obj_perms %}
 
 <div class="slds-button-group" role="group">
 {% if build.get_status == 'error' or build.get_status == 'fail' %}
@@ -24,7 +26,7 @@
   </a>
 {% endif %}
 
-{% if org_instance and not org_instance.deleted %}
+{% if 'view_builds_org' in obj_perms and org_instance and not org_instance.deleted %}
 <a href="{{ org_instance.get_absolute_url }}/login" target="_blank">
   <button class="slds-button slds-button--brand">Log In to Org</button>
 </a>
@@ -152,7 +154,7 @@
   </a>
 </li>
 {% endif %}
-{% if request.user.is_staff %}
+{% if 'view_builds_org' in obj_perms %}
   <li class="slds-tabs--default__item{% if tab == 'org' %} slds-active{% endif %}"
   title="Org" role="presentation">
     <a class="slds-tabs--default__link"
@@ -166,7 +168,7 @@
   </a>
 </li>
 {% endif %}
-{% if request.user.is_staff and build.plan.type == 'qa' and build.time_end %}
+{% if 'qa_builds' in obj_perms and build.plan.type == 'qa' and build.time_end %}
   <li class="slds-tabs--default__item{% if tab == 'qa' %} slds-active{% endif %}"
   title="QA" role="presentation">
     <a class="slds-tabs--default__link"

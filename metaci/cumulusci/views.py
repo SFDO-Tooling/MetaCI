@@ -2,10 +2,10 @@ from urllib.parse import urljoin
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
-from django.contrib.admin.views.decorators import staff_member_required
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
+from django.db.models import Q
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
@@ -17,14 +17,25 @@ from metaci.cumulusci.forms import OrgUnlockForm
 from metaci.cumulusci.models import Org
 from metaci.cumulusci.models import ScratchOrgInstance
 from metaci.cumulusci.utils import get_connected_app
+from metaci.plan.models import PlanRepository
 
 
-@staff_member_required
+@login_required
 def org_detail(request, org_id):
     org = get_object_or_404(Org, id=org_id)
+
+    # Verify access
+    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
+    planrepos = planrepos.filter(repo=org.repo, plan__org=org.name)
+    if not planrepos.exists():
+        return HttpResponseForbidden('You are not authorized to view this org')
+
+    # Get builds
     query = {'org': org}
     builds = view_queryset(request, query)
-    instances = org.instances.filter(deleted=False)
+
+    # Get ScratchOrgInstances
+    instances = org.instances.filter(deleted=False) if org.scratch else []
 
     context = {
         'builds': builds,
@@ -69,13 +80,15 @@ def org_unlock(request, org_id):
     return _org_lock_unlock(request, org_id, 'unlock')
 
 
-@staff_member_required
+@login_required
 def org_login(request, org_id, instance_id=None):
     org = get_object_or_404(Org, id=org_id)
 
-    if org.management_group is not None:
-        if not request.user.groups.filter(pk=org.management_group_id).exists():
-            raise PermissionDenied('You are not a member of the management group.')
+    # Verify access
+    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
+    planrepos = planrepos.filter(repo=org.repo, plan__org=org.name)
+    if not planrepos.exists():
+        return HttpResponseForbidden('You are not authorized to view this org')
 
     def get_org_config(org):
         org_config = org.get_org_config()
@@ -110,9 +123,15 @@ def org_login(request, org_id, instance_id=None):
     raise Http404()
 
 
-@staff_member_required
+@login_required
 def org_instance_delete(request, org_id, instance_id):
     instance = get_object_or_404(ScratchOrgInstance, org_id=org_id, id=instance_id)
+
+    # Verify access
+    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
+    planrepos = planrepos.filter(repo=instance.org.repo, plan__org=instance.org.name)
+    if not planrepos.exists():
+        return HttpResponseForbidden('You are not authorized to view this org')
 
     context = {
         'instance': instance,
@@ -123,10 +142,17 @@ def org_instance_delete(request, org_id, instance_id):
     instance.delete_org()
     return HttpResponseRedirect(instance.get_absolute_url())
 
-
-@staff_member_required
+@login_required
 def org_instance_detail(request, org_id, instance_id):
     instance = get_object_or_404(ScratchOrgInstance, org_id=org_id, id=instance_id)
+
+    # Verify access
+    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
+    planrepos = planrepos.filter(repo=instance.org.repo, plan__org=instance.org.name)
+    if not planrepos.exists():
+        return HttpResponseForbidden('You are not authorized to view this org')
+
+    # Get builds
     query = {'org_instance': instance}
     builds = view_queryset(request, query)
 
@@ -136,8 +162,13 @@ def org_instance_detail(request, org_id, instance_id):
     }
     return render(request, 'cumulusci/org_instance_detail.html', context=context)
 
-@staff_member_required
+@login_required
 def org_list(request):
+    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
+    planrepos = planrepos.values('plan__org', 'repo')
+    if not planrepos:
+        return HttpResponseForbidden('You are not authorized to view any orgs')
+
     query = {}
     repo = request.GET.get('repo')
     if repo:
@@ -145,8 +176,14 @@ def org_list(request):
     scratch = request.GET.get('scratch')
     if scratch:
         query['scratch'] = scratch
+
     orgs = Org.objects.filter(**query)
+    q = Q()
+    for plan_org in planrepos:
+        q.add(Q(name=plan_org['plan__org'], repo_id=plan_org['repo']), Q.OR)
+    orgs = orgs.filter(q)
     orgs = orgs.order_by('id')
+
     orgs = paginate(orgs, request)
     context = {'orgs': orgs}
     return render(request, 'cumulusci/org_list.html', context=context)

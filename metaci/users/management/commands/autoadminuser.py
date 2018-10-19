@@ -33,7 +33,6 @@ class Command(BaseCommand):
         admin = User(
             username = options['user'],
             email = options['email'],
-            is_staff = True,
             is_superuser = True,
         )
         admin.set_password(password)

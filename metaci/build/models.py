@@ -151,6 +151,9 @@ class Build(models.Model):
 
     class Meta:
         ordering = ['-time_queue']
+        permissions = (
+            ('search_builds', 'Search Builds'),
+        )
 
     def __unicode__(self):
         return '{}: {} - {}'.format(self.id, self.repo, self.commit)

@@ -11,7 +11,7 @@ class PlanRepositoryInline(admin.TabularInline):
     model = PlanRepository
 
 class RepositoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'public')
+    list_display = ('name', 'owner')
     inlines = [
         PlanRepositoryInline
     ]

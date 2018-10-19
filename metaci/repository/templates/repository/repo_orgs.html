@@ -38,7 +38,7 @@
         </tr>
       </thead>
       <tbody>
-      {% for org in repo.orgs.all %}
+      {% for org in orgs %}
         <tr>
           <th data-label="Orgs">
             <div class="slds-truncate" title="{{ org.name }}"><a href="{{ org.get_absolute_url }}">{{ org.name }}</a></div>

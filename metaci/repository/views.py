@@ -11,19 +11,21 @@ from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.contrib.admin.views.decorators import staff_member_required
 from metaci.repository.models import Branch
 from metaci.repository.models import Repository
 from metaci.release.models import Release
-from metaci.plan.models import Plan
+from metaci.plan.models import (
+    Plan,
+    PlanRepository,
+)
 from metaci.build.models import Build
 from metaci.build.utils import view_queryset
 
 def repo_list(request, owner=None):
-    repos = Repository.objects.all()
+    repos = Repository.objects.filter(
+        planrepository__in = PlanRepository.objects.for_user(request.user),
+    ).distinct()
 
-    if not request.user.is_staff:
-        repos = repos.filter(public = True)
     if owner:
         repos = repos.filter(owner = owner)
 
@@ -35,9 +37,9 @@ def repo_list(request, owner=None):
         repo_info['name'] = repo.name
         repo_info['owner'] = repo.owner
         repo_info['title'] = unicode(repo)
-        repo_info['build_count'] = repo.builds.count()
+        repo_info['build_count'] = repo.builds.for_user(request.user).count()
         repo_info['columns'] = {}
-        for plan in repo.plans.filter(dashboard__isnull = False):
+        for plan in repo.plans.for_user(request.user).filter(dashboard__isnull = False):
             if plan.name not in columns:
                 columns.append(plan.name)
             builds = []
@@ -70,9 +72,9 @@ def repo_detail(request, owner, name):
         'owner': owner,
         'name': name,
     }
-    if not request.user.is_staff:
-        query['public'] = True
     repo = get_object_or_404(Repository, **query)
+    if not PlanRepository.objects.for_user(request.user).filter(repo=repo).count():
+        return HttpResponseForbidden('You are not authorized to view this repository')
 
     query = {'repo': repo}
     builds = view_queryset(request, query)
@@ -87,9 +89,9 @@ def repo_branches(request, owner, name):
         'owner': owner,
         'name': name,
     }
-    if not request.user.is_staff:
-        query['public'] = True
     repo = get_object_or_404(Repository, **query)
+    if not PlanRepository.objects.for_user(request.user).filter(repo=repo).count():
+        return HttpResponseForbidden('You are not authorized to view this repository')
 
     context = {
         'repo': repo,
@@ -101,24 +103,29 @@ def repo_plans(request, owner, name):
         'owner': owner,
         'name': name,
     }
-    if not request.user.is_staff:
-        query['public'] = True
     repo = get_object_or_404(Repository, **query)
+    if not PlanRepository.objects.for_user(request.user).filter(repo=repo).count():
+        return HttpResponseForbidden('You are not authorized to view this repository')
 
     context = {
         'repo': repo,
     }
     return render(request, 'repository/repo_plans.html', context=context)
 
-@staff_member_required
 def repo_orgs(request, owner, name):
     query = {
         'owner': owner,
         'name': name,
     }
     repo = get_object_or_404(Repository, **query)
+    planrepos = PlanRepository.objects.for_user(request.user, 'plan.view_builds_org')
+    if not planrepos.count():
+        return HttpResponseForbidden('You are not authorized to view orgs for this repo')
+
+    orgs = repo.orgs.filter(name__in = planrepos.values_list('plan__org', flat=True))
 
     context = {
+        'orgs': orgs,
         'repo': repo,
     }
     return render(request, 'repository/repo_orgs.html', context=context)
@@ -128,9 +135,9 @@ def branch_detail(request, owner, name, branch):
         'owner': owner,
         'name': name,
     }
-    if not request.user.is_staff:
-        query['public'] = True
     repo = get_object_or_404(Repository, **query)
+    if not PlanRepository.objects.for_user(request.user).filter(repo=repo).count():
+        return HttpResponseForbidden('You are not authorized to view this repository')
 
     branch = get_object_or_404(Branch, repo=repo, name=branch)
     query = {'branch': branch}
@@ -146,9 +153,9 @@ def commit_detail(request, owner, name, sha):
         'owner': owner,
         'name': name,
     }
-    if not request.user.is_staff:
-        query['public'] = True
     repo = get_object_or_404(Repository, **query)
+    if not PlanRepository.objects.for_user(request.user).filter(repo=repo).count():
+        return HttpResponseForbidden('You are not authorized to view this repository')
     
     query = {'commit': sha, 'repo': repo}
     builds = view_queryset(request, query)

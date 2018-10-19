@@ -6,6 +6,7 @@ from django.apps import apps
 from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+from guardian.shortcuts import get_objects_for_user
 
 from metaci.repository.models import Repository
 
@@ -30,6 +31,16 @@ def validate_yaml_field(value):
     except yaml.YAMLError as err:
         raise ValidationError('Error parsing additional YAML: {}'.format(err))
 
+class PlanQuerySet(models.QuerySet):
+    def for_user(self, user, perms=None):
+        if perms is None:
+            perms = 'plan.view_builds'
+        planrepos = get_objects_for_user(
+            user,
+            perms,
+            PlanRepository,
+        )
+        return self.filter(planrepository__in = planrepos).distinct()
 
 class Plan(models.Model):
     name = models.CharField(max_length=255)
@@ -45,12 +56,13 @@ class Plan(models.Model):
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
     context = models.CharField(max_length=255, null=True, blank=True)
-    public = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
     dashboard = models.CharField(max_length=8, choices=DASHBOARD_CHOICES, default=None, null=True, blank=True)
     junit_path = models.CharField(max_length=255, null=True, blank=True)
     sfdx_config = models.TextField(null=True, blank=True)
     yaml_config = models.TextField(null=True, blank=True, validators=[validate_yaml_field])
+
+    objects = PlanQuerySet.as_manager()
 
     class Meta:
         ordering = ['name', 'active', 'context']
@@ -123,6 +135,15 @@ class Plan(models.Model):
 
 
 class PlanRepositoryQuerySet(models.QuerySet):
+    def for_user(self, user, perms=None):
+        if not perms:
+            perms = 'plan.view_builds'
+        return get_objects_for_user(
+            user,
+            perms,
+            PlanRepository,
+        )
+
     def should_run(self):
         return self.filter(active=True, plan__active=True)
     
@@ -144,6 +165,7 @@ class PlanRepository(models.Model):
             ('view_builds', 'View Builds'),
             ('rebuild_builds', 'Rebuild Builds'),
             ('qa_builds', 'QA Builds'),
+            ('view_builds_org', 'View Builds Org'),
         )
 
     def __unicode__(self):

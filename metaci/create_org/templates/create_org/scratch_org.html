@@ -22,7 +22,7 @@
       <div class="slds-media__body slds-truncate">
         <h2>
           <a href="javascript:void(0);" class="slds-text-link--reset">
-            <span class="slds-text-heading--small">Available Plans ({{plan_repos|length}})</span>
+            <span class="slds-text-heading--small">Available Plans ({{planrepos|length}})</span>
           </a>
         </h2>
       </div>
@@ -40,7 +40,7 @@
         </tr>
       </thead>
       <tbody>
-{% for pr in plan_repos %}
+{% for pr in planrepos %}
         <tr class="slds-hint-parent">
           <th scope="row"><a href="{% url 'repo_detail' pr.repo.owner pr.repo.name %}">{{ pr.repo.name }}</a></th>
           <td>{{ pr.plan.name }}</td>

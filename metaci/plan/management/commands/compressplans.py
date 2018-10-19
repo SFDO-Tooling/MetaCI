@@ -46,7 +46,6 @@ class Command(BaseCommand):
                 'flows',
                 'org',
                 'context',
-                'public',
                 'active',
                 'dashboard',
                 'junit_path',

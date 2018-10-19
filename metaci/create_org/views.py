@@ -1,4 +1,5 @@
-from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Q
+from django.http import HttpResponseForbidden
 from django.shortcuts import render
 
 from metaci.plan.models import (
@@ -6,28 +7,31 @@ from metaci.plan.models import (
     PlanRepository,
 )
 
-@staff_member_required
 def create_org(request):
+    planrepos = PlanRepository.objects.for_user(request.user, 'plan.run_plan')
+    planrepos.filter(plan__type__in = ['org', 'qa'])
+    if not planrepos.count():
+        return HttpResponseForbidden('You are not authorized to create orgs')
     return render(request, 'create_org/create_org.html')
 
-@staff_member_required
 def scratch_org(request):
-    plans = Plan.objects.filter(public=False, active=True, type='org').prefetch_related('repos')
-    plan_repos = PlanRepository.objects.should_run().filter(plan__in=plans).order_by('repo__name','plan__name')
+    planrepos = PlanRepository.objects.for_user(request.user, 'plan.run_plan')
+    planrepos = planrepos.should_run().filter(plan__type='org').order_by('repo__name','plan__name')
+    if not planrepos.count():
+        return HttpResponseForbidden('You are not authorized to create orgs')
     
     context = {
-        'plans': plans,
-        'plan_repos': plan_repos,
+        'planrepos': planrepos,
     }
     return render(request, 'create_org/scratch_org.html', context=context)
 
-@staff_member_required
 def qa_org(request):
-    plans = Plan.objects.filter(active=True, type='qa').prefetch_related('repos')
-    plan_repos = PlanRepository.objects.should_run().filter(plan__in=plans).order_by('repo__name','plan__name')
+    planrepos = PlanRepository.objects.for_user(request.user, 'plan.run_plan')
+    planrepos = planrepos.should_run().filter(plan__type='qa').order_by('repo__name','plan__name')
+    if not planrepos.count():
+        return HttpResponseForbidden('You are not authorized to create orgs')
     
     context = {
-        'plans': plans,
-        'plan_repos': plan_repos,
+        'planrepos': planrepos,
     }
     return render(request, 'create_org/qa_org.html', context=context)

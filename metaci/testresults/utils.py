@@ -8,9 +8,7 @@ def find_buildflow(request, build_id, flow):
     """ given a build_id and flow name, find a single BuildFlow (ala tests/ urls patterns). """
     build = get_object_or_404(Build, id=build_id)
 
-    if not build.plan.public and not request.user.is_staff:
-        raise PermissionDenied()
-    if not build.repo.public and not request.user.is_staff:
+    if not request.user.has_perm('plan.view_builds', build):
         raise PermissionDenied()
     query = {'build_id': build_id, 'flow': flow}
     if build.current_rebuild:

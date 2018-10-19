@@ -14,11 +14,9 @@ class PlanAdmin(admin.ModelAdmin):
         'org',
         'regex',
         'active',
-        'public',
     )
     list_filter = (
         'active',
-        'public',
         'type',
         'org',
         'repos',

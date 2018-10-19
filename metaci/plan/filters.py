@@ -14,7 +14,6 @@ class PlanRelatedFilter(filters.FilterSet):
             'id',
             'name',
             'org',
-            'public',
             'regex',
             'type',
         ]
