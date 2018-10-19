@@ -1,9 +1,9 @@
 import json
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
-from django.http import HttpResponseForbidden
 
 from rq import Worker
 from rq.registry import DeferredJobRegistry
@@ -29,7 +29,7 @@ def info(request, token):
     if not settings.HIREFIRE_TOKEN:
         return HttpResponseBadRequest('Hirefire not configured.  Set the HIREFIRE_TOKEN environment variable on the app to use Hirefire for dyno scaling')
     if token != settings.HIREFIRE_TOKEN:
-        return HttpResponseForbidden('Invalid token')
+        raise PermissionDenied('Invalid token')
 
     current_tasks = 0
 

@@ -4,11 +4,11 @@ import re
 
 from hashlib import sha1
 
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.http import HttpResponse
-from django.http import HttpResponseForbidden
+from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from metaci.repository.models import Branch
@@ -153,14 +153,12 @@ def validate_github_webhook(request):
         key = key.encode()
     mac = hmac.new(key, msg=request.body, digestmod=sha1)
     if not hmac.compare_digest(mac.hexdigest(), signature):
-        return False
-    return True
+        raise PermissionDenied()
 
 @csrf_exempt
 @require_POST
 def github_push_webhook(request):
-    if not validate_github_webhook(request):
-        return HttpResponseForbidden
+    validate_github_webhook(request)
 
     push = json.loads(request.body)
     repo_id = push['repository']['id']

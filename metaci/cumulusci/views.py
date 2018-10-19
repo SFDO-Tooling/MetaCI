@@ -2,8 +2,8 @@ from urllib.parse import urljoin
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
@@ -45,7 +45,7 @@ def org_detail(request, org_id):
 def _org_lock_unlock(request, org_id, action):
     org = get_object_or_404(Org, id=org_id)
     if org.scratch:
-        raise HttpResponseForbidden('Scratch orgs may not be locked/unlocked')
+        raise PermissionDenied('Scratch orgs may not be locked/unlocked')
     if action == 'lock':
         form_class = OrgLockForm
         template = 'cumulusci/org_lock.html'
@@ -122,7 +122,7 @@ def org_instance_delete(request, org_id, instance_id):
     try:
         org = Org.objects.for_user(request.user).get(id=org_id)
     except Org.DoesNotExist:
-        return HttpResponseForbidden('You are not authorized to view this org')
+        raise PermissionDenied('You are not authorized to view this org')
 
     context = {
         'instance': instance,
@@ -141,7 +141,7 @@ def org_instance_detail(request, org_id, instance_id):
     try:
         org = Org.objects.for_user(request.user).get(id=org_id)
     except Org.DoesNotExist:
-        return HttpResponseForbidden('You are not authorized to view this org')
+        raise PermissionDenied('You are not authorized to view this org')
 
     # Get builds
     query = {'org_instance': instance}

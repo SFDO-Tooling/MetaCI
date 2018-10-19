@@ -1,7 +1,7 @@
 from ansi2html import Ansi2HTMLConverter
 from django.contrib.auth.decorators import permission_required
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
@@ -34,7 +34,7 @@ def build_detail_base(request, build_id, rebuild_id):
     rebuild = None
 
     if not request.user.has_perm('plan.view_builds', build.planrepo):
-        return HttpResponseForbidden(
+        raise PermissionDenied(
             'You are not authorized to view this build')
 
     if not rebuild_id:
@@ -114,7 +114,7 @@ def build_detail_org(request, build_id, rebuild_id=None):
     build, context = build_detail_base(request, build_id, rebuild_id)
 
     if not request.user.has_perm('plan.org_login', build.planrepo):
-        return HttpResponseForbidden(
+        raise PermissionDenied(
             'You are not authorized to view this build org')
 
     context['tab'] = 'org'
@@ -130,7 +130,7 @@ def build_detail_qa(request, build_id, rebuild_id=None):
     build, context = build_detail_base(request, build_id, rebuild_id)
 
     if not request.user.has_perm('plan.qa_builds', build.planrepo):
-        return HttpResponseForbidden(
+        raise PermissionDenied(
             'You are not authorized to qa this build')
 
     context['tab'] = 'qa'
@@ -149,7 +149,7 @@ def build_rebuild(request, build_id):
     build = get_object_or_404(Build, id=build_id)
 
     if not request.user.has_perm('plan.rebuild_builds', build.planrepo):
-        return HttpResponseForbidden(
+        raise PermissionDenied(
             'You are not authorized to rebuild this build')
 
     rebuild = Rebuild(

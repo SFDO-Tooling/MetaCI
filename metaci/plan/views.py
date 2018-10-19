@@ -1,7 +1,5 @@
-from django.http import (
-    HttpResponseForbidden,
-    HttpResponseRedirect,
-)
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
@@ -50,7 +48,7 @@ def plan_detail_repo(request, plan_id, repo_owner, repo_name):
 def plan_run(request, plan_id):
     plan = get_object_or_404(Plan, id=plan_id)
     if not Plan.objects.for_user(request.user, 'plan.run_plan').filter(id=plan_id).count():
-        return HttpResponseForbidden('You are not authorized to run this plan')
+        raise PermissionDenied('You are not authorized to run this plan')
     context = {
         'plan': plan,
         'planrepos': plan.planrepository_set.should_run().all(),
@@ -69,7 +67,7 @@ def plan_run_repo(request, plan_id, repo_owner, repo_name):
         plan__active=True
     )
     if not request.user.has_perm('plan.run_plan', planrepo):
-        return HttpResponseForbidden('You are not authorized to run this plan')
+        raise PermissionDenied('You are not authorized to run this plan')
 
     if request.method == 'POST':
         form = RunPlanForm(plan, repo, request.user, request.POST)
