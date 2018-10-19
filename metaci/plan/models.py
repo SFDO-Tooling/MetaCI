@@ -4,6 +4,7 @@ import yaml
 
 from django.apps import apps
 from django.db import models
+from django.http import Http404
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from guardian.shortcuts import get_objects_for_user
@@ -38,6 +39,12 @@ class PlanQuerySet(models.QuerySet):
         return self.filter(
             planrepository__in = PlanRepository.objects.for_user(user, perms),
         ).distinct()
+
+    def get_for_user_or_404(self, user, query, perms=None):
+        try:
+            return self.for_user(user, perms).get(**query)
+        except Plan.DoesNotExist:
+            raise Http404
 
 class Plan(models.Model):
     name = models.CharField(max_length=255)
@@ -140,6 +147,12 @@ class PlanRepositoryQuerySet(models.QuerySet):
             perms,
             PlanRepository,
         )
+
+    def get_for_user_or_404(self, user, query, perms=None):
+        try:
+            return self.for_user(user, perms).get(**query)
+        except PlanRepository.DoesNotExist:
+            raise Http404
 
     def should_run(self):
         return self.filter(active=True, plan__active=True)

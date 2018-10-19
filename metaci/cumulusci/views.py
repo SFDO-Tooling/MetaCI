@@ -21,10 +21,9 @@ from metaci.plan.models import PlanRepository
 
 @login_required
 def org_detail(request, org_id):
-    try:
-        org = Org.objects.for_user(request.user).get(id=org_id)
-    except Org.DoesNotExist:
-        raise Http404
+    org = Org.objects.get_for_user_or_404(request.user, {
+        'id': org_id,
+    })
 
     # Get builds
     query = {'org': org}
@@ -78,10 +77,9 @@ def org_unlock(request, org_id):
 
 @login_required
 def org_login(request, org_id, instance_id=None):
-    try:
-        org = Org.objects.for_user(request.user).get(id=org_id)
-    except Org.DoesNotExist:
-        raise Http404
+    org = Org.objects.get_for_user_or_404(request.user, {
+        'id': org_id,
+    })
 
     def get_org_config(org):
         org_config = org.get_org_config()

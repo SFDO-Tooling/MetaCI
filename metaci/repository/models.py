@@ -6,6 +6,7 @@ from django.urls import reverse
 from github3 import login
 from django.apps import apps
 from django.conf import settings
+from django.http import Http404
 from model_utils.models import SoftDeletableModel
 
 class RepositoryQuerySet(models.QuerySet):
@@ -16,6 +17,12 @@ class RepositoryQuerySet(models.QuerySet):
         return self.filter(
             planrepository__in = PlanRepository.objects.for_user(user, perms),
         ).distinct()
+
+    def get_for_user_or_404(self, user, query, perms=None):
+        try:
+            return self.for_user(user, perms).get(**query)
+        except Repository.DoesNotExist:
+            raise Http404
 
 class Repository(models.Model):
     name = models.CharField(max_length=255)

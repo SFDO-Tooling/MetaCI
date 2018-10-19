@@ -1,5 +1,4 @@
 from django.http import (
-    Http404,
     HttpResponseForbidden,
     HttpResponseRedirect,
 )
@@ -20,10 +19,7 @@ def plan_list(request):
     return render(request, 'plan/list.html', context=context)
 
 def plan_detail(request, plan_id):
-    try:
-        plan = Plan.objects.for_user(request.user).get(id=plan_id)
-    except Plan.DoesNotExist:
-        raise Http404()
+    plan = Plan.objects.get_for_user_or_404(request.user, {'id': plan_id})
     
     query = {'plan': plan}
     builds = view_queryset(request, query)
@@ -35,14 +31,11 @@ def plan_detail(request, plan_id):
     return render(request, 'plan/detail.html', context=context)
     
 def plan_detail_repo(request, plan_id, repo_owner, repo_name):
-    try:
-        planrepo = Plan.objects.for_user(request.user).get(
-            repo__owner=repo_owner,
-            repo__name=repo_name,
-            plan__id=plan_id,
-        )
-    except Plan.DoesNotExist:
-        raise Http404
+    planrepo = Plan.objects.get_for_user_or_404(request.user, {
+        'repo__owner': repo_owner,
+        'repo__name': repo_name,
+        'plan__id': plan_id,
+    })
     query = {'planrepo': planrepo}
     builds = view_queryset(request, query)
 

@@ -1,7 +1,6 @@
 from ansi2html import Ansi2HTMLConverter
 from django.contrib.auth.decorators import permission_required
 from django.db import transaction
-from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404

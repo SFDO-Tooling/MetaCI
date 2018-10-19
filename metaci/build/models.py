@@ -23,9 +23,10 @@ from cumulusci.utils import elementtree_parse_file
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from django.apps import apps
 from django.conf import settings
-from django.db import models
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
+from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
@@ -100,6 +101,12 @@ class BuildQuerySet(models.QuerySet):
         return self.filter(
             planrepo__in = PlanRepository.objects.for_user(user, perms),
         )
+
+    def get_for_user_or_404(self, user, query, perms=None):
+        try:
+            return self.for_user(user, perms).get(**query)
+        except Build.DoesNotExist:
+            raise Http404
 
 class Build(models.Model):
     repo = models.ForeignKey('repository.Repository', related_name='builds', on_delete=models.CASCADE)

@@ -14,6 +14,7 @@ from cumulusci.core.exceptions import ScratchOrgException
 from django.apps import apps
 from django.core.cache import cache
 from django.db import models
+from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -68,6 +69,12 @@ class OrgQuerySet(models.QuerySet):
         for plan_org in planrepos:
             q.add(models.Q(name=plan_org['plan__org'], repo_id=plan_org['repo']), models.Q.OR)
         return self.filter(q)
+
+    def get_for_user_or_404(self, user, query, perms=None):
+        try:
+            return self.for_user(user, perms).get(**query)
+        except Org.DoesNotExist:
+            raise Http404
 
 class Org(models.Model):
     name = models.CharField(max_length=255)

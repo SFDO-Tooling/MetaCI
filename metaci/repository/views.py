@@ -7,7 +7,6 @@ from hashlib import sha1
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
@@ -67,10 +66,10 @@ def repo_list(request, owner=None):
     return render(request, 'repository/repo_list.html', context=context)
 
 def repo_detail(request, owner, name):
-    try:
-        repo = Repository.objects.for_user(request.user).get(owner=owner, name=name)
-    except Repository.DoesNotExist:
-        raise Http404()
+    repo = Repository.objects.get_for_user_or_404(request.user, {
+        'owner': owner,
+        'name': name,
+    })
 
     query = {'repo': repo}
     builds = view_queryset(request, query)
@@ -81,10 +80,10 @@ def repo_detail(request, owner, name):
     return render(request, 'repository/repo_detail.html', context=context)
 
 def repo_branches(request, owner, name):
-    try:
-        repo = Repository.objects.for_user(request.user).get(owner=owner, name=name)
-    except Repository.DoesNotExist:
-        raise Http404()
+    repo = Repository.objects.get_for_user_or_404(request.user, {
+        'owner': owner,
+        'name': name,
+    })
 
     context = {
         'repo': repo,
@@ -92,10 +91,10 @@ def repo_branches(request, owner, name):
     return render(request, 'repository/repo_branches.html', context=context)
 
 def repo_plans(request, owner, name):
-    try:
-        repo = Repository.objects.for_user(request.user).get(owner=owner, name=name)
-    except Repository.DoesNotExist:
-        raise Http404()
+    repo = Repository.objects.get_for_user_or_404(request.user, {
+        'owner': owner,
+        'name': name,
+    })
 
     context = {
         'repo': repo,
@@ -103,10 +102,10 @@ def repo_plans(request, owner, name):
     return render(request, 'repository/repo_plans.html', context=context)
 
 def repo_orgs(request, owner, name):
-    try:
-        repo = Repository.objects.for_user(request.user, 'plan.org_login').get(owner=owner, name=name)
-    except Repository.DoesNotExist:
-        raise Http404()
+    repo = Repository.objects.get_for_user_or_404(request.user, 'plan.org_login', {
+        'owner': owner,
+        'name': name,
+    })
 
     orgs = repo.orgs.filter(name__in = planrepos.values_list('plan__org', flat=True))
 
@@ -117,10 +116,10 @@ def repo_orgs(request, owner, name):
     return render(request, 'repository/repo_orgs.html', context=context)
 
 def branch_detail(request, owner, name, branch):
-    try:
-        repo = Repository.objects.for_user(request.user).get(owner=owner, name=name)
-    except Repository.DoesNotExist:
-        raise Http404()
+    repo = Repository.objects.get_for_user_or_404(request.user, {
+        'owner': owner,
+        'name': name,
+    })
 
     branch = get_object_or_404(Branch, repo=repo, name=branch)
     query = {'branch': branch}
@@ -132,10 +131,10 @@ def branch_detail(request, owner, name, branch):
     return render(request, 'repository/branch_detail.html', context=context)
 
 def commit_detail(request, owner, name, sha):
-    try:
-        repo = Repository.objects.for_user(request.user).get(owner=owner, name=name)
-    except Repository.DoesNotExist:
-        raise Http404()
+    repo = Repository.objects.get_for_user_or_404(request.user, {
+        'owner': owner,
+        'name': name,
+    })
     
     query = {'commit': sha, 'repo': repo}
     builds = view_queryset(request, query)
