@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='planrepository',
-            options={'base_manager_name': 'objects', 'ordering': ['repo', 'plan'], 'permissions': (('run_plan', 'Run Plan'), ('view_builds', 'View Builds'), ('rebuild_builds', 'Rebuild Builds'), ('qa_builds', 'QA Builds'), ('view_builds_org', 'View Builds Org')), 'verbose_name_plural': 'Plan Repositories'},
+            options={'base_manager_name': 'objects', 'ordering': ['repo', 'plan'], 'permissions': (('run_plan', 'Run Plan'), ('view_builds', 'View Builds'), ('rebuild_builds', 'Rebuild Builds'), ('qa_builds', 'QA Builds'), ('org_login', 'Login to Org')), 'verbose_name_plural': 'Plan Repositories'},
         ),
     ]

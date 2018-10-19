@@ -162,7 +162,7 @@ class PlanRepository(models.Model):
             ('view_builds', 'View Builds'),
             ('rebuild_builds', 'Rebuild Builds'),
             ('qa_builds', 'QA Builds'),
-            ('view_builds_org', 'View Builds Org'),
+            ('org_login', 'Login to Org'),
         )
 
     def __unicode__(self):

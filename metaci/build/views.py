@@ -72,7 +72,7 @@ def build_detail_base(request, build_id, rebuild_id):
 
     obj_perms = {
         'rebuild_builds': request.user.has_perm('plan.rebuild_builds', build.planrepo),
-        'view_builds_org': request.user.has_perm('plan.rebuild_builds', build.planrepo),
+        'org_login': request.user.has_perm('plan.rebuild_builds', build.planrepo),
         'qa_build': request.user.has_perm('plan.rebuild_builds', build.planrepo),
     }
 
@@ -114,7 +114,7 @@ def build_detail_rebuilds(request, build_id, rebuild_id=None):
 def build_detail_org(request, build_id, rebuild_id=None):
     build, context = build_detail_base(request, build_id, rebuild_id)
 
-    if not request.user.has_perm('plan.view_builds_org', build.planrepo):
+    if not request.user.has_perm('plan.org_login', build.planrepo):
         return HttpResponseForbidden(
             'You are not authorized to view this build org')
 

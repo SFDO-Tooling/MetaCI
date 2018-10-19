@@ -104,7 +104,7 @@ def repo_plans(request, owner, name):
 
 def repo_orgs(request, owner, name):
     try:
-        repo = Repository.objects.for_user(request.user, 'plan.view_builds_org').get(owner=owner, name=name)
+        repo = Repository.objects.for_user(request.user, 'plan.org_login').get(owner=owner, name=name)
     except Repository.DoesNotExist:
         raise Http404()
 

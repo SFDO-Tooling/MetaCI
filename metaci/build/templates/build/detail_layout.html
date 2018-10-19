@@ -24,7 +24,7 @@
   </a>
 {% endif %}
 
-{% if obj_perms.view_builds_org and org_instance and not org_instance.deleted %}
+{% if obj_perms.org_login and org_instance and not org_instance.deleted %}
 <a href="{{ org_instance.get_absolute_url }}/login" target="_blank">
   <button class="slds-button slds-button--brand">Log In to Org</button>
 </a>
@@ -152,7 +152,7 @@
   </a>
 </li>
 {% endif %}
-{% if obj_perms.view_builds_org %}
+{% if obj_perms.org_login %}
   <li class="slds-tabs--default__item{% if tab == 'org' %} slds-active{% endif %}"
   title="Org" role="presentation">
     <a class="slds-tabs--default__link"

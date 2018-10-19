@@ -38,9 +38,9 @@ def create_groups_and_migrate_users(apps, schema_editor):
         Permission.objects.get(codename='qa_builds')
     )
 
-    org_group = Group.objects.create(name='View All Builds Org')
+    org_group = Group.objects.create(name='Login All Orgs')
     org_group.permissions.add(
-        Permission.objects.get(codename='view_builds_org')
+        Permission.objects.get(codename='org_login')
     )
 
 
