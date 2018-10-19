@@ -6,10 +6,11 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from guardian.mixins import GuardianUserMixin
 
 
 @python_2_unicode_compatible
-class User(AbstractUser):
+class User(GuardianUserMixin, AbstractUser):
 
     # First Name and Last Name do not cover name patterns
     # around the globe.

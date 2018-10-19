@@ -3,9 +3,12 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth.management import create_permissions
+from django.contrib.auth.hashers import make_password
 from django.db import migrations
+from guardian.conf import settings as guardian_settings
 from guardian.shortcuts import assign_perm
 from guardian.utils import get_anonymous_user
+import metaci
 
 def migrate_permissions(apps, schema_editor):
     for app_config in apps.get_app_configs():
@@ -60,7 +63,17 @@ def create_groups_and_migrate_users(apps, schema_editor):
 
 def grant_anonymous_perms(apps, schema_editor):
     PlanRepository = apps.get_model('plan.PlanRepository')
-    anon = get_anonymous_user()
+    User = apps.get_model('users.User')
+    try:
+        anon = get_anonymous_user()
+    except Exception as e:
+        if not e.__class__.__name__ == 'DoesNotExist':
+            raise
+        anon = User(
+            username=guardian_settings.ANONYMOUS_USER_NAME,
+            password=make_password(None),
+        )
+        anon.save()
     for pr in PlanRepository.objects.all().iterator():
         if pr.plan.public is False:
             continue
