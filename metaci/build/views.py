@@ -70,6 +70,12 @@ def build_detail_base(request, build_id, rebuild_id):
             tests['failed_tests'].extend(list(flow.test_results.filter(
                 outcome__in=['Fail', 'CompileFail'])))
 
+    obj_perms = {
+        'rebuild_builds': request.user.has_perm('plan.rebuild_builds', build.planrepo),
+        'view_builds_org': request.user.has_perm('plan.rebuild_builds', build.planrepo),
+        'qa_build': request.user.has_perm('plan.rebuild_builds', build.planrepo),
+    }
+
     return build, {
         'build': build,
         'rebuild': rebuild,
@@ -77,6 +83,7 @@ def build_detail_base(request, build_id, rebuild_id):
         'tab': None,
         'flows': flows,
         'tests': tests,
+        'obj_perms': obj_perms,
     }
 
 
