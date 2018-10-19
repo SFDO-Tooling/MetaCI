@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block layout_header_buttons %}
-{% if request.user.is_staff %}
+{% if obj_perms.rebuild_builds %}
 
 <div class="slds-button-group" role="group">
 {% if build.get_status == 'error' or build.get_status == 'fail' %}
@@ -24,7 +24,7 @@
   </a>
 {% endif %}
 
-{% if org_instance and not org_instance.deleted %}
+{% if obj_perms.org_login and org_instance and not org_instance.deleted %}
 <a href="{{ org_instance.get_absolute_url }}/login" target="_blank">
   <button class="slds-button slds-button--brand">Log In to Org</button>
 </a>
@@ -152,7 +152,7 @@
   </a>
 </li>
 {% endif %}
-{% if request.user.is_staff %}
+{% if obj_perms.org_login %}
   <li class="slds-tabs--default__item{% if tab == 'org' %} slds-active{% endif %}"
   title="Org" role="presentation">
     <a class="slds-tabs--default__link"
@@ -166,7 +166,7 @@
   </a>
 </li>
 {% endif %}
-{% if request.user.is_staff and build.plan.type == 'qa' and build.time_end %}
+{% if obj_perms.qa_builds and build.plan.type == 'qa' and build.time_end %}
   <li class="slds-tabs--default__item{% if tab == 'qa' %} slds-active{% endif %}"
   title="QA" role="presentation">
     <a class="slds-tabs--default__link"

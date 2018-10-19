@@ -10,7 +10,6 @@ class RepositorySerializer(serializers.HyperlinkedModelSerializer):
             'github_id',
             'name',
             'owner',
-            'public',
             'url',
         )
 

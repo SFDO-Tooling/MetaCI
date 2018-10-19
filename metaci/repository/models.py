@@ -4,17 +4,35 @@ from django.db import models
 from django.urls import reverse
 
 from github3 import login
+from django.apps import apps
 from django.conf import settings
+from django.http import Http404
 from model_utils.models import SoftDeletableModel
+
+class RepositoryQuerySet(models.QuerySet):
+    def for_user(self, user, perms=None):
+        if perms is None:
+            perms = 'plan.view_builds'
+        PlanRepository = apps.get_model('plan.PlanRepository')
+        return self.filter(
+            planrepository__in = PlanRepository.objects.for_user(user, perms),
+        ).distinct()
+
+    def get_for_user_or_404(self, user, query, perms=None):
+        try:
+            return self.for_user(user, perms).get(**query)
+        except Repository.DoesNotExist:
+            raise Http404
 
 class Repository(models.Model):
     name = models.CharField(max_length=255)
     owner = models.CharField(max_length=255)
     github_id = models.IntegerField(null=True, blank=True)
     url = models.URLField(max_length=255)
-    public = models.BooleanField(default=True)
 
     release_tag_regex = models.CharField(max_length=255, blank=True, null=True)
+
+    objects = RepositoryQuerySet.as_manager()
 
     class Meta:
         ordering = ['name','owner']

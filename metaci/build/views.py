@@ -1,7 +1,7 @@
 from ansi2html import Ansi2HTMLConverter
+from django.contrib.auth.decorators import permission_required
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404
-from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
@@ -29,21 +29,13 @@ def build_list(request):
     }
     return render(request, 'build/build_list.html', context=context)
 
-@transaction.non_atomic_requests
-def build_detail(request, build_id, rebuild_id=None, tab=None):
+def build_detail_base(request, build_id, rebuild_id):
     build = get_object_or_404(Build, id=build_id)
     rebuild = None
 
-    if not request.user.is_staff:
-        if not build.plan.public:
-            return HttpResponseForbidden(
-                'You are not authorized to view this build')
-        if tab == 'org':
-            return HttpResponseForbidden(
-                "You are not authorized to view this build's org info")
-        if tab == 'qa':
-            return HttpResponseForbidden(
-                "You are not authorized to view this build's QA info")
+    if not request.user.has_perm('plan.view_builds', build.planrepo):
+        raise PermissionDenied(
+            'You are not authorized to view this build')
 
     if not rebuild_id:
         if build.current_rebuild:
@@ -77,51 +69,88 @@ def build_detail(request, build_id, rebuild_id=None, tab=None):
             tests['failed_tests'].extend(list(flow.test_results.filter(
                 outcome__in=['Fail', 'CompileFail'])))
 
-    if rebuild and rebuild.org_instance:
-        org_instance = rebuild.org_instance
-    else:
-        org_instance = build.org_instance
-    context = {
+    obj_perms = {
+        'rebuild_builds': request.user.has_perm('plan.rebuild_builds', build.planrepo),
+        'org_login': request.user.has_perm('plan.org_login', build.planrepo),
+        'qa_build': request.user.has_perm('plan.qa_build', build.planrepo),
+    }
+
+    return build, {
         'build': build,
         'rebuild': rebuild,
         'original_build': rebuild_id == 'original',
-        'tab': tab,
+        'tab': None,
         'flows': flows,
         'tests': tests,
-        'org_instance': org_instance,
+        'obj_perms': obj_perms,
     }
 
-    if not tab:
-        return render(request, 'build/detail.html', context=context)
-    elif tab == 'flows':
-        return render(request, 'build/detail_flows.html', context=context)
-    elif tab == 'tests':
-        return render(request, 'build/detail_tests.html', context=context)
-    elif tab == 'rebuilds':
-        return render(request, 'build/detail_rebuilds.html', context=context)
-    elif tab == 'org':
-        return render(request, 'build/detail_org.html', context=context)
-    elif tab == 'qa':
-        if request.method == 'POST':
-            form = QATestingForm(build, request.user, request.POST)
-            if form.is_valid():
-                form.save()
-                build = Build.objects.get(id=build.id)
-                context['build'] = build
-        else:
-            form = QATestingForm(build, request.user)
-        context['form'] = form
-        return render(request, 'build/detail_qa.html', context=context)
-    else:
-        raise BuildError('Unsupported value for "tab": {}'.format(tab))
 
+@transaction.non_atomic_requests
+def build_detail(request, build_id, rebuild_id=None):
+    build, context = build_detail_base(request, build_id, rebuild_id)
+    return render(request, 'build/detail.html', context=context)
+
+@transaction.non_atomic_requests
+def build_detail_flows(request, build_id, rebuild_id=None):
+    build, context = build_detail_base(request, build_id, rebuild_id)
+    context['tab'] = 'flows'
+    return render(request, 'build/detail_flows.html', context=context)
+
+@transaction.non_atomic_requests
+def build_detail_tests(request, build_id, rebuild_id=None):
+    build, context = build_detail_base(request, build_id, rebuild_id)
+    context['tab'] = 'tests'
+    return render(request, 'build/detail_tests.html', context=context)
+
+@transaction.non_atomic_requests
+def build_detail_rebuilds(request, build_id, rebuild_id=None):
+    build, context = build_detail_base(request, build_id, rebuild_id)
+    context['tab'] = 'rebuilds'
+    return render(request, 'build/detail_rebuilds.html', context=context)
+
+@transaction.non_atomic_requests
+def build_detail_org(request, build_id, rebuild_id=None):
+    build, context = build_detail_base(request, build_id, rebuild_id)
+
+    if not request.user.has_perm('plan.org_login', build.planrepo):
+        raise PermissionDenied(
+            'You are not authorized to view this build org')
+
+    context['tab'] = 'org'
+    rebuild = context['rebuild']
+    if rebuild and rebuild.org_instance:
+        context['org_instance'] = rebuild.org_instance
+    else:
+        context['org_instance'] = build.org_instance
+    return render(request, 'build/detail_org.html', context=context)
+
+@transaction.non_atomic_requests
+def build_detail_qa(request, build_id, rebuild_id=None):
+    build, context = build_detail_base(request, build_id, rebuild_id)
+
+    if not request.user.has_perm('plan.qa_builds', build.planrepo):
+        raise PermissionDenied(
+            'You are not authorized to qa this build')
+
+    context['tab'] = 'qa'
+    if request.method == 'POST':
+        form = QATestingForm(build, request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            build = Build.objects.get(id=build.id)
+            context['build'] = build
+    else:
+        form = QATestingForm(build, request.user)
+    context['form'] = form
+    return render(request, 'build/detail_qa.html', context=context)
 
 def build_rebuild(request, build_id):
     build = get_object_or_404(Build, id=build_id)
 
-    if not request.user.is_staff:
-        return HttpResponseForbidden(
-            'You are not authorized to rebuild builds')
+    if not request.user.has_perm('plan.rebuild_builds', build.planrepo):
+        raise PermissionDenied(
+            'You are not authorized to rebuild this build')
 
     rebuild = Rebuild(
         build=build,
@@ -141,6 +170,7 @@ def build_rebuild(request, build_id):
     return HttpResponseRedirect('/builds/{}'.format(build.id))
 
 
+@permission_required('build.search_builds')
 def build_search(request):
     results = []
 

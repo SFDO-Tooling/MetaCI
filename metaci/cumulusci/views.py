@@ -2,9 +2,8 @@ from urllib.parse import urljoin
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
-from django.contrib.admin.views.decorators import staff_member_required
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
@@ -17,14 +16,21 @@ from metaci.cumulusci.forms import OrgUnlockForm
 from metaci.cumulusci.models import Org
 from metaci.cumulusci.models import ScratchOrgInstance
 from metaci.cumulusci.utils import get_connected_app
+from metaci.plan.models import PlanRepository
 
 
-@staff_member_required
+@login_required
 def org_detail(request, org_id):
-    org = get_object_or_404(Org, id=org_id)
+    org = Org.objects.get_for_user_or_404(request.user, {
+        'id': org_id,
+    })
+
+    # Get builds
     query = {'org': org}
     builds = view_queryset(request, query)
-    instances = org.instances.filter(deleted=False)
+
+    # Get ScratchOrgInstances
+    instances = org.instances.filter(deleted=False) if org.scratch else []
 
     context = {
         'builds': builds,
@@ -39,7 +45,7 @@ def org_detail(request, org_id):
 def _org_lock_unlock(request, org_id, action):
     org = get_object_or_404(Org, id=org_id)
     if org.scratch:
-        raise HttpResponseForbidden('Scratch orgs may not be locked/unlocked')
+        raise PermissionDenied('Scratch orgs may not be locked/unlocked')
     if action == 'lock':
         form_class = OrgLockForm
         template = 'cumulusci/org_lock.html'
@@ -69,13 +75,11 @@ def org_unlock(request, org_id):
     return _org_lock_unlock(request, org_id, 'unlock')
 
 
-@staff_member_required
+@login_required
 def org_login(request, org_id, instance_id=None):
-    org = get_object_or_404(Org, id=org_id)
-
-    if org.management_group is not None:
-        if not request.user.groups.filter(pk=org.management_group_id).exists():
-            raise PermissionDenied('You are not a member of the management group.')
+    org = Org.objects.get_for_user_or_404(request.user, {
+        'id': org_id,
+    })
 
     def get_org_config(org):
         org_config = org.get_org_config()
@@ -110,9 +114,15 @@ def org_login(request, org_id, instance_id=None):
     raise Http404()
 
 
-@staff_member_required
+@login_required
 def org_instance_delete(request, org_id, instance_id):
     instance = get_object_or_404(ScratchOrgInstance, org_id=org_id, id=instance_id)
+
+    # Verify access
+    try:
+        org = Org.objects.for_user(request.user).get(id=org_id)
+    except Org.DoesNotExist:
+        raise PermissionDenied('You are not authorized to view this org')
 
     context = {
         'instance': instance,
@@ -123,10 +133,17 @@ def org_instance_delete(request, org_id, instance_id):
     instance.delete_org()
     return HttpResponseRedirect(instance.get_absolute_url())
 
-
-@staff_member_required
+@login_required
 def org_instance_detail(request, org_id, instance_id):
     instance = get_object_or_404(ScratchOrgInstance, org_id=org_id, id=instance_id)
+
+    # Verify access
+    try:
+        org = Org.objects.for_user(request.user).get(id=org_id)
+    except Org.DoesNotExist:
+        raise PermissionDenied('You are not authorized to view this org')
+
+    # Get builds
     query = {'org_instance': instance}
     builds = view_queryset(request, query)
 
@@ -136,7 +153,7 @@ def org_instance_detail(request, org_id, instance_id):
     }
     return render(request, 'cumulusci/org_instance_detail.html', context=context)
 
-@staff_member_required
+@login_required
 def org_list(request):
     query = {}
     repo = request.GET.get('repo')
@@ -145,8 +162,10 @@ def org_list(request):
     scratch = request.GET.get('scratch')
     if scratch:
         query['scratch'] = scratch
-    orgs = Org.objects.filter(**query)
+
+    orgs = Org.objects.for_user(request.user).filter(**query)
     orgs = orgs.order_by('id')
+
     orgs = paginate(orgs, request)
     context = {'orgs': orgs}
     return render(request, 'cumulusci/org_list.html', context=context)

@@ -4,26 +4,26 @@ import re
 
 from hashlib import sha1
 
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.http import HttpResponse
-from django.http import HttpResponseForbidden
+from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.contrib.admin.views.decorators import staff_member_required
 from metaci.repository.models import Branch
 from metaci.repository.models import Repository
 from metaci.release.models import Release
-from metaci.plan.models import Plan
+from metaci.plan.models import (
+    Plan,
+    PlanRepository,
+)
 from metaci.build.models import Build
 from metaci.build.utils import view_queryset
 
 def repo_list(request, owner=None):
-    repos = Repository.objects.all()
+    repos = Repository.objects.for_user(request.user)
 
-    if not request.user.is_staff:
-        repos = repos.filter(public = True)
     if owner:
         repos = repos.filter(owner = owner)
 
@@ -35,9 +35,9 @@ def repo_list(request, owner=None):
         repo_info['name'] = repo.name
         repo_info['owner'] = repo.owner
         repo_info['title'] = unicode(repo)
-        repo_info['build_count'] = repo.builds.count()
+        repo_info['build_count'] = repo.builds.for_user(request.user).count()
         repo_info['columns'] = {}
-        for plan in repo.plans.filter(dashboard__isnull = False):
+        for plan in repo.plans.for_user(request.user).filter(dashboard__isnull = False):
             if plan.name not in columns:
                 columns.append(plan.name)
             builds = []
@@ -66,13 +66,10 @@ def repo_list(request, owner=None):
     return render(request, 'repository/repo_list.html', context=context)
 
 def repo_detail(request, owner, name):
-    query = {
+    repo = Repository.objects.get_for_user_or_404(request.user, {
         'owner': owner,
         'name': name,
-    }
-    if not request.user.is_staff:
-        query['public'] = True
-    repo = get_object_or_404(Repository, **query)
+    })
 
     query = {'repo': repo}
     builds = view_queryset(request, query)
@@ -83,13 +80,10 @@ def repo_detail(request, owner, name):
     return render(request, 'repository/repo_detail.html', context=context)
 
 def repo_branches(request, owner, name):
-    query = {
+    repo = Repository.objects.get_for_user_or_404(request.user, {
         'owner': owner,
         'name': name,
-    }
-    if not request.user.is_staff:
-        query['public'] = True
-    repo = get_object_or_404(Repository, **query)
+    })
 
     context = {
         'repo': repo,
@@ -97,40 +91,35 @@ def repo_branches(request, owner, name):
     return render(request, 'repository/repo_branches.html', context=context)
 
 def repo_plans(request, owner, name):
-    query = {
+    repo = Repository.objects.get_for_user_or_404(request.user, {
         'owner': owner,
         'name': name,
-    }
-    if not request.user.is_staff:
-        query['public'] = True
-    repo = get_object_or_404(Repository, **query)
+    })
 
     context = {
         'repo': repo,
     }
     return render(request, 'repository/repo_plans.html', context=context)
 
-@staff_member_required
 def repo_orgs(request, owner, name):
-    query = {
+    repo = Repository.objects.get_for_user_or_404(request.user, 'plan.org_login', {
         'owner': owner,
         'name': name,
-    }
-    repo = get_object_or_404(Repository, **query)
+    })
+
+    orgs = repo.orgs.filter(name__in = planrepos.values_list('plan__org', flat=True))
 
     context = {
+        'orgs': orgs,
         'repo': repo,
     }
     return render(request, 'repository/repo_orgs.html', context=context)
 
 def branch_detail(request, owner, name, branch):
-    query = {
+    repo = Repository.objects.get_for_user_or_404(request.user, {
         'owner': owner,
         'name': name,
-    }
-    if not request.user.is_staff:
-        query['public'] = True
-    repo = get_object_or_404(Repository, **query)
+    })
 
     branch = get_object_or_404(Branch, repo=repo, name=branch)
     query = {'branch': branch}
@@ -142,13 +131,10 @@ def branch_detail(request, owner, name, branch):
     return render(request, 'repository/branch_detail.html', context=context)
 
 def commit_detail(request, owner, name, sha):
-    query = {
+    repo = Repository.objects.get_for_user_or_404(request.user, {
         'owner': owner,
         'name': name,
-    }
-    if not request.user.is_staff:
-        query['public'] = True
-    repo = get_object_or_404(Repository, **query)
+    })
     
     query = {'commit': sha, 'repo': repo}
     builds = view_queryset(request, query)
@@ -167,14 +153,12 @@ def validate_github_webhook(request):
         key = key.encode()
     mac = hmac.new(key, msg=request.body, digestmod=sha1)
     if not hmac.compare_digest(mac.hexdigest(), signature):
-        return False
-    return True
+        raise PermissionDenied()
 
 @csrf_exempt
 @require_POST
 def github_push_webhook(request):
-    if not validate_github_webhook(request):
-        return HttpResponseForbidden
+    validate_github_webhook(request)
 
     push = json.loads(request.body)
     repo_id = push['repository']['id']
