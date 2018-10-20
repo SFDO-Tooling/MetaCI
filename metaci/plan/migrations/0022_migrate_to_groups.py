@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import migrations
 from guardian.conf import settings as guardian_settings
 from guardian.utils import get_anonymous_user
@@ -73,9 +74,7 @@ def grant_anonymous_perms(apps, schema_editor):
 
     try:
         anon = get_anonymous_user()
-    except Exception as e:
-        if not e.__class__.__name__ == 'DoesNotExist':
-            raise
+    except ObjectDoesNotExist:
         anon = User(
             username=guardian_settings.ANONYMOUS_USER_NAME,
             password=make_password(None),
