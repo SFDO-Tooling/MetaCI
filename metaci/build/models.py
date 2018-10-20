@@ -117,7 +117,7 @@ class Build(models.Model):
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     plan = models.ForeignKey('plan.Plan', related_name='builds', on_delete=models.CASCADE)
-    planrepo = models.ForeignKey('plan.PlanRepository', related_name='builds', on_delete=models.CASCADE)
+    planrepo = models.ForeignKey('plan.PlanRepository', related_name='builds', on_delete=models.CASCADE, null=True)
     org = models.ForeignKey('cumulusci.Org', related_name='builds', null=True,
                             blank=True, on_delete=models.CASCADE)
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
