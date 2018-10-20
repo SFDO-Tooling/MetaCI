@@ -82,11 +82,7 @@ def grant_anonymous_perms(apps, schema_editor):
         )
         anon.save()
 
-    try:
-        anon.groups.get(name='Public')
-    except Exception as e:
-        if not e.__class__.__name__ == 'DoesNotExist':
-            raise
+    if not anon.groups.filter(name='Public').exists():
         anon.groups.add(public_group)
   
     content_type = ContentType.objects.get(app_label='guardian',model='groupobjectpermission') 
@@ -106,11 +102,7 @@ def grant_anonymous_perms(apps, schema_editor):
 
     # Add all users to the Public group
     for user in User.objects.all().iterator():
-        try:
-            user.groups.get(name='Public')
-        except Exception as e:
-            if not e.__class__.__name__ == 'DoesNotExist':
-                raise
+        if not user.groups.filter(name='Public').exists():
             user.groups.add(public_group)
         
 

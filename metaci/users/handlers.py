@@ -14,9 +14,6 @@ def add_public_group(sender, **kwargs):
     if user.username == guardian_settings.ANONYMOUS_USER_NAME:
         return
 
-    try:
-        user.groups.get(name='Public')
-    except Group.DoesNotExist:
-        user.groups.add(
-            Group.objects.get(name='Public')
-        )
+    user.groups.add(
+        Group.objects.get(name='Public')
+    )
