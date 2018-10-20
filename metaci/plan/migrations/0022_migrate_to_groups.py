@@ -6,7 +6,6 @@ from django.contrib.auth.management import create_permissions
 from django.contrib.auth.hashers import make_password
 from django.db import migrations
 from guardian.conf import settings as guardian_settings
-from guardian.shortcuts import assign_perm
 from guardian.utils import get_anonymous_user
 import metaci
 
@@ -47,7 +46,6 @@ def create_groups_and_migrate_users(apps, schema_editor):
         Permission.objects.get(codename='org_login')
     )
 
-
     users = User.objects.filter(is_staff = True, is_superuser = False)
     for user in users.iterator():
         user.groups.add(
@@ -64,7 +62,15 @@ def create_groups_and_migrate_users(apps, schema_editor):
 
 def grant_anonymous_perms(apps, schema_editor):
     PlanRepository = apps.get_model('plan.PlanRepository')
+    Group = apps.get_model('auth.Group')
     User = apps.get_model('users.User')
+    Permission = apps.get_model('auth.Permission')
+    ContentType = apps.get_model('contenttypes', 'ContentType')
+    GroupObjectPermission = apps.get_model('guardian.GroupObjectPermission')
+
+    public_group = Group.objects.create(name='Public')
+    view_builds = Permission.objects.get(codename='view_builds')
+
     try:
         anon = get_anonymous_user()
     except Exception as e:
@@ -75,12 +81,37 @@ def grant_anonymous_perms(apps, schema_editor):
             password=make_password(None),
         )
         anon.save()
+
+    try:
+        anon.groups.get(name='Public')
+    except Exception as e:
+        if not e.__class__.__name__ == 'DoesNotExist':
+            raise
+        anon.groups.add(public_group)
+  
+    content_type = ContentType.objects.get(app_label='guardian',model='groupobjectpermission') 
     for pr in PlanRepository.objects.all().iterator():
         if pr.plan.public is False:
             continue
         if pr.repo.public is False:
             continue
-        assign_perm('plan.view_builds', anon, pr)
+
+        obj_perm = GroupObjectPermission(
+            permission=view_builds,
+            group = public_group,
+            content_type = content_type,
+            object_pk = pr.id,
+        )
+        obj_perm.save()
+
+    # Add all users to the Public group
+    for user in User.objects.all().iterator():
+        try:
+            user.groups.get(name='Public')
+        except Exception as e:
+            if not e.__class__.__name__ == 'DoesNotExist':
+                raise
+            user.groups.add(public_group)
         
 
 class Migration(migrations.Migration):
@@ -91,8 +122,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(migrate_permissions),
-        migrations.RunPython(create_groups_and_migrate_users),
         migrations.RunPython(grant_anonymous_perms),
+        migrations.RunPython(create_groups_and_migrate_users),
     ]
 
     complete_apps = ['auth','users']

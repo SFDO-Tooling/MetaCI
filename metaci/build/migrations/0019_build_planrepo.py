@@ -8,7 +8,11 @@ import django.db.models.deletion
 def set_planrepository(apps, schema_editor):
     Build = apps.get_model('build', 'Build')
     for build in Build.objects.all().iterator():
-        build.planrepo = build.plan.planrepository_set.get(repo = build.repo)
+        try:
+            build.planrepo = build.plan.planrepository_set.get(repo = build.repo)
+        except Exception as e:
+            if e.__class__.__name__ == 'DoesNotExist':
+                continue
         build.save()
 
 class Migration(migrations.Migration):
@@ -26,9 +30,4 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.RunPython(set_planrepository),
-        migrations.AlterField(
-            model_name='build',
-            name='planrepo',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='builds', to='plan.PlanRepository'),
-        ),
     ]
