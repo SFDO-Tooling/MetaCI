@@ -84,7 +84,7 @@ def grant_anonymous_perms(apps, schema_editor):
     if not anon.groups.filter(name='Public').exists():
         anon.groups.add(public_group)
   
-    content_type = ContentType.objects.get(app_label='guardian',model='groupobjectpermission') 
+    content_type = ContentType.objects.get(app_label='plan',model='planrepository') 
     for pr in PlanRepository.objects.all().iterator():
         if pr.plan.public is False:
             continue
