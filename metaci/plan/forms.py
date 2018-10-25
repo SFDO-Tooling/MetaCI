@@ -18,9 +18,10 @@ class RunPlanForm(forms.Form):
     keep_org = forms.BooleanField(required=False)
     release = forms.ModelChoiceField(None, required=False)
 
-    def __init__(self, plan, repo, user, *args, **kwargs):
-        self.plan = plan
-        self.repo = repo
+    def __init__(self, planrepo, user, *args, **kwargs):
+        self.planrepo = planrepo
+        self.plan = planrepo.plan
+        self.repo = planrepo.repo
         self.user = user
         org = kwargs.pop('org', None)
         self.org = org
@@ -104,6 +105,7 @@ class RunPlanForm(forms.Form):
         build = Build(
             repo=self.repo,
             plan=self.plan,
+            planrepo=self.planrepo,
             org=self.org,
             branch=branch,
             commit=commit,
