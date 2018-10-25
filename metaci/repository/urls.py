@@ -5,32 +5,32 @@ from metaci.repository import views as repository_views
 
 urlpatterns = [
     url(
-        r'(?P<owner>\w+)/(?P<name>[^/].*)/branch/(?P<branch>.*)$',
+        r'(?P<owner>[-\w]+)/(?P<name>[^/].*)/branch/(?P<branch>.*)$',
         repository_views.branch_detail,
         name='branch_detail',
     ),
     url(
-        r'(?P<owner>\w+)/(?P<name>[^/].*)/commit/(?P<sha>\w+)$',
+        r'(?P<owner>[-\w]+)/(?P<name>[^/].*)/commit/(?P<sha>\w+)$',
         repository_views.commit_detail,
         name='commit_detail',
     ),
     url(
-        r'(?P<owner>\w+)/(?P<name>[^/].*)/branches',
+        r'(?P<owner>[-\w]+)/(?P<name>[^/].*)/branches',
         repository_views.repo_branches,
         name='repo_branches',
     ),
     url(
-        r'(?P<owner>\w+)/(?P<name>[^/].*)/plans',
+        r'(?P<owner>[-\w]+)/(?P<name>[^/].*)/plans',
         repository_views.repo_plans,
         name='repo_plans',
     ),
     url(
-        r'(?P<owner>\w+)/(?P<name>[^/].*)/orgs',
+        r'(?P<owner>[-\w]+)/(?P<name>[^/].*)/orgs',
         repository_views.repo_orgs,
         name='repo_orgs',
     ),
     url(
-        r'(?P<owner>\w+)/(?P<name>[^/].*)/*$',
+        r'(?P<owner>[-\w]+)/(?P<name>[^/].*)/*$',
         repository_views.repo_detail,
         name='repo_detail',
     ),
