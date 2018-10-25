@@ -70,12 +70,12 @@ def plan_run_repo(request, plan_id, repo_owner, repo_name):
         raise PermissionDenied('You are not authorized to run this plan')
 
     if request.method == 'POST':
-        form = RunPlanForm(plan, repo, request.user, request.POST)
+        form = RunPlanForm(planrepo, request.user, request.POST)
         if form.is_valid():
             build = form.create_build()
             return HttpResponseRedirect(build.get_absolute_url())
     else:
-        form = RunPlanForm(plan, repo, request.user, request.GET)
+        form = RunPlanForm(planrepo, request.user, request.GET)
     context = {
         'form': form,
         'plan': plan,

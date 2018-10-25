@@ -126,7 +126,7 @@ class Build(models.Model):
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
     qa_comment = models.TextField(null=True, blank=True)
-    qa_user = models.ForeignKey('users.User', related_name='builds_qa', null=True, on_delete=models.PROTECT)
+    qa_user = models.ForeignKey('users.User', related_name='builds_qa', null=True, blank=True, on_delete=models.PROTECT)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES,
                               default='queued')
     keep_org = models.BooleanField(default=False)

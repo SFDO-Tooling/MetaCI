@@ -206,6 +206,7 @@ def github_push_webhook(request):
             build = Build(
                 repo = repo,
                 plan = plan,
+                planrepo = pr,
                 commit = commit,
                 commit_message = commit_message,
                 branch = branch,
