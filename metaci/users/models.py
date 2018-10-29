@@ -21,3 +21,11 @@ class User(GuardianUserMixin, AbstractUser):
 
     def get_absolute_url(self):
         return reverse('users:detail', kwargs={'username': self.username})
+
+    def has_perm(self, perm, obj=None):
+        if obj is not None:
+            has_local_perm = super(User, self).has_perm(perm, obj)
+        else:
+            has_local_perm = False
+        has_global_perm = super(User, self).has_perm(perm)
+        return has_local_perm or has_global_perm
