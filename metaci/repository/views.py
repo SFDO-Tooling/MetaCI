@@ -105,7 +105,7 @@ def repo_orgs(request, owner, name):
     repo = Repository.objects.get_for_user_or_404(request.user, {
         'owner': owner,
         'name': name,
-    }, 'plan.org_login')
+    }, perms='plan.org_login')
 
     orgs = repo.orgs.filter(name__in = planrepos.values_list('plan__org', flat=True))
 
