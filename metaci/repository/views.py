@@ -102,10 +102,10 @@ def repo_plans(request, owner, name):
     return render(request, 'repository/repo_plans.html', context=context)
 
 def repo_orgs(request, owner, name):
-    repo = Repository.objects.get_for_user_or_404(request.user, 'plan.org_login', {
+    repo = Repository.objects.get_for_user_or_404(request.user, {
         'owner': owner,
         'name': name,
-    })
+    }, 'plan.org_login')
 
     orgs = repo.orgs.filter(name__in = planrepos.values_list('plan__org', flat=True))
 
