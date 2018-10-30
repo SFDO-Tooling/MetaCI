@@ -11,6 +11,8 @@ from model_utils.models import SoftDeletableModel
 
 class RepositoryQuerySet(models.QuerySet):
     def for_user(self, user, perms=None):
+        if user.is_superuser:
+            return self
         if perms is None:
             perms = 'plan.view_builds'
         PlanRepository = apps.get_model('plan.PlanRepository')

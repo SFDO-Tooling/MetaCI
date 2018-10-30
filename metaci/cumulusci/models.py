@@ -60,6 +60,8 @@ def sf_session(jwt):
 
 class OrgQuerySet(models.QuerySet):
     def for_user(self, user, perms=None):
+        if user.is_superuser:
+            return self
         if perms is None:
             perms = 'plan.org_login'
         PlanRepository = apps.get_model('plan.PlanRepository')
