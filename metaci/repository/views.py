@@ -107,7 +107,7 @@ def repo_orgs(request, owner, name):
         'name': name,
     }, perms='plan.org_login')
 
-    orgs = repo.orgs.filter(name__in = planrepos.values_list('plan__org', flat=True))
+    orgs = repo.orgs.for_user(request.user)
 
     context = {
         'orgs': orgs,
