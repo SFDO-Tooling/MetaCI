@@ -105,7 +105,7 @@ def build_flow_tests(request, build_id, flow):
     return render(request, 'testresults/build_flow_tests.html', data)
 
 def test_result_detail(request, result_id):
-    build_qs = view_queryset(request)
+    build_qs = Build.objects.for_user(request.user)
     result = get_object_or_404(
         TestResult,
         id=result_id,
@@ -138,7 +138,7 @@ def test_result_detail(request, result_id):
 
 @xframe_options_exempt
 def test_result_robot(request, result_id):
-    build_qs = view_queryset(request)
+    build_qs = Build.objects.for_user(request.user)
     result = get_object_or_404(
         TestResult,
         id=result_id,
@@ -158,7 +158,7 @@ def test_result_robot(request, result_id):
     return HttpResponse(log_html)
 
 def test_method_peek(request, method_id):
-    build_qs = view_queryset(request)
+    build_qs = Build.objects.for_user(request.user)
     method = get_object_or_404(TestMethod, id=method_id)
     latest_fails = method.test_results.filter(
         outcome='Fail',
@@ -185,7 +185,7 @@ def test_method_peek(request, method_id):
 
 @login_required
 def test_method_trend(request, method_id):
-    build_qs = view_queryset(request)
+    build_qs = Build.objects.for_user(request.user)
     method = get_object_or_404(TestMethod, id=method_id)
 
     latest_results = method.test_results.filter(
@@ -270,7 +270,7 @@ def build_flow_compare_to(request, build_id, flow):
 def test_dashboard(request, repo_owner, repo_name):
     """ display a dashboard of test results from preconfigured methods """
     repo = get_object_or_404(Repository, name=repo_name, owner=repo_owner)
-    builds = view_queryset(request)
+    build = Build.objects.for_user(request.user)
     methods = TestMethod.objects.filter(testclass__repo=repo, test_dashboard=True)
     methods = methods.filter(testresult__build__in = builds).distinct()
     data = {'repo': repo, 'methods': methods }
