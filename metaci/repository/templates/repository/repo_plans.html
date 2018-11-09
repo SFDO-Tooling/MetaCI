@@ -62,8 +62,11 @@
           <th data-label="Plan">
             <div class="slds-truncate" title="{{ plan.name }}"><a href="{{ planrepo.get_absolute_url }}">{{ plan.name }}</a></div>
           </th>
-          <th data-label="Type">
-            <div class="slds-truncate"><span>{{ plan.type }}</span></div>
+          <th data-label="Role">
+            <div class="slds-truncate"><span>{{ plan.role }}</span></div>
+          </th>
+          <th data-label="Trigger">
+            <div class="slds-truncate"><span>{{ plan.trigger }}</span></div>
           </th>
           <th data-label="Regex">
             <div class="slds-truncate"><span>{{ plan.regex }}</span></div>

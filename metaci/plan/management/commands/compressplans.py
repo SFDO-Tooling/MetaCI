@@ -41,7 +41,8 @@ class Command(BaseCommand):
             plan2 = Plan.objects.get(pk=plan_combo[1])
             # skip if plans are not equal for these fields
             if not is_attr_equal(plan1, plan2, [
-                'type',
+                'role',
+                'trigger',
                 'regex',
                 'flows',
                 'org',

@@ -15,7 +15,8 @@ class PlanRelatedFilter(filters.FilterSet):
             'name',
             'org',
             'regex',
-            'type',
+            'role',
+            'trigger',
         ]
 
 class PlanFilter(PlanRelatedFilter):
