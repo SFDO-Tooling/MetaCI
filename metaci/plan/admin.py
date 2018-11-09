@@ -9,7 +9,8 @@ class PlanRepositoryInline(admin.TabularInline):
 class PlanAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'type',
+        'trigger',
+        'role',
         'flows',
         'org',
         'regex',
@@ -17,7 +18,8 @@ class PlanAdmin(admin.ModelAdmin):
     )
     list_filter = (
         'active',
-        'type',
+        'trigger',
+        'role',
         'org',
         'repos',
     )

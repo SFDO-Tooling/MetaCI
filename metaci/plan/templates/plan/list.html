@@ -12,7 +12,8 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>Type</th>
+          <th>Role</th>
+          <th>Trigger</th>
           <th>RegEx</th>
           <th># Repositories</th>
           <th>Org</th>
@@ -24,7 +25,8 @@
 {% for plan in plans %}
         <tr>
           <td><a href="/plans/{{ plan.id }}">{{ plan.name }}</a></td>
-          <td>{{ plan.type }}</td>
+          <td>{{ plan.role }}</td>
+          <td>{{ plan.trigger }}</td>
           <td>{{ plan.regex }}</td>
           <td>{{ plan.repos.count }}</td>
           <td>{{ plan.org }}</td>

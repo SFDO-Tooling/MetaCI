@@ -16,8 +16,18 @@ TRIGGER_TYPES = (
     ('manual', 'Manual'),
     ('commit', 'Commit'),
     ('tag', 'Tag'),
-    ('org', 'Org Request'),
-    ('qa', 'QA Testing'),
+)
+
+BUILD_ROLES = (
+    ('beta_release', 'Beta Release'),
+    ('beta_test', 'Beta Test'),
+    ('feature', 'Feature Test'),
+    ('other', 'Other'),
+    ('qa', 'QA Org'),
+    ('release_deploy', 'Release Deploy'),
+    ('release', 'Release'),
+    ('release_test', 'Release Test'),
+    ('scratch', 'Scratch Org'),
 )
 
 DASHBOARD_CHOICES = (
@@ -57,7 +67,8 @@ class Plan(models.Model):
         through='PlanRepository',
         through_fields=('plan', 'repo'),
     )
-    type = models.CharField(max_length=8, choices=TRIGGER_TYPES)
+    trigger = models.CharField(max_length=8, choices=TRIGGER_TYPES)
+    role = models.CharField(max_length=16, choices=BUILD_ROLES)
     regex = models.CharField(max_length=255, null=True, blank=True)
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
