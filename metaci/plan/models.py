@@ -21,7 +21,9 @@ TRIGGER_TYPES = (
 BUILD_ROLES = (
     ('beta_release', 'Beta Release'),
     ('beta_test', 'Beta Test'),
+    ('deploy', 'Deployment'),
     ('feature', 'Feature Test'),
+    ('feature_robot', 'Feature Test Robot'),
     ('other', 'Other'),
     ('qa', 'QA Org'),
     ('release_deploy', 'Release Deploy'),
@@ -100,7 +102,7 @@ class Plan(models.Model):
         commit_message = None
 
         # Handle commit events
-        if self.type == 'commit':
+        if self.trigger == 'commit':
             # Check if the event was triggered by a commit
             if not push['ref'].startswith('refs/heads/'):
                 return run_build, commit, commit_message
@@ -130,7 +132,7 @@ class Plan(models.Model):
                 
 
         # Handle tag events
-        elif self.type == 'tag':
+        elif self.trigger == 'tag':
             # Check if the event was triggered by a tag
             if not push['ref'].startswith('refs/tags/'):
                 return run_build, commit, commit_message

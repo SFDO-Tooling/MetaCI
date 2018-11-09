@@ -15,8 +15,9 @@ class PlanSerializer(serializers.HyperlinkedModelSerializer):
             'flows',
             'name',
             'org',
+            'role',
             'regex',
-            'type',
+            'trigger',
         )
 
 class PlanRepositorySerializer(serializers.HyperlinkedModelSerializer):
