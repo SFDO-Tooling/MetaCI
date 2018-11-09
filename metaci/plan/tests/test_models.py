@@ -16,7 +16,8 @@ class PlanTestCase(TestCase):
         )
         self.commit_plan = Plan(
             name = 'Test Plan',
-            type = 'commit',
+            role = 'feature',
+            trigger = 'commit',
             regex = 'test/.*',
             flows = 'test_flow',
             org = 'test_org',
@@ -24,7 +25,8 @@ class PlanTestCase(TestCase):
         )
         self.tag_plan = Plan(
             name = 'Test Plan',
-            type = 'tag',
+            role = 'feature',
+            trigger = 'tag',
             regex = 'test/.*',
             flows = 'test_flow',
             org = 'test_org',
