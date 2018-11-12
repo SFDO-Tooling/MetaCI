@@ -22,16 +22,17 @@ def populate_releases(apps, schema_editor):
                 'repo': build.branch.repo,
                 'tags': set(),
             }
-        release_tags[build.branch.repo.id].add(build.branch.name.replace('tag: ',''))
+        release_tags[build.branch.repo.id]['tags'].add(build.branch.name.replace('tag: ',''))
   
     github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
     for repo, info in release_tags.items():
         repo = github.repository(info['repo'].owner, info['repo'].name) 
         for release in repo.iter_releases():
-            if release.tag_name in tags:
-                ref = repo.ref('tag/{}'.format(release.tag_name))
+            if release.tag_name in info['tags']:
+                ref = repo.ref('tags/{}'.format(release.tag_name))
                 rel = Release(
                     repo = info['repo'],
+                    status = 'published',
                     version_name = release.name,
                     version_number = release.name,
                     git_tag = release.tag_name,
@@ -43,16 +44,20 @@ def populate_releases(apps, schema_editor):
                     r'Sandbox orgs: (20[\d][\d]-[\d][\d]-[\d][\d])', release.body
                 )
                 if sandbox_date:
-                    rel.sandbox_push_date = strptime(sandbox_date[0], '%Y-%m-%d')
+                    rel.sandbox_push_date = datetime.strptime(sandbox_date[0], '%Y-%m-%d')
                     
                 prod_date = re.findall(
-                    r' orgs: (20[\d][\d]-[\d][\d]-[\d][\d])', release.body
+                    r'Production orgs: (20[\d][\d]-[\d][\d]-[\d][\d])', release.body
                 )
                 if prod_date:
-                    rel.production_push_date = strptime(prod_date[0], '%Y-%m-%d')
+                    rel.production_push_date = datetime.strptime(prod_date[0], '%Y-%m-%d')
+
+                package_version_id = re.findall(r'(04t[\w]+)', release.body)
+                if package_version_id:
+                    rel.package_version_id = package_version_id[0]
 
                 trialforce_id = re.findall(
-                    r'# Trialforce Template ID\r\n\r\n(0TT[\w])', rel.body
+                    r'# Trialforce Template ID\r\n\r\n(0TT[\w]+)', release.body
                 )
                 if trialforce_id:
                     rel.trialforce_id = trialforce_id[0]
@@ -65,7 +70,7 @@ def populate_build_release(apps, schema_editor):
 
     for build in Build.objects.filter(plan__role__in = ['release', 'release_test']):
         try:
-            rel = Release.objects.get(repo = build.repo, git_tag = build.branch.tag.name.replace('tag: ',''))
+            rel = Release.objects.get(repo = build.repo, git_tag = build.branch.name.replace('tag: ',''))
         except ObjectDoesNotExist:
             continue
         build.release = rel
