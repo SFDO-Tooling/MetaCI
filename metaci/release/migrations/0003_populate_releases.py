@@ -31,6 +31,13 @@ def populate_releases(apps, schema_editor):
         repo = github.repository(info['repo'].owner, info['repo'].name) 
         for release in repo.iter_releases():
             if release.tag_name in info['tags']:
+                existing = Release.objects.filter(
+                    repo = info['repo'],
+                    git_tag = release.tag_name,
+                )
+                if existing.exists():
+                    continue
+                
                 ref = repo.ref('tags/{}'.format(release.tag_name))
                 rel = Release(
                     repo = info['repo'],
