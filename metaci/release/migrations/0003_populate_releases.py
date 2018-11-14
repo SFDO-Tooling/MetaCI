@@ -11,6 +11,8 @@ from django.db import migrations
 from django.utils.dateparse import parse_date
 from github3 import login
 
+from metaci.release.utils import update_release_from_github
+
 logger = logging.getLogger(__name__)
 
 def populate_releases(apps, schema_editor):
@@ -29,49 +31,21 @@ def populate_releases(apps, schema_editor):
     github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
     for info in repos.values():
         repo = github.repository(info['repo'].owner, info['repo'].name) 
-        for release in repo.iter_releases():
-            if release.tag_name in info['tags']:
-                existing = Release.objects.filter(
-                    repo = info['repo'],
-                    git_tag = release.tag_name,
-                )
-                if existing.exists():
-                    continue
-                
-                ref = repo.ref('tags/{}'.format(release.tag_name))
-                rel = Release(
-                    repo = info['repo'],
-                    status = 'published',
-                    version_name = release.name,
-                    version_number = release.name,
-                    git_tag = release.tag_name,
-                    github_release = release.html_url,
-                    release_creation_date = release.created_at,
-                    created_from_commit = ref.object.sha,
-                )
-                sandbox_date = re.findall(
-                    r'^Sandbox orgs: (20[\d][\d]-[\d][\d]-[\d][\d])', release.body
-                )
-                if sandbox_date:
-                    rel.sandbox_push_date = parse_date(sandbox_date[0], '%Y-%m-%d')
-                    
-                prod_date = re.findall(
-                    r'^Production orgs: (20[\d][\d]-[\d][\d]-[\d][\d])', release.body
-                )
-                if prod_date:
-                    rel.production_push_date = parse_date(prod_date[0], '%Y-%m-%d')
-
-                package_version_id = re.findall(r'(04t[\w]{15,18})', release.body)
-                if package_version_id:
-                    rel.package_version_id = package_version_id[0]
-
-                trialforce_id = re.findall(
-                    r'^(0TT[\w]{15,18})', release.body
-                )
-                if trialforce_id:
-                    rel.trialforce_id = trialforce_id[0]
-
-                rel.save()
+        for tag in info['tags']:
+            existing = Release.objects.filter(
+                repo = info['repo'],
+                git_tag = tag,
+            )
+            if existing.exists():
+                continue
+            
+            release = Release(
+                repo = info['repo'],
+                status = 'published',
+                git_tag = tag,
+            )
+            update_release_from_github(release)
+            release.save()
 
 def populate_build_release(apps, schema_editor):
     Build = apps.get_model('build.Build')

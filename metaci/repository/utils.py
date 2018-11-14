@@ -1,14 +1,18 @@
 from django.conf import settings
 from github3 import login
 
+def get_github_api(repo):
+    github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
+    return github.repository(repo.owner, repo.name)
+
+    
 
 def create_status(build):
     if not build.plan.context:
         # skip setting Github status if the context field is empty
         return
 
-    github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
-    repo = github.repository(build.repo.owner, build.repo.name)
+    repo = get_github_api(build.repo)
 
     print build.get_status()
 
