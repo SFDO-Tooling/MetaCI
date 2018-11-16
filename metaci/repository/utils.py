@@ -1,11 +1,9 @@
 from django.conf import settings
-from github3 import login
+from cumulusci.core.github import get_github_api
 
 def get_github_api(repo):
-    github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
+    github = get_github_api(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
     return github.repository(repo.owner, repo.name)
-
-    
 
 def create_status(build):
     if not build.plan.context:

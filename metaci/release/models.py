@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import logging
 import re
 
 from django.db import models
@@ -15,8 +14,6 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from metaci.release.utils import update_release_from_github
 from metaci.repository.utils import get_github_api
-
-logger = logging.getLogger(__name__)
 
 class Release(StatusModel):
     STATUS = Choices('draft', 'published', 'hidden')
