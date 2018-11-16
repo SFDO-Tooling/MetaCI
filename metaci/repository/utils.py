@@ -1,18 +1,11 @@
 from django.conf import settings
-from cumulusci.core.github import get_github_api
-
-def get_github_api(repo):
-    github = get_github_api(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
-    return github.repository(repo.owner, repo.name)
 
 def create_status(build):
     if not build.plan.context:
         # skip setting Github status if the context field is empty
         return
 
-    repo = get_github_api(build.repo)
-
-    print build.get_status()
+    repo = build.repo.github_api
 
     if build.get_status() == 'queued':
         state = 'pending'

@@ -5,11 +5,11 @@ from __future__ import unicode_literals
 import logging
 import re
 
+from cumulusci.core.github import get_github_api
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import migrations
 from django.utils.dateparse import parse_date
-from github3 import login
 
 from metaci.release.utils import update_release_from_github
 
@@ -28,9 +28,9 @@ def populate_releases(apps, schema_editor):
             }
         repos[build.branch.repo.id]['tags'].add(build.branch.name.replace('tag: ',''))
   
-    github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
+    github = get_github_api(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
     for info in repos.values():
-        repo = github.repository(info['repo'].owner, info['repo'].name) 
+        repo_api = github.repository(info['repo'].owner, info['repo'].name) 
         for tag in info['tags']:
             existing = Release.objects.filter(
                 repo = info['repo'],
@@ -44,7 +44,7 @@ def populate_releases(apps, schema_editor):
                 status = 'published',
                 git_tag = tag,
             )
-            update_release_from_github(release)
+            update_release_from_github(release, repo_api)
             release.save()
 
 def populate_build_release(apps, schema_editor):

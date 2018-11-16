@@ -7,23 +7,22 @@ import re
 from django.utils.dateparse import parse_date
 from django.utils.dateparse import parse_datetime
 
-from metaci.repository.utils import get_github_api
-
 logger = logging.getLogger(__name__)
 
-def update_release_from_github(release):
+def update_release_from_github(release, repo_api=None):
+    if not repo_api:
+        repo_api = release.repo.github_api
     if not release.git_tag:
         logger.info('Cannot update release, no git_tag specified')
         return
-    repo = get_github_api(release.repo)
-    ref = repo.ref('tags/{}'.format(release.git_tag))
+    ref = repo_api.ref('tags/{}'.format(release.git_tag))
     if not ref:
         logger.info(
             'Cannot update release, ref tags/{} not found in Github'.format(release.git_tag)
         )
         return
-    url = repo._build_url('releases/tags/{}'.format(release.git_tag), base_url=repo._api)
-    gh_release = repo._get(url).json()
+    url = repo_api._build_url('releases/tags/{}'.format(release.git_tag), base_url=repo_api._api)
+    gh_release = repo_api._get(url).json()
     release.status = 'published'
     release.version_name = gh_release['name']
     release.version_number = gh_release['name']
