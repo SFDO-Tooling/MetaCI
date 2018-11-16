@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import re
-
 from django.db import models
-from django.utils.dateparse import parse_date
-from django.utils.dateparse import parse_datetime
 from django.utils.translation import ugettext_lazy as _
 
 from model_utils import Choices
