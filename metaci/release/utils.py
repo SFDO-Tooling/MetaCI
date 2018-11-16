@@ -51,3 +51,5 @@ def update_release_from_github(release):
     )
     if trialforce_id:
         release.trialforce_id = trialforce_id[0]
+
+    return release
