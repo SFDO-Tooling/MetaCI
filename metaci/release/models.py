@@ -13,7 +13,6 @@ from model_utils.models import StatusModel
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
 from metaci.release.utils import update_release_from_github
-from metaci.repository.utils import get_github_api
 
 class Release(StatusModel):
     STATUS = Choices('draft', 'published', 'hidden')
