@@ -1,16 +1,11 @@
 from django.conf import settings
-from github3 import login
-
 
 def create_status(build):
     if not build.plan.context:
         # skip setting Github status if the context field is empty
         return
 
-    github = login(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
-    repo = github.repository(build.repo.owner, build.repo.name)
-
-    print build.get_status()
+    repo = build.repo.github_api
 
     if build.get_status() == 'queued':
         state = 'pending'

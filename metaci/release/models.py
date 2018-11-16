@@ -8,6 +8,8 @@ from model_utils import Choices
 from model_utils.models import StatusModel
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
+from metaci.release.utils import update_release_from_github
+
 class Release(StatusModel):
     STATUS = Choices('draft', 'published', 'hidden')
     created = AutoCreatedField(_('created'))
@@ -38,3 +40,6 @@ class Release(StatusModel):
 
     def __unicode__(self):
         return "{}: {}".format(self.repo, self.version_name)
+
+    def update_from_github(self):
+        update_release_from_github(self)
