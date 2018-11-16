@@ -166,7 +166,7 @@
   </a>
 </li>
 {% endif %}
-{% if obj_perms.qa_builds and build.plan.role == 'qa' and build.time_end %}
+{% if obj_perms.qa_build and build.plan.role == 'qa' and build.time_end %}
   <li class="slds-tabs--default__item{% if tab == 'qa' %} slds-active{% endif %}"
   title="QA" role="presentation">
     <a class="slds-tabs--default__link"

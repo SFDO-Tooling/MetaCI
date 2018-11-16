@@ -29,7 +29,7 @@ def plan_detail(request, plan_id):
     return render(request, 'plan/detail.html', context=context)
     
 def plan_detail_repo(request, plan_id, repo_owner, repo_name):
-    planrepo = Plan.objects.get_for_user_or_404(request.user, {
+    planrepo = PlanRepository.objects.get_for_user_or_404(request.user, {
         'repo__owner': repo_owner,
         'repo__name': repo_name,
         'plan__id': plan_id,
