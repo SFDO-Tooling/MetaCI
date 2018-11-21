@@ -1,8 +1,8 @@
-from cumulusci.core.config import YamlGlobalConfig
-from cumulusci.core.config import YamlProjectConfig
+from cumulusci.core.config import BaseGlobalConfig
+from cumulusci.core.config import BaseProjectConfig
 
 
-class MetaCIProjectConfig(YamlProjectConfig):
+class MetaCIProjectConfig(BaseProjectConfig):
 
     def __init__(self, global_config_obj, build, *args, **kwargs):
         self.build = build
@@ -42,7 +42,7 @@ class MetaCIProjectConfig(YamlProjectConfig):
         return self.build.commit
 
 
-class MetaCIGlobalConfig(YamlGlobalConfig):
+class MetaCIGlobalConfig(BaseGlobalConfig):
     project_config_class = MetaCIProjectConfig
 
     @property
