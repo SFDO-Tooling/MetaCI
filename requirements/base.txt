@@ -42,14 +42,14 @@ django-rq-wrapper>=1.4
 django-rq-scheduler>=1.1.1
 
 # CumulusCI
-cumulusci==2.1.2
+cumulusci==2.2.0
 
 # Salesforce Lightning Design System for Django
 django-slds
 django-slds-crispyforms
 
 # Github library
-github3.py==0.9.6
+github3.py==1.2.0
 
 ansi2html==1.1.1
 
