@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-import StringIO
 from glob import iglob
+from io import BytesIO
 import json
 import os
 import re
@@ -326,7 +326,7 @@ class Build(models.Model):
 
     def checkout(self):
         # get the ref
-        zip_content = StringIO.StringIO()
+        zip_content = BytesIO()
         self.repo.github_api.archive('zipball', zip_content, ref=self.commit)
         build_dir = tempfile.mkdtemp()
         self.logger.info('-- Extracting zip to temp dir {}'.format(build_dir))

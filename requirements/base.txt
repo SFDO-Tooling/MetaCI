@@ -56,7 +56,7 @@ honcho>=0.7.1
 
 # Django REST Framework
 djangorestframework==3.9.0
-djangorestframework-filters==0.10.2.post0
+djangorestframework-filters==1.0.0.dev0
 
 # Core API for DRF schema generation
 coreapi==2.3.3

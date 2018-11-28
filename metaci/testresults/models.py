@@ -189,5 +189,5 @@ def asset_upload_to(instance, filename):
     return os.path.join(folder, filename)
 
 class TestResultAsset(models.Model):
-    result = models.ForeignKey(TestResult, related_name="assets")
+    result = models.ForeignKey(TestResult, related_name="assets", on_delete=models.CASCADE)
     asset = models.FileField(upload_to=asset_upload_to)
