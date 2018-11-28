@@ -1,7 +1,6 @@
 import json
 import os
 import re
-import urllib
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from cumulusci.utils import elementtree_parse_file

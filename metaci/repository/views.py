@@ -21,6 +21,7 @@ from metaci.plan.models import (
 from metaci.build.models import Build
 from metaci.build.utils import view_queryset
 
+
 def repo_list(request, owner=None):
     repos = Repository.objects.for_user(request.user)
 
@@ -34,7 +35,7 @@ def repo_list(request, owner=None):
         repo_info = {}
         repo_info['name'] = repo.name
         repo_info['owner'] = repo.owner
-        repo_info['title'] = unicode(repo)
+        repo_info['title'] = str(repo)
         repo_info['build_count'] = repo.builds.for_user(request.user).count()
         repo_info['columns'] = {}
         for plan in repo.plans.for_user(request.user).filter(dashboard__isnull = False):
@@ -62,7 +63,7 @@ def repo_list(request, owner=None):
         'repos': repo_list,
         'columns': columns,
     }
-    print context
+    print(context)
     return render(request, 'repository/repo_list.html', context=context)
 
 def repo_detail(request, owner, name):
@@ -149,7 +150,7 @@ def commit_detail(request, owner, name, sha):
 def validate_github_webhook(request):
     key = settings.GITHUB_WEBHOOK_SECRET
     signature = request.META.get('HTTP_X_HUB_SIGNATURE').split('=')[1]
-    if type(key) == unicode:
+    if isinstance(key, str):
         key = key.encode()
     mac = hmac.new(key, msg=request.body, digestmod=sha1)
     if not hmac.compare_digest(mac.hexdigest(), signature):

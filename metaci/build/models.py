@@ -246,7 +246,7 @@ class Build(models.Model):
             org_config = self.get_org(project_config)
 
         except Exception as e:
-            self.logger.error(unicode(e))
+            self.logger.error(str(e))
             set_build_info(build, status='error', time_end=timezone.now())
             self.delete_build_dir()
             self.flush_log()
@@ -299,7 +299,7 @@ class Build(models.Model):
             if org_config.created:
                 self.delete_org(org_config)
             self.logger = init_logger(self)
-            self.logger.error(unicode(e))
+            self.logger.error(str(e))
             self.delete_build_dir()
             self.flush_log()
             return
@@ -508,8 +508,8 @@ class BuildFlow(models.Model):
         }
         if exception:
             if status == 'error':
-                self.logger.error(unicode(e))
-            kwargs['error_message'] = unicode(e)
+                self.logger.error(str(e))
+            kwargs['error_message'] = str(e)
             kwargs['exception'] = e.__class__.__name__
         set_build_info(self, **kwargs)
 

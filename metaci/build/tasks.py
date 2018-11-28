@@ -52,7 +52,7 @@ def run_build(build_id, lock_id=None):
 
         build.set_status('error')
         build.log += '\nERROR: The build raised an exception\n'
-        build.log += unicode(e)
+        build.log += str(e)
         build.save()
 
         build_complete.send(
