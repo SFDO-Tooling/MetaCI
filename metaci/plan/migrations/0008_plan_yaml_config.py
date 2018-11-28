@@ -8,14 +8,16 @@ import metaci.plan.models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0007_plan_dashboard'),
-    ]
+    dependencies = [("plan", "0007_plan_dashboard")]
 
     operations = [
         migrations.AddField(
-            model_name='plan',
-            name='yaml_config',
-            field=models.TextField(blank=True, null=True, validators=[metaci.plan.models.validate_yaml_field]),
-        ),
+            model_name="plan",
+            name="yaml_config",
+            field=models.TextField(
+                blank=True,
+                null=True,
+                validators=[metaci.plan.models.validate_yaml_field],
+            ),
+        )
     ]

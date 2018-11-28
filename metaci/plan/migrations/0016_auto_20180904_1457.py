@@ -7,14 +7,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0015_auto_20180314_2252'),
-    ]
+    dependencies = [("plan", "0015_auto_20180314_2252")]
 
     operations = [
         migrations.AlterField(
-            model_name='plan',
-            name='type',
-            field=models.CharField(choices=[('manual', 'Manual'), ('commit', 'Commit'), ('tag', 'Tag'), ('org', 'Org Request'), ('qa', 'QA Testing')], max_length=8),
-        ),
+            model_name="plan",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("manual", "Manual"),
+                    ("commit", "Commit"),
+                    ("tag", "Tag"),
+                    ("org", "Org Request"),
+                    ("qa", "QA Testing"),
+                ],
+                max_length=8,
+            ),
+        )
     ]

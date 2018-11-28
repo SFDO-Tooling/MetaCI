@@ -8,20 +8,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0018_remove_build_schedule'),
-        ('plan', '0016_auto_20180904_1457'),
+        ("build", "0018_remove_build_schedule"),
+        ("plan", "0016_auto_20180904_1457"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='planschedule',
-            name='branch',
-        ),
-        migrations.RemoveField(
-            model_name='planschedule',
-            name='plan',
-        ),
-        migrations.DeleteModel(
-            name='PlanSchedule',
-        ),
+        migrations.RemoveField(model_name="planschedule", name="branch"),
+        migrations.RemoveField(model_name="planschedule", name="plan"),
+        migrations.DeleteModel(name="PlanSchedule"),
     ]

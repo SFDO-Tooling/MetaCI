@@ -7,54 +7,52 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('notification', '0003_auto_20170111_2103'),
-    ]
+    dependencies = [("notification", "0003_auto_20170111_2103")]
 
     operations = [
         migrations.AddField(
-            model_name='branchnotification',
-            name='on_error',
+            model_name="branchnotification",
+            name="on_error",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='branchnotification',
-            name='on_fail',
+            model_name="branchnotification",
+            name="on_fail",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='branchnotification',
-            name='on_success',
+            model_name="branchnotification",
+            name="on_success",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='plannotification',
-            name='on_error',
+            model_name="plannotification",
+            name="on_error",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='plannotification',
-            name='on_fail',
+            model_name="plannotification",
+            name="on_fail",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='plannotification',
-            name='on_success',
+            model_name="plannotification",
+            name="on_success",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='repositorynotification',
-            name='on_error',
+            model_name="repositorynotification",
+            name="on_error",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='repositorynotification',
-            name='on_fail',
+            model_name="repositorynotification",
+            name="on_fail",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='repositorynotification',
-            name='on_success',
+            model_name="repositorynotification",
+            name="on_success",
             field=models.BooleanField(default=False),
         ),
     ]

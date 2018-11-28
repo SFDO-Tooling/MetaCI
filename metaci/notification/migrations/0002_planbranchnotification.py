@@ -10,20 +10,49 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('repository', '0001_initial'),
-        ('plan', '0001_initial'),
+        ("repository", "0001_initial"),
+        ("plan", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('notification', '0001_initial'),
+        ("notification", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PlanBranchNotification',
+            name="PlanBranchNotification",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('branch', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='plan_notifications', to='repository.Branch')),
-                ('plan', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='branch_notifications', to='plan.Plan')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='plan_branch_notifications', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "branch",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="plan_notifications",
+                        to="repository.Branch",
+                    ),
+                ),
+                (
+                    "plan",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="branch_notifications",
+                        to="plan.Plan",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="plan_branch_notifications",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-        ),
+        )
     ]

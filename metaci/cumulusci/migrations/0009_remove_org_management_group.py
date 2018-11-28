@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('cumulusci', '0008_org_management_group'),
-    ]
+    dependencies = [("cumulusci", "0008_org_management_group")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='org',
-            name='management_group',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="org", name="management_group")]

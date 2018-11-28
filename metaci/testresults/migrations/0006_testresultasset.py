@@ -8,17 +8,30 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('testresults', '0005_testclass_test_type'),
-    ]
+    dependencies = [("testresults", "0005_testclass_test_type")]
 
     operations = [
         migrations.CreateModel(
-            name='TestResultAsset',
+            name="TestResultAsset",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('asset', models.FileField(upload_to=b'')),
-                ('result', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='assets', to='testresults.TestResult')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("asset", models.FileField(upload_to=b"")),
+                (
+                    "result",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="assets",
+                        to="testresults.TestResult",
+                    ),
+                ),
             ],
-        ),
+        )
     ]

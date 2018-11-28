@@ -7,13 +7,22 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0020_auto_20181018_1636'),
-    ]
+    dependencies = [("plan", "0020_auto_20181018_1636")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='planrepository',
-            options={'base_manager_name': 'objects', 'ordering': ['repo', 'plan'], 'permissions': (('run_plan', 'Run Plan'), ('view_builds', 'View Builds'), ('rebuild_builds', 'Rebuild Builds'), ('qa_builds', 'QA Builds'), ('org_login', 'Login to Org')), 'verbose_name_plural': 'Plan Repositories'},
-        ),
+            name="planrepository",
+            options={
+                "base_manager_name": "objects",
+                "ordering": ["repo", "plan"],
+                "permissions": (
+                    ("run_plan", "Run Plan"),
+                    ("view_builds", "View Builds"),
+                    ("rebuild_builds", "Rebuild Builds"),
+                    ("qa_builds", "QA Builds"),
+                    ("org_login", "Login to Org"),
+                ),
+                "verbose_name_plural": "Plan Repositories",
+            },
+        )
     ]

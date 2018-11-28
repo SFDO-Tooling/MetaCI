@@ -1,6 +1,7 @@
 import re
 from rest_framework.generics import get_object_or_404
 
+
 class PkOrSlugMixin(object):
     """
     ViewSet Mixin that supports looking up an object by primary key
@@ -10,13 +11,13 @@ class PkOrSlugMixin(object):
     """
 
     # Override lookup_slug_field with the name of your string/uri slug field
-    lookup_slug_field = 'slug'
+    lookup_slug_field = "slug"
     # default assumes django orm convention of pk.
-    lookup_field = 'pk'
+    lookup_field = "pk"
     # default assumes integer PKs
     lookup_pk_regexp = r"^\d+$"
     # default from the router made explicit
-    lookup_value_regexp = r'[^/.]+'
+    lookup_value_regexp = r"[^/.]+"
 
     def get_object(self):
         """ return the object based on pk or slug """

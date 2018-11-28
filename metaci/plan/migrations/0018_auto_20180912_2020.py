@@ -8,17 +8,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('repository', '0005_repository_release_tag_regex'),
-        ('plan', '0017_merge_20180911_1915'),
+        ("repository", "0005_repository_release_tag_regex"),
+        ("plan", "0017_merge_20180911_1915"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='plan',
-            name='test_dashboard',
-        ),
+        migrations.RemoveField(model_name="plan", name="test_dashboard"),
         migrations.AlterUniqueTogether(
-            name='planrepository',
-            unique_together=set([('plan', 'repo')]),
+            name="planrepository", unique_together=set([("plan", "repo")])
         ),
     ]

@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('testresults', '0003_auto_20170814_2352'),
-    ]
+    dependencies = [("testresults", "0003_auto_20170814_2352")]
 
     operations = [
         migrations.AddField(
-            model_name='testresult',
-            name='robot_xml',
+            model_name="testresult",
+            name="robot_xml",
             field=models.TextField(blank=True, null=True),
-        ),
+        )
     ]

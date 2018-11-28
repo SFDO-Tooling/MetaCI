@@ -16,7 +16,11 @@ framework.
 import os
 
 from django.core.wsgi import get_wsgi_application
-if os.environ.get('DJANGO_SETTINGS_MODULE') == 'config.settings.production' and 'DJANGO_SENTRY_DSN' in os.environ:
+
+if (
+    os.environ.get("DJANGO_SETTINGS_MODULE") == "config.settings.production"
+    and "DJANGO_SENTRY_DSN" in os.environ
+):
     from raven.contrib.django.raven_compat.middleware.wsgi import Sentry
 
 # We defer to a DJANGO_SETTINGS_MODULE already in the environment. This breaks
@@ -29,7 +33,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
 application = get_wsgi_application()
-if os.environ.get('DJANGO_SETTINGS_MODULE') == 'config.settings.production' and 'DJANGO_SENTRY_DSN' in os.environ:
+if (
+    os.environ.get("DJANGO_SETTINGS_MODULE") == "config.settings.production"
+    and "DJANGO_SENTRY_DSN" in os.environ
+):
     application = Sentry(application)
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication

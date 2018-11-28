@@ -8,13 +8,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('repository', '0005_repository_release_tag_regex'),
-        ('release', '0001_initial'),
+        ("repository", "0005_repository_release_tag_regex"),
+        ("release", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='release',
-            unique_together=set([('repo', 'git_tag')]),
-        ),
+            name="release", unique_together=set([("repo", "git_tag")])
+        )
     ]

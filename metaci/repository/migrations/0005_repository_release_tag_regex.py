@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('repository', '0004_remove_branch_deleted'),
-    ]
+    dependencies = [("repository", "0004_remove_branch_deleted")]
 
     operations = [
         migrations.AddField(
-            model_name='repository',
-            name='release_tag_regex',
+            model_name="repository",
+            name="release_tag_regex",
             field=models.CharField(blank=True, max_length=255, null=True),
-        ),
+        )
     ]

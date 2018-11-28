@@ -7,22 +7,28 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('cumulusci', '0001_initial'),
-    ]
+    dependencies = [("cumulusci", "0001_initial")]
 
     operations = [
         migrations.CreateModel(
-            name='ScratchOrgInstance',
+            name="ScratchOrgInstance",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('username', models.CharField(max_length=255)),
-                ('org_id', models.CharField(max_length=32)),
-                ('deleted', models.BooleanField(default=False)),
-                ('json', models.TextField()),
-                ('json_dx', models.TextField()),
-                ('time_created', models.DateTimeField(auto_now_add=True)),
-                ('time_deleted', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("username", models.CharField(max_length=255)),
+                ("org_id", models.CharField(max_length=32)),
+                ("deleted", models.BooleanField(default=False)),
+                ("json", models.TextField()),
+                ("json_dx", models.TextField()),
+                ("time_created", models.DateTimeField(auto_now_add=True)),
+                ("time_deleted", models.DateTimeField(blank=True, null=True)),
             ],
-        ),
+        )
     ]

@@ -7,20 +7,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('notification', '0005_planrepositorynotification'),
-    ]
+    dependencies = [("notification", "0005_planrepositorynotification")]
 
     operations = [
         migrations.RemoveField(
-            model_name='planrepositorynotification',
-            name='planrepository',
+            model_name="planrepositorynotification", name="planrepository"
         ),
-        migrations.RemoveField(
-            model_name='planrepositorynotification',
-            name='user',
-        ),
-        migrations.DeleteModel(
-            name='PlanRepositoryNotification',
-        ),
+        migrations.RemoveField(model_name="planrepositorynotification", name="user"),
+        migrations.DeleteModel(name="PlanRepositoryNotification"),
     ]
