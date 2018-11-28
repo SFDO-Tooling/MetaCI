@@ -74,7 +74,7 @@ class RunPlanForm(forms.Form):
         choices = [
             (gh_repo.default_branch, gh_repo.default_branch)
         ]
-        for branch in gh_repo.iter_branches():
+        for branch in gh_repo.branches():
             if branch.name != gh_repo.default_branch:
                 choices.append((branch.name, branch.name))
         return tuple(choices)
