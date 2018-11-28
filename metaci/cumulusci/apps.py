@@ -4,4 +4,4 @@ from django.apps import AppConfig
 
 
 class CumulusCIConfig(AppConfig):
-    name = 'metaci.cumulusci'
+    name = "metaci.cumulusci"

@@ -13,9 +13,9 @@ from metaci.cumulusci.models import ScratchOrgInstance
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
     # These next two lines tell the view to index lookups by username
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
-    orgs_object_list_name = 'orgs'
+    slug_field = "username"
+    slug_url_kwarg = "username"
+    orgs_object_list_name = "orgs"
 
     def get_context_data(self, **kwargs):
         context = super(UserDetailView, self).get_context_data(**kwargs)
@@ -26,26 +26,23 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         return ScratchOrgInstance.active.filter(build__user=self.object)
 
 
-
 class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self):
-        return reverse('users:detail',
-                       kwargs={'username': self.request.user.username})
+        return reverse("users:detail", kwargs={"username": self.request.user.username})
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
 
-    fields = ['name', ]
+    fields = ["name"]
 
     # we already imported User in the view code above, remember?
     model = User
 
     # send the user back to their own page after a successful update
     def get_success_url(self):
-        return reverse('users:detail',
-                       kwargs={'username': self.request.user.username})
+        return reverse("users:detail", kwargs={"username": self.request.user.username})
 
     def get_object(self):
         # Only get the User record for the user making the request
@@ -55,5 +52,5 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 class UserListView(LoginRequiredMixin, ListView):
     model = User
     # These next two lines tell the view to index lookups by username
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
+    slug_field = "username"
+    slug_url_kwarg = "username"

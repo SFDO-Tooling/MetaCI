@@ -15,22 +15,23 @@ from metaci.cumulusci.utils import get_connected_app
 
 
 class MetaCIProjectKeychain(BaseProjectKeychain):
-
     def __init__(self, project_config, key, build):
         self.build = build
         super(MetaCIProjectKeychain, self).__init__(project_config, key)
 
     def _load_keychain_services(self):
-        for key, value in settings.__dict__['_wrapped'].__dict__.items():
-            if key.startswith('CUMULUSCI_SERVICE_'):
-                print('%%% DEBUG %%%: {}'.format(key[len('CUMULUSCI_SERVICE_'):]))
-                self.services[key[len('CUMULUSCI_SERVICE_'):]] = ServiceConfig(json.loads(value))
+        for key, value in settings.__dict__["_wrapped"].__dict__.items():
+            if key.startswith("CUMULUSCI_SERVICE_"):
+                print("%%% DEBUG %%%: {}".format(key[len("CUMULUSCI_SERVICE_") :]))
+                self.services[key[len("CUMULUSCI_SERVICE_") :]] = ServiceConfig(
+                    json.loads(value)
+                )
 
     def change_key(self):
-        raise NotImplementedError('change_key is not supported in this keychain')
+        raise NotImplementedError("change_key is not supported in this keychain")
 
     def set_connected_app(self):
-        raise NotImplementedError('set_connected_app is not supported in this keychain')
+        raise NotImplementedError("set_connected_app is not supported in this keychain")
 
     def get_connected_app(self):
         return get_connected_app()
@@ -55,16 +56,18 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         service.save()
 
     def list_orgs(self):
-        orgs = Org.objects.filter(
-            repo = self.build.repo,
-        ).order_by('name').values_list('name', flat=True)
+        orgs = (
+            Org.objects.filter(repo=self.build.repo)
+            .order_by("name")
+            .values_list("name", flat=True)
+        )
         return orgs
 
     def get_default_org(self):
-        raise NotImplementedError('get_default_org is not supported in this keychain')
+        raise NotImplementedError("get_default_org is not supported in this keychain")
 
     def set_default_org(self):
-        raise NotImplementedError('set_default_org is not supported in this keychain')
+        raise NotImplementedError("set_default_org is not supported in this keychain")
 
     def get_org(self, org_name):
         org = Org.objects.get(repo=self.build.repo, name=org_name)
@@ -97,15 +100,15 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         info = org_config.scratch_info
 
         org_json = json.dumps(org_config.config, cls=DjangoJSONEncoder)
-        
+
         # Create a ScratchOrgInstance to store the org info
         instance = ScratchOrgInstance(
             org=org_config.org,
             build=self.build,
-            sf_org_id=info['org_id'],
-            username=info['username'],
+            sf_org_id=info["org_id"],
+            username=info["username"],
             json=org_json,
-            expiration_date = org_config.expires
+            expiration_date=org_config.expires,
         )
         instance.save()
         org_config.org_instance = instance
@@ -118,11 +121,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
             org = Org.objects.get(repo=self.build.repo, name=org_config.name)
             org.json = org_json
         except Org.DoesNotExist:
-            org = Org(
-                name=org_config.name,
-                json=org_json,
-                repo=self.build.repo,
-            )
+            org = Org(name=org_config.name, json=org_json, repo=self.build.repo)
 
         org.scratch = isinstance(org_config, ScratchOrgConfig)
         if not org.scratch:

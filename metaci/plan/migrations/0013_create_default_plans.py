@@ -6,94 +6,90 @@ from django.db import migrations
 
 
 def create_default_plans(apps, schema_editor):
-    Plan = apps.get_model('plan', 'Plan')
+    Plan = apps.get_model("plan", "Plan")
     if Plan.objects.count():
         # If any plans already exist, do nothing
         return
     # Feature Test
     Plan.objects.create(
-        name='Feature Test',
+        name="Feature Test",
         description=(
-            'Deploys the unmanaged code into the standard feature org and '
-            'runs apex tests'
+            "Deploys the unmanaged code into the standard feature org and "
+            "runs apex tests"
         ),
-        type='commit',
-        regex='feature/.*',
-        flows='ci_feature',
-        org='feature',
-        context='Feature Test',
+        type="commit",
+        regex="feature/.*",
+        flows="ci_feature",
+        org="feature",
+        context="Feature Test",
     )
     # Upload Beta
     Plan.objects.create(
-        name='Upload Beta',
+        name="Upload Beta",
         description=(
-            'Deploy the metadata to the packaging org, upload a beta '
-            'version, and create a GitHub release with release notes'
+            "Deploy the metadata to the packaging org, upload a beta "
+            "version, and create a GitHub release with release notes"
         ),
-        type='commit',
-        regex='master',
-        flows='ci_master,release_beta',
-        org='packaging',
-        context='Upload Beta',
+        type="commit",
+        regex="master",
+        flows="ci_master,release_beta",
+        org="packaging",
+        context="Upload Beta",
     )
     # Beta Test
     Plan.objects.create(
-        name='Beta Test',
+        name="Beta Test",
         description=(
-            'Installs the latest beta in the standard beta test org and '
-            'runs apex tests'
+            "Installs the latest beta in the standard beta test org and "
+            "runs apex tests"
         ),
-        type='tag',
-        regex='beta/.*',
-        flows='ci_beta',
-        org='beta',
-        context='Beta Test',
+        type="tag",
+        regex="beta/.*",
+        flows="ci_beta",
+        org="beta",
+        context="Beta Test",
     )
     # Upload Release
     Plan.objects.create(
-        name='Upload Release',
+        name="Upload Release",
         description=(
-            'Deploy the metadata to the packaging org, upload a production '
-            'version, and create a GitHub release with release notes'
+            "Deploy the metadata to the packaging org, upload a production "
+            "version, and create a GitHub release with release notes"
         ),
-        type='manual',
-        flows='ci_master,release_production',
-        org='packaging',
-        context='Upload Release',
+        type="manual",
+        flows="ci_master,release_production",
+        org="packaging",
+        context="Upload Release",
     )
     # Release Test
     Plan.objects.create(
-        name='Release Test',
+        name="Release Test",
         description=(
-            'Installs the latest release in the standard release test org and '
-            'runs apex tests'
+            "Installs the latest release in the standard release test org and "
+            "runs apex tests"
         ),
-        type='tag',
-        regex='rel/.*',
-        flows='ci_release',
-        org='release',
-        context='Release Test',
+        type="tag",
+        regex="rel/.*",
+        flows="ci_release",
+        org="release",
+        context="Release Test",
     )
     # Dev Org
     Plan.objects.create(
-        name='Dev Org',
+        name="Dev Org",
         description=(
-            'Runs the dev_org flow against the dev scratch org config.  This '
-            'plan is used by the New Org Please feature'
+            "Runs the dev_org flow against the dev scratch org config.  This "
+            "plan is used by the New Org Please feature"
         ),
-        type='org',
-        flows='dev_org',
-        org='dev',
+        type="org",
+        flows="dev_org",
+        org="dev",
         public=False,
     )
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0012_auto_20171026_1722'),
-    ]
+    dependencies = [("plan", "0012_auto_20171026_1722")]
 
-    operations = [
-        migrations.RunPython(create_default_plans),
-    ]
+    operations = [migrations.RunPython(create_default_plans)]

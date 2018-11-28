@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0005_plan_junit_path'),
-    ]
+    dependencies = [("plan", "0005_plan_junit_path")]
 
     operations = [
         migrations.AddField(
-            model_name='plan',
-            name='sfdx_config',
+            model_name="plan",
+            name="sfdx_config",
             field=models.TextField(blank=True, null=True),
-        ),
+        )
     ]

@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('repository', '0003_branch_is_removed'),
-    ]
+    dependencies = [("repository", "0003_branch_is_removed")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='branch',
-            name='deleted',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="branch", name="deleted")]

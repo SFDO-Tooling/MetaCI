@@ -8,9 +8,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plan', '0016_plan_test_dashboard'),
-        ('plan', '0016_auto_20180904_1457'),
+        ("plan", "0016_plan_test_dashboard"),
+        ("plan", "0016_auto_20180904_1457"),
     ]
 
-    operations = [
-    ]
+    operations = []

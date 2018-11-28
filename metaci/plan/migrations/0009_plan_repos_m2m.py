@@ -8,23 +8,41 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('repository', '0001_initial'),
-        ('plan', '0008_plan_yaml_config'),
-    ]
+    dependencies = [("repository", "0001_initial"), ("plan", "0008_plan_yaml_config")]
 
     operations = [
         migrations.CreateModel(
-            name='PlanRepository',
+            name="PlanRepository",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('plan', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='plan.Plan')),
-                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='repository.Repository')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "plan",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="plan.Plan"
+                    ),
+                ),
+                (
+                    "repo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="repository.Repository",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='plan',
-            name='repos',
-            field=models.ManyToManyField(through='plan.PlanRepository', to='repository.Repository'),
+            model_name="plan",
+            name="repos",
+            field=models.ManyToManyField(
+                through="plan.PlanRepository", to="repository.Repository"
+            ),
         ),
     ]

@@ -15,17 +15,17 @@ class LogStream(object):
     """ File-like interface to Django model. """
 
     def __init__(self, model):
-        if not hasattr(model, 'log'):
+        if not hasattr(model, "log"):
             raise LoggerException('Model does not have "log" attribute.')
         self.model = model
-        self.buffer = ''
+        self.buffer = ""
         self.last_save_time = timezone.now()
 
     def flush(self, force=False):
         if self.model.log is None:
-            self.model.log = u''
+            self.model.log = u""
         self.model.log += self.buffer
-        self.buffer = ''
+        self.buffer = ""
         now = timezone.now()
         if force or now - self.last_save_time > datetime.timedelta(seconds=1):
             self.model.save()
@@ -47,7 +47,7 @@ class LogHandler(logging.StreamHandler):
 def init_logger(model):
     """ Initialize the logger. """
 
-    logger = logging.getLogger('cumulusci')
+    logger = logging.getLogger("cumulusci")
 
     # Remove existing handlers
     for handler in list(logger.handlers):
@@ -55,7 +55,7 @@ def init_logger(model):
         logger.removeHandler(handler)
 
     # Create the custom handler
-    formatter = coloredlogs.ColoredFormatter(fmt='%(asctime)s: %(message)s')
+    formatter = coloredlogs.ColoredFormatter(fmt="%(asctime)s: %(message)s")
     handler = LogHandler(model)
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(formatter)

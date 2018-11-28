@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0022_migrate_to_groups'),
-    ]
+    dependencies = [("plan", "0022_migrate_to_groups")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='plan',
-            name='public',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="plan", name="public")]

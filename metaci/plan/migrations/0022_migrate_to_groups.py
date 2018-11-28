@@ -10,81 +10,68 @@ from guardian.conf import settings as guardian_settings
 from guardian.utils import get_anonymous_user
 import metaci
 
+
 def migrate_permissions(apps, schema_editor):
     for app_config in apps.get_app_configs():
         app_config.models_module = True
         create_permissions(app_config, apps=apps, verbosity=0)
         app_config.models_module = None
 
+
 def create_groups_and_migrate_users(apps, schema_editor):
-    Group = apps.get_model('auth.Group')
-    Permission = apps.get_model('auth.Permission')
-    User = apps.get_model('users.User')
+    Group = apps.get_model("auth.Group")
+    Permission = apps.get_model("auth.Permission")
+    User = apps.get_model("users.User")
 
-    run_group = Group.objects.create(name='Run All Plans')
-    run_group.permissions.add(
-        Permission.objects.get(codename='run_plan')
-    )
+    run_group = Group.objects.create(name="Run All Plans")
+    run_group.permissions.add(Permission.objects.get(codename="run_plan"))
 
-    view_group = Group.objects.create(name='View All Builds')
+    view_group = Group.objects.create(name="View All Builds")
     view_group.permissions.add(
-        Permission.objects.get(codename='view_builds'),
-        Permission.objects.get(codename='search_builds'),
+        Permission.objects.get(codename="view_builds"),
+        Permission.objects.get(codename="search_builds"),
     )
 
-    rebuild_group = Group.objects.create(name='Rebuild All Builds')
-    rebuild_group.permissions.add(
-        Permission.objects.get(codename='rebuild_builds')
-    )
+    rebuild_group = Group.objects.create(name="Rebuild All Builds")
+    rebuild_group.permissions.add(Permission.objects.get(codename="rebuild_builds"))
 
-    qa_group = Group.objects.create(name='QA All Builds')
-    qa_group.permissions.add(
-        Permission.objects.get(codename='qa_builds')
-    )
+    qa_group = Group.objects.create(name="QA All Builds")
+    qa_group.permissions.add(Permission.objects.get(codename="qa_builds"))
 
-    org_group = Group.objects.create(name='Login All Orgs')
-    org_group.permissions.add(
-        Permission.objects.get(codename='org_login')
-    )
+    org_group = Group.objects.create(name="Login All Orgs")
+    org_group.permissions.add(Permission.objects.get(codename="org_login"))
 
-    users = User.objects.filter(is_staff = True, is_superuser = False)
+    users = User.objects.filter(is_staff=True, is_superuser=False)
     for user in users.iterator():
-        user.groups.add(
-            run_group,
-            view_group,
-            rebuild_group,
-            qa_group,
-            org_group,
-        )
+        user.groups.add(run_group, view_group, rebuild_group, qa_group, org_group)
         # Since access is now granted through guardian, remove is_staff
         user.is_staff = False
         user.save()
 
 
 def grant_anonymous_perms(apps, schema_editor):
-    PlanRepository = apps.get_model('plan.PlanRepository')
-    Group = apps.get_model('auth.Group')
-    User = apps.get_model('users.User')
-    Permission = apps.get_model('auth.Permission')
-    ContentType = apps.get_model('contenttypes', 'ContentType')
-    GroupObjectPermission = apps.get_model('guardian.GroupObjectPermission')
+    PlanRepository = apps.get_model("plan.PlanRepository")
+    Group = apps.get_model("auth.Group")
+    User = apps.get_model("users.User")
+    Permission = apps.get_model("auth.Permission")
+    ContentType = apps.get_model("contenttypes", "ContentType")
+    GroupObjectPermission = apps.get_model("guardian.GroupObjectPermission")
 
-    public_group = Group.objects.create(name='Public')
-    view_builds = Permission.objects.get(codename='view_builds')
+    public_group = Group.objects.create(name="Public")
+    view_builds = Permission.objects.get(codename="view_builds")
 
     try:
         anon = get_anonymous_user()
     except ObjectDoesNotExist:
         anon = User(
-            username=guardian_settings.ANONYMOUS_USER_NAME,
-            password=make_password(None),
+            username=guardian_settings.ANONYMOUS_USER_NAME, password=make_password(None)
         )
         anon.save()
 
-    if not anon.groups.filter(name='Public').exists():
+    if not anon.groups.filter(name="Public").exists():
         anon.groups.add(public_group)
-  
-    content_type = ContentType.objects.get(app_label='plan',model='planrepository') 
+
+    content_type = ContentType.objects.get(app_label="plan", model="planrepository")
     for pr in PlanRepository.objects.all().iterator():
         if pr.plan.public is False:
             continue
@@ -93,23 +80,21 @@ def grant_anonymous_perms(apps, schema_editor):
 
         obj_perm = GroupObjectPermission(
             permission=view_builds,
-            group = public_group,
-            content_type = content_type,
-            object_pk = pr.id,
+            group=public_group,
+            content_type=content_type,
+            object_pk=pr.id,
         )
         obj_perm.save()
 
     # Add all users to the Public group
     for user in User.objects.all().iterator():
-        if not user.groups.filter(name='Public').exists():
+        if not user.groups.filter(name="Public").exists():
             user.groups.add(public_group)
-        
+
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0021_auto_20181018_2143'),
-    ]
+    dependencies = [("plan", "0021_auto_20181018_2143")]
 
     operations = [
         migrations.RunPython(migrate_permissions),
@@ -117,4 +102,4 @@ class Migration(migrations.Migration):
         migrations.RunPython(create_groups_and_migrate_users),
     ]
 
-    complete_apps = ['auth','users']
+    complete_apps = ["auth", "users"]

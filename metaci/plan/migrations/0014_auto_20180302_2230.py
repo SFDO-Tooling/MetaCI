@@ -7,14 +7,20 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0013_create_default_plans'),
-    ]
+    dependencies = [("plan", "0013_create_default_plans")]
 
     operations = [
         migrations.AlterField(
-            model_name='plan',
-            name='type',
-            field=models.CharField(choices=[('manual', 'Manual'), ('commit', 'Commit'), ('tag', 'Tag'), ('org', 'Org Request')], max_length=8),
-        ),
+            model_name="plan",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("manual", "Manual"),
+                    ("commit", "Commit"),
+                    ("tag", "Tag"),
+                    ("org", "Org Request"),
+                ],
+                max_length=8,
+            ),
+        )
     ]

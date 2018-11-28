@@ -7,13 +7,8 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('cumulusci', '0005_scratchorginstance_delete_error'),
-    ]
+    dependencies = [("cumulusci", "0005_scratchorginstance_delete_error")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='scratchorginstance',
-            name='json_dx',
-        ),
+        migrations.RemoveField(model_name="scratchorginstance", name="json_dx")
     ]

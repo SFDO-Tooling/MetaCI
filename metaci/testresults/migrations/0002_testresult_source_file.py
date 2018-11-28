@@ -7,15 +7,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('testresults', '0001_initial'),
-    ]
+    dependencies = [("testresults", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='testresult',
-            name='source_file',
-            field=models.CharField(default='test_results.json', max_length=255),
+            model_name="testresult",
+            name="source_file",
+            field=models.CharField(default="test_results.json", max_length=255),
             preserve_default=False,
-        ),
+        )
     ]

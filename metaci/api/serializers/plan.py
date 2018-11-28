@@ -4,41 +4,34 @@ from metaci.plan.models import Plan
 from metaci.plan.models import PlanRepository
 from metaci.repository.models import Repository
 
+
 class PlanSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Plan
         fields = (
-            'id',
-            'active',
-            'context',
-            'description',
-            'flows',
-            'name',
-            'org',
-            'role',
-            'regex',
-            'trigger',
+            "id",
+            "active",
+            "context",
+            "description",
+            "flows",
+            "name",
+            "org",
+            "role",
+            "regex",
+            "trigger",
         )
+
 
 class PlanRepositorySerializer(serializers.HyperlinkedModelSerializer):
     plan = PlanSerializer(read_only=True)
     plan_id = serializers.PrimaryKeyRelatedField(
-        queryset=Plan.objects.all(),
-        source='plan',
-        write_only=True
+        queryset=Plan.objects.all(), source="plan", write_only=True
     )
     repo = RepositorySerializer(read_only=True)
     repo_id = serializers.PrimaryKeyRelatedField(
-        queryset=Repository.objects.all(),
-        source='repo',
-        write_only=True
+        queryset=Repository.objects.all(), source="repo", write_only=True
     )
+
     class Meta:
         model = PlanRepository
-        fields = (
-            'id',
-            'plan',
-            'plan_id',
-            'repo',
-            'repo_id',
-        )
+        fields = ("id", "plan", "plan_id", "repo", "repo_id")

@@ -8,20 +8,21 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('cumulusci', '0002_scratchorginstance'),
-    ]
+    dependencies = [("cumulusci", "0002_scratchorginstance")]
 
     operations = [
         migrations.RenameField(
-            model_name='scratchorginstance',
-            old_name='org_id',
-            new_name='sf_org_id',
+            model_name="scratchorginstance", old_name="org_id", new_name="sf_org_id"
         ),
         migrations.AddField(
-            model_name='scratchorginstance',
-            name='org',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='instances', to='cumulusci.Org'),
+            model_name="scratchorginstance",
+            name="org",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="instances",
+                to="cumulusci.Org",
+            ),
             preserve_default=False,
         ),
     ]

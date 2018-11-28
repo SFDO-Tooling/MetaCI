@@ -6,18 +6,14 @@ from django.db import migrations
 
 
 def copy_repo(apps, schema_editor):
-    Plan = apps.get_model('plan', 'Plan')
-    PlanRepository = apps.get_model('plan', 'PlanRepository')
+    Plan = apps.get_model("plan", "Plan")
+    PlanRepository = apps.get_model("plan", "PlanRepository")
     for plan in Plan.objects.all():
         PlanRepository.objects.create(plan=plan, repo=plan.repo)
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0009_plan_repos_m2m'),
-    ]
+    dependencies = [("plan", "0009_plan_repos_m2m")]
 
-    operations = [
-        migrations.RunPython(copy_repo),
-    ]
+    operations = [migrations.RunPython(copy_repo)]

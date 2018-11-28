@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0010_copy_plan_repo'),
-    ]
+    dependencies = [("plan", "0010_copy_plan_repo")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='plan',
-            name='repo',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="plan", name="repo")]
