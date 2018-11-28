@@ -8,15 +8,16 @@ from django.http import Http404
 from django.urls import reverse
 from model_utils.models import SoftDeletableModel
 
+
 class RepositoryQuerySet(models.QuerySet):
     def for_user(self, user, perms=None):
         if user.is_superuser:
             return self
         if perms is None:
-            perms = 'plan.view_builds'
-        PlanRepository = apps.get_model('plan.PlanRepository')
+            perms = "plan.view_builds"
+        PlanRepository = apps.get_model("plan.PlanRepository")
         return self.filter(
-            planrepository__in = PlanRepository.objects.for_user(user, perms),
+            planrepository__in=PlanRepository.objects.for_user(user, perms)
         ).distinct()
 
     def get_for_user_or_404(self, user, query, perms=None):
@@ -24,6 +25,7 @@ class RepositoryQuerySet(models.QuerySet):
             return self.for_user(user, perms).get(**query)
         except Repository.DoesNotExist:
             raise Http404
+
 
 class Repository(models.Model):
     name = models.CharField(max_length=255)
@@ -36,16 +38,16 @@ class Repository(models.Model):
     objects = RepositoryQuerySet.as_manager()
 
     class Meta:
-        ordering = ['name','owner']
-        verbose_name_plural = 'repositories'
+        ordering = ["name", "owner"]
+        verbose_name_plural = "repositories"
 
     def get_absolute_url(self):
-        return reverse('repo_detail', kwargs={'owner': self.owner, 'name': self.name})
+        return reverse("repo_detail", kwargs={"owner": self.owner, "name": self.name})
 
     def __unicode__(self):
-        return '{}/{}'.format(self.owner, self.name)
-   
-    @property 
+        return "{}/{}".format(self.owner, self.name)
+
+    @property
     def github_api(self):
         gh = get_github_api(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
         repo = gh.repository(self.owner, self.name)
@@ -57,22 +59,32 @@ class Repository(models.Model):
             return self.releases.latest()
         except Repository.DoesNotExist:
             return None
-        
+
+
 class Branch(SoftDeletableModel):
     name = models.CharField(max_length=255)
-    repo = models.ForeignKey(Repository, related_name='branches', on_delete=models.CASCADE)
+    repo = models.ForeignKey(
+        Repository, related_name="branches", on_delete=models.CASCADE
+    )
 
     class Meta:
-        ordering = ['repo__name','repo__owner', 'name']
-        verbose_name_plural = 'branches'
+        ordering = ["repo__name", "repo__owner", "name"]
+        verbose_name_plural = "branches"
 
     def get_absolute_url(self):
-        return reverse('branch_detail', kwargs={'owner': self.repo.owner, 'name': self.repo.name, 'branch': self.name})
+        return reverse(
+            "branch_detail",
+            kwargs={
+                "owner": self.repo.owner,
+                "name": self.repo.name,
+                "branch": self.name,
+            },
+        )
 
     def __unicode__(self):
-        return u'{}'.format(self.name)
+        return "{}".format(self.name)
 
-    @property 
+    @property
     def github_api(self):
         branch = self.repo.github_api.branch(self.name)
         return branch

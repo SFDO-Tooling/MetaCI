@@ -10,30 +10,49 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('repository', '__first__'),
-    ]
+    dependencies = [("repository", "__first__")]
 
     operations = [
         migrations.CreateModel(
-            name='Org',
+            name="Org",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('json', models.TextField()),
-                ('scratch', models.BooleanField(default=False)),
-                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='orgs', to='repository.Repository')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("json", models.TextField()),
+                ("scratch", models.BooleanField(default=False)),
+                (
+                    "repo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="orgs",
+                        to="repository.Repository",
+                    ),
+                ),
             ],
-            options={
-                'ordering': ['name', 'repo__owner', 'repo__name'],
-            },
+            options={"ordering": ["name", "repo__owner", "repo__name"]},
         ),
         migrations.CreateModel(
-            name='Service',
+            name="Service",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('json', models.TextField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("json", models.TextField()),
             ],
         ),
     ]

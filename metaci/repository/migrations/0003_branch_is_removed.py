@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('repository', '0002_auto_20171031_2037'),
-    ]
+    dependencies = [("repository", "0002_auto_20171031_2037")]
 
     operations = [
         migrations.AddField(
-            model_name='branch',
-            name='is_removed',
+            model_name="branch",
+            name="is_removed",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

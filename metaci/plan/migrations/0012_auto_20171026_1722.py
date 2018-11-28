@@ -7,26 +7,25 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0011_remove_plan_repo'),
-    ]
+    dependencies = [("plan", "0011_remove_plan_repo")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='plan',
-            options={'ordering': ['name', 'active', 'context']},
+            name="plan", options={"ordering": ["name", "active", "context"]}
         ),
         migrations.AlterModelOptions(
-            name='planrepository',
-            options={'verbose_name_plural': 'Plan Repositories'},
+            name="planrepository", options={"verbose_name_plural": "Plan Repositories"}
         ),
         migrations.AlterModelOptions(
-            name='planschedule',
-            options={'verbose_name_plural': 'Plan Schedules'},
+            name="planschedule", options={"verbose_name_plural": "Plan Schedules"}
         ),
         migrations.AlterField(
-            model_name='plan',
-            name='repos',
-            field=models.ManyToManyField(related_name='plans', through='plan.PlanRepository', to='repository.Repository'),
+            model_name="plan",
+            name="repos",
+            field=models.ManyToManyField(
+                related_name="plans",
+                through="plan.PlanRepository",
+                to="repository.Repository",
+            ),
         ),
     ]

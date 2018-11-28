@@ -7,19 +7,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('testresults', '0003_auto_20170814_2352'),
-    ]
+    dependencies = [("testresults", "0003_auto_20170814_2352")]
 
     operations = [
         migrations.AddField(
-            model_name='testmethod',
-            name='description',
+            model_name="testmethod",
+            name="description",
             field=models.CharField(blank=True, max_length=1024, null=True),
         ),
         migrations.AddField(
-            model_name='testmethod',
-            name='test_dashboard',
+            model_name="testmethod",
+            name="test_dashboard",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -4,73 +4,100 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+
 def set_trigger_and_role(apps, schema_editor):
-    Plan = apps.get_model('plan.Plan')
-    
+    Plan = apps.get_model("plan.Plan")
+
     for plan in Plan.objects.all():
-        if plan.trigger == 'qa':
-            plan.trigger = 'manual'
-            plan.role = 'qa'
-        elif plan.trigger == 'org':
-            plan.trigger = 'manual'
-            plan.role = 'scratch'
-        elif plan.trigger == 'tag':
-            if 'ci_beta' in plan.flows:
-                plan.role = 'beta_test'
-            elif 'ci_release' in plan.flows:
-                plan.role = 'release_test'
+        if plan.trigger == "qa":
+            plan.trigger = "manual"
+            plan.role = "qa"
+        elif plan.trigger == "org":
+            plan.trigger = "manual"
+            plan.role = "scratch"
+        elif plan.trigger == "tag":
+            if "ci_beta" in plan.flows:
+                plan.role = "beta_test"
+            elif "ci_release" in plan.flows:
+                plan.role = "release_test"
             else:
-                plan.role = 'other'
-        elif plan.trigger == 'commit':
-            if 'feature/' in plan.regex:
-                if 'robot' in plan.flows:
-                    plan.role = 'feature_robot'
-                elif 'ci_feature' in plan.flows:
-                    plan.role = 'feature'
+                plan.role = "other"
+        elif plan.trigger == "commit":
+            if "feature/" in plan.regex:
+                if "robot" in plan.flows:
+                    plan.role = "feature_robot"
+                elif "ci_feature" in plan.flows:
+                    plan.role = "feature"
                 else:
-                    plan.role = 'other'
-            elif plan.regex == 'master':
-                if 'release_beta' in plan.flows:
-                    plan.role = 'beta_release'
+                    plan.role = "other"
+            elif plan.regex == "master":
+                if "release_beta" in plan.flows:
+                    plan.role = "beta_release"
                 else:
-                    plan.role = 'deploy'
-        elif plan.trigger == 'manual':
-            if plan.flows == 'ci_master':
-                plan.role = 'release_deploy'
-            elif plan.flows == 'release_prod':
-                plan.role = 'release'
+                    plan.role = "deploy"
+        elif plan.trigger == "manual":
+            if plan.flows == "ci_master":
+                plan.role = "release_deploy"
+            elif plan.flows == "release_prod":
+                plan.role = "release"
             else:
-                plan.role = 'other'
+                plan.role = "other"
         plan.save()
-        
+
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0023_remove_plan_public'),
-    ]
+    dependencies = [("plan", "0023_remove_plan_public")]
 
     operations = [
-        migrations.RenameField(
-            model_name='plan',
-            old_name='type',
-            new_name='trigger',
-        ),
+        migrations.RenameField(model_name="plan", old_name="type", new_name="trigger"),
         migrations.AlterField(
-            model_name='plan',
-            name='trigger',
-            field=models.CharField(choices=[('manual', 'Manual'), ('commit', 'Commit'), ('tag', 'Tag')], max_length=8),
+            model_name="plan",
+            name="trigger",
+            field=models.CharField(
+                choices=[("manual", "Manual"), ("commit", "Commit"), ("tag", "Tag")],
+                max_length=8,
+            ),
             preserve_default=True,
         ),
         migrations.AddField(
-            model_name='plan',
-            name='role',
-            field=models.CharField(choices=[('beta_release', 'Beta Release'), ('beta_test', 'Beta Test'), ('feature', 'Feature Test'), ('other', 'Other'), ('qa', 'QA Org'), ('release_deploy', 'Release Deploy'), ('release', 'Release'), ('release_test', 'Release Test'), ('scratch', 'Scratch Org')], max_length=16, null=True, blank=True),
+            model_name="plan",
+            name="role",
+            field=models.CharField(
+                choices=[
+                    ("beta_release", "Beta Release"),
+                    ("beta_test", "Beta Test"),
+                    ("feature", "Feature Test"),
+                    ("other", "Other"),
+                    ("qa", "QA Org"),
+                    ("release_deploy", "Release Deploy"),
+                    ("release", "Release"),
+                    ("release_test", "Release Test"),
+                    ("scratch", "Scratch Org"),
+                ],
+                max_length=16,
+                null=True,
+                blank=True,
+            ),
         ),
         migrations.RunPython(set_trigger_and_role),
         migrations.AlterField(
-            model_name='plan',
-            name='role',
-            field=models.CharField(choices=[('beta_release', 'Beta Release'), ('beta_test', 'Beta Test'), ('feature', 'Feature Test'), ('other', 'Other'), ('qa', 'QA Org'), ('release_deploy', 'Release Deploy'), ('release', 'Release'), ('release_test', 'Release Test'), ('scratch', 'Scratch Org')], default='other', max_length=16),
+            model_name="plan",
+            name="role",
+            field=models.CharField(
+                choices=[
+                    ("beta_release", "Beta Release"),
+                    ("beta_test", "Beta Test"),
+                    ("feature", "Feature Test"),
+                    ("other", "Other"),
+                    ("qa", "QA Org"),
+                    ("release_deploy", "Release Deploy"),
+                    ("release", "Release"),
+                    ("release_test", "Release Test"),
+                    ("scratch", "Scratch Org"),
+                ],
+                default="other",
+                max_length=16,
+            ),
         ),
     ]

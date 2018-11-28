@@ -7,15 +7,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('testresults', '0004_testresult_robot_xml'),
-    ]
+    dependencies = [("testresults", "0004_testresult_robot_xml")]
 
     operations = [
         migrations.AddField(
-            model_name='testclass',
-            name='test_type',
-            field=models.CharField(choices=[(b'Apex', b'Apex'), (b'Robot', b'Robot'), (b'Other', b'Other')], db_index=True, default='Apex', max_length=32),
+            model_name="testclass",
+            name="test_type",
+            field=models.CharField(
+                choices=[
+                    (b"Apex", b"Apex"),
+                    (b"Robot", b"Robot"),
+                    (b"Other", b"Other"),
+                ],
+                db_index=True,
+                default="Apex",
+                max_length=32,
+            ),
             preserve_default=False,
-        ),
+        )
     ]

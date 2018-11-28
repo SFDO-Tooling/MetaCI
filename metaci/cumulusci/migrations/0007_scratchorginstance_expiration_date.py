@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('cumulusci', '0006_remove_scratchorginstance_json_dx'),
-    ]
+    dependencies = [("cumulusci", "0006_remove_scratchorginstance_json_dx")]
 
     operations = [
         migrations.AddField(
-            model_name='scratchorginstance',
-            name='expiration_date',
+            model_name="scratchorginstance",
+            name="expiration_date",
             field=models.DateTimeField(blank=True, null=True),
-        ),
+        )
     ]

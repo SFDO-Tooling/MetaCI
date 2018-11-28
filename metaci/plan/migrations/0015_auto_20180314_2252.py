@@ -7,13 +7,14 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0014_auto_20180302_2230'),
-    ]
+    dependencies = [("plan", "0014_auto_20180302_2230")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='planrepository',
-            options={'ordering': ['repo', 'plan'], 'verbose_name_plural': 'Plan Repositories'},
-        ),
+            name="planrepository",
+            options={
+                "ordering": ["repo", "plan"],
+                "verbose_name_plural": "Plan Repositories",
+            },
+        )
     ]

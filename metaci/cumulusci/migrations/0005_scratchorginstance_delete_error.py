@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('cumulusci', '0004_scratchorginstance_build'),
-    ]
+    dependencies = [("cumulusci", "0004_scratchorginstance_build")]
 
     operations = [
         migrations.AddField(
-            model_name='scratchorginstance',
-            name='delete_error',
+            model_name="scratchorginstance",
+            name="delete_error",
             field=models.TextField(blank=True, null=True),
-        ),
+        )
     ]

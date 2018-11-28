@@ -5,7 +5,7 @@ from django.utils import timezone
 from metaci.cumulusci.models import ScratchOrgInstance
 
 
-@job('short')
+@job("short")
 def prune_orgs():
     """ An RQ task to mark expired orgs as deleted.
     
@@ -16,8 +16,6 @@ def prune_orgs():
     db.connection.close()
     pruneing_qs = ScratchOrgInstance.expired.all()
     count = pruneing_qs.update(
-        deleted=True,
-        time_deleted = timezone.now(),
-        delete_error = "Org is expired."
+        deleted=True, time_deleted=timezone.now(), delete_error="Org is expired."
     )
-    return 'pruned {} orgs'.format(count)
+    return "pruned {} orgs".format(count)

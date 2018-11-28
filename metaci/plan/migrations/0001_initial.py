@@ -10,28 +10,51 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('repository', '__first__'),
-    ]
+    dependencies = [("repository", "__first__")]
 
     operations = [
         migrations.CreateModel(
-            name='Plan',
+            name="Plan",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('type', models.CharField(choices=[('manual', 'Manual'), ('commit', 'Commit'), ('tag', 'Tag')], max_length=8)),
-                ('regex', models.CharField(blank=True, max_length=255, null=True)),
-                ('flows', models.CharField(max_length=255)),
-                ('org', models.CharField(max_length=255)),
-                ('context', models.CharField(blank=True, max_length=255, null=True)),
-                ('public', models.BooleanField(default=True)),
-                ('active', models.BooleanField(default=True)),
-                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='plans', to='repository.Repository')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("manual", "Manual"),
+                            ("commit", "Commit"),
+                            ("tag", "Tag"),
+                        ],
+                        max_length=8,
+                    ),
+                ),
+                ("regex", models.CharField(blank=True, max_length=255, null=True)),
+                ("flows", models.CharField(max_length=255)),
+                ("org", models.CharField(max_length=255)),
+                ("context", models.CharField(blank=True, max_length=255, null=True)),
+                ("public", models.BooleanField(default=True)),
+                ("active", models.BooleanField(default=True)),
+                (
+                    "repo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="plans",
+                        to="repository.Repository",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['name', 'repo__owner', 'repo__name', 'active', 'context'],
+                "ordering": ["name", "repo__owner", "repo__name", "active", "context"]
             },
-        ),
+        )
     ]

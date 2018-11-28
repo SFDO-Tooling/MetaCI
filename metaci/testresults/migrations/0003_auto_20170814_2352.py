@@ -7,20 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('testresults', '0002_testresult_source_file'),
-    ]
+    dependencies = [("testresults", "0002_testresult_source_file")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='testcodeunit',
-            name='parent',
-        ),
-        migrations.RemoveField(
-            model_name='testcodeunit',
-            name='testresult',
-        ),
-        migrations.DeleteModel(
-            name='TestCodeUnit',
-        ),
+        migrations.RemoveField(model_name="testcodeunit", name="parent"),
+        migrations.RemoveField(model_name="testcodeunit", name="testresult"),
+        migrations.DeleteModel(name="TestCodeUnit"),
     ]

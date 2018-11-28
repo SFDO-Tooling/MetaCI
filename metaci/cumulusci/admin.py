@@ -5,18 +5,32 @@ from metaci.cumulusci.models import Service
 
 
 class OrgAdmin(admin.ModelAdmin):
-    list_display = ('name', 'repo', 'scratch')
-    list_filter = ('name', 'scratch', 'repo')
+    list_display = ("name", "repo", "scratch")
+    list_filter = ("name", "scratch", "repo")
+
+
 admin.site.register(Org, OrgAdmin)
 
 
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ("name",)
+
+
 admin.site.register(Service, ServiceAdmin)
 
 
 class ScratchOrgInstanceAdmin(admin.ModelAdmin):
-    list_display = ('org', 'build', 'sf_org_id', 'username', 'deleted', 'time_created', 'time_deleted')
-    list_filter = ('deleted', 'org')
-    raw_id_fields = ('build',)
+    list_display = (
+        "org",
+        "build",
+        "sf_org_id",
+        "username",
+        "deleted",
+        "time_created",
+        "time_deleted",
+    )
+    list_filter = ("deleted", "org")
+    raw_id_fields = ("build",)
+
+
 admin.site.register(ScratchOrgInstance, ScratchOrgInstanceAdmin)

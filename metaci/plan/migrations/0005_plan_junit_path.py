@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('plan', '0004_remove_plan_devhub'),
-    ]
+    dependencies = [("plan", "0004_remove_plan_devhub")]
 
     operations = [
         migrations.AddField(
-            model_name='plan',
-            name='junit_path',
+            model_name="plan",
+            name="junit_path",
             field=models.CharField(blank=True, max_length=255, null=True),
-        ),
+        )
     ]

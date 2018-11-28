@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('repository', '0005_repository_release_tag_regex'),
-    ]
+    dependencies = [("repository", "0005_repository_release_tag_regex")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='repository',
-            name='public',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="repository", name="public")]

@@ -4,7 +4,7 @@ from django_rq import job
 from metaci.repository.models import Branch
 
 
-@job('short')
+@job("short")
 def prune_branches():
     db.connection.close()
     pruned = []
@@ -13,8 +13,8 @@ def prune_branches():
             branch.delete()
             pruned.append(str(branch))
     if pruned:
-        msg = 'Pruned branches:\n'
-        msg += '\n'.join(pruned)
+        msg = "Pruned branches:\n"
+        msg += "\n".join(pruned)
         return msg
     else:
-        return 'No branches pruned'
+        return "No branches pruned"

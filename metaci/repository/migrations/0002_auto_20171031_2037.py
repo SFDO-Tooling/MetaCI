@@ -7,17 +7,21 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('repository', '0001_initial'),
-    ]
+    dependencies = [("repository", "0001_initial")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='branch',
-            options={'ordering': ['repo__name', 'repo__owner', 'name'], 'verbose_name_plural': 'branches'},
+            name="branch",
+            options={
+                "ordering": ["repo__name", "repo__owner", "name"],
+                "verbose_name_plural": "branches",
+            },
         ),
         migrations.AlterModelOptions(
-            name='repository',
-            options={'ordering': ['name', 'owner'], 'verbose_name_plural': 'repositories'},
+            name="repository",
+            options={
+                "ordering": ["name", "owner"],
+                "verbose_name_plural": "repositories",
+            },
         ),
     ]

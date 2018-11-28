@@ -10,196 +10,670 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('repository', '0001_initial'),
-        ('build', '0001_initial'),
-    ]
+    dependencies = [("repository", "0001_initial"), ("build", "0001_initial")]
 
     operations = [
         migrations.CreateModel(
-            name='TestClass',
+            name="TestClass",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(db_index=True, max_length=255)),
-                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='testclasses', to='repository.Repository')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(db_index=True, max_length=255)),
+                (
+                    "repo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="testclasses",
+                        to="repository.Repository",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Test Class',
-                'verbose_name_plural': 'Test Classes',
+                "verbose_name": "Test Class",
+                "verbose_name_plural": "Test Classes",
             },
         ),
         migrations.CreateModel(
-            name='TestCodeUnit',
+            name="TestCodeUnit",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('unit', models.TextField(db_index=True)),
-                ('unit_type', models.CharField(db_index=True, max_length=255)),
-                ('duration', models.FloatField(blank=True, db_index=True, null=True)),
-                ('event', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
-                ('sobject', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
-                ('email_invocations_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('email_invocations_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('soql_queries_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('soql_queries_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('future_calls_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('future_calls_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_rows_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_rows_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('cpu_time_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('cpu_time_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('query_rows_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('query_rows_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_statements_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_statements_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('mobile_apex_push_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('mobile_apex_push_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('heap_size_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('heap_size_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('sosl_queries_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('sosl_queries_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('queueable_jobs_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('queueable_jobs_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('callouts_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('callouts_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_email_invocations_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_email_invocations_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_soql_queries_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_soql_queries_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_future_calls_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_future_calls_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_rows_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_rows_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_cpu_time_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_cpu_time_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_query_rows_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_query_rows_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_statements_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_statements_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_mobile_apex_push_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_mobile_apex_push_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_heap_size_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_heap_size_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_sosl_queries_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_sosl_queries_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_queueable_jobs_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_queueable_jobs_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_callouts_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_callouts_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='testresults.TestCodeUnit')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("unit", models.TextField(db_index=True)),
+                ("unit_type", models.CharField(db_index=True, max_length=255)),
+                ("duration", models.FloatField(blank=True, db_index=True, null=True)),
+                (
+                    "event",
+                    models.CharField(
+                        blank=True, db_index=True, max_length=255, null=True
+                    ),
+                ),
+                (
+                    "sobject",
+                    models.CharField(
+                        blank=True, db_index=True, max_length=255, null=True
+                    ),
+                ),
+                (
+                    "email_invocations_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "email_invocations_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "soql_queries_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "soql_queries_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "future_calls_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "future_calls_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_rows_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_rows_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "cpu_time_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "cpu_time_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "query_rows_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "query_rows_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_statements_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_statements_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "mobile_apex_push_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "mobile_apex_push_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "heap_size_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "heap_size_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "sosl_queries_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "sosl_queries_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "queueable_jobs_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "queueable_jobs_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "callouts_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "callouts_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_email_invocations_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_email_invocations_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_soql_queries_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_soql_queries_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_future_calls_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_future_calls_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_rows_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_rows_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_cpu_time_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_cpu_time_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_query_rows_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_query_rows_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_statements_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_statements_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_mobile_apex_push_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_mobile_apex_push_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_heap_size_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_heap_size_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_sosl_queries_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_sosl_queries_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_queueable_jobs_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_queueable_jobs_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_callouts_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_callouts_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "parent",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="children",
+                        to="testresults.TestCodeUnit",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Test Code Unit',
-                'verbose_name_plural': 'Test Code Units',
+                "verbose_name": "Test Code Unit",
+                "verbose_name_plural": "Test Code Units",
             },
         ),
         migrations.CreateModel(
-            name='TestMethod',
+            name="TestMethod",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(db_index=True, max_length=255)),
-                ('testclass', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='methods', to='testresults.TestClass')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(db_index=True, max_length=255)),
+                (
+                    "testclass",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="methods",
+                        to="testresults.TestClass",
+                    ),
+                ),
             ],
-            options={
-                'verbose_name': 'Test Method',
-            },
+            options={"verbose_name": "Test Method"},
         ),
         migrations.CreateModel(
-            name='TestResult',
+            name="TestResult",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('duration', models.FloatField(blank=True, db_index=True, null=True)),
-                ('outcome', models.CharField(choices=[(b'Pass', b'Pass'), (b'CompileFail', b'CompileFail'), (b'Fail', b'Fail'), (b'Skip', b'Skip')], db_index=True, max_length=16)),
-                ('stacktrace', models.TextField(blank=True, null=True)),
-                ('message', models.TextField(blank=True, null=True)),
-                ('email_invocations_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('email_invocations_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('email_invocations_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('soql_queries_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('soql_queries_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('soql_queries_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('future_calls_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('future_calls_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('future_calls_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_rows_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_rows_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_rows_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('cpu_time_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('cpu_time_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('cpu_time_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('query_rows_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('query_rows_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('query_rows_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_statements_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_statements_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('dml_statements_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('mobile_apex_push_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('mobile_apex_push_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('mobile_apex_push_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('heap_size_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('heap_size_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('heap_size_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('sosl_queries_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('sosl_queries_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('sosl_queries_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('queueable_jobs_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('queueable_jobs_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('queueable_jobs_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('callouts_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('callouts_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('callouts_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_email_invocations_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_email_invocations_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_email_invocations_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_soql_queries_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_soql_queries_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_soql_queries_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_future_calls_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_future_calls_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_future_calls_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_rows_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_rows_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_rows_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_cpu_time_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_cpu_time_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_cpu_time_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_query_rows_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_query_rows_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_query_rows_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_statements_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_statements_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_dml_statements_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_mobile_apex_push_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_mobile_apex_push_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_mobile_apex_push_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_heap_size_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_heap_size_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_heap_size_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_sosl_queries_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_sosl_queries_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_sosl_queries_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_queueable_jobs_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_queueable_jobs_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_queueable_jobs_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_callouts_used', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_callouts_allowed', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('test_callouts_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('worst_limit', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
-                ('worst_limit_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('worst_limit_nontest', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
-                ('worst_limit_nontest_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('worst_limit_test', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
-                ('worst_limit_test_percent', models.IntegerField(blank=True, db_index=True, null=True)),
-                ('build_flow', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='test_results', to='build.BuildFlow')),
-                ('method', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='test_results', to='testresults.TestMethod')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("duration", models.FloatField(blank=True, db_index=True, null=True)),
+                (
+                    "outcome",
+                    models.CharField(
+                        choices=[
+                            (b"Pass", b"Pass"),
+                            (b"CompileFail", b"CompileFail"),
+                            (b"Fail", b"Fail"),
+                            (b"Skip", b"Skip"),
+                        ],
+                        db_index=True,
+                        max_length=16,
+                    ),
+                ),
+                ("stacktrace", models.TextField(blank=True, null=True)),
+                ("message", models.TextField(blank=True, null=True)),
+                (
+                    "email_invocations_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "email_invocations_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "email_invocations_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "soql_queries_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "soql_queries_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "soql_queries_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "future_calls_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "future_calls_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "future_calls_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_rows_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_rows_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_rows_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "cpu_time_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "cpu_time_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "cpu_time_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "query_rows_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "query_rows_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "query_rows_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_statements_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_statements_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "dml_statements_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "mobile_apex_push_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "mobile_apex_push_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "mobile_apex_push_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "heap_size_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "heap_size_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "heap_size_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "sosl_queries_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "sosl_queries_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "sosl_queries_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "queueable_jobs_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "queueable_jobs_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "queueable_jobs_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "callouts_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "callouts_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "callouts_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_email_invocations_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_email_invocations_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_email_invocations_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_soql_queries_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_soql_queries_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_soql_queries_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_future_calls_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_future_calls_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_future_calls_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_rows_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_rows_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_rows_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_cpu_time_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_cpu_time_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_cpu_time_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_query_rows_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_query_rows_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_query_rows_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_statements_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_statements_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_dml_statements_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_mobile_apex_push_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_mobile_apex_push_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_mobile_apex_push_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_heap_size_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_heap_size_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_heap_size_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_sosl_queries_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_sosl_queries_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_sosl_queries_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_queueable_jobs_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_queueable_jobs_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_queueable_jobs_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_callouts_used",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_callouts_allowed",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "test_callouts_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "worst_limit",
+                    models.CharField(
+                        blank=True, db_index=True, max_length=255, null=True
+                    ),
+                ),
+                (
+                    "worst_limit_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "worst_limit_nontest",
+                    models.CharField(
+                        blank=True, db_index=True, max_length=255, null=True
+                    ),
+                ),
+                (
+                    "worst_limit_nontest_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "worst_limit_test",
+                    models.CharField(
+                        blank=True, db_index=True, max_length=255, null=True
+                    ),
+                ),
+                (
+                    "worst_limit_test_percent",
+                    models.IntegerField(blank=True, db_index=True, null=True),
+                ),
+                (
+                    "build_flow",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="test_results",
+                        to="build.BuildFlow",
+                    ),
+                ),
+                (
+                    "method",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="test_results",
+                        to="testresults.TestMethod",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Test Result',
-                'verbose_name_plural': 'Test Results',
+                "verbose_name": "Test Result",
+                "verbose_name_plural": "Test Results",
             },
         ),
         migrations.AddField(
-            model_name='testcodeunit',
-            name='testresult',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='codeunits', to='testresults.TestResult'),
+            model_name="testcodeunit",
+            name="testresult",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="codeunits",
+                to="testresults.TestResult",
+            ),
         ),
     ]

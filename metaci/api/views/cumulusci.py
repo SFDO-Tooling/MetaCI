@@ -9,25 +9,31 @@ from metaci.cumulusci.models import ScratchOrgInstance
 from metaci.cumulusci.models import Service
 from rest_framework import viewsets
 
+
 class OrgViewSet(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing Orgs
     """
+
     serializer_class = OrgSerializer
     queryset = Org.objects.all()
     filter_class = OrgFilter
+
 
 class ScratchOrgInstanceViewSet(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing ScratchOrgInstances
     """
+
     serializer_class = ScratchOrgInstanceSerializer
     queryset = ScratchOrgInstance.objects.all()
     filter_class = ScratchOrgInstanceFilter
+
 
 class ServiceViewSet(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing Services
     """
+
     serializer_class = ServiceSerializer
     queryset = Service.objects.all()
