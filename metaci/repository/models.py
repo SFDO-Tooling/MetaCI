@@ -42,7 +42,7 @@ class Repository(models.Model):
     def get_absolute_url(self):
         return reverse('repo_detail', kwargs={'owner': self.owner, 'name': self.name})
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}/{}'.format(self.owner, self.name)
    
     @property 
@@ -69,8 +69,8 @@ class Branch(SoftDeletableModel):
     def get_absolute_url(self):
         return reverse('branch_detail', kwargs={'owner': self.repo.owner, 'name': self.repo.name, 'branch': self.name})
 
-    def __unicode__(self):
-        return u'{}'.format(self.name)
+    def __str__(self):
+        return self.name
 
     @property 
     def github_api(self):

@@ -89,7 +89,7 @@ class Org(models.Model):
     class Meta:
         ordering = ['name', 'repo__owner', 'repo__name']
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}: {}'.format(self.repo.name, self.name)
 
     def get_absolute_url(self):
@@ -146,7 +146,7 @@ class ScratchOrgInstance(models.Model):
     active = ActiveOrgManager()
     expired = ExpiredOrgManager()
 
-    def __unicode__(self):
+    def __str__(self):
         if self.username:
             return self.username
         if self.sf_org_id:
@@ -208,5 +208,5 @@ class Service(models.Model):
     name = models.CharField(max_length=255)
     json = models.TextField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name

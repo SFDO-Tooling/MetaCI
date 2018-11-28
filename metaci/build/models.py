@@ -159,7 +159,7 @@ class Build(models.Model):
             ('search_builds', 'Search Builds'),
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}: {} - {}'.format(self.id, self.repo, self.commit)
 
     def get_log_html(self):
@@ -406,7 +406,7 @@ class Build(models.Model):
         return self.get_org_attr('sf_org_id')
 
     def get_org_name(self):
-        return self.get_org_attr('__unicode__')
+        return self.get_org_attr('__str__')
 
     def get_org_time_deleted(self):
         return self.get_org_attr('time_deleted')
@@ -458,7 +458,7 @@ class BuildFlow(models.Model):
     asset_hash = models.CharField(max_length=64, unique=True, default=generate_hash)
 
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}: {} - {} - {}'.format(self.build.id, self.build.repo,
                                          self.build.commit, self.flow)
 

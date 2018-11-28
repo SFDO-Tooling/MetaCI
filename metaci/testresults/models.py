@@ -18,7 +18,7 @@ class TestClass(models.Model):
         verbose_name = 'Test Class'
         verbose_name_plural = 'Test Classes'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class TestMethod(models.Model):
@@ -30,7 +30,7 @@ class TestMethod(models.Model):
     class Meta:
         verbose_name = 'Test Method'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -175,7 +175,7 @@ class TestResult(models.Model):
         verbose_name = 'Test Result'
         verbose_name_plural = 'Test Results'
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s.%s' % (self.method.testclass, self.method.name)
 
     def get_absolute_url(self):
