@@ -53,12 +53,13 @@ class PlanTestCase(TestCase):
     def test_check_push_tag_matches(self):
         push = {
             "ref": "refs/tags/test/matches",
-            "before": "0123456789",
-            "head_commit": None,
+            "head_commit": {
+                "id": "0123456789"
+            },
         }
         run_build, commit, commit_message = self.tag_plan.check_push(push)
         self.assertTrue(run_build)
-        self.assertEquals(commit, push["before"])
+        self.assertEquals(commit, push["head_commit"]["id"])
 
     def test_check_push_tag_does_not_match(self):
         push = {"ref": "refs/tags/no-match", "head_commit": None}
