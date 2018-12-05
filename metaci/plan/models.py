@@ -144,12 +144,8 @@ class Plan(models.Model):
             if not re.match(self.regex, tag):
                 return run_build, commit, commit_message
 
-            if push["head_commit"]:
-                # Skip... for some reason a second push event is sent that has no 'before' but does have a head_commit
-                return run_build, commit, commit_message
-
             run_build = True
-            commit = push["before"]
+            commit = push["head_commit"]["id"]
             return run_build, commit, commit_message
 
         return run_build, commit, commit_message
