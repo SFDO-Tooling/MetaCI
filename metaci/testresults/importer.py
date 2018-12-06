@@ -123,7 +123,12 @@ def populate_limit_fields(testresult, code_unit):
     for limit_type in LIMIT_TYPES:
         percent_test = getattr(testresult, "test_%s_percent" % limit_type)
 
-        if percent_test > worst_limit_test_percent:
+        if percent_test is None:
+            continue
+        if worst_limit_test_percent is None:
+            worst_limit_test = "test_%s_percent" % limit_type
+            worst_limit_test_percent = percent_test
+        elif percent_test > worst_limit_test_percent:
             worst_limit_test = "test_%s_percent" % limit_type
             worst_limit_test_percent = percent_test
 

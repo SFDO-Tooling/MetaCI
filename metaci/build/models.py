@@ -508,9 +508,9 @@ class BuildFlow(models.Model):
         }
         if exception:
             if status == 'error':
-                self.logger.error(str(e))
-            kwargs['error_message'] = str(e)
-            kwargs['exception'] = e.__class__.__name__
+                self.logger.error(str(exception))
+            kwargs['error_message'] = str(exception)
+            kwargs['exception'] = exception.__class__.__name__
         set_build_info(self, **kwargs)
 
     def run_flow(self, project_config, org_config):
