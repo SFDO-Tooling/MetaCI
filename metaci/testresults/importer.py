@@ -263,5 +263,5 @@ def render_robot_test_xml(root, test):
     if test["suite"]["teardown"] is not None:
         suite.append(test["suite"]["teardown"])
     suite.append(test["suite"]["status"])
-    test_xml = ET.tostring(testroot)
+    test_xml = ET.tostring(testroot, encoding="unicode")
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)
