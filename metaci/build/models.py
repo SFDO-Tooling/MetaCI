@@ -8,6 +8,7 @@ import re
 import shutil
 import sys
 import tempfile
+import traceback
 import zipfile
 import decimal
 
@@ -127,6 +128,7 @@ class Build(models.Model):
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
+    traceback = models.TextField(null=True, blank=True)
     qa_comment = models.TextField(null=True, blank=True)
     qa_user = models.ForeignKey('users.User', related_name='builds_qa', null=True, blank=True, on_delete=models.PROTECT)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES,
@@ -279,6 +281,7 @@ class Build(models.Model):
                         build,
                         status=build_flow.status,
                         exception=build_flow.exception,
+                        traceback=build_flow.traceback,
                         error_message=build_flow.error_message,
                         time_end=timezone.now(),
                     )
@@ -295,7 +298,13 @@ class Build(models.Model):
                     self.save()
 
         except Exception as e:
-            set_build_info(build, status='error', time_end=timezone.now())
+            set_build_info(
+                build,
+                exception=str(e),
+                traceback=''.join(traceback.format_tb(e.__traceback__)),
+                status='error',
+                time_end=timezone.now(),
+            )
             if org_config.created:
                 self.delete_org(org_config)
             self.logger = init_logger(self)
@@ -448,6 +457,7 @@ class BuildFlow(models.Model):
     flow = models.CharField(max_length=255, null=True, blank=True)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
+    traceback = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
@@ -511,6 +521,7 @@ class BuildFlow(models.Model):
                 self.logger.error(str(exception))
             kwargs['error_message'] = str(exception)
             kwargs['exception'] = exception.__class__.__name__
+            kwargs['traceback'] = ''.join(traceback.format_tb(exception.__traceback__))
         set_build_info(self, **kwargs)
 
     def run_flow(self, project_config, org_config):
