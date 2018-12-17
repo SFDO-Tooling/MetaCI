@@ -637,6 +637,16 @@ class BuildFlow(models.Model):
         return results
 
 
+def asset_upload_to(instance, filename):
+    folder = instance.build_flow.asset_hash
+    return os.path.join(folder, filename)
+
+
+class BuildFlowAsset(models.Model):
+    build_flow = models.ForeignKey(BuildFlow, related_name="assets")
+    asset = models.FileField(upload_to=asset_upload_to)
+
+
 class Rebuild(models.Model):
     build = models.ForeignKey('build.Build', related_name='rebuilds', on_delete=models.CASCADE)
     user = models.ForeignKey('users.User', related_name='rebuilds', on_delete=models.CASCADE)
