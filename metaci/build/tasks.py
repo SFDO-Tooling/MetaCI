@@ -8,7 +8,7 @@ import django_rq
 import requests
 
 from metaci.build.signals import build_complete
-from metaci.cumulusci.models import Org
+from metaci.cumulusci.models import Org, jwt_session, sf_session
 from metaci.repository.utils import create_status
 
 BUILD_TIMEOUT = 28800
@@ -91,14 +91,25 @@ def check_queued_build(build_id):
             build.plan.org)
 
     if org.scratch:
-        # For scratch orgs, we don't need concurrency blocking logic, just run
-        # the build
-        res_run = run_build.delay(build.id)
-        build.task_id_check = None
-        build.task_id_run = res_run.id
-        build.save()
-        return ('Org is a scratch org, running build concurrently ' +
-                'as task {}'.format(res_run.id))
+        # For scratch orgs, we don't need concurrency blocking logic, 
+        # but we need to check capacity
+        sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
+        sf = sf_session(sfjwt)
+        remaining_orgs = sf.limits()['ActiveScratchOrgs']['Remaining']
+
+        if remaining_orgs > 10:
+            res_run = run_build.delay(build.id)
+            build.task_id_check = None
+            build.task_id_run = res_run.id
+            build.save()
+            return ('DevHub has scratch org capacity, running the build ' +
+                    'as task {}'.format(res_run.id))
+        else:
+            build.task_id_check = None
+            build.set_status('waiting')
+            build.log = "Waiting on DevHub scratch org availability"
+            build.save()
+            return "DevHub does not have enough capacity to start this build. Requeueing task."
 
     else:
         # For persistent orgs, use the cache to lock the org
