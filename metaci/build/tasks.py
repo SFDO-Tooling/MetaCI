@@ -29,9 +29,9 @@ def scratch_org_limits():
     sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
     limits = sf_session(sfjwt).limits()['ActiveScratchOrgs']
     value = ActiveScratchOrgLimits(remaining=limits['Remaining'], max=limits['Max'])
+    # store it for 65 seconds, enough til the next tick. we may want to tune this
     cache.set(ACTIVESCRATCHORGLIMITS_KEY, value, 65)
-
-
+    return value
 
 @django_rq.job('default', timeout=BUILD_TIMEOUT)
 def run_build(build_id, lock_id=None):
@@ -102,8 +102,7 @@ def check_queued_build(build_id):
         build.log = message
         build.set_status('error')
         build.save()
-        return 'Could not find org configuration for org {}'.format(
-            build.plan.org)
+        return message
 
     if org.scratch:
         # For scratch orgs, we don't need concurrency blocking logic, 
@@ -112,9 +111,10 @@ def check_queued_build(build_id):
         if scratch_org_limits().remaining < settings.SCRATCH_ORG_RESERVE:
             build.task_id_check = None
             build.set_status('waiting')
-            build.log = "Waiting on DevHub scratch org availability."
+            msg = "DevHub does not have enough capacity to start this build. Requeueing task."
+            build.log = msg
             build.save()
-            return "DevHub does not have enough capacity to start this build. Requeueing task."
+            return msg
         res_run = run_build.delay(build.id)
         build.task_id_check = None
         build.task_id_run = res_run.id
