@@ -121,8 +121,6 @@ def check_queued_build(build_id):
         build.save()
         return ('DevHub has scratch org capacity, running the build ' +
                 'as task {}'.format(res_run.id))
-
-
     else:
         # For persistent orgs, use the cache to lock the org
         status = cache.add(
