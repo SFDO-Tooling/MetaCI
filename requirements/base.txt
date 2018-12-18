@@ -39,7 +39,7 @@ django-rq-wrapper>=1.4
 django-rq-scheduler>=1.1.1
 
 # CumulusCI
-cumulusci==2.2.4
+git+git://github.com/SFDO-Tooling/CumulusCI.git@22809220e9e1c20f0b1bdf401fffb228a8d8f32c
 requests==2.20.1
 
 # Salesforce Lightning Design System for Django
