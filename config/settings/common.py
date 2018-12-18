@@ -290,6 +290,8 @@ SFDX_HUB_USERNAME = None
 # Application Behaviors
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", True)
 METACI_FLOW_SUBCLASS_ENABLED = env.bool("METACI_FLOW_SUBCLASS_ENABLED", True)
+SCRATCH_ORG_RESERVE = env.int("METACI_SCRATCH_ORG_RESERVE", 10)
+# number of scratch orgs to leave available in the org.
 
 # Django REST Framework
 REST_FRAMEWORK = {
