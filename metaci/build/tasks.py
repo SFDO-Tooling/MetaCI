@@ -8,6 +8,7 @@ import django_rq
 import requests
 
 from metaci.build.signals import build_complete
+from metaci.build.utils import check_scratch_available
 from metaci.cumulusci.models import Org
 from metaci.repository.utils import create_status
 
@@ -92,7 +93,16 @@ def check_queued_build(build_id):
 
     if org.scratch:
         # For scratch orgs, we don't need concurrency blocking logic, just run
-        # the build
+        # the build if orgs are available
+        if check_scratch_available() <= 0:
+            # Failed to get lock, queue next check
+            build.task_id_check = None
+            build.set_status('waiting')
+            msg = 'Waiting: scratch org limit has been reached'
+            build.log = msg
+            build.save()
+            return (msg)
+            
         res_run = run_build.delay(build.id)
         build.task_id_check = None
         build.task_id_run = res_run.id

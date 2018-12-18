@@ -7,8 +7,11 @@ from django.apps import apps
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.core.paginator import Paginator
+from django.conf import settings
 from django.db.models import Q
+from simple_salesforce import Salesforce
 
+from metaci.cumulusci.models import jwt_session
 
 def paginate(build_list, request):
     page = request.GET.get('page')
@@ -97,3 +100,13 @@ def run_command(command, env=None, cwd=None):
             p.stderr,
         )
         raise CommandException(message)
+
+def check_scratch_available():
+    session = jwt_session(username=settings.SFDX_HUB_USERNAME)
+    sf = Salesforce(
+        instance = session["instance_url"].replace("https://", ""),
+        session_id = session["access_token"],
+        version = "43.0",
+    )
+    active = sf.query("select count(id) from ActiveScratchOrg")["records"][0]["expr0"]
+    return settings.SCRATCH_LIMIT - settings.SCRATCH_RESERVE - active

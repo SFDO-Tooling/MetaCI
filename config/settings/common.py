@@ -287,6 +287,10 @@ SFDX_CLIENT_ID = None
 SFDX_HUB_KEY = None
 SFDX_HUB_USERNAME = None
 
+# Scratch org limit in DevHub and number of available scratch orgs to reserve
+SCRATCH_LIMIT = env.int('SCRATCH_LIMIT', 40)
+SCRATCH_RESERVE = env.int('SCRATCH_RESERVE', 10)
+
 # Application Behaviors
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", True)
 METACI_FLOW_SUBCLASS_ENABLED = env.bool("METACI_FLOW_SUBCLASS_ENABLED", True)
