@@ -29,7 +29,7 @@ django-allauth==0.38.0
 awesome-slugify==1.6.5
 
 # Redis support
-django-redis==4.1.0
+django-redis==4.10.0
 redis==3.0.1
 
 # Django RQ
