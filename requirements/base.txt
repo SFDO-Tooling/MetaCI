@@ -29,8 +29,8 @@ django-allauth==0.38.0
 awesome-slugify==1.6.5
 
 # Redis support
-django-redis==4.10.0
-redis>=2.10.5
+django-redis==4.9.0
+redis>=2.10,<3.0
 
 # Django RQ
 django-rq>=0.9.4
@@ -38,8 +38,8 @@ django-rq-wrapper>=1.4
 django-rq-scheduler>=1.1.1
 
 # CumulusCI
-cumulusci==2.2.2
-requests==2.20.1
+https://github.com/SFDO-Tooling/CumulusCI/tarball/master
+requests==2.21.0
 
 # Salesforce Lightning Design System for Django
 django-slds

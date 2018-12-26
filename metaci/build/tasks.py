@@ -1,6 +1,8 @@
 import os
 import time
 
+from collections import namedtuple
+
 from django import db
 from django.conf import settings
 from django.core.cache import cache
@@ -8,15 +10,28 @@ import django_rq
 import requests
 
 from metaci.build.signals import build_complete
-from metaci.cumulusci.models import Org
+from metaci.cumulusci.models import Org, jwt_session, sf_session
 from metaci.repository.utils import create_status
 
 BUILD_TIMEOUT = 28800
+ACTIVESCRATCHORGLIMITS_KEY = 'metaci:activescratchorgs:limits'
 
+ActiveScratchOrgLimits = namedtuple('ActiveScratchOrgLimits', ['remaining', 'max'])
 
 def reset_database_connection():
     db.connection.close()
 
+def scratch_org_limits():
+    cached = cache.get(ACTIVESCRATCHORGLIMITS_KEY, None)
+    if cached:
+        return cached
+
+    sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
+    limits = sf_session(sfjwt).limits()['ActiveScratchOrgs']
+    value = ActiveScratchOrgLimits(remaining=limits['Remaining'], max=limits['Max'])
+    # store it for 65 seconds, enough til the next tick. we may want to tune this
+    cache.set(ACTIVESCRATCHORGLIMITS_KEY, value, 65)
+    return value
 
 @django_rq.job('default', timeout=BUILD_TIMEOUT)
 def run_build(build_id, lock_id=None):
@@ -87,19 +102,25 @@ def check_queued_build(build_id):
         build.log = message
         build.set_status('error')
         build.save()
-        return 'Could not find org configuration for org {}'.format(
-            build.plan.org)
+        return message
 
     if org.scratch:
-        # For scratch orgs, we don't need concurrency blocking logic, just run
-        # the build
+        # For scratch orgs, we don't need concurrency blocking logic, 
+        # but we need to check capacity
+
+        if scratch_org_limits().remaining < settings.SCRATCH_ORG_RESERVE:
+            build.task_id_check = None
+            build.set_status('waiting')
+            msg = "DevHub does not have enough capacity to start this build. Requeueing task."
+            build.log = msg
+            build.save()
+            return msg
         res_run = run_build.delay(build.id)
         build.task_id_check = None
         build.task_id_run = res_run.id
         build.save()
-        return ('Org is a scratch org, running build concurrently ' +
+        return ('DevHub has scratch org capacity, running the build ' +
                 'as task {}'.format(res_run.id))
-
     else:
         # For persistent orgs, use the cache to lock the org
         status = cache.add(

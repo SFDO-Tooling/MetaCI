@@ -77,6 +77,11 @@
       "value": "1",
       "required": false
     },
+    "METACI_SCRATCH_ORG_RESERVE": {
+      "description": "The number of scratch orgs to always reserve in the DevHub (for non CI use). Ten is a good number, but if your DevHub is a free DE, you'll need to set it to something lower, like one.",
+      "value": "10",
+      "required": false
+    },
     "SFDX_HUB_KEY": {
       "description": "The private key for the JWT authentication to the devhub for Salesforce DX.  Required to use scratch orgs",
       "value": "",

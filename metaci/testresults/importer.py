@@ -139,8 +139,17 @@ def populate_limit_fields(testresult, code_unit):
 
 
 def import_robot_test_results(build_flow, path):
+    # import is here to avoid import cycle
+    from metaci.build.models import BuildFlowAsset
+
     classes = {}
     methods = {}
+
+    with open(path, "r") as f:
+        asset = BuildFlowAsset(
+            build_flow=build_flow, asset=ContentFile(f.read(), 'output.xml')
+        )
+        asset.save()
 
     for result in parse_robot_output(path):
         class_and_method = "{}.{}".format(result["suite"]["name"], result["name"])
