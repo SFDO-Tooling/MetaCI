@@ -654,8 +654,9 @@ def asset_upload_to(instance, filename):
 
 
 class BuildFlowAsset(models.Model):
-    build_flow = models.ForeignKey(BuildFlow, related_name="assets")
+    build_flow = models.ForeignKey(BuildFlow, related_name="assets", on_delete=models.CASCADE)
     asset = models.FileField(upload_to=asset_upload_to)
+    category = models.CharField(max_length=1024,)
 
 
 class Rebuild(models.Model):
