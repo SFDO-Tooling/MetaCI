@@ -43,7 +43,6 @@ THIRD_PARTY_APPS = (
     "crispy_forms",  # Form layouts
     "django_filters",  # view helpers for filtering models
     "django_rq",
-    "django_rq_wrapper",
     "django_slds",  # Salesforce Lightning Design System
     "django_slds_crispyforms",  # SLDS theme for crispyforms
     "guardian",  # Per Object Permissions via django-guardian
