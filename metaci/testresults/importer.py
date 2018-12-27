@@ -145,7 +145,7 @@ def import_robot_test_results(build_flow, path):
     classes = {}
     methods = {}
 
-    with open(path, "r") as f:
+    with open(path, "rb") as f:
         asset = BuildFlowAsset(
             build_flow=build_flow, asset=ContentFile(f.read(), 'output.xml'), category='robot-output'
         )
@@ -188,7 +188,7 @@ def import_robot_test_results(build_flow, path):
                 screenshot_path = screenshot
                 if dirname:
                     screenshot_path = "{}/{}".format(dirname, screenshot)
-                with open(screenshot_path, "r") as f:
+                with open(screenshot_path, "rb") as f:
                     asset = TestResultAsset(
                         result=testresult, asset=ContentFile(f.read(), screenshot)
                     )
