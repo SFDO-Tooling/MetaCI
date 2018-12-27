@@ -7,6 +7,7 @@ from django.db import models
 from django.http import Http404
 from django.urls import reverse
 from model_utils.models import SoftDeletableModel
+import github3.exceptions
 
 
 class RepositoryQuerySet(models.QuerySet):
@@ -86,5 +87,8 @@ class Branch(SoftDeletableModel):
 
     @property
     def github_api(self):
-        branch = self.repo.github_api.branch(self.name)
+        try:
+            branch = self.repo.github_api.branch(self.name)
+        except github3.exceptions.NotFoundError:
+            branch = None
         return branch
