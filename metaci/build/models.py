@@ -576,8 +576,10 @@ class BuildFlow(models.Model):
             # (build temp dir) but this should handle it so long as
             # only one build runs at a time
             has_results = True
-            import_robot_test_results(self, root_dir_robot_path)
-            os.remove(root_dir_robot_path)
+            try:
+                import_robot_test_results(self, root_dir_robot_path)
+            finally:
+                os.remove(root_dir_robot_path)
 
         # Load JUnit
         results = []
