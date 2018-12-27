@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
-import StringIO
 from glob import iglob
+from io import BytesIO
 import json
 import os
 import re
 import shutil
 import sys
 import tempfile
+import traceback
 import zipfile
 import decimal
 
@@ -127,6 +128,7 @@ class Build(models.Model):
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
+    traceback = models.TextField(null=True, blank=True)
     qa_comment = models.TextField(null=True, blank=True)
     qa_user = models.ForeignKey('users.User', related_name='builds_qa', null=True, blank=True, on_delete=models.PROTECT)
     status = models.CharField(max_length=16, choices=BUILD_STATUSES,
@@ -159,7 +161,7 @@ class Build(models.Model):
             ('search_builds', 'Search Builds'),
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}: {} - {}'.format(self.id, self.repo, self.commit)
 
     def get_log_html(self):
@@ -246,7 +248,7 @@ class Build(models.Model):
             org_config = self.get_org(project_config)
 
         except Exception as e:
-            self.logger.error(unicode(e))
+            self.logger.error(str(e))
             set_build_info(build, status='error', time_end=timezone.now())
             self.delete_build_dir()
             self.flush_log()
@@ -279,6 +281,7 @@ class Build(models.Model):
                         build,
                         status=build_flow.status,
                         exception=build_flow.exception,
+                        traceback=build_flow.traceback,
                         error_message=build_flow.error_message,
                         time_end=timezone.now(),
                     )
@@ -295,11 +298,17 @@ class Build(models.Model):
                     self.save()
 
         except Exception as e:
-            set_build_info(build, status='error', time_end=timezone.now())
+            set_build_info(
+                build,
+                exception=str(e),
+                traceback=''.join(traceback.format_tb(e.__traceback__)),
+                status='error',
+                time_end=timezone.now(),
+            )
             if org_config.created:
                 self.delete_org(org_config)
             self.logger = init_logger(self)
-            self.logger.error(unicode(e))
+            self.logger.error(str(e))
             self.delete_build_dir()
             self.flush_log()
             return
@@ -326,7 +335,7 @@ class Build(models.Model):
 
     def checkout(self):
         # get the ref
-        zip_content = StringIO.StringIO()
+        zip_content = BytesIO()
         self.repo.github_api.archive('zipball', zip_content, ref=self.commit)
         build_dir = tempfile.mkdtemp()
         self.logger.info('-- Extracting zip to temp dir {}'.format(build_dir))
@@ -406,7 +415,7 @@ class Build(models.Model):
         return self.get_org_attr('sf_org_id')
 
     def get_org_name(self):
-        return self.get_org_attr('__unicode__')
+        return self.get_org_attr('__str__')
 
     def get_org_time_deleted(self):
         return self.get_org_attr('time_deleted')
@@ -448,6 +457,7 @@ class BuildFlow(models.Model):
     flow = models.CharField(max_length=255, null=True, blank=True)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
+    traceback = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
@@ -458,7 +468,7 @@ class BuildFlow(models.Model):
     asset_hash = models.CharField(max_length=64, unique=True, default=generate_hash)
 
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}: {} - {} - {}'.format(self.build.id, self.build.repo,
                                          self.build.commit, self.flow)
 
@@ -508,9 +518,10 @@ class BuildFlow(models.Model):
         }
         if exception:
             if status == 'error':
-                self.logger.error(unicode(e))
-            kwargs['error_message'] = unicode(e)
-            kwargs['exception'] = e.__class__.__name__
+                self.logger.error(str(exception))
+            kwargs['error_message'] = str(exception)
+            kwargs['exception'] = exception.__class__.__name__
+            kwargs['traceback'] = ''.join(traceback.format_tb(exception.__traceback__))
         set_build_info(self, **kwargs)
 
     def run_flow(self, project_config, org_config):
@@ -643,8 +654,9 @@ def asset_upload_to(instance, filename):
 
 
 class BuildFlowAsset(models.Model):
-    build_flow = models.ForeignKey(BuildFlow, related_name="assets")
+    build_flow = models.ForeignKey(BuildFlow, related_name="assets", on_delete=models.CASCADE)
     asset = models.FileField(upload_to=asset_upload_to)
+    category = models.CharField(max_length=1024,)
 
 
 class Rebuild(models.Model):

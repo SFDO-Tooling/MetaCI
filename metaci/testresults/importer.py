@@ -1,7 +1,6 @@
 import json
 import os
 import re
-import urllib
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from cumulusci.utils import elementtree_parse_file
@@ -124,7 +123,12 @@ def populate_limit_fields(testresult, code_unit):
     for limit_type in LIMIT_TYPES:
         percent_test = getattr(testresult, "test_%s_percent" % limit_type)
 
-        if percent_test > worst_limit_test_percent:
+        if percent_test is None:
+            continue
+        if worst_limit_test_percent is None:
+            worst_limit_test = "test_%s_percent" % limit_type
+            worst_limit_test_percent = percent_test
+        elif percent_test > worst_limit_test_percent:
             worst_limit_test = "test_%s_percent" % limit_type
             worst_limit_test_percent = percent_test
 
@@ -143,7 +147,7 @@ def import_robot_test_results(build_flow, path):
 
     with open(path, "r") as f:
         asset = BuildFlowAsset(
-            build_flow=build_flow, asset=ContentFile(f.read(), 'output.xml')
+            build_flow=build_flow, asset=ContentFile(f.read(), 'output.xml'), category='robot-output'
         )
         asset.save()
 
@@ -268,5 +272,5 @@ def render_robot_test_xml(root, test):
     if test["suite"]["teardown"] is not None:
         suite.append(test["suite"]["teardown"])
     suite.append(test["suite"]["status"])
-    test_xml = ET.tostring(testroot)
+    test_xml = ET.tostring(testroot, encoding="unicode")
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)

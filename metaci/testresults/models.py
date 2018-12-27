@@ -23,7 +23,7 @@ class TestClass(models.Model):
         verbose_name = "Test Class"
         verbose_name_plural = "Test Classes"
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -38,7 +38,7 @@ class TestMethod(models.Model):
     class Meta:
         verbose_name = "Test Method"
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -232,7 +232,7 @@ class TestResult(models.Model):
         verbose_name = "Test Result"
         verbose_name_plural = "Test Results"
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s.%s" % (self.method.testclass, self.method.name)
 
     def get_absolute_url(self):
@@ -248,5 +248,7 @@ def asset_upload_to(instance, filename):
 
 
 class TestResultAsset(models.Model):
-    result = models.ForeignKey(TestResult, related_name="assets")
+    result = models.ForeignKey(
+        TestResult, related_name="assets", on_delete=models.CASCADE
+    )
     asset = models.FileField(upload_to=asset_upload_to)

@@ -92,7 +92,7 @@ class Plan(models.Model):
     def get_absolute_url(self):
         return reverse("plan_detail", kwargs={"plan_id": self.id})
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def get_repos(self):
@@ -189,7 +189,7 @@ class PlanRepository(models.Model):
             ("org_login", "Login to Org"),
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return "[{}] {}".format(self.repo, self.plan)
 
     def get_absolute_url(self):

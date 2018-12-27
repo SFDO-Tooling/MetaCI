@@ -115,7 +115,7 @@ def test_result_detail(request, result_id):
     result = get_object_or_404(TestResult, id=result_id, build_flow__build__in=build_qs)
     data = {"result": result}
     if result.method.testclass.test_type == "Apex":
-        stats = STATS_MAP.keys()
+        stats = list(STATS_MAP.keys())
         stats.sort()
         test_stats = []
         test_stats.append(
@@ -214,7 +214,7 @@ def test_method_trend(request, method_id):
                 results_by_plan[key].append(None)
 
     results = []
-    plan_keys = results_by_plan.keys()
+    plan_keys = list(results_by_plan.keys())
     plan_keys.sort()
     for key in plan_keys:
         plan_results = []

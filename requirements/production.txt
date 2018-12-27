@@ -2,17 +2,14 @@
 #	production that aren't in development.
 -r base.txt
 
-
-
 # WSGI Handler
 # ------------------------------------------------
-gevent==1.2a1
 gunicorn==19.7.1
 
 # Email backends for Mailgun, Postmark, SendGrid and more
 # -------------------------------------------------------
-django-anymail==1.4
+django-anymail==5.0
 
 # Raven is the Sentry client
 # --------------------------
-raven==6.7.0
+raven # will get correct version from cci

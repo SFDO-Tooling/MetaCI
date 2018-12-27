@@ -26,12 +26,17 @@ class PlanNotification(AbstractNotification):
 
 
 class PlanRepositoryNotification(AbstractNotification):
-    user = models.ForeignKey("users.User", related_name="planrepository_notifications")
+    user = models.ForeignKey(
+        "users.User",
+        related_name="planrepository_notifications",
+        on_delete=models.CASCADE,
+    )
     target = models.ForeignKey(
         "plan.PlanRepository",
         related_name="notifications",
         db_column="planrepository_id",
         verbose_name="planrepository",
+        on_delete=models.CASCADE,
     )
 
 

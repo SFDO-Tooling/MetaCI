@@ -7,6 +7,7 @@ from django.db import models
 from django.http import Http404
 from django.urls import reverse
 from model_utils.models import SoftDeletableModel
+import github3.exceptions
 
 
 class RepositoryQuerySet(models.QuerySet):
@@ -44,7 +45,7 @@ class Repository(models.Model):
     def get_absolute_url(self):
         return reverse("repo_detail", kwargs={"owner": self.owner, "name": self.name})
 
-    def __unicode__(self):
+    def __str__(self):
         return "{}/{}".format(self.owner, self.name)
 
     @property
@@ -81,10 +82,13 @@ class Branch(SoftDeletableModel):
             },
         )
 
-    def __unicode__(self):
-        return "{}".format(self.name)
+    def __str__(self):
+        return self.name
 
     @property
     def github_api(self):
-        branch = self.repo.github_api.branch(self.name)
+        try:
+            branch = self.repo.github_api.branch(self.name)
+        except github3.exceptions.NotFoundError:
+            branch = None
         return branch

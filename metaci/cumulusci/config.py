@@ -6,7 +6,7 @@ class MetaCIProjectConfig(BaseProjectConfig):
     def __init__(self, global_config_obj, build, *args, **kwargs):
         self.build = build
 
-        if not kwargs.has_key("additional_yaml"):
+        if "additional_yaml" not in kwargs:
             kwargs["additional_yaml"] = build.plan.yaml_config
 
         super(MetaCIProjectConfig, self).__init__(global_config_obj, *args, **kwargs)
