@@ -77,4 +77,3 @@ PyJWT==1.7.1
 
 # Django Defender
 django-defender==0.5.5
-
