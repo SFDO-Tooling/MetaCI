@@ -1,4 +1,4 @@
-setuptools 
+setuptools==40.6.3 
 
 # Django
 django==2.1.3
