@@ -8,7 +8,7 @@ Sphinx==1.8.3
 django-extensions==2.1.4
 Werkzeug==0.14.1
 
-django-debug-toolbar==1.10.1
+django-debug-toolbar==1.11
 
 # improved REPL
 ipdb==0.11
