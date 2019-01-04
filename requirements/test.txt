@@ -1,7 +1,7 @@
 # Test dependencies go here.
 -r base.txt
 
-pytest==3.6 # this version pin can't be good.
+pytest==4.0.2 # this version pin can't be good.
 coverage==4.5.2
 django_coverage_plugin==1.6.0
 flake8==3.6.0
