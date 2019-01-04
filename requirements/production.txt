@@ -4,7 +4,7 @@
 
 # WSGI Handler
 # ------------------------------------------------
-gunicorn==19.7.1
+gunicorn==19.9.0
 
 # Email backends for Mailgun, Postmark, SendGrid and more
 # -------------------------------------------------------
