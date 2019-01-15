@@ -378,10 +378,10 @@ class Build(models.Model):
                 break
             except ScratchOrgException as e:
                 if (
-                    e.message.startswith(FAILED_TO_CREATE_SCRATCH_ORG) and
+                    str(e).startswith(FAILED_TO_CREATE_SCRATCH_ORG) and
                     attempt <= retries
                 ):
-                    self.logger.warning(e.message)
+                    self.logger.warning(str(e))
                     self.logger.info('Retrying create scratch org ' +
                         '(retry {} of {})'.format(attempt, retries))
                     attempt += 1
@@ -438,7 +438,7 @@ class Build(models.Model):
             org_instance = self.get_org_instance()
             org_instance.delete_org(org_config)
         except Exception as e:
-            self.logger.error(e.message)
+            self.logger.error(str(e))
             self.save()
 
     def delete_build_dir(self):
