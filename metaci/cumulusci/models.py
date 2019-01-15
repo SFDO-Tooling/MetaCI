@@ -219,7 +219,7 @@ class ScratchOrgInstance(models.Model):
             else:
                 self.delete_error = "Org did not exist when deleted."
         except SalesforceError as e:
-            self.delete_error = e.message
+            self.delete_error = str(e)
             self.deleted = False
             self.save()
             return
