@@ -14,6 +14,7 @@ import decimal
 
 from cumulusci.core.config import FlowConfig
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
+from cumulusci.core.flowrunner import FlowCoordinator
 from cumulusci.core.exceptions import ApexTestException
 from cumulusci.core.exceptions import BrowserTestFailure
 from cumulusci.core.exceptions import RobotTestFailure
@@ -33,6 +34,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import requests
 
+from metaci.build.flows import MetaCIFlowCallback
 from metaci.build.tasks import set_github_status
 from metaci.build.utils import format_log
 from metaci.build.utils import set_build_info
@@ -534,26 +536,16 @@ class BuildFlow(models.Model):
             raise FlowNotFoundError('Flow not found: {}'.format(self.flow))
         flow_config = FlowConfig(flow)
 
-        if settings.METACI_FLOW_SUBCLASS_ENABLED:
-            class_path = 'metaci.build.flows.MetaCIFlow'
-        else:
-            # Get the class to look up options
-            class_path = flow_config.config.get('class_path',
-                                                'cumulusci.core.flows.BaseFlow')
-
-        flow_class = import_class(class_path)
+        callbacks = None
+        if settings.METACI_FLOW_CALLBACK_ENABLED:
+            callbacks = MetaCIFlowCallback(buildflow_id=self.pk)
 
         # Create the flow and handle initialization exceptions
-        self.flow_instance = flow_class(project_config, flow_config,
-                                        org_config, name=self.flow)
-
-        if settings.METACI_FLOW_SUBCLASS_ENABLED:
-            self.flow_instance.buildflow_id = self.pk
+        self.flow_instance = FlowCoordinator(
+            project_config, flow_config, name=self.flow, callbacks=callbacks)
 
         # Run the flow
-        res = self.flow_instance()
-
-        return res
+        return self.flow_instance.run(org_config)
 
     def record_result(self):
         self.status = 'success'
