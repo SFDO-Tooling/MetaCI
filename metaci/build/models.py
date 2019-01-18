@@ -34,7 +34,6 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import requests
 
-from metaci.build.flows import MetaCIFlowCallback
 from metaci.build.tasks import set_github_status
 from metaci.build.utils import format_log
 from metaci.build.utils import set_build_info
@@ -538,6 +537,7 @@ class BuildFlow(models.Model):
 
         callbacks = None
         if settings.METACI_FLOW_CALLBACK_ENABLED:
+            from metaci.build.flows import MetaCIFlowCallback
             callbacks = MetaCIFlowCallback(buildflow_id=self.pk)
 
         # Create the flow and handle initialization exceptions
