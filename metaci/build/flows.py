@@ -10,20 +10,20 @@ class MetaCIFlowCallback(FlowCallback):
     def __init__(self, buildflow_id):
         self.buildflow_id = buildflow_id
     
-    def pre_task(self, task):
-        flowtask = FlowTask.objects.find_task(self.buildflow_id, task.name, task.stepnum)
-        flowtask.description = task.task_config.description
+    def pre_task(self, step):
+        flowtask = FlowTask.objects.find_task(self.buildflow_id, step.task_name, step.stepnum)
+        flowtask.description = step.task_config.get('description')
         flowtask.time_start = timezone.now()
-        flowtask.options = task.options
-        flowtask.class_path = task.__class__.__name__
+        flowtask.options = step.task_config['options']
+        flowtask.class_path = step.task_class.__name__
         flowtask.status = 'running'
         flowtask.save()
 
-    def post_task(self, task, result):
-        flowtask = FlowTask.objects.find_task(self.buildflow_id, task.name, task.stepnum)
+    def post_task(self, step, result):
+        flowtask = FlowTask.objects.find_task(self.buildflow_id, step.task_name, step.stepnum)
         flowtask.time_end = timezone.now()
-        flowtask.result = task.result
-        flowtask.return_values = task.return_values
+        flowtask.result = result.result
+        flowtask.return_values = result.return_values
         if result.exception:
             flowtask.exception = result.exception.__class__
             flowtask.status = 'error'
