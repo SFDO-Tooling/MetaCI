@@ -680,12 +680,11 @@ class Rebuild(models.Model):
 class FlowTaskManager(models.Manager):
     
 # TODO: refactor to use step strings?
-    def find_task(self, build_flow_id, task_name, step_num):
-        step_num = decimal.Decimal(*step_num.version)
+    def find_task(self, build_flow_id, path, step_num):
         try:
-            return self.get(build_flow_id=build_flow_id, name=task_name, stepnum=step_num)
+            return self.get(build_flow_id=build_flow_id, path=path, stepnum=step_num)
         except ObjectDoesNotExist:
-            return FlowTask(build_flow_id=build_flow_id, name=task_name, stepnum=step_num)
+            return FlowTask(build_flow_id=build_flow_id, path=path, stepnum=step_num)
 
 class FlowTask(models.Model):
     """ A FlowTask holds the result of a task execution during a BuildFlow. """
@@ -693,10 +692,13 @@ class FlowTask(models.Model):
     time_end = models.DateTimeField(null=True, blank=True)
     # time_initialize = models.DateTimeField(null=True, blank=True)
 
-    name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    stepnum = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='step number')
-    step_string = models.CharField(max_length=255,)
+    stepnum = models.CharField(
+        max_length=64, help_text="dotted step number for CCI task"
+    )
+    path = models.CharField(
+        max_length=2048, help_text="dotted path e.g. flow1.flow2.task_name"
+    )
     class_path = models.TextField(null=True, blank=True)
     options = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
     result = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
