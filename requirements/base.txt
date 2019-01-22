@@ -39,7 +39,7 @@ django-rq==1.3.0
 django-rq-scheduler==1.1.1
 
 # CumulusCI
-https://github.com/SFDO-Tooling/CumulusCI/tarball/feature/flowprovements
+https://github.com/SFDO-Tooling/CumulusCI/tarball/master
 requests==2.21.0
 
 # Salesforce Lightning Design System for Django
