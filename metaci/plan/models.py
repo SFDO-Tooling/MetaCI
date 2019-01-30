@@ -205,3 +205,31 @@ class PlanRepository(models.Model):
     @property
     def should_run(self):
         return self.active and self.plan.active
+
+
+class PlanRepositoryTriggerQuerySet(models.QuerySet):
+    def should_run(self):
+        return self.filter(active=True, plan__active=True)
+
+
+class PlanRepositoryTrigger(models.Model):
+    plan_repo = models.ForeignKey(PlanRepository, on_delete=models.CASCADE)
+    repo = models.ForeignKey(Repository, on_delete=models.CASCADE)
+    branch = models.CharField(max_length=255)
+    regex = models.CharField(max_length=255, null=True, blank=True)
+    trigger = models.CharField(max_length=8, choices=TRIGGER_TYPES)
+    active = models.BooleanField(default=True)
+
+    objects = PlanRepositoryTriggerQuerySet.as_manager()
+
+    def fire(self, finished_build):
+        repo_id = self.plan_repo.repo.id
+        build = Build(
+            repo=repo_id,
+            plan=self.plan_repo.plan.id,
+            planrepo=self.plan_repo.id,
+            commit=commit,  # TODO Get this from somewhere?
+            commit_message=commit_message,  # TODO Get this from somewhere?
+            branch=Branch.object.get(repo=repo_id, name=self.branch),
+            build_type="auto",
+        )
