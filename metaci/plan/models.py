@@ -9,7 +9,8 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from guardian.shortcuts import get_objects_for_user
 
-from metaci.repository.models import Repository
+from metaci.build.models import Build
+from metaci.repository.models import Branch, Repository
 
 
 TRIGGER_TYPES = (("manual", "Manual"), ("commit", "Commit"), ("tag", "Tag"))
@@ -209,7 +210,7 @@ class PlanRepository(models.Model):
 
 class PlanRepositoryTriggerQuerySet(models.QuerySet):
     def should_run(self):
-        return self.filter(active=True, plan__active=True)
+        return self.filter(active=True, plan_repo__active=True)
 
 
 class PlanRepositoryTrigger(models.Model):
@@ -222,14 +223,18 @@ class PlanRepositoryTrigger(models.Model):
 
     objects = PlanRepositoryTriggerQuerySet.as_manager()
 
+    def _get_or_create_branch(self):
+        branch, _ = Branch.objects.get_or_create(repo=self.repo, name=self.branch)
+        return branch
+
     def fire(self, finished_build):
         repo_id = self.plan_repo.repo.id
         build = Build(
-            repo=repo_id,
-            plan=self.plan_repo.plan.id,
-            planrepo=self.plan_repo.id,
-            commit=commit,  # TODO Get this from somewhere?
-            commit_message=commit_message,  # TODO Get this from somewhere?
-            branch=Branch.object.get(repo=repo_id, name=self.branch),
+            repo=self.plan_repo.repo,
+            plan=self.plan_repo.plan,
+            planrepo=self.plan_repo,
+            commit=self.branch,
+            branch=self._get_or_create_branch(),
             build_type="auto",
         )
+        build.save()
