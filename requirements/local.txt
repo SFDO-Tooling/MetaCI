@@ -4,7 +4,7 @@
 black==18.9b0
 pre-commit==1.14.3
 
-Sphinx==1.8.3
+Sphinx==1.8.4
 django-extensions==2.1.4
 Werkzeug==0.14.1
 
