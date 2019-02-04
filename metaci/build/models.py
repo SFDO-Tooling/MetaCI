@@ -715,7 +715,7 @@ class FlowTask(models.Model):
     objects = FlowTaskManager()
 
     def __str__(self):
-        return "{}: {} - {}".format(self.build_flow_id, self.stepnum, self.name)
+        return "{}: {} - {}".format(self.build_flow_id, self.stepnum, self.path)
 
     class Meta:
         ordering = ["-build_flow", "stepnum"]
