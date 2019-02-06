@@ -223,6 +223,16 @@ class PlanRepositoryTrigger(models.Model):
 
     objects = PlanRepositoryTriggerQuerySet.as_manager()
 
+    class Meta:
+        ordering = ["repo", "plan_repo"]
+        verbose_name_plural = "Plan Repository Triggers"
+        permissions = (
+            ("run_plan", "Run Plan"),
+            ("view_builds", "View Builds"),
+            ("rebuild_builds", "Rebuild Builds"),
+            ("org_login", "Login to Org"),
+        )
+
     def _get_or_create_branch(self):
         branch, _ = Branch.objects.get_or_create(repo=self.repo, name=self.branch)
         return branch
