@@ -26,8 +26,8 @@ admin.site.register(PlanRepository, PlanRepositoryAdmin)
 
 
 class PlanRepositoryTriggerAdmin(GuardedModelAdmin):
-    list_display = ("repo", "plan_repo", "active")
-    list_filter = ("repo", "plan_repo", "active")
+    list_display = ("target_plan_repo", "source_plan_repo")
+    list_filter = ("target_plan_repo", "source_plan_repo")
 
 
 admin.site.register(PlanRepositoryTrigger, PlanRepositoryTriggerAdmin)

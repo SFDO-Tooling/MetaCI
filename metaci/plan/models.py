@@ -210,21 +210,24 @@ class PlanRepository(models.Model):
 
 class PlanRepositoryTriggerQuerySet(models.QuerySet):
     def should_run(self):
-        return self.filter(active=True, plan_repo__active=True)
+        return self.filter(active=True, target_plan_repo__active=True)
 
 
 class PlanRepositoryTrigger(models.Model):
-    plan_repo = models.ForeignKey(PlanRepository, on_delete=models.CASCADE)
-    repo = models.ForeignKey(Repository, on_delete=models.CASCADE)
+    source_plan_repo = models.ForeignKey(
+        PlanRepository, on_delete=models.CASCADE, related_name="Sources"
+    )
+    target_plan_repo = models.ForeignKey(
+        PlanRepository, on_delete=models.CASCADE, related_name="Triggers"
+    )
     branch = models.CharField(max_length=255)
-    regex = models.CharField(max_length=255, null=True, blank=True)
-    trigger = models.CharField(max_length=8, choices=TRIGGER_TYPES)
     active = models.BooleanField(default=True)
 
     objects = PlanRepositoryTriggerQuerySet.as_manager()
 
     class Meta:
-        ordering = ["repo", "plan_repo"]
+        ordering = ["target_plan_repo", "source_plan_repo"]
+        unique_together = ("target_plan_repo", "source_plan_repo")
         verbose_name_plural = "Plan Repository Triggers"
         permissions = (
             ("run_plan", "Run Plan"),
@@ -234,15 +237,16 @@ class PlanRepositoryTrigger(models.Model):
         )
 
     def _get_or_create_branch(self):
-        branch, _ = Branch.objects.get_or_create(repo=self.repo, name=self.branch)
+        branch, _ = Branch.objects.get_or_create(
+            repo=self.target_plan_repo.repo, name=self.branch
+        )
         return branch
 
     def fire(self, finished_build):
-        repo_id = self.plan_repo.repo.id
         build = Build(
-            repo=self.plan_repo.repo,
-            plan=self.plan_repo.plan,
-            planrepo=self.plan_repo,
+            repo=self.target_plan_repo.repo,
+            plan=self.target_plan_repo.plan,
+            planrepo=self.target_plan_repo,
             commit=self.branch,
             branch=self._get_or_create_branch(),
             build_type="auto",

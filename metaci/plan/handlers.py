@@ -9,6 +9,8 @@ def trigger_dependent_builds(sender, **kwargs):
     status = kwargs.get("status")
     if status is not "success":
         return
-    triggers = PlanRepositoryTrigger.objects.should_run().filter(repo=build.repo)
+    triggers = PlanRepositoryTrigger.objects.should_run().filter(
+        source_plan_repo=build.planrepo
+    )
     for trigger in triggers:
         trigger.fire(build)
