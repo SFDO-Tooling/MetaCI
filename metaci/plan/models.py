@@ -227,14 +227,14 @@ class PlanRepositoryTrigger(models.Model):
 
     class Meta:
         ordering = ["target_plan_repo", "source_plan_repo"]
-        unique_together = ("target_plan_repo", "source_plan_repo")
+        unique_together = ("target_plan_repo", "source_plan_repo", "branch")
         verbose_name_plural = "Plan Repository Triggers"
-        permissions = (
-            ("run_plan", "Run Plan"),
-            ("view_builds", "View Builds"),
-            ("rebuild_builds", "Rebuild Builds"),
-            ("org_login", "Login to Org"),
-        )
+
+    def _get_commit(self):
+        repo = self.target_plan_repo.repo.github_api
+        branch = repo.branch(self.branch)
+        commit = branch.commit.sha
+        return commit
 
     def _get_or_create_branch(self):
         branch, _ = Branch.objects.get_or_create(
@@ -247,7 +247,7 @@ class PlanRepositoryTrigger(models.Model):
             repo=self.target_plan_repo.repo,
             plan=self.target_plan_repo.plan,
             planrepo=self.target_plan_repo,
-            commit=self.branch,
+            commit=self._get_commit(),
             branch=self._get_or_create_branch(),
             build_type="auto",
         )

@@ -57,7 +57,9 @@ class PlanHandlerTestCase(TestCase):
             repo=self.source_repo, planrepo=self.source_plan_repo, plan=self.source_plan
         )
 
-    def test_should_send_on_build_success(self):
+    @mock.patch("metaci.plan.models.PlanRepositoryTrigger._get_commit")
+    def test_should_send_on_build_success(self, get_commit):
+        get_commit.return_value = "f1d2d2f924e986ac86fdf7b36c94bcdf32beec15"
         with mock.patch(
             "metaci.plan.handlers.trigger_dependent_builds", autospec=True
         ) as handler:
@@ -65,7 +67,9 @@ class PlanHandlerTestCase(TestCase):
             build_complete.send(sender="sender", build=self.build, status="success")
             handler.assert_called_once()
 
-    def test_build_triggered(self):
+    @mock.patch("metaci.plan.models.PlanRepositoryTrigger._get_commit")
+    def test_build_triggered(self, get_commit):
+        get_commit.return_value = "f1d2d2f924e986ac86fdf7b36c94bcdf32beec15"
         self.plan_repo_trigger.fire(self.build)
         enqueued_build = Build.objects.get(repo=self.target_repo)
         self.assertIsNotNone(enqueued_build)
