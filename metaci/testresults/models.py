@@ -112,107 +112,107 @@ class TestResult(models.Model):
     email_invocations_percent = models.IntegerField(
         null=True, blank=True, db_index=True
     )
-    soql_queries_used = models.IntegerField(null=True, blank=True, db_index=True)
-    soql_queries_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    soql_queries_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    future_calls_used = models.IntegerField(null=True, blank=True, db_index=True)
-    future_calls_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    future_calls_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    dml_rows_used = models.IntegerField(null=True, blank=True, db_index=True)
-    dml_rows_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    dml_rows_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    cpu_time_used = models.IntegerField(null=True, blank=True, db_index=True)
-    cpu_time_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    cpu_time_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    query_rows_used = models.IntegerField(null=True, blank=True, db_index=True)
-    query_rows_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    query_rows_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    dml_statements_used = models.IntegerField(null=True, blank=True, db_index=True)
-    dml_statements_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    dml_statements_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    mobile_apex_push_used = models.IntegerField(null=True, blank=True, db_index=True)
-    mobile_apex_push_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    mobile_apex_push_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    heap_size_used = models.IntegerField(null=True, blank=True, db_index=True)
-    heap_size_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    heap_size_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    sosl_queries_used = models.IntegerField(null=True, blank=True, db_index=True)
-    sosl_queries_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    sosl_queries_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    queueable_jobs_used = models.IntegerField(null=True, blank=True, db_index=True)
-    queueable_jobs_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    queueable_jobs_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    callouts_used = models.IntegerField(null=True, blank=True, db_index=True)
-    callouts_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    callouts_percent = models.IntegerField(null=True, blank=True, db_index=True)
+    soql_queries_used = models.IntegerField(null=True, blank=True)
+    soql_queries_allowed = models.IntegerField(null=True, blank=True)
+    soql_queries_percent = models.IntegerField(null=True, blank=True)
+    future_calls_used = models.IntegerField(null=True, blank=True)
+    future_calls_allowed = models.IntegerField(null=True, blank=True)
+    future_calls_percent = models.IntegerField(null=True, blank=True)
+    dml_rows_used = models.IntegerField(null=True, blank=True)
+    dml_rows_allowed = models.IntegerField(null=True, blank=True)
+    dml_rows_percent = models.IntegerField(null=True, blank=True)
+    cpu_time_used = models.IntegerField(null=True, blank=True)
+    cpu_time_allowed = models.IntegerField(null=True, blank=True)
+    cpu_time_percent = models.IntegerField(null=True, blank=True)
+    query_rows_used = models.IntegerField(null=True, blank=True)
+    query_rows_allowed = models.IntegerField(null=True, blank=True)
+    query_rows_percent = models.IntegerField(null=True, blank=True)
+    dml_statements_used = models.IntegerField(null=True, blank=True)
+    dml_statements_allowed = models.IntegerField(null=True, blank=True)
+    dml_statements_percent = models.IntegerField(null=True, blank=True)
+    mobile_apex_push_used = models.IntegerField(null=True, blank=True)
+    mobile_apex_push_allowed = models.IntegerField(null=True, blank=True)
+    mobile_apex_push_percent = models.IntegerField(null=True, blank=True)
+    heap_size_used = models.IntegerField(null=True, blank=True)
+    heap_size_allowed = models.IntegerField(null=True, blank=True)
+    heap_size_percent = models.IntegerField(null=True, blank=True)
+    sosl_queries_used = models.IntegerField(null=True, blank=True)
+    sosl_queries_allowed = models.IntegerField(null=True, blank=True)
+    sosl_queries_percent = models.IntegerField(null=True, blank=True)
+    queueable_jobs_used = models.IntegerField(null=True, blank=True)
+    queueable_jobs_allowed = models.IntegerField(null=True, blank=True)
+    queueable_jobs_percent = models.IntegerField(null=True, blank=True)
+    callouts_used = models.IntegerField(null=True, blank=True)
+    callouts_allowed = models.IntegerField(null=True, blank=True)
+    callouts_percent = models.IntegerField(null=True, blank=True)
     test_email_invocations_used = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_email_invocations_allowed = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_email_invocations_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
-    test_soql_queries_used = models.IntegerField(null=True, blank=True, db_index=True)
+    test_soql_queries_used = models.IntegerField(null=True, blank=True)
     test_soql_queries_allowed = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_soql_queries_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
-    test_future_calls_used = models.IntegerField(null=True, blank=True, db_index=True)
+    test_future_calls_used = models.IntegerField(null=True, blank=True)
     test_future_calls_allowed = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_future_calls_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
-    test_dml_rows_used = models.IntegerField(null=True, blank=True, db_index=True)
-    test_dml_rows_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    test_dml_rows_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    test_cpu_time_used = models.IntegerField(null=True, blank=True, db_index=True)
-    test_cpu_time_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    test_cpu_time_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    test_query_rows_used = models.IntegerField(null=True, blank=True, db_index=True)
-    test_query_rows_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    test_query_rows_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    test_dml_statements_used = models.IntegerField(null=True, blank=True, db_index=True)
+    test_dml_rows_used = models.IntegerField(null=True, blank=True)
+    test_dml_rows_allowed = models.IntegerField(null=True, blank=True)
+    test_dml_rows_percent = models.IntegerField(null=True, blank=True)
+    test_cpu_time_used = models.IntegerField(null=True, blank=True)
+    test_cpu_time_allowed = models.IntegerField(null=True, blank=True)
+    test_cpu_time_percent = models.IntegerField(null=True, blank=True)
+    test_query_rows_used = models.IntegerField(null=True, blank=True)
+    test_query_rows_allowed = models.IntegerField(null=True, blank=True)
+    test_query_rows_percent = models.IntegerField(null=True, blank=True)
+    test_dml_statements_used = models.IntegerField(null=True, blank=True)
     test_dml_statements_allowed = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_dml_statements_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_mobile_apex_push_used = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_mobile_apex_push_allowed = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_mobile_apex_push_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
-    test_heap_size_used = models.IntegerField(null=True, blank=True, db_index=True)
-    test_heap_size_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    test_heap_size_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    test_sosl_queries_used = models.IntegerField(null=True, blank=True, db_index=True)
+    test_heap_size_used = models.IntegerField(null=True, blank=True)
+    test_heap_size_allowed = models.IntegerField(null=True, blank=True)
+    test_heap_size_percent = models.IntegerField(null=True, blank=True)
+    test_sosl_queries_used = models.IntegerField(null=True, blank=True)
     test_sosl_queries_allowed = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_sosl_queries_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
-    test_queueable_jobs_used = models.IntegerField(null=True, blank=True, db_index=True)
+    test_queueable_jobs_used = models.IntegerField(null=True, blank=True)
     test_queueable_jobs_allowed = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
     test_queueable_jobs_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
+        null=True, blank=True
     )
-    test_callouts_used = models.IntegerField(null=True, blank=True, db_index=True)
-    test_callouts_allowed = models.IntegerField(null=True, blank=True, db_index=True)
-    test_callouts_percent = models.IntegerField(null=True, blank=True, db_index=True)
+    test_callouts_used = models.IntegerField(null=True, blank=True)
+    test_callouts_allowed = models.IntegerField(null=True, blank=True)
+    test_callouts_percent = models.IntegerField(null=True, blank=True)
     worst_limit = models.CharField(max_length=255, null=True, blank=True, db_index=True)
     worst_limit_percent = models.IntegerField(null=True, blank=True, db_index=True)
     worst_limit_nontest = models.CharField(
