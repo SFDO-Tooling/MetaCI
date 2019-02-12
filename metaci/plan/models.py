@@ -9,7 +9,8 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from guardian.shortcuts import get_objects_for_user
 
-from metaci.repository.models import Repository
+from metaci.build.models import Build
+from metaci.repository.models import Branch, Repository
 
 
 TRIGGER_TYPES = (("manual", "Manual"), ("commit", "Commit"), ("tag", "Tag"))
@@ -205,3 +206,49 @@ class PlanRepository(models.Model):
     @property
     def should_run(self):
         return self.active and self.plan.active
+
+
+class PlanRepositoryTriggerQuerySet(models.QuerySet):
+    def should_run(self):
+        return self.filter(active=True, target_plan_repo__active=True)
+
+
+class PlanRepositoryTrigger(models.Model):
+    source_plan_repo = models.ForeignKey(
+        PlanRepository, on_delete=models.CASCADE, related_name="Sources"
+    )
+    target_plan_repo = models.ForeignKey(
+        PlanRepository, on_delete=models.CASCADE, related_name="Triggers"
+    )
+    branch = models.CharField(max_length=255)
+    active = models.BooleanField(default=True)
+
+    objects = PlanRepositoryTriggerQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["target_plan_repo", "source_plan_repo"]
+        unique_together = ("target_plan_repo", "source_plan_repo", "branch")
+        verbose_name_plural = "Plan Repository Triggers"
+
+    def _get_commit(self):
+        repo = self.target_plan_repo.repo.github_api
+        branch = repo.branch(self.branch)
+        commit = branch.commit.sha
+        return commit
+
+    def _get_or_create_branch(self):
+        branch, _ = Branch.objects.get_or_create(
+            repo=self.target_plan_repo.repo, name=self.branch
+        )
+        return branch
+
+    def fire(self, finished_build):
+        build = Build(
+            repo=self.target_plan_repo.repo,
+            plan=self.target_plan_repo.plan,
+            planrepo=self.target_plan_repo,
+            commit=self._get_commit(),
+            branch=self._get_or_create_branch(),
+            build_type="auto",
+        )
+        build.save()

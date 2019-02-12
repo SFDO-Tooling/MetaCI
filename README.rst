@@ -123,6 +123,8 @@ Plans are what ties together a repository, org, and CumulusCI flows.  Plans can 
 
 When you create Commit or Tag plans, the webhook should be automatically created in the repository to listen on the Github push event.  Creating the webhook requires that the GITHUB_USERNAME you used in the Heroku config for the app is an admin on the repository.
 
+Additionally, you can define a Plan Repository Trigger that will trigger a plan based on another plan. For example, you could create a trigger such that when Plan X for Repository A completes successfully, Plan Y for Repository B is queued. This is especially helpful when building against upstream dependencies.
+
 Private Plans & Repositories
 ----------------------------
 
