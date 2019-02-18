@@ -2,7 +2,7 @@
 -r test.txt
 
 black==18.9b0
-pre-commit==1.14.3
+pre-commit==1.14.4
 
 Sphinx==1.8.4
 django-extensions==2.1.5
