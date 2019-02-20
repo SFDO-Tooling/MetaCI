@@ -50,5 +50,6 @@ class RebuildAdmin(admin.ModelAdmin):
         'time_start',
         'time_end',
     )
-    list_filter = ('build__repo', 'build')
+    list_filter = ('build__repo', 'build__plan')
+    raw_id_fields = ('build', 'org_instance')
 admin.site.register(Rebuild, RebuildAdmin)
