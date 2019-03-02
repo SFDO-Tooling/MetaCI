@@ -51,7 +51,11 @@ class TestResultManager(models.Manager):
 
         results = OrderedDict()
         for build_flow in build_flows:
-            for result in build_flow.test_results.all():
+            test_results = build_flow.test_results \
+                .select_related('method') \
+                .select_related('method__testclass') \
+                .all()
+            for result in test_results:
                 cls = result.method.testclass.name
                 method = result.method.name
 
@@ -240,6 +244,24 @@ class TestResult(models.Model):
 
     def get_robot_url(self):
         return reverse("test_result_robot", kwargs={"result_id": str(self.id)})
+
+    def get_limit_types(self):
+        types = (
+            "email_invocations",
+            "soql_queries",
+            "future_calls",
+            "dml_rows",
+            "cpu_time",
+            "query_rows",
+            "dml_statements",
+            "mobile_apex_push",
+            "heap_size",
+            "sosl_queries",
+            "queueable_jobs",
+            "callouts",
+        )
+
+        return types
 
 
 def asset_upload_to(instance, filename):
