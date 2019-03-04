@@ -74,7 +74,6 @@ TEMPLATES[0]["OPTIONS"]["loaders"] = [
 
 GITHUB_USERNAME = "TestUser"
 GITHUB_PASSWORD = "TestUserPass123"
-GITHUB_WEBHOOK_BASE_URL = ""
 GITHUB_WEBHOOK_SECRET = "a secret"
 
 # Salesforce OAuth Connected App credentials
