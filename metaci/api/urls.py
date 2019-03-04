@@ -9,6 +9,7 @@ from metaci.api.views.plan import PlanViewSet
 from metaci.api.views.plan import PlanRepositoryViewSet
 from metaci.api.views.repository import BranchViewSet
 from metaci.api.views.repository import RepositoryViewSet
+from metaci.api.views.testmethod_perf import TestMethodPerfListView
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 
@@ -27,3 +28,4 @@ urlpatterns = router.urls
 
 schema_view = get_schema_view(title="MetaCI API")
 urlpatterns += (url(r"^schema/$", schema_view),)
+urlpatterns += (url(r"^testmethod_perf/$", TestMethodPerfListView.as_view(), name="testmethod-perf"),)
