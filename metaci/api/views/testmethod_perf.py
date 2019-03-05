@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.db.models import F, Avg, Count
 from django.db import models
-from django.forms import SelectDateWidget
+from django.forms import SelectDateWidget, DateInput
 
 import django_filters.rest_framework
+from django_filters.widgets import DateRangeWidget, SuffixedMultiWidget
+from django_filters.rest_framework import DateRangeFilter
 
 from rest_framework import generics, filters
 
@@ -15,11 +17,13 @@ from metaci.repository.models import Repository
 from metaci.plan.models import Plan
 
 
-class TestMethodPerfFilter(django_filters.rest_framework.FilterSet):
-    def __init__(self, *args, **kwargs):
-        print("***** INITIALIZXED ***", args, kwargs)
-        super(TestMethodPerfFilter, self).__init__(*args, **kwargs)
+class LessAwfulDateRangeWidget(DateRangeWidget):
+    def __init__(self, attrs = None):
+        widgets = (SelectDateWidget, SelectDateWidget)
+        super(SuffixedMultiWidget, self).__init__(widgets, attrs)
 
+
+class TestMethodPerfFilter(django_filters.rest_framework.FilterSet):
     method_name = django_filters.rest_framework.CharFilter(field_name="method_name",
         label="Method Name")
 
@@ -41,20 +45,22 @@ class TestMethodPerfFilter(django_filters.rest_framework.FilterSet):
          label="Flow Name", choices = flow_choices,
          method = dummy_filter)
 
-    foobar = django_filters.rest_framework.DateRangeFilter(field_name="xyzzy",
-        label="Date range (unimplemented)", method = dummy_filter,
+    recentdate = DateRangeFilter(
+        label="Recent Date", method = dummy_filter,
         )
 
-    # foobar2 = django_filters.rest_framework.DateFromToRangeFilter(field_name="xyzzy",
-    #     label="Date range (unimplemented)", method = dummy_filter,
-    #     widget = SelectDateWidget)
-
+    daterange = django_filters.rest_framework.DateFromToRangeFilter(
+         label="Date range", method = dummy_filter,
+         widget = DateRangeWidget(attrs={'type': 'date'})
+         )
 
     o = django_filters.rest_framework.OrderingFilter(
         fields=(
             ('method_name', 'method_name'),
             ('avg', 'avg'),
             ('count', 'count'),
+            ('repo', 'repo'),
+
         ),
     )
 
@@ -62,7 +68,9 @@ class TestMethodPerfFilter(django_filters.rest_framework.FilterSet):
 
 class TestMethodPerfListView(generics.ListAPIView):
     """
-    A view for lists of aggregated test metrics
+    A view for lists of aggregated test metrics.
+
+    Note that the number of builds covered is capped at 300 for performance reasons.
     """
 
     serializer_class = TestMethodPerfSerializer
@@ -72,22 +80,17 @@ class TestMethodPerfListView(generics.ListAPIView):
     # example URLs:
     # http://localhost:8000/api/testmethod_perf/?repo=gem&plan=Release%20Test&method_name=testCreateNegative
     # http://localhost:8000/api/testmethod_perf/?repo=Cumulus&plan=Feature%20Test&o=avg
+    # http://localhost:8000/api/testmethod_perf/?method_name=&repo=&plan=&flow=&recentdate=&daterange_after=&daterange_before=&o=-repo
 
     def get_queryset(self):
-        range_start = "2018-02-04 01:01:24.777558+00"
-        range_end = "2019-02-04 17:38:24.777558+00"
         build_flows_limit = 100
-        test_results_limit = 100
         metric = self.request.query_params.get("metric") or "duration"
-        print("KWARGS", self.kwargs)
-        print(self.kwargs.get("repo"))
-        print("ARGS", self.args)
-        print("GET", self.request.query_params.get("repo"))
+        # print("KWARGS", self.kwargs)
+        # print(self.kwargs.get("repo"))
+        # print("ARGS", self.args)
+        # print("GET", self.request.query_params)
 
-        buildflows = (BuildFlow.objects
-                .filter(time_end__isnull = False)
-                .filter(time_end__gt = range_start)
-                .filter(time_end__lt = range_end))
+        buildflows = BuildFlow.objects.filter(tests_total__isnull = False)
         get = self.request.query_params.get
 
         param_filters = (("repo", "build__repo__name"), 
@@ -95,25 +98,29 @@ class TestMethodPerfListView(generics.ListAPIView):
                     ("branch", "build__branch__name"),
                     ("flow", "flow"))
 
+        output_fields = {"repo": F("build_flow__build__repo__name")}
+
         for param, filtername in param_filters:
             if get(param): 
                 buildflows = buildflows.filter(**{filtername: get(param)})
-                
-        buildflows = buildflows[0:build_flows_limit]
-        
-        print(str(buildflows.query))
+                output_fields[param] = F("build_flow__" + filtername)
+
+        if get("recentdate"):
+            buildflows = DateRangeFilter.filters[get("recentdate")](buildflows, "time_end")
+        elif get("daterange_after") and get("daterange_before"):
+            buildflows = buildflows \
+                 .filter(time_end__isnull = False) \
+                 .filter(time_end__gte =  get("daterange_after")) \
+                 .filter(time_end__lt = get("daterange_before"))
+
+        buildflows = buildflows.order_by("-time_end")[0:build_flows_limit]
 
         queryset = TestResult.objects.filter(
-                build_flow_id__in = buildflows)\
+                build_flow_id__in = buildflows,
+                duration__isnull = False)\
                         .values(method_name = F('method__name'), 
-                                repo = F('build_flow__build__repo__name'),
-#                                plan = F('build_flow__build__plan__name'),
-#                                flow = F('build_flow__flow'),
-#                                branch = F('build_flow__build__branch__name'),
-                                )\
-                                .annotate(count = Count('id'), avg = Avg(metric))
-        print(str(queryset.query))
-# 
+                                **output_fields
+                                ).annotate(count = Count('id'), avg = Avg(metric))
+ 
         return queryset
-
 
