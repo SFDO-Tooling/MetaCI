@@ -13,14 +13,8 @@ from metaci.testresults.models import TestResult
 from metaci.build.models import BuildFlow
 from metaci.build.filters import BuildFilter
 from metaci.api.serializers.testmethod_perf import TestMethodPerfSerializer
-from metaci.repository.models import Repository
+from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
-
-
-class LessAwfulDateRangeWidget(DateRangeWidget):
-    def __init__(self, attrs = None):
-        widgets = (SelectDateWidget, SelectDateWidget)
-        super(SuffixedMultiWidget, self).__init__(widgets, attrs)
 
 
 class TestMethodPerfFilter(django_filters.rest_framework.FilterSet):
@@ -35,6 +29,11 @@ class TestMethodPerfFilter(django_filters.rest_framework.FilterSet):
     repo_choices = Repository.objects.values_list('name', 'name').order_by('name').distinct()
     repo = django_filters.rest_framework.ChoiceFilter(field_name="repo", label="Repo Name", 
          choices = repo_choices, method = dummy_filter)
+
+
+    branch_choices = Branch.objects.values_list('name', 'name').order_by('name').distinct()
+    branch_choices = django_filters.rest_framework.ChoiceFilter(field_name="branch", label="Branch Name", 
+         choices = branch_choices, method = dummy_filter)
 
     plan_choices = Plan.objects.values_list('name', 'name').order_by('name').distinct()
     plan = django_filters.rest_framework.ChoiceFilter(field_name="plan", label="Plan Name", 
@@ -54,10 +53,15 @@ class TestMethodPerfFilter(django_filters.rest_framework.FilterSet):
          widget = DateRangeWidget(attrs={'type': 'date'})
          )
 
+    group_by_choices = (("repo", "repo"),("plan", "plan"), ("flow", "flow"), ("branch", "branch"))
+    group_by = django_filters.rest_framework.MultipleChoiceFilter(
+        label="Group By", 
+        choices = group_by_choices, method = dummy_filter)
+
     o = django_filters.rest_framework.OrderingFilter(
         fields=(
-            ('method_name', 'method_name'),
             ('avg', 'avg'),
+            ('method_name', 'method_name'),
             ('count', 'count'),
             ('repo', 'repo'),
             ('failures', 'failures'),
@@ -91,24 +95,29 @@ class TestMethodPerfListView(generics.ListAPIView):
         # print("KWARGS", self.kwargs)
         # print(self.kwargs.get("repo"))
         # print("ARGS", self.args)
-        # print("GET", self.request.query_params)
+        print("GET", self.request.query_params)
 
         buildflows = BuildFlow.objects.filter(tests_total__isnull = False)
         get = self.request.query_params.get
 
-        param_filters = (("repo", "build__repo__name"), 
-                    ("plan", "build__plan__name"), 
-                    ("branch", "build__branch__name"),
-                    ("flow", "flow"))
+        param_filters = {"repo": "build__repo__name", 
+                         "plan": "build__plan__name",
+                         "branch": "build__branch__name",
+                         "flow": "flow"}
 
         output_fields = {"repo": F("build_flow__build__repo__name")}
 
-        for param, filtername in param_filters:
-            if get(param): 
+        for param, filtername in param_filters.items():
+            if get(param):
                 buildflows = buildflows.filter(**{filtername: get(param)})
-                output_fields[param] = F("build_flow__" + filtername)
+
+        if get("group_by"):
+            for param in self.request.query_params.getlist("group_by"):
+                output_fields[param] = F("build_flow__" + param_filters[param])
 
         if get("recentdate"):
+            if get("daterange_after") or get("daterange_before"):
+                return None
             buildflows = DateRangeFilter.filters[get("recentdate")](buildflows, "time_end")
         elif get("daterange_after") and get("daterange_before"):
             buildflows = buildflows \
