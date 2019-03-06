@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.db.models import F, Avg, Count
+from django.db.models import F, Avg, Count, Q
 from django.db import models
 from django.forms import SelectDateWidget, DateInput
 
@@ -60,7 +60,10 @@ class TestMethodPerfFilter(django_filters.rest_framework.FilterSet):
             ('avg', 'avg'),
             ('count', 'count'),
             ('repo', 'repo'),
-
+            ('failures', 'failures'),
+            ('assertion_failures', 'assertion_failures'),
+            ('DML_failures', 'DML_failures'),
+            ('Other_failures', 'Other_failures'),
         ),
     )
 
@@ -70,7 +73,7 @@ class TestMethodPerfListView(generics.ListAPIView):
     """
     A view for lists of aggregated test metrics.
 
-    Note that the number of builds covered is capped at 300 for performance reasons.
+    Note that the number of build flows covered is capped at **100** for performance reasons.
     """
 
     serializer_class = TestMethodPerfSerializer
@@ -115,12 +118,23 @@ class TestMethodPerfListView(generics.ListAPIView):
 
         buildflows = buildflows.order_by("-time_end")[0:build_flows_limit]
 
+        annotations = {"count": Count('id'), 
+                        "avg": Avg(metric)}
+
+        if get("o") and "failures" in get("o"):
+            annotations.update({
+                "failures" : Count('id', filter=Q(outcome = "Fail")),
+                "assertion_failures" : Count('id', filter=Q(message__startswith = "System.AssertException")),
+                "DML_failures" : Count('id', filter=Q(message__startswith = "System.DmlException")),
+                "Other_failures" : Count('id', filter=~Q(message__startswith = "System.DmlException")
+                                            & ~Q(message__startswith = "System.AssertException"))})
+
         queryset = TestResult.objects.filter(
                 build_flow_id__in = buildflows,
                 duration__isnull = False)\
                         .values(method_name = F('method__name'), 
                                 **output_fields
-                                ).annotate(count = Count('id'), avg = Avg(metric))
- 
+                                ).annotate(**annotations)
+
         return queryset
 
