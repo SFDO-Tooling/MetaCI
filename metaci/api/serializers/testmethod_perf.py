@@ -1,7 +1,13 @@
 from rest_framework import serializers
+from collections import OrderedDict
 
 
-class TestMethodPerfSerializer(serializers.Serializer):
+class NonNullModelSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        result = super(NonNullModelSerializer, self).to_representation(instance)
+        return OrderedDict([(key, result[key]) for key in result if result[key] is not None])
+
+class TestMethodPerfSerializer(NonNullModelSerializer):
     method_name = serializers.CharField()
     count = serializers.IntegerField()
     avg = serializers.FloatField()
