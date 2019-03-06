@@ -7,7 +7,7 @@ import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget, SuffixedMultiWidget
 from django_filters.rest_framework import DateRangeFilter
 
-from rest_framework import generics, filters
+from rest_framework import generics, filters, exceptions
 
 from metaci.testresults.models import TestResult
 from metaci.build.models import BuildFlow
@@ -17,46 +17,68 @@ from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
 
 
-class TestMethodPerfFilter(django_filters.rest_framework.FilterSet):
-    method_name = django_filters.rest_framework.CharFilter(field_name="method_name",
-        label="Method Name")
+
+class BuildFlowFilter(django_filters.rest_framework.FilterSet):
+    really_filter = False
+    def __init__(self, *args, really_filter=really_filter, **kwargs):
+        self.really_filter = really_filter
+        print("REALLY", self.really_filter)
+        super().__init__(*args, **kwargs)
 
     # we implement many of these "by hand" in get_queryset, so we don't want them
     # here too. They should be implemented in the view because they filter the
     # buildflow list, not the output.
-    dummy_filter = lambda queryset, name, value:  queryset
+    def dummy_filter(self, queryset, name, value):
+        return queryset
+
+    param_filters = {"repo": "build__repo__name", 
+                    "plan": "build__plan__name",
+                    "branch": "build__branch__name",
+                    "flow": "flow"}
+
+    def conditional_filter(self, queryset, name, value):
+        if self.really_filter:
+            print("REALLY FILTERING", name, self.param_filters[name])
+            return queryset.filter(**{self.param_filters[name]: value})
+        else:
+            return queryset
 
     repo_choices = Repository.objects.values_list('name', 'name').order_by('name').distinct()
     repo = django_filters.rest_framework.ChoiceFilter(field_name="repo", label="Repo Name", 
-         choices = repo_choices, method = dummy_filter)
-
+        choices = repo_choices, method = "conditional_filter")
 
     branch_choices = Branch.objects.values_list('name', 'name').order_by('name').distinct()
     branch_choices = django_filters.rest_framework.ChoiceFilter(field_name="branch", label="Branch Name", 
-         choices = branch_choices, method = dummy_filter)
+        choices = branch_choices, method = "conditional_filter")
 
     plan_choices = Plan.objects.values_list('name', 'name').order_by('name').distinct()
     plan = django_filters.rest_framework.ChoiceFilter(field_name="plan", label="Plan Name", 
-         choices = plan_choices, method = dummy_filter)
+        choices = plan_choices, method = "conditional_filter")
 
     flow_choices = BuildFlow.objects.values_list('flow', 'flow').order_by('flow').distinct()
     flow = django_filters.rest_framework.ChoiceFilter(field_name="flow",
-         label="Flow Name", choices = flow_choices,
-         method = dummy_filter)
+        label="Flow Name", choices = flow_choices,
+        method = "conditional_filter")
 
     recentdate = DateRangeFilter(
-        label="Recent Date", method = dummy_filter,
+        label="Recent Date", method = "dummy_filter",
         )
 
     daterange = django_filters.rest_framework.DateFromToRangeFilter(
-         label="Date range", method = dummy_filter,
-         widget = DateRangeWidget(attrs={'type': 'date'})
-         )
+        label="Date range", method = "dummy_filter",
+        widget = DateRangeWidget(attrs={'type': 'date'})
+        )
 
+class TestMethodPerfFilter(BuildFlowFilter):
+
+    method_name = django_filters.rest_framework.CharFilter(field_name="method_name",
+        label="Method Name")
+
+    dummy = lambda queryset, name, value:  queryset
     group_by_choices = (("repo", "repo"),("plan", "plan"), ("flow", "flow"), ("branch", "branch"))
     group_by = django_filters.rest_framework.MultipleChoiceFilter(
         label="Group By", 
-        choices = group_by_choices, method = dummy_filter)
+        choices = group_by_choices, method = dummy )
 
     o = django_filters.rest_framework.OrderingFilter(
         fields=(
@@ -92,32 +114,22 @@ class TestMethodPerfListView(generics.ListAPIView):
     def get_queryset(self):
         build_flows_limit = 100
         metric = self.request.query_params.get("metric") or "duration"
-        # print("KWARGS", self.kwargs)
-        # print(self.kwargs.get("repo"))
-        # print("ARGS", self.args)
         print("GET", self.request.query_params)
 
         buildflows = BuildFlow.objects.filter(tests_total__isnull = False)
         get = self.request.query_params.get
-
-        param_filters = {"repo": "build__repo__name", 
-                         "plan": "build__plan__name",
-                         "branch": "build__branch__name",
-                         "flow": "flow"}
+        buildflows = BuildFlowFilter(self.request.GET, buildflows, really_filter=True).qs
 
         output_fields = {"repo": F("build_flow__build__repo__name")}
 
-        for param, filtername in param_filters.items():
-            if get(param):
-                buildflows = buildflows.filter(**{filtername: get(param)})
-
+        param_filters = BuildFlowFilter.param_filters
         if get("group_by"):
             for param in self.request.query_params.getlist("group_by"):
                 output_fields[param] = F("build_flow__" + param_filters[param])
 
         if get("recentdate"):
             if get("daterange_after") or get("daterange_before"):
-                return None
+                raise exceptions.APIException("Specified both recentdate and daterange")
             buildflows = DateRangeFilter.filters[get("recentdate")](buildflows, "time_end")
         elif get("daterange_after") and get("daterange_before"):
             buildflows = buildflows \
