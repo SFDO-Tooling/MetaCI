@@ -16,22 +16,22 @@ from metaci.repository.models import Repository
 class BuildRelatedFilter(filters.FilterSet):
     branch = filters.RelatedFilter(
         BranchRelatedFilter,
-        name='branch',
+        field_name='branch',
         queryset=Branch.objects.all()
     )
     org = filters.RelatedFilter(
         OrgRelatedFilter,
-        name='org',
+        field_name='org',
         queryset=Org.objects.all()
     )
     plan = filters.RelatedFilter(
         PlanRelatedFilter,
-        name='plan',
+        field_name='plan',
         queryset=Plan.objects.all()
     )
     repo = filters.RelatedFilter(
         RepositoryRelatedFilter,
-        name='repo',
+        field_name='repo',
         queryset=Repository.objects.all()
     )
 
@@ -70,12 +70,12 @@ class RebuildFilter(RebuildRelatedFilter):
 class BuildFlowRelatedFilter(filters.FilterSet):
     build = filters.RelatedFilter(
         BuildRelatedFilter,
-        name='build',
+        field_name='build',
         queryset=Build.objects.all()
     )
     rebuild = filters.RelatedFilter(
         RebuildRelatedFilter,
-        name='build',
+        field_name='build',
         queryset=Rebuild.objects.all()
     )
 
