@@ -106,7 +106,7 @@ class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.Fil
         ("branch", "branch"),
     )
     group_by = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Group By", choices=group_by_choices, method=dummy
+        label="Split On", choices=group_by_choices, method=dummy
     )
 
     o = django_filters.rest_framework.OrderingFilter(
