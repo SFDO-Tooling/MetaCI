@@ -144,7 +144,7 @@ class TestMethodPerfListView(generics.ListAPIView):
     # http://localhost:8000/api/testmethod_perf/?method_name=&repo=&plan=&flow=&recentdate=&daterange_after=&daterange_before=&o=-repo
 
     def get_queryset(self):
-        # set_timeout(20)
+        set_timeout(20)
         get = self.request.query_params.get
 
         build_flows_limit = int(get("build_flows_limit") or BUILD_FLOWS_LIMIT)
