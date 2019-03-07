@@ -148,7 +148,7 @@ class TestMethodPerfListView(generics.ListAPIView):
         buildflows = buildflows.order_by("-time_end")[0:build_flows_limit]
 
         annotations = {"count": Count('id'), 
-                        "avg": Avg(metric)}
+                        "avg": Avg('duration')}
 
         if get("o") and "failures" in get("o"):
             annotations.update({
