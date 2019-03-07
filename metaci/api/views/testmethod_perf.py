@@ -97,13 +97,14 @@ class TestMethodPerfFilter(BuildFlowFilter):
         ),
     )
 
-
+BUILD_FLOWS_LIMIT = 100
 
 class TestMethodPerfListView(generics.ListAPIView):
     """
     A view for lists of aggregated test metrics.
 
-    Note that the number of build flows covered is capped at **100** for performance reasons.
+    Note that the number of build flows covered is limited to **BUILD_FLOWS_LIMIT** for performance reasons. You can 
+    change this default with the build_flows_limit parameter.
     """
 
     serializer_class = TestMethodPerfSerializer
@@ -118,6 +119,9 @@ class TestMethodPerfListView(generics.ListAPIView):
     def get_queryset(self):
         # set_timeout(20)
         get = self.request.query_params.get
+
+        build_flows_limit = int(get("build_flows_limit") or BUILD_FLOWS_LIMIT)
+
         print("GET", self.request.query_params)
 
         buildflows = BuildFlow.objects.filter(tests_total__isnull = False)
