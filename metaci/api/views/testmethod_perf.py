@@ -16,7 +16,11 @@ from metaci.api.serializers.testmethod_perf import TestMethodPerfSerializer
 from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
 
+from django.db import connection
 
+def set_timeout(timeout):
+    with connection.cursor() as cursor:
+        cursor.execute("SET LOCAL statement_timeout=%s", [timeout * 1000])
 
 class BuildFlowFilter(django_filters.rest_framework.FilterSet):
     really_filter = False
@@ -112,8 +116,8 @@ class TestMethodPerfListView(generics.ListAPIView):
     # http://localhost:8000/api/testmethod_perf/?method_name=&repo=&plan=&flow=&recentdate=&daterange_after=&daterange_before=&o=-repo
 
     def get_queryset(self):
-        build_flows_limit = 100
-        metric = self.request.query_params.get("metric") or "duration"
+        # set_timeout(20)
+        get = self.request.query_params.get
         print("GET", self.request.query_params)
 
         buildflows = BuildFlow.objects.filter(tests_total__isnull = False)
@@ -159,3 +163,5 @@ class TestMethodPerfListView(generics.ListAPIView):
 
         return queryset
 
+TestMethodPerfListView.__doc__ = TestMethodPerfListView.__doc__.replace(
+        "BUILD_FLOWS_LIMIT", str(BUILD_FLOWS_LIMIT))
