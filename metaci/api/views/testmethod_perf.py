@@ -1,19 +1,15 @@
 import copy
 
-from django.shortcuts import render
 from django.db.models import F, Avg, Count, Q
-from django.db import models
-from django.forms import SelectDateWidget, DateInput
 
 import django_filters.rest_framework
-from django_filters.widgets import DateRangeWidget, SuffixedMultiWidget
+from django_filters.widgets import DateRangeWidget
 from django_filters.rest_framework import DateRangeFilter
 
-from rest_framework import generics, filters, exceptions
+from rest_framework import generics, exceptions
 
 from metaci.testresults.models import TestResult
 from metaci.build.models import BuildFlow
-from metaci.build.filters import BuildFilter
 from metaci.api.serializers.testmethod_perf import TestMethodPerfSerializer
 from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
@@ -98,7 +94,9 @@ class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.Fil
         field_name="method_name", label="Method Name"
     )
 
-    dummy = lambda queryset, name, value: queryset
+    def dummy(queryset, name, value):
+        return queryset
+
     group_by_choices = (
         ("repo", "repo"),
         ("plan", "plan"),
@@ -107,6 +105,16 @@ class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.Fil
     )
     group_by = django_filters.rest_framework.MultipleChoiceFilter(
         label="Split On", choices=group_by_choices, method=dummy
+    )
+
+    metric_choices = (
+        ("repo", "repo"),
+        ("plan", "plan"),
+        ("flow", "flow"),
+        ("branch", "branch"),
+    )
+    metrics = django_filters.rest_framework.MultipleChoiceFilter(
+        label="Split On", choices=metric_choices, method=dummy
     )
 
     o = django_filters.rest_framework.OrderingFilter(
@@ -130,7 +138,7 @@ class TestMethodPerfListView(generics.ListAPIView):
     """
     A view for lists of aggregated test metrics.
 
-    Note that the number of build flows covered is limited to **BUILD_FLOWS_LIMIT** for performance reasons. You can 
+    Note that the number of build flows covered is limited to **BUILD_FLOWS_LIMIT** for performance reasons. You can
     change this default with the build_flows_limit parameter.
     """
 
