@@ -21,11 +21,18 @@ from django.db import connection
 
 
 def set_timeout(timeout):
+    """Restrict extremely long Postgres queries. 
+    Theoretically this should reset on the next request but that
+    could use some additional testing"""
     with connection.cursor() as cursor:
         cursor.execute("SET LOCAL statement_timeout=%s", [timeout * 1000])
 
 
 class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
+    """A bit of a hack to allow two filtersets to work together in generating the
+       djago-filter config form but to have only one of them actually filter the
+       output queryset. The other filters a queryset of a sub-select."""
+
     really_filter = False
 
     def __init__(self, *args, really_filter=really_filter, **kwargs):
@@ -44,7 +51,8 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
 
 class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     """This filterset is not used directly on the output queryset.
-       get_queryset must create it explicitly with really_filter=True."""
+       get_queryset must create it explicitly with really_filter=True.
+       Otherwise it is disabled by default."""
 
     build_fields = {
         "repo": "build__repo__name",
@@ -93,10 +101,12 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
         method="dummy_filter", label="Build Flows Limit (default: 100)"
     )
 
-    disable_by_default = dir()
+    disable_by_default = dir()  # disable all of these fields by default.
 
 
 class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.FilterSet):
+    """This filterset works on the output queries"""
+
     method_name = django_filters.rest_framework.CharFilter(
         field_name="method_name", label="Method Name"
     )
@@ -211,6 +221,7 @@ class TestMethodPerfListView(generics.ListAPIView):
         return aggregations
 
     def _get_splitter_fields(self):
+        "Which fields to split on (or group by, depending on how you think about it"
         params = self.request.query_params
         output_fields = {}
 
@@ -232,6 +243,7 @@ class TestMethodPerfListView(generics.ListAPIView):
             raise exceptions.APIException("Specified both recentdate and daterange")
 
     def get_queryset(self):
+        "The main method that the Django infrastructure invokes."
         set_timeout(20)
         self._check_params()
 
@@ -250,6 +262,8 @@ class TestMethodPerfListView(generics.ListAPIView):
         return queryset
 
 
+# A bit of hackery to make a dynamic docstring, because the docstring
+# appears in the UI.
 TestMethodPerfListView.__doc__ = TestMethodPerfListView.__doc__.replace(
     "BUILD_FLOWS_LIMIT", str(BUILD_FLOWS_LIMIT)
 )
