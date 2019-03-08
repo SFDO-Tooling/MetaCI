@@ -1,6 +1,9 @@
 import copy
 
-from django.db.models import F, Avg, Count, Q
+from django.db.models import FloatField
+from django.db.models.functions import Cast
+
+from django.db.models import F, Avg, Count, Q, Min, Max
 
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
@@ -30,10 +33,10 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
         super().__init__(*args, **kwargs)
 
         for filtername in self.filters.keys():
-            if not really_filter and filtername in BuildFlowFilterSet.__dict__.keys():
-                print(self.filters[filtername])
-                self.filters[filtername] = copy.copy(self.filters[filtername])
-                self.filters[filtername].method = self.dummy_filter
+            if not really_filter:
+                if filtername in self.disable_by_default:
+                    self.filters[filtername] = copy.copy(self.filters[filtername])
+                    self.filters[filtername].method = self.dummy_filter
 
     def dummy_filter(self, queryset, name, value):
         return queryset
@@ -43,7 +46,7 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     """This filterset is not used directly on the output queryset.
        get_queryset must create it explicitly with really_filter=True."""
 
-    param_filters = {
+    build_fields = {
         "repo": "build__repo__name",
         "plan": "build__plan__name",
         "branch": "build__branch__name",
@@ -79,7 +82,9 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     recentdate = DateRangeFilter(label="Recent Date", field_name="time_end")
 
     daterange = django_filters.rest_framework.DateFromToRangeFilter(
-        label="Date range", widget=DateRangeWidget(attrs={"type": "date"})
+        field_name="time_end",
+        label="Date range",
+        widget=DateRangeWidget(attrs={"type": "date"}),
     )
 
     # This is not really a filter. It's actually just a query input but putting it
@@ -87,6 +92,8 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     build_flows_limit = django_filters.rest_framework.NumberFilter(
         method="dummy_filter", label="Build Flows Limit (default: 100)"
     )
+
+    disable_by_default = dir()
 
 
 class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.FilterSet):
@@ -97,36 +104,56 @@ class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.Fil
     def dummy(queryset, name, value):
         return queryset
 
-    group_by_choices = (
-        ("repo", "repo"),
-        ("plan", "plan"),
-        ("flow", "flow"),
-        ("branch", "branch"),
-    )
-    group_by = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Split On", choices=group_by_choices, method=dummy
+    group_by_choices = tuple(
+        (name, name) for name in BuildFlowFilterSet.build_fields.keys()
     )
 
-    metric_choices = (
-        ("repo", "repo"),
-        ("plan", "plan"),
-        ("flow", "flow"),
-        ("branch", "branch"),
+    group_by = django_filters.rest_framework.MultipleChoiceFilter(
+        label="Split On (multi-select okay)", choices=group_by_choices, method=dummy
     )
-    metrics = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Split On", choices=metric_choices, method=dummy
+
+    metrics = {
+        "average_duration": Avg("duration"),
+        "slowest_runs": Min("duration"),  # fixme: use p05
+        "fastest_runs": Max("duration"),  # fixme: use p95
+        "average_cpu_usage": Avg("test_cpu_time_used"),
+        "low_cpu_usage": Min("test_cpu_time_used"),
+        "high_cpu_usage": Max("test_cpu_time_used"),
+        "count": Count("id"),
+        "failures": Count("id", filter=Q(outcome="Fail")),
+        "assertion_failures": Count(
+            "id", filter=Q(message__startswith="System.AssertException")
+        ),
+        "DML_failures": Count(
+            "id", filter=Q(message__startswith="System.DmlException")
+        ),
+        "Other_failures": Count(
+            "id",
+            filter=~Q(message__startswith="System.DmlException")
+            & ~Q(message__startswith="System.AssertException"),
+        ),
+        "success_percentage": Cast(Count("id", filter=Q(outcome="Pass")), FloatField())
+        / Cast(Count("id"), FloatField()),
+    }
+
+    metric_choices = tuple(zip(metrics.keys(), metrics.keys()))
+    include_fields = django_filters.rest_framework.MultipleChoiceFilter(
+        label="Include (multi-select okay)", choices=metric_choices, method=dummy
     )
 
     o = django_filters.rest_framework.OrderingFilter(
         fields=(
-            ("avg", "avg"),
-            ("method_name", "method_name"),
-            ("count", "count"),
-            ("repo", "repo"),
-            ("failures", "failures"),
-            ("assertion_failures", "assertion_failures"),
-            ("DML_failures", "DML_failures"),
-            ("Other_failures", "Other_failures"),
+            metric_choices
+            + group_by_choices
+            + (
+                ("method_name", "method_name"),
+                ("count", "count"),
+                ("failures", "failures"),
+                ("assertion_failures", "assertion_failures"),
+                ("DML_failures", "DML_failures"),
+                ("Other_failures", "Other_failures"),
+                ("success_percentage", "success_percentage"),
+            )
         )
     )
 
@@ -151,57 +178,73 @@ class TestMethodPerfListView(generics.ListAPIView):
     # http://localhost:8000/api/testmethod_perf/?repo=Cumulus&plan=Feature%20Test&o=avg
     # http://localhost:8000/api/testmethod_perf/?method_name=&repo=&plan=&flow=&recentdate=&daterange_after=&daterange_before=&o=-repo
 
-    def get_queryset(self):
-        set_timeout(20)
-        get = self.request.query_params.get
+    def _get_buildflows(self):
+        """Which buildflows do we need to look at? Limit by time, repo, etc.
+           Also limit # for performance reasons"""
+        params = self.request.query_params
+        build_flows_limit = int(params.get("build_flows_limit") or BUILD_FLOWS_LIMIT)
 
-        build_flows_limit = int(get("build_flows_limit") or BUILD_FLOWS_LIMIT)
-
-        print("GET", self.request.query_params)
-
-        buildflows = BuildFlow.objects.filter(tests_total__isnull=False)
+        buildflows = BuildFlow.objects.filter(tests_total__gte=1)
         buildflows = BuildFlowFilterSet(
             self.request.GET, buildflows, really_filter=True
         ).qs
 
-        output_fields = {"repo": F("build_flow__build__repo__name")}
+        return buildflows.order_by("-time_end")[0:build_flows_limit]
 
-        param_filters = BuildFlowFilterSet.param_filters
-        if get("group_by"):
-            for param in self.request.query_params.getlist("group_by"):
-                output_fields[param] = F("build_flow__" + param_filters[param])
+    def _get_aggregation_fields(self):
+        """What fields should appear in the output?"""
+        params = self.request.query_params
+        aggregations = {}
+        fields_to_include = params.getlist("include_fields")
 
-        if get("recentdate") and (get("daterange_after") or get("daterange_before")):
+        if params.get("o"):
+            fields_to_include.append(params.get("o"))
+
+        fields = self.filter_class.metrics
+
+        for fieldname in fields_to_include:
+            fieldname = fieldname.strip("-")
+            aggregations[fieldname] = fields[fieldname]
+
+        print("Aggregating", aggregations)
+
+        return aggregations
+
+    def _get_splitter_fields(self):
+        params = self.request.query_params
+        output_fields = {}
+
+        build_fields = BuildFlowFilterSet.build_fields
+        if params.get("group_by"):
+            for param in params.getlist("group_by"):
+                output_fields[param] = F("build_flow__" + build_fields[param])
+
+        print("Splitting", output_fields)
+
+        return output_fields
+
+    def _check_params(self):
+        "Check things the django-filter does not check automatically"
+        params = self.request.query_params
+        if params.get("recentdate") and (
+            params.get("daterange_after") or params.get("daterange_before")
+        ):
             raise exceptions.APIException("Specified both recentdate and daterange")
 
-        buildflows = buildflows.order_by("-time_end")[0:build_flows_limit]
+    def get_queryset(self):
+        set_timeout(20)
+        self._check_params()
 
-        annotations = {"count": Count("id"), "avg": Avg("duration")}
-
-        if get("o") and "failures" in get("o"):
-            annotations.update(
-                {
-                    "failures": Count("id", filter=Q(outcome="Fail")),
-                    "assertion_failures": Count(
-                        "id", filter=Q(message__startswith="System.AssertException")
-                    ),
-                    "DML_failures": Count(
-                        "id", filter=Q(message__startswith="System.DmlException")
-                    ),
-                    "Other_failures": Count(
-                        "id",
-                        filter=~Q(message__startswith="System.DmlException")
-                        & ~Q(message__startswith="System.AssertException"),
-                    ),
-                }
-            )
+        buildflows = self._get_buildflows()
+        splitter_fields = self._get_splitter_fields()
+        aggregations = self._get_aggregation_fields()
 
         queryset = (
             TestResult.objects.filter(
                 build_flow_id__in=buildflows, duration__isnull=False
             )
-            .values(method_name=F("method__name"), **output_fields)
-            .annotate(**annotations)
+            .values(method_name=F("method__name"), **splitter_fields)
+            .annotate(**aggregations)
         )
 
         return queryset
