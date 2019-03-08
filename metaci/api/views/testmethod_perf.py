@@ -9,7 +9,7 @@ import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
 from django_filters.rest_framework import DateRangeFilter
 
-from rest_framework import generics, exceptions
+from rest_framework import generics, exceptions, viewsets
 
 from metaci.testresults.models import TestResult
 from metaci.build.models import BuildFlow
@@ -21,7 +21,7 @@ from django.db import connection
 
 
 def set_timeout(timeout):
-    """Restrict extremely long Postgres queries. 
+    """Restrict extremely long Postgres queries.
     Theoretically this should reset on the next request but that
     could use some additional testing"""
     with connection.cursor() as cursor:
@@ -186,7 +186,7 @@ class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.Fil
 BUILD_FLOWS_LIMIT = 100
 
 
-class TestMethodPerfListView(generics.ListAPIView):
+class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     """
     A view for lists of aggregated test metrics.
 
