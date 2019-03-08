@@ -24,8 +24,8 @@ router.register(r"rebuilds", RebuildViewSet, base_name="rebuild")
 router.register(r"repos", RepositoryViewSet, base_name="repo")
 router.register(r"scratch_orgs", ScratchOrgInstanceViewSet, base_name="scratch_org")
 router.register(r"services", ServiceViewSet, base_name="service")
+router.register(r"testmethod_perf", TestMethodPerfListView, base_name="testmethod_perf")
 urlpatterns = router.urls
 
 schema_view = get_schema_view(title="MetaCI API")
 urlpatterns += (url(r"^schema/$", schema_view),)
-urlpatterns += (url(r"^testmethod_perf/$", TestMethodPerfListView.as_view(), name="testmethod-perf"),)
