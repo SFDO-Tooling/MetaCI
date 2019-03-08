@@ -50,9 +50,24 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
 
 
 class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
-    """This filterset is not used directly on the output queryset.
-       get_queryset must create it explicitly with really_filter=True.
-       Otherwise it is disabled by default."""
+    """
+       The tricky bit is that this filter serves three different jobs.
+
+        1. It validates incoming parameters (which is not strictly necessary
+          but probably difficult to turn off and perhaps sometimes useful).
+
+        2. It populates the django-filter form.
+
+        3. It drives actual filtering of the build-list sub-query.
+
+        Feature 3 is turned on and off by the really_filter parameter.
+        We do NOT want django-filter to try to automatically filter the
+        output queryset based on these filters because it is actually the
+        sub-query that we need to filter.
+
+        Accordingly, its fields are turned off by default (see disable_by_default) 
+        and turned on explicitly ("really_filter") when it is created by get_queryset
+       """
 
     build_fields = {
         "repo": "build__repo__name",
