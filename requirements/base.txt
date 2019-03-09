@@ -77,3 +77,6 @@ PyJWT==1.7.1
 
 # Django Defender
 django-defender==0.6.0
+
+# Django Postgres Stats
+django-postgres-stats==1.0.0
