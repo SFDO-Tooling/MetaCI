@@ -3,21 +3,31 @@ import copy
 from django.db.models import FloatField
 from django.db.models.functions import Cast
 
-from django.db.models import F, Avg, Count, Q, Min, Max
+from django.db.models import F, Avg, Count, Q, StdDev
 
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
 from django_filters.rest_framework import DateRangeFilter
 
+from postgres_stats.aggregates import Percentile
+
 from rest_framework import generics, exceptions, viewsets
 
 from metaci.testresults.models import TestResult
 from metaci.build.models import BuildFlow
-from metaci.api.serializers.testmethod_perf import TestMethodPerfSerializer
+from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
 from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
 
 from django.db import connection
+
+
+def NearMin(field):
+    return Percentile(field, 0.5, output_field=FloatField())
+
+
+def NearMax(field):
+    return Percentile(field, 0.95, output_field=FloatField())
 
 
 def set_timeout(timeout):
@@ -69,13 +79,6 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
         and turned on explicitly ("really_filter") when it is created by get_queryset
        """
 
-    build_fields = {
-        "repo": "build__repo__name",
-        "plan": "build__plan__name",
-        "branch": "build__branch__name",
-        "flow": "flow",
-    }
-
     repo_choices = (
         Repository.objects.values_list("name", "name").order_by("name").distinct()
     )
@@ -116,6 +119,14 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
         method="dummy_filter", label="Build Flows Limit (default: 100)"
     )
 
+    fields_and_stuff = locals()
+
+    build_fields = {}
+
+    for name in ("repo", "plan", "branch", "flow"):
+        # make a list of db field_names for use in grouping
+        build_fields[name] = fields_and_stuff[name].field_name
+
     disable_by_default = dir()  # disable all of these fields by default.
 
 
@@ -138,12 +149,14 @@ class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.Fil
     )
 
     metrics = {
-        "average_duration": Avg("duration"),
-        "slowest_runs": Min("duration"),  # fixme: use p05
-        "fastest_runs": Max("duration"),  # fixme: use p95
-        "average_cpu_usage": Avg("test_cpu_time_used"),
-        "low_cpu_usage": Min("test_cpu_time_used"),
-        "high_cpu_usage": Max("test_cpu_time_used"),
+        "duration_average": Avg("duration"),
+        "duration_slow": NearMax("duration"),
+        "duration_fast": NearMin("duration"),
+        "duration_stddev": StdDev("duration"),
+        "duration_coefficient_var": StdDev("duration") / Avg("duration"),
+        "cpu_usage_average": Avg("test_cpu_time_used"),
+        "cpu_usage_low": NearMin("test_cpu_time_used"),
+        "cpu_usage_high": NearMax("test_cpu_time_used"),
         "count": Count("id"),
         "failures": Count("id", filter=Q(outcome="Fail")),
         "assertion_failures": Count(
@@ -194,7 +207,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     change this default with the build_flows_limit parameter.
     """
 
-    serializer_class = TestMethodPerfSerializer
+    serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = TestMethodPerfFilter
 
