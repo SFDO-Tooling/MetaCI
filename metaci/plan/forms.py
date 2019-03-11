@@ -64,7 +64,11 @@ class RunPlanForm(forms.Form):
             self.helper.layout.extend([Field("keep_org")])
         self.helper.layout.append(
             FormActions(
-                Submit("submit", "Submit", css_class="slds-button slds-button--brand")
+                Submit(
+                    "submit",
+                    "Submit",
+                    css_class="slds-button slds-button--brand slds-m-around--medium",
+                )
             )
         )
 
