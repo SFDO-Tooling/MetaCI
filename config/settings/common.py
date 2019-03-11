@@ -275,7 +275,6 @@ ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
 # Github credentials
 GITHUB_USERNAME = None
 GITHUB_PASSWORD = None
-GITHUB_WEBHOOK_BASE_URL = None
 GITHUB_WEBHOOK_SECRET = None
 
 # Salesforce OAuth Connected App credentials

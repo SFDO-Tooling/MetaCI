@@ -59,10 +59,6 @@
       "description": "The Github password used to connect to repositories and create web hooks.  Using an application token instead of password is recommended",
       "value": ""
     },
-    "GITHUB_WEBHOOK_BASE_URL": {
-      "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
-      "value": ""
-    },
     "GITHUB_WEBHOOK_SECRET": {
       "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
       "generator": "secret"

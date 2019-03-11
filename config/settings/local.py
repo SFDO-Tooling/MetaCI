@@ -113,7 +113,6 @@ SITE_URL = env("SITE_URL", default="http://localhost:8000")
 # Github credentials
 GITHUB_USERNAME = env("GITHUB_USERNAME")
 GITHUB_PASSWORD = env("GITHUB_PASSWORD")
-GITHUB_WEBHOOK_BASE_URL = env("GITHUB_WEBHOOK_BASE_URL")
 GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET")
 
 # Salesforce OAuth Connected App credentials
