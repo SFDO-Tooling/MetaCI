@@ -43,14 +43,11 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
        djago-filter config form but to have only one of them actually filter the
        output queryset. The other filters a queryset of a sub-select."""
 
-    really_filter = False
-
-    def __init__(self, *args, really_filter=really_filter, **kwargs):
-        self.really_filter = really_filter
+    def __init__(self, *args, really_filter=False, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for filtername in self.filters.keys():
-            if not really_filter:
+        if not really_filter:
+            for filtername in self.filters.keys():
                 if filtername in self.disable_by_default:
                     self.filters[filtername] = copy.copy(self.filters[filtername])
                     self.filters[filtername].method = self.dummy_filter
@@ -59,6 +56,12 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
         return queryset
 
 
+def turnFilterSetOffByDefaultDecorator(cls):
+    cls.disable_by_default = dir(cls)  # disable all of these fields by default.
+    return cls
+
+
+@turnFilterSetOffByDefaultDecorator
 class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     """
        The tricky bit is that this filter serves three different jobs.
@@ -126,8 +129,6 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     for name in ("repo", "plan", "branch", "flow"):
         # make a list of db field_names for use in grouping
         build_fields[name] = fields_and_stuff[name].field_name
-
-    disable_by_default = dir()  # disable all of these fields by default.
 
 
 class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.FilterSet):
@@ -218,7 +219,9 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
     def _get_buildflows(self):
         """Which buildflows do we need to look at? Limit by time, repo, etc.
-           Also limit # for performance reasons"""
+
+        Also limits # of returned buildflows for performance reasons
+        """
         params = self.request.query_params
         build_flows_limit = int(params.get("build_flows_limit") or BUILD_FLOWS_LIMIT)
 
@@ -244,12 +247,10 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             fieldname = fieldname.strip("-")
             aggregations[fieldname] = fields[fieldname]
 
-        print("Aggregating", aggregations)
-
         return aggregations
 
     def _get_splitter_fields(self):
-        "Which fields to split on (or group by, depending on how you think about it"
+        """Which fields to split on (or group by, depending on how you think about it"""
         params = self.request.query_params
         output_fields = {}
 
@@ -258,12 +259,10 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             for param in params.getlist("group_by"):
                 output_fields[param] = F("build_flow__" + build_fields[param])
 
-        print("Splitting", output_fields)
-
         return output_fields
 
     def _check_params(self):
-        "Check things the django-filter does not check automatically"
+        """Check things the django-filter does not check automatically"""
         params = self.request.query_params
         if params.get("recentdate") and (
             params.get("daterange_after") or params.get("daterange_before")
@@ -271,7 +270,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             raise exceptions.APIException("Specified both recentdate and daterange")
 
     def get_queryset(self):
-        "The main method that the Django infrastructure invokes."
+        """The main method that the Django infrastructure invokes."""
         set_timeout(20)
         self._check_params()
 
