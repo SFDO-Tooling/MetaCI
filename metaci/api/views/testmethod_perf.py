@@ -23,25 +23,33 @@ from django.db import connection
 
 
 def NearMin(field):
+    "DB Statistical function for almost the minimum but not quite."
     return Percentile(field, 0.5, output_field=FloatField())
 
 
 def NearMax(field):
+    "DB Statistical function for almost the maximum but not quite."
     return Percentile(field, 0.95, output_field=FloatField())
 
 
 def set_timeout(timeout):
     """Restrict extremely long Postgres queries.
+
     Theoretically this should reset on the next request but that
-    could use some additional testing"""
+    could use some additional testing.
+    """
     with connection.cursor() as cursor:
         cursor.execute("SET LOCAL statement_timeout=%s", [timeout * 1000])
 
 
 class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
-    """A bit of a hack to allow two filtersets to work together in generating the
-       djago-filter config form but to have only one of them actually filter the
-       output queryset. The other filters a queryset of a sub-select."""
+    """A bit of a hack class. Use carefully!
+    
+    This is a bit of a hack to allow two filtersets to work together in
+    generating the djago-filter config form but to have only one of them
+    actually filter the output queryset. The other filters a queryset of
+    a sub-select.
+    """
 
     def __init__(self, *args, really_filter=False, **kwargs):
         super().__init__(*args, **kwargs)
@@ -63,24 +71,25 @@ def turnFilterSetOffByDefaultDecorator(cls):
 
 @turnFilterSetOffByDefaultDecorator
 class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
+    """A "conditional" filterset for generating the BuildFlow sub-select.
+
+    The tricky bit is that this filter serves three different jobs.
+
+    1. It validates incoming parameters (which is not strictly necessary
+        but probably difficult to turn off and perhaps sometimes useful).
+
+    2. It populates the django-filter form.
+
+    3. It drives actual filtering of the build-list sub-query.
+
+    Feature 3 is turned on and off by the really_filter parameter.
+    We do NOT want django-filter to try to automatically filter the
+    output queryset based on these filters because it is actually the
+    sub-query that we need to filter.
+
+    Accordingly, its fields are turned off by default (see disable_by_default) 
+    and turned on explicitly ("really_filter") when it is created by get_queryset
     """
-       The tricky bit is that this filter serves three different jobs.
-
-        1. It validates incoming parameters (which is not strictly necessary
-          but probably difficult to turn off and perhaps sometimes useful).
-
-        2. It populates the django-filter form.
-
-        3. It drives actual filtering of the build-list sub-query.
-
-        Feature 3 is turned on and off by the really_filter parameter.
-        We do NOT want django-filter to try to automatically filter the
-        output queryset based on these filters because it is actually the
-        sub-query that we need to filter.
-
-        Accordingly, its fields are turned off by default (see disable_by_default) 
-        and turned on explicitly ("really_filter") when it is created by get_queryset
-       """
 
     repo_choices = (
         Repository.objects.values_list("name", "name").order_by("name").distinct()
@@ -201,8 +210,7 @@ BUILD_FLOWS_LIMIT = 100
 
 
 class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
-    """
-    A view for lists of aggregated test metrics.
+    """A view for lists of aggregated test metrics.
 
     Note that the number of build flows covered is limited to **BUILD_FLOWS_LIMIT** for performance reasons. You can
     change this default with the build_flows_limit parameter.
