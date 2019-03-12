@@ -222,11 +222,15 @@ MEDIA_URL = "/media/"
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
 
-# ADMIN_AREA_PREFIX = env("DJANGO_ADMIN_URL", default="admin/", cast=url_prefix)
+# Location of root django.contrib.admin URL, use {% url 'admin:index' %}
+ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin")
+ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
 
-RESTRICTED_PREFIXES = env(
-    "RESTRICTED_PREFIXES", default=["admin/", "api/"], cast=url_prefix_list
-)
+# Forward-compatible alias for use with IP-checking middleware
+ADMIN_AREA_PREFIX = ADMIN_URL
+
+# URLs other than ADMIN_AREA which should be secure
+RESTRICTED_PREFIXES = env("RESTRICTED_PREFIXES", default=["api/"], cast=url_prefix_list)
 
 ADMIN_API_ALLOWED_SUBNETS = env(
     "ADMIN_API_ALLOWED_SUBNETS",
@@ -297,10 +301,6 @@ RQ_QUEUES = {
 # Site URL
 SITE_URL = None
 FROM_EMAIL = "test@mailinator.com"
-
-# Location of root django.contrib.admin URL, use {% url 'admin:index' %}
-ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin")
-ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
 
 # Github credentials
 GITHUB_USERNAME = None
