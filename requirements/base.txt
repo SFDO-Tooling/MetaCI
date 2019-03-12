@@ -77,3 +77,6 @@ PyJWT==1.7.1
 
 # Django Defender
 django-defender==0.6.0
+
+# SFDO Template Helpers for authorization middleware and other helpers
+-e git+https://github.com/SFDO-Tooling/sfdo-template-helpers.git@v0.1.0#egg=sfdo_template_helpers

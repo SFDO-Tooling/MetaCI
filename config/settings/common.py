@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 from __future__ import absolute_import, unicode_literals
 
 import environ
+from ipaddress import IPv4Network
+from typing import List
+
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
@@ -19,6 +22,19 @@ APPS_DIR = ROOT_DIR.path("metaci")
 
 env = environ.Env()
 env.read_env()
+
+
+def ipv4_networks(val: str) -> List[IPv4Network]:
+    return [IPv4Network(s.strip()) for s in val.split(",")]
+
+
+def url_prefix(val: str) -> str:
+    return val.rstrip("/") + "/"
+
+
+def url_prefix_list(val: str) -> List[str]:
+    return val.split(",")
+
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -80,6 +96,7 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "sfdo_template_helpers.admin.middleware.AdminRestrictMiddleware",
 )
 
 # MIGRATIONS CONFIGURATION
@@ -204,6 +221,19 @@ MEDIA_URL = "/media/"
 # URL Configuration
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
+
+# ADMIN_AREA_PREFIX = env("DJANGO_ADMIN_URL", default="admin/", cast=url_prefix)
+
+RESTRICTED_PREFIXES = env(
+    "RESTRICTED_PREFIXES", default=["admin/", "api/"], cast=url_prefix_list
+)
+
+ADMIN_API_ALLOWED_SUBNETS = env(
+    "ADMIN_API_ALLOWED_SUBNETS",
+    default="127.0.0.1/32",
+    cast=ipv4_networks,
+    parse_default=True,
+)
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = "config.wsgi.application"
