@@ -33,7 +33,7 @@ def url_prefix(val: str) -> str:
 
 
 def url_prefix_list(val: str) -> List[str]:
-    return val.split(",")
+    return [url_prefix(url) for url in val.split(",")]
 
 
 # APP CONFIGURATION
@@ -230,7 +230,7 @@ RESTRICTED_PREFIXES = env(
 
 ADMIN_API_ALLOWED_SUBNETS = env(
     "ADMIN_API_ALLOWED_SUBNETS",
-    default="127.0.0.1/32",
+    default="0.0.0.0/0",
     cast=ipv4_networks,
     parse_default=True,
 )
