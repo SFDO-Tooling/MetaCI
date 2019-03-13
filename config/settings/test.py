@@ -15,7 +15,7 @@ DEBUG = False
 TEMPLATES[0]["OPTIONS"]["debug"] = False
 
 # Allow requests with Host: testserver
-ALLOWED_HOSTS = ['testserver']
+ALLOWED_HOSTS = ["testserver"]
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
