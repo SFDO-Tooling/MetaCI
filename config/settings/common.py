@@ -85,6 +85,15 @@ LOCAL_APPS = (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "127.0.0.1:8000",
+    "127.0.0.1:8080",
+    "localhost",
+    "localhost:8000",
+    "localhost:8080",
+]
+
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = (
