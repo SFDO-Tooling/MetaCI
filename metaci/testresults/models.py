@@ -11,6 +11,7 @@ from metaci.testresults.choices import TEST_TYPE_CHOICES
 
 
 class TestClass(models.Model):
+    __test__ = False  # Tell pytest that this is not a test.
     name = models.CharField(max_length=255, db_index=True)
     test_type = models.CharField(
         max_length=32, choices=TEST_TYPE_CHOICES, db_index=True
@@ -28,6 +29,7 @@ class TestClass(models.Model):
 
 
 class TestMethod(models.Model):
+    __test__ = False  # Not a unit test
     name = models.CharField(max_length=255, db_index=True)
     testclass = models.ForeignKey(
         TestClass, related_name="methods", on_delete=models.CASCADE
@@ -43,6 +45,8 @@ class TestMethod(models.Model):
 
 
 class TestResultManager(models.Manager):
+    __test__ = False  # Not a unit test
+
     def update_summary_fields(self):
         for summary in self.all():
             summary.update_summary_fields()
@@ -51,10 +55,11 @@ class TestResultManager(models.Manager):
 
         results = OrderedDict()
         for build_flow in build_flows:
-            test_results = build_flow.test_results \
-                .select_related('method') \
-                .select_related('method__testclass') \
+            test_results = (
+                build_flow.test_results.select_related("method")
+                .select_related("method__testclass")
                 .all()
+            )
             for result in test_results:
                 cls = result.method.testclass.name
                 method = result.method.name
@@ -97,6 +102,7 @@ class TestResultManager(models.Manager):
 
 
 class TestResult(models.Model):
+    __test__ = False  # Tell pytest that this is not a test.
     build_flow = models.ForeignKey(
         "build.BuildFlow", related_name="test_results", on_delete=models.CASCADE
     )
@@ -149,29 +155,15 @@ class TestResult(models.Model):
     callouts_used = models.IntegerField(null=True, blank=True)
     callouts_allowed = models.IntegerField(null=True, blank=True)
     callouts_percent = models.IntegerField(null=True, blank=True)
-    test_email_invocations_used = models.IntegerField(
-        null=True, blank=True
-    )
-    test_email_invocations_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_email_invocations_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_email_invocations_used = models.IntegerField(null=True, blank=True)
+    test_email_invocations_allowed = models.IntegerField(null=True, blank=True)
+    test_email_invocations_percent = models.IntegerField(null=True, blank=True)
     test_soql_queries_used = models.IntegerField(null=True, blank=True)
-    test_soql_queries_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_soql_queries_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_soql_queries_allowed = models.IntegerField(null=True, blank=True)
+    test_soql_queries_percent = models.IntegerField(null=True, blank=True)
     test_future_calls_used = models.IntegerField(null=True, blank=True)
-    test_future_calls_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_future_calls_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_future_calls_allowed = models.IntegerField(null=True, blank=True)
+    test_future_calls_percent = models.IntegerField(null=True, blank=True)
     test_dml_rows_used = models.IntegerField(null=True, blank=True)
     test_dml_rows_allowed = models.IntegerField(null=True, blank=True)
     test_dml_rows_percent = models.IntegerField(null=True, blank=True)
@@ -182,38 +174,20 @@ class TestResult(models.Model):
     test_query_rows_allowed = models.IntegerField(null=True, blank=True)
     test_query_rows_percent = models.IntegerField(null=True, blank=True)
     test_dml_statements_used = models.IntegerField(null=True, blank=True)
-    test_dml_statements_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_dml_statements_percent = models.IntegerField(
-        null=True, blank=True
-    )
-    test_mobile_apex_push_used = models.IntegerField(
-        null=True, blank=True
-    )
-    test_mobile_apex_push_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_mobile_apex_push_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_dml_statements_allowed = models.IntegerField(null=True, blank=True)
+    test_dml_statements_percent = models.IntegerField(null=True, blank=True)
+    test_mobile_apex_push_used = models.IntegerField(null=True, blank=True)
+    test_mobile_apex_push_allowed = models.IntegerField(null=True, blank=True)
+    test_mobile_apex_push_percent = models.IntegerField(null=True, blank=True)
     test_heap_size_used = models.IntegerField(null=True, blank=True)
     test_heap_size_allowed = models.IntegerField(null=True, blank=True)
     test_heap_size_percent = models.IntegerField(null=True, blank=True)
     test_sosl_queries_used = models.IntegerField(null=True, blank=True)
-    test_sosl_queries_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_sosl_queries_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_sosl_queries_allowed = models.IntegerField(null=True, blank=True)
+    test_sosl_queries_percent = models.IntegerField(null=True, blank=True)
     test_queueable_jobs_used = models.IntegerField(null=True, blank=True)
-    test_queueable_jobs_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_queueable_jobs_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_queueable_jobs_allowed = models.IntegerField(null=True, blank=True)
+    test_queueable_jobs_percent = models.IntegerField(null=True, blank=True)
     test_callouts_used = models.IntegerField(null=True, blank=True)
     test_callouts_allowed = models.IntegerField(null=True, blank=True)
     test_callouts_percent = models.IntegerField(null=True, blank=True)
@@ -270,6 +244,7 @@ def asset_upload_to(instance, filename):
 
 
 class TestResultAsset(models.Model):
+    __test__ = False  # Tell pytest that this is not a test.
     result = models.ForeignKey(
         TestResult, related_name="assets", on_delete=models.CASCADE
     )
