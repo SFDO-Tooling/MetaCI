@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 from __future__ import absolute_import, unicode_literals
 
 import environ
+from ipaddress import IPv4Network
+from typing import List
+
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
@@ -19,6 +22,19 @@ APPS_DIR = ROOT_DIR.path("metaci")
 
 env = environ.Env()
 env.read_env()
+
+
+def ipv4_networks(val: str) -> List[IPv4Network]:
+    return [IPv4Network(s.strip()) for s in val.split(",")]
+
+
+def url_prefix(val: str) -> str:
+    return val.rstrip("/") + "/"
+
+
+def url_prefix_list(val: str) -> List[str]:
+    return [url_prefix(url) for url in val.split(",")]
+
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -80,6 +96,7 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "sfdo_template_helpers.admin.middleware.AdminRestrictMiddleware",
 )
 
 # MIGRATIONS CONFIGURATION
@@ -205,6 +222,23 @@ MEDIA_URL = "/media/"
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
 
+# Location of root django.contrib.admin URL, use {% url 'admin:index' %}
+ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin")
+ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
+
+# Forward-compatible alias for use with IP-checking middleware
+ADMIN_AREA_PREFIX = ADMIN_URL
+
+# URLs other than ADMIN_AREA which should be secure
+RESTRICTED_PREFIXES = env("RESTRICTED_PREFIXES", default=["api/"], cast=url_prefix_list)
+
+ADMIN_API_ALLOWED_SUBNETS = env(
+    "ADMIN_API_ALLOWED_SUBNETS",
+    default="0.0.0.0/0",
+    cast=ipv4_networks,
+    parse_default=True,
+)
+
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = "config.wsgi.application"
 
@@ -267,10 +301,6 @@ RQ_QUEUES = {
 # Site URL
 SITE_URL = None
 FROM_EMAIL = "test@mailinator.com"
-
-# Location of root django.contrib.admin URL, use {% url 'admin:index' %}
-ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin")
-ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
 
 # Github credentials
 GITHUB_USERNAME = None
