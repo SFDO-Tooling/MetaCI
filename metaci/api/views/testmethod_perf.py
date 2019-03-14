@@ -189,21 +189,21 @@ class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.Fil
         label="Include (multi-select okay)", choices=metric_choices, method=dummy
     )
 
-    o = django_filters.rest_framework.OrderingFilter(
-        fields=(
-            metric_choices
-            + group_by_choices
-            + (
-                ("method_name", "method_name"),
-                ("count", "count"),
-                ("failures", "failures"),
-                ("assertion_failures", "assertion_failures"),
-                ("DML_failures", "DML_failures"),
-                ("Other_failures", "Other_failures"),
-                ("success_percentage", "success_percentage"),
-            )
+    ordering_fields = (
+        metric_choices
+        + group_by_choices
+        + (
+            ("method_name", "method_name"),
+            ("count", "count"),
+            ("failures", "failures"),
+            ("assertion_failures", "assertion_failures"),
+            ("DML_failures", "DML_failures"),
+            ("Other_failures", "Other_failures"),
+            ("success_percentage", "success_percentage"),
         )
     )
+    o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
+    ordering_param_name = "o"
 
 
 BUILD_FLOWS_LIMIT = 100
@@ -219,6 +219,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = TestMethodPerfFilter
+    ordering_param_name = filter_class.ordering_param_name
 
     # example URLs:
     # http://localhost:8000/api/testmethod_perf/?repo=gem&plan=Release%20Test&method_name=testCreateNegative
@@ -246,8 +247,8 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         aggregations = {}
         fields_to_include = params.getlist("include_fields")
 
-        if params.get("o"):
-            fields_to_include.append(params.get("o"))
+        if params.get(self.ordering_param_name):
+            fields_to_include.append(params.get(self.ordering_param_name))
 
         fields = self.filter_class.metrics
 
@@ -293,6 +294,9 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             .values(method_name=F("method__name"), **splitter_fields)
             .annotate(**aggregations)
         )
+
+        if not self.request.query_params.get(self.ordering_param_name, None):
+            queryset.order_by("method_name")
 
         return queryset
 
