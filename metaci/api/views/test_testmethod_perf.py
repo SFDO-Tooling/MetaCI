@@ -55,10 +55,8 @@ class BuildFlowFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BuildFlow
 
-    class Params:
-        flow = "gowiththe"
-
     build = factory.SubFactory(BuildFactory)
+    flow = "rida"
 
 
 class TestClassFactory(factory.django.DjangoModelFactory):
@@ -77,6 +75,7 @@ class TestMethodFactory(factory.django.DjangoModelFactory):
         model = TestMethod
 
     testclass = factory.SubFactory(TestClassFactory)
+    name = "GenericMethod"
 
 
 class TestResultFactory(factory.django.DjangoModelFactory):
@@ -87,6 +86,7 @@ class TestResultFactory(factory.django.DjangoModelFactory):
 
     build_flow = factory.SubFactory(BuildFlowFactory)
     method = factory.SubFactory(TestMethodFactory)
+    duration = 5
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -106,7 +106,6 @@ class StaffSuperuserFactory(UserFactory):
 
 
 def make_user_and_client():
-    password = "12345"
     user = StaffSuperuserFactory()
     client = APIClient()
     client.force_authenticate(user)
@@ -132,6 +131,9 @@ class TestTestMethodPerfRESTAPI(APITestCase):
     def setUpClass(cls):
         cls.client, cls.user = make_user_and_client()
         super().setUpClass()
+
+    def setUp(self):
+        self.client.force_authenticate(self.user)
         t1 = TestResultFactory(
             method__name="Foo", duration=10, build_flow__tests_total=1
         )
@@ -139,21 +141,18 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         TestResultFactory(method__name="Bar", duration=3, build_flow__tests_total=1)
         TestResultFactory(method__name="Bar", duration=5, build_flow__tests_total=1)
 
-    def setUp(self):
-        self.client.force_authenticate(self.user)
+    def find_by(self, fieldname, objs, value):
+        return next((x for x in objs["results"] if x[fieldname] == value), None)
 
-    @staticmethod
-    def find_by_methodname(objs, methodname):
-        return next(
-            (x for x in objs["results"] if x["method_name"] == methodname), None
-        )
+    def find_by_methodname(self, objs, methodname):
+        return self.find_by("method_name", objs, methodname)
 
     def stats_test_helper(self, stat):
         response = self.client.get(testapi_url(include_fields=stat))
         self.assertEqual(response.status_code, 200)
         return response.json()
 
-    def identical_tests_helper(self, method_name, count, **fields):
+    def identical_tests_helper(self, count, method_name="GenericMethod", **fields):
         t1 = TestResultFactory(
             build_flow__tests_total=1, method__name=method_name, **fields
         )
@@ -193,7 +192,7 @@ class TestTestMethodPerfRESTAPI(APITestCase):
             "success_percentage",
         ]
 
-        def test_fields(fields):
+        def _test_fields(fields):
             response = self.client.get(testapi_url(include_fields=fields))
             self.assertEqual(response.status_code, 200)
             rows = response.json()["results"]
@@ -204,15 +203,17 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         random.seed("xyzzy")
         for i in range(10):
             field = random.sample(includable_fields, 1)
-            test_fields(field)
+            _test_fields(field)
 
         for i in range(10):
             field1, field2 = random.sample(includable_fields, 2)
-            test_fields([field1, field2])
+            _test_fields([field1, field2])
 
         for i in range(10):
             field1, field2, field3 = random.sample(includable_fields, 3)
-            test_fields([field1, field2, field3])
+            _test_fields([field1, field2, field3])
+
+        _test_fields(includable_fields)
 
     def test_duration_slow(self):
         """Test counting high durations"""
@@ -244,12 +245,8 @@ class TestTestMethodPerfRESTAPI(APITestCase):
 
     def test_count_failures(self):
         """Test counting failed tests"""
-        self.identical_tests_helper(
-            method_name="FailingTest", duration=5, count=15, outcome="Fail"
-        )
-        self.identical_tests_helper(
-            method_name="FailingTest", duration=5, count=10, outcome="Pass"
-        )
+        self.identical_tests_helper(method_name="FailingTest", count=15, outcome="Fail")
+        self.identical_tests_helper(method_name="FailingTest", count=10, outcome="Pass")
         response = self.client.get(
             testapi_url(include_fields=["failures", "success_percentage"])
         )
@@ -262,19 +259,13 @@ class TestTestMethodPerfRESTAPI(APITestCase):
             self.find_by_methodname(objs, "FailingTest")["success_percentage"], 10 / 25
         )
 
-    def xyzzy_test_split_by_repo(self):
-        """Test counting failed tests"""
+    def test_split_by_repo(self):
+        """Test Splitting on repo"""
         self.identical_tests_helper(
-            method_name="HedaTest",
-            duration=5,
-            count=15,
-            build_flow__build__repo__name="HEDA",
+            method_name="HedaTest", count=15, build_flow__build__repo__name="HEDA"
         )
         self.identical_tests_helper(
-            method_name="NPSPTest",
-            duration=5,
-            count=20,
-            build_flow__build__repo__name="Cumulus",
+            method_name="NPSPTest", count=20, build_flow__build__repo__name="Cumulus"
         )
         response = self.client.get(testapi_url(include_fields="count", group_by="repo"))
         self.assertEqual(response.status_code, 200)
@@ -286,83 +277,77 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         self.assertEqual(self.find_by_methodname(objs, "NPSPTest")["count"], 20)
         self.assertEqual(self.find_by_methodname(objs, "NPSPTest")["repo"], "Cumulus")
 
-    def xyzzy_test_split_by_repo_and_flow(self):
-        """Test counting failed tests"""
+    def test_split_by_flow(self):
+        """Test splitting on flow"""
         self.identical_tests_helper(
-            method_name="HedaTest",
-            duration=5,
-            count=15,
-            build_flow__build__repo__name="HEDA",
-            build_flow__flow="A_HEDA_Flow",
+            method_name="HedaTest", count=15, build_flow__flow="ci_feature"
         )
         self.identical_tests_helper(
-            method_name="NPSPTest",
-            duration=5,
-            count=20,
-            build_flow__build__repo__name="Cumulus",
-            build_flow__flow="A_Cumulus_Flow",
+            method_name="HedaTest", count=20, build_flow__flow="ci_beta"
+        )
+        response = self.client.get(testapi_url(include_fields="count", group_by="flow"))
+        self.assertEqual(response.status_code, 200)
+        objs = response.json()
+        print(objs)
+
+        for row in objs["results"]:
+            self.assertIn(row["flow"], ["ci_feature", "ci_beta", "rida"])
+
+        self.assertEqual(self.find_by("flow", objs, "ci_feature")["count"], 15)
+        self.assertEqual(self.find_by("flow", objs, "ci_beta")["count"], 20)
+
+    def test_split_by_flow_ignoring_repo(self):
+        """Test splitting on flow regardless of repro"""
+        self.identical_tests_helper(
+            count=3, build_flow__build__repo__name="HEDA", build_flow__flow="Flow1"
+        )
+        self.identical_tests_helper(
+            count=5, build_flow__build__repo__name="HEDA", build_flow__flow="Flow2"
+        )
+        self.identical_tests_helper(
+            count=7, build_flow__build__repo__name="Cumulus", build_flow__flow="Flow1"
+        )
+        self.identical_tests_helper(
+            count=9, build_flow__build__repo__name="Cumulus", build_flow__flow="Flow2"
         )
         response = self.client.get(
-            testapi_url(include_fields="count", group_by=["repo", "flow"])
+            testapi_url(include_fields="count", group_by=["flow"])
         )
         self.assertEqual(response.status_code, 200)
         objs = response.json()
         print(objs)
 
-        self.assertEqual(self.find_by_methodname(objs, "HedaTest")["count"], 15)
-        self.assertEqual(self.find_by_methodname(objs, "HedaTest")["repo"], "HEDA")
-        self.assertEqual(
-            self.find_by_methodname(objs, "HedaTest")["flow"], "A_HEDA_Flow"
-        )
-        self.assertEqual(self.find_by_methodname(objs, "NPSPTest")["count"], 20)
-        self.assertEqual(self.find_by_methodname(objs, "NPSPTest")["repo"], "Cumulus")
-        self.assertEqual(
-            self.find_by_methodname(objs, "NPSPTest")["flow"], "A_Cumulus_Flow"
-        )
+        self.assertEqual(self.find_by("flow", objs, "Flow1")["count"], 10)
+        self.assertEqual(self.find_by("flow", objs, "Flow2")["count"], 14)
 
-    def xyzzy_test_merge_by_flow(self):
-        """Test counting failed tests"""
+    def test_split_by_plan(self):
+        """Test splitting on plan regardless of the rest"""
         self.identical_tests_helper(
-            method_name="HedaTest",
-            duration=5,
-            count=15,
+            count=3,
             build_flow__build__repo__name="HEDA",
-            build_flow__flow="A_HEDA_Flow",
+            build_flow__build__plan__name="plan1",
         )
         self.identical_tests_helper(
-            method_name="NPSPTest",
-            duration=5,
-            count=20,
-            build_flow__build__repo__name="Cumulus",
-            build_flow__flow="A_Cumulus_Flow",
-        )
-        self.identical_tests_helper(
-            method_name="HedaTest",
-            duration=5,
-            count=15,
+            count=5,
             build_flow__build__repo__name="HEDA",
-            build_flow__flow="A_Cumulus_Flow",
+            build_flow__build__plan__name="plan2",
         )
         self.identical_tests_helper(
-            method_name="NPSPTest",
-            duration=5,
-            count=20,
+            count=7,
             build_flow__build__repo__name="Cumulus",
-            build_flow__flow="A_HEDA_Flow",
+            build_flow__build__plan__name="plan1",
         )
-
+        self.identical_tests_helper(
+            count=9,
+            build_flow__build__repo__name="Cumulus",
+            build_flow__build__plan__name="plan2",
+        )
         response = self.client.get(
-            r"/api/testmethod_perf/?include_fields=count&group_by=repo&group_by=flow"
+            testapi_url(include_fields="count", group_by=["plan"])
         )
         self.assertEqual(response.status_code, 200)
         objs = response.json()
         print(objs)
 
-        self.assertEqual(self.find_by_methodname(objs, "HedaTest")["count"], 25)
-        self.assertEqual(
-            self.find_by_methodname(objs, "HedaTest")["flow"], "A_HEDA_Flow"
-        )
-        self.assertEqual(self.find_by_methodname(objs, "NPSPTest")["count"], 20)
-        self.assertEqual(
-            self.find_by_methodname(objs, "NPSPTest")["flow"], "A_Cumulus_Flow"
-        )
+        self.assertEqual(self.find_by("plan", objs, "plan1")["count"], 10)
+        self.assertEqual(self.find_by("plan", objs, "plan2")["count"], 14)
