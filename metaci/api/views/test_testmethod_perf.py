@@ -142,15 +142,23 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         TestResultFactory(method__name="Bar", duration=5, build_flow__tests_total=1)
 
     def find_by(self, fieldname, objs, value):
-        return next((x for x in objs["results"] if x[fieldname] == value), None)
+        if type(objs) == dict:
+            objs = objs.get("results", objs)
+        return next((x for x in objs if x[fieldname] == value), None)
 
     def find_by_methodname(self, objs, methodname):
         return self.find_by("method_name", objs, methodname)
 
-    def stats_test_helper(self, stat):
-        response = self.client.get(testapi_url(include_fields=stat))
+    def api_call_helper(self, **kwargs):
+        print("Request", kwargs)
+        response = self.client.get(testapi_url(**kwargs))
         self.assertEqual(response.status_code, 200)
-        return response.json()
+        objs = response.json()
+        print("Response", objs)
+        return objs["results"]
+
+    def stats_test_helper(self, stat):
+        return self.api_call_helper(include_fields=stat)
 
     def identical_tests_helper(self, count, method_name="GenericMethod", **fields):
         t1 = TestResultFactory(
@@ -220,43 +228,28 @@ class TestTestMethodPerfRESTAPI(APITestCase):
 
         self.identical_tests_helper(method_name="Foo", count=20, duration=10)
         _outlier = TestResultFactory(method__name="Foo", duration=11)  # noqa
-        response = self.client.get(
-            testapi_url(include_fields=["duration_slow", "count"])
-        )
-        self.assertEqual(response.status_code, 200)
-        objs = response.json()
-        print(objs)
+        rows = self.api_call_helper(include_fields=["duration_slow", "count"])
 
-        self.assertEqual(self.find_by_methodname(objs, "Foo")["duration_slow"], 10)
+        self.assertEqual(self.find_by_methodname(rows, "Foo")["duration_slow"], 10)
 
     def test_duration_fast(self):
         """Test counting high durations"""
 
         self.identical_tests_helper(method_name="Foo", count=20, duration=2)
         _outlier = TestResultFactory(method__name="Foo", duration=1)  # noqa
-        response = self.client.get(
-            testapi_url(include_fields=["duration_slow", "count"])
-        )
-        self.assertEqual(response.status_code, 200)
-        objs = response.json()
-        print(objs)
+        rows = self.api_call_helper(include_fields=["duration_slow", "count"])
 
-        self.assertEqual(self.find_by_methodname(objs, "Foo")["duration_slow"], 2)
+        self.assertEqual(self.find_by_methodname(rows, "Foo")["duration_slow"], 2)
 
     def test_count_failures(self):
         """Test counting failed tests"""
         self.identical_tests_helper(method_name="FailingTest", count=15, outcome="Fail")
         self.identical_tests_helper(method_name="FailingTest", count=10, outcome="Pass")
-        response = self.client.get(
-            testapi_url(include_fields=["failures", "success_percentage"])
-        )
-        self.assertEqual(response.status_code, 200)
-        objs = response.json()
-        print(objs)
+        rows = self.api_call_helper(include_fields=["failures", "success_percentage"])
 
-        self.assertEqual(self.find_by_methodname(objs, "FailingTest")["failures"], 15)
+        self.assertEqual(self.find_by_methodname(rows, "FailingTest")["failures"], 15)
         self.assertEqual(
-            self.find_by_methodname(objs, "FailingTest")["success_percentage"], 10 / 25
+            self.find_by_methodname(rows, "FailingTest")["success_percentage"], 10 / 25
         )
 
     def test_split_by_repo(self):
@@ -267,15 +260,12 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         self.identical_tests_helper(
             method_name="NPSPTest", count=20, build_flow__build__repo__name="Cumulus"
         )
-        response = self.client.get(testapi_url(include_fields="count", group_by="repo"))
-        self.assertEqual(response.status_code, 200)
-        objs = response.json()
-        print(objs)
+        rows = self.api_call_helper(include_fields="count", group_by="repo")
 
-        self.assertEqual(self.find_by_methodname(objs, "HedaTest")["count"], 15)
-        self.assertEqual(self.find_by_methodname(objs, "HedaTest")["repo"], "HEDA")
-        self.assertEqual(self.find_by_methodname(objs, "NPSPTest")["count"], 20)
-        self.assertEqual(self.find_by_methodname(objs, "NPSPTest")["repo"], "Cumulus")
+        self.assertEqual(self.find_by_methodname(rows, "HedaTest")["count"], 15)
+        self.assertEqual(self.find_by_methodname(rows, "HedaTest")["repo"], "HEDA")
+        self.assertEqual(self.find_by_methodname(rows, "NPSPTest")["count"], 20)
+        self.assertEqual(self.find_by_methodname(rows, "NPSPTest")["repo"], "Cumulus")
 
     def test_split_by_flow(self):
         """Test splitting on flow"""
@@ -285,16 +275,13 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         self.identical_tests_helper(
             method_name="HedaTest", count=20, build_flow__flow="ci_beta"
         )
-        response = self.client.get(testapi_url(include_fields="count", group_by="flow"))
-        self.assertEqual(response.status_code, 200)
-        objs = response.json()
-        print(objs)
+        rows = self.api_call_helper(include_fields="count", group_by="flow")
 
-        for row in objs["results"]:
+        for row in rows:
             self.assertIn(row["flow"], ["ci_feature", "ci_beta", "rida"])
 
-        self.assertEqual(self.find_by("flow", objs, "ci_feature")["count"], 15)
-        self.assertEqual(self.find_by("flow", objs, "ci_beta")["count"], 20)
+        self.assertEqual(self.find_by("flow", rows, "ci_feature")["count"], 15)
+        self.assertEqual(self.find_by("flow", rows, "ci_beta")["count"], 20)
 
     def test_split_by_flow_ignoring_repo(self):
         """Test splitting on flow regardless of repro"""
@@ -310,15 +297,10 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         self.identical_tests_helper(
             count=9, build_flow__build__repo__name="Cumulus", build_flow__flow="Flow2"
         )
-        response = self.client.get(
-            testapi_url(include_fields="count", group_by=["flow"])
-        )
-        self.assertEqual(response.status_code, 200)
-        objs = response.json()
-        print(objs)
+        rows = self.api_call_helper(include_fields="count", group_by=["flow"])
 
-        self.assertEqual(self.find_by("flow", objs, "Flow1")["count"], 10)
-        self.assertEqual(self.find_by("flow", objs, "Flow2")["count"], 14)
+        self.assertEqual(self.find_by("flow", rows, "Flow1")["count"], 10)
+        self.assertEqual(self.find_by("flow", rows, "Flow2")["count"], 14)
 
     def test_split_by_plan(self):
         """Test splitting on plan regardless of the rest"""
@@ -342,12 +324,53 @@ class TestTestMethodPerfRESTAPI(APITestCase):
             build_flow__build__repo__name="Cumulus",
             build_flow__build__plan__name="plan2",
         )
-        response = self.client.get(
-            testapi_url(include_fields="count", group_by=["plan"])
-        )
-        self.assertEqual(response.status_code, 200)
-        objs = response.json()
-        print(objs)
+        rows = self.api_call_helper(include_fields="count", group_by=["plan"])
 
-        self.assertEqual(self.find_by("plan", objs, "plan1")["count"], 10)
-        self.assertEqual(self.find_by("plan", objs, "plan2")["count"], 14)
+        self.assertEqual(self.find_by("plan", rows, "plan1")["count"], 10)
+        self.assertEqual(self.find_by("plan", rows, "plan2")["count"], 14)
+
+    def test_order_by_count_desc(self):
+        """Test ordering by count"""
+        TestResultFactory(method__name="Bar", duration=3, build_flow__tests_total=1)
+
+        rows = self.api_call_helper(o="-count")
+
+        self.assertEqual(rows[0]["method_name"], "Bar")
+        self.assertEqual(rows[1]["method_name"], "Foo")
+
+    def test_order_by_count_asc(self):
+        """Test ordering by count"""
+        TestResultFactory(method__name="Bar", duration=3, build_flow__tests_total=1)
+
+        rows = self.api_call_helper(o="count")
+
+        self.assertEqual(rows[0]["method_name"], "Foo")
+        self.assertEqual(rows[1]["method_name"], "Bar")
+
+    def test_order_by_method_name_asc(self):
+        rows = self.api_call_helper(o="method_name")
+        self.assertTrue(rows[0]["method_name"] < rows[-1]["method_name"])
+
+    def test_order_by_method_name_desc(self):
+        rows = self.api_call_helper(o="-method_name")
+        self.assertTrue(rows[0]["method_name"] > rows[-1]["method_name"])
+
+    def test_order_by_success_percentage(self):
+        TestResultFactory(method__name="Bar", outcome="Pass", build_flow__tests_total=1)
+        rows = self.api_call_helper(o="success_percentage")
+        self.assertTrue(rows[0]["success_percentage"] < rows[-1]["success_percentage"])
+
+    def test_order_by_success_percentage_desc(self):
+        TestResultFactory(method__name="Bar", outcome="Pass", build_flow__tests_total=1)
+        rows = self.api_call_helper(o="-success_percentage")
+        self.assertTrue(rows[0]["success_percentage"] > rows[-1]["success_percentage"])
+
+    def test_order_by_unknown_field(self):
+        response = self.client.get(testapi_url(o="fjioesjfoi"))
+        self.assertEqual(response.status_code, 400)
+        response.json()  # should still be able to parse it
+
+    def test_include_unknown_field(self):
+        response = self.client.get(testapi_url(include_fields=["fjioesjfofi"]))
+        self.assertEqual(response.status_code, 400)
+        response.json()  # should still be able to parse it
