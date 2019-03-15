@@ -14,6 +14,9 @@ from .common import *  # noqa
 DEBUG = False
 TEMPLATES[0]["OPTIONS"]["debug"] = False
 
+# Allow requests with Host: testserver
+ALLOWED_HOSTS = ['testserver']
+
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
@@ -44,14 +47,6 @@ RQ_QUEUES = {
     "default": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
     "short": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 500, "AUTOCOMMIT": False},
 }
-
-# Add django_nose to INSTALLED_APPS
-INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
-
-# TESTING
-# ------------------------------------------------------------------------------
-TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
-NOSE_ARGS = ["--with-tap", "--tap-stream", "--with-coverage", "--cover-package=metaci"]
 
 
 # PASSWORD HASHING

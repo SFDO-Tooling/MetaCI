@@ -1,7 +1,6 @@
 from rest_framework.reverse import reverse
 from test_plus.test import TestCase
 
-
 class TestURLReversals(TestCase):
     """Test URL patterns for APIs app."""
 

@@ -35,8 +35,8 @@ npm-debug.log*
 # Unit test / coverage reports
 .coverage
 .tox
-nosetests.xml
 htmlcov
+*.tap
 
 # Translations
 *.mo
