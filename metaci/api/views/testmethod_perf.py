@@ -118,6 +118,7 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     disable_by_default.append("flow")
 
     recentdate = DateRangeFilter(label="Recent Date", field_name="time_end")
+    disable_by_default.append("recentdate")
 
     daterange = django_filters.rest_framework.DateFromToRangeFilter(
         field_name="time_end",
@@ -210,6 +211,12 @@ class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.Fil
 BUILD_FLOWS_LIMIT = 100
 
 
+class MetaCIApiException(exceptions.APIException):
+    status_code = 400
+    default_detail = "Validation Error."
+    default_code = 400
+
+
 class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     """A view for lists of aggregated test metrics.
 
@@ -287,7 +294,9 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         if params.get("recentdate") and (
             params.get("daterange_after") or params.get("daterange_before")
         ):
-            raise exceptions.APIException("Specified both recentdate and daterange")
+            raise MetaCIApiException(
+                detail="Specified both recentdate and daterange", code=400
+            )
 
     def get_queryset(self):
         """The main method that the Django infrastructure invokes."""
