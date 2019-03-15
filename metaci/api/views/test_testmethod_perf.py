@@ -374,3 +374,25 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         response = self.client.get(testapi_url(include_fields=["fjioesjfofi"]))
         self.assertEqual(response.status_code, 400)
         response.json()  # should still be able to parse it
+
+    def test_group_by_unknown_field(self):
+        response = self.client.get(testapi_url(include_fields=["fesafs"]))
+        self.assertEqual(response.status_code, 400)
+        response.json()  # should still be able to parse it
+
+    def test_cannot_specify_two_kinds_of_dates(self):
+        response = self.client.get(testapi_url(include_fields=["fesafs"]))
+        self.assertEqual(response.status_code, 400)
+        response.json()  # should still be able to parse it
+
+    def test_filter_by_recent_date_UNIMPLMENTED(self):
+        pass
+
+    def test_filter_by_date_UNIMPLMENTED(self):
+        pass
+
+    def test_api_view(self):
+        response = self.client.get(testapi_url(format="api"))
+        print(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("text/html", response["content-type"])
