@@ -118,6 +118,7 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     disable_by_default.append("flow")
 
     recentdate = DateRangeFilter(label="Recent Date", field_name="time_end")
+    disable_by_default.append("recentdate")
 
     daterange = django_filters.rest_framework.DateFromToRangeFilter(
         field_name="time_end",
