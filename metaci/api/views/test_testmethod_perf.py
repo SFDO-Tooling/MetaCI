@@ -10,7 +10,7 @@ from rest_framework.test import APIClient, APITestCase
 
 class _TestingHelpers:
     def debugmsg(self, *args):
-        print(*args)
+        print(*args)  # Pytest does useful stuff with stdout, better than logger data
 
     @classmethod
     def make_user_and_client(cls):
