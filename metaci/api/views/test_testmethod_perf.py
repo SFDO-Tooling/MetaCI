@@ -109,9 +109,8 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             response = self.client.get(self.api_url(include_fields=fields))
             self.assertEqual(response.status_code, 200)
             rows = response.json()["results"]
-            for field in fields:
-                for row in rows:
-                    self.assertIn(field, row.keys())
+            for row in rows:
+                self.assertSetEqual(set(fields + ["method_name"]), set(row))
 
         random.seed("xyzzy")
         for i in range(10):
