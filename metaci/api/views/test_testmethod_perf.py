@@ -1,13 +1,12 @@
 from urllib.parse import urlencode
 import random
+from datetime import timedelta, datetime
+from django.utils import timezone
 
 from rest_framework.test import APIClient, APITestCase
 
 import factory
 import factory.fuzzy
-
-from django.urls import reverse
-from rest_framework.test import APIClient
 
 from metaci.plan.models import Plan, PlanRepository
 from metaci.testresults.models import TestResult, TestMethod, TestClass
@@ -15,7 +14,6 @@ from metaci.build.models import BuildFlow, Build
 from metaci.repository.models import Branch, Repository
 
 from metaci.users.models import User
-from rest_framework.authtoken.models import Token
 
 
 class PlanFactory(factory.django.DjangoModelFactory):
@@ -55,6 +53,7 @@ class BuildFlowFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BuildFlow
 
+    tests_total = 5
     build = factory.SubFactory(BuildFactory)
     flow = "rida"
 
@@ -105,56 +104,41 @@ class StaffSuperuserFactory(UserFactory):
     is_superuser = True
 
 
-def make_user_and_client():
-    user = StaffSuperuserFactory()
-    client = APIClient()
-    client.force_authenticate(user)
-    response = client.get("/api/")
-    if response.status_code == 400 and "DisallowedHost" in str(response.content):
-        print("**** YOU MAY NEED TO ADD AN ALLOWED_HOSTS TO YOUR TEST.PY")
-        raise (Exception(response))
-
-    assert response.status_code == 200, response.content
-    return client, user
-
-
-def testapi_url(**kwargs):
-    params = urlencode(kwargs, True)
-    print(params)
-    return r"/api/testmethod_perf/?" + params
-
-
-class TestTestMethodPerfRESTAPI(APITestCase):
-    """Test the testmethodperf REST API"""
+class _TestingHelpers:
+    def debugmsg(self, *args):
+        print(*args)
 
     @classmethod
-    def setUpClass(cls):
-        cls.client, cls.user = make_user_and_client()
-        super().setUpClass()
+    def make_user_and_client(cls):
+        user = StaffSuperuserFactory()
+        client = APIClient()
+        client.force_authenticate(user)
+        response = client.get("/api/")
+        if response.status_code == 400 and "DisallowedHost" in str(response.content):
+            cls.debugmsg("**** YOU MAY NEED TO ADD AN ALLOWED_HOSTS TO YOUR TEST.PY")
+            raise (Exception(response))
 
-    def setUp(self):
-        self.client.force_authenticate(self.user)
-        t1 = TestResultFactory(
-            method__name="Foo", duration=10, build_flow__tests_total=1
-        )
-        TestResultFactory(duration=2, build_flow__tests_total=1, method=t1.method)
-        TestResultFactory(method__name="Bar", duration=3, build_flow__tests_total=1)
-        TestResultFactory(method__name="Bar", duration=5, build_flow__tests_total=1)
+        assert response.status_code == 200, response.content
+        return client, user
+
+    def api_url(self, **kwargs):
+        params = urlencode(kwargs, True)
+        self.debugmsg("QueryParams", params)
+        return r"/api/testmethod_perf/?" + params
 
     def find_by(self, fieldname, objs, value):
         if type(objs) == dict:
             objs = objs.get("results", objs)
         return next((x for x in objs if x[fieldname] == value), None)
 
-    def find_by_methodname(self, objs, methodname):
-        return self.find_by("method_name", objs, methodname)
-
     def api_call_helper(self, **kwargs):
-        print("Request", kwargs)
-        response = self.client.get(testapi_url(**kwargs))
+        self.debugmsg("Request", kwargs)
+        response = self.client.get(self.api_url(**kwargs, format="api"))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(self.api_url(**kwargs))
         self.assertEqual(response.status_code, 200)
         objs = response.json()
-        print("Response", objs)
+        self.debugmsg("Response", objs)
         return objs["results"]
 
     def stats_test_helper(self, stat):
@@ -167,20 +151,40 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         for i in range(count - 1):
             TestResultFactory(**fields, build_flow__tests_total=1, method=t1.method)
 
+
+class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
+    """Test the testmethodperf REST API"""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.client, cls.user = cls.make_user_and_client()
+        super().setUpClass()
+
+    def setUp(self):
+        self.client.force_authenticate(self.user)
+        t1 = TestResultFactory(
+            method__name="Foo", duration=10, build_flow__tests_total=1
+        )
+        TestResultFactory(duration=2, build_flow__tests_total=1, method=t1.method)
+        TestResultFactory(method__name="Bar", duration=3, build_flow__tests_total=1)
+        TestResultFactory(method__name="Bar", duration=5, build_flow__tests_total=1)
+
     def test_counting(self):
         """Test counting of method invocations"""
         objs = self.stats_test_helper("count")
-        print(objs)
-        self.assertEqual(self.find_by_methodname(objs, "Foo")["count"], 2)
-        self.assertEqual(self.find_by_methodname(objs, "Bar")["count"], 2)
+        self.assertEqual(self.find_by("method_name", objs, "Foo")["count"], 2)
+        self.assertEqual(self.find_by("method_name", objs, "Bar")["count"], 2)
 
     def test_averaging(self):
         """Test averaging of methods"""
         objs = self.stats_test_helper("duration_average")
-        print(objs)
 
-        self.assertEqual(self.find_by_methodname(objs, "Foo")["duration_average"], 6)
-        self.assertEqual(self.find_by_methodname(objs, "Bar")["duration_average"], 4)
+        self.assertEqual(
+            self.find_by("method_name", objs, "Foo")["duration_average"], 6
+        )
+        self.assertEqual(
+            self.find_by("method_name", objs, "Bar")["duration_average"], 4
+        )
 
     def test_all_included_fields(self):
         includable_fields = [
@@ -201,7 +205,7 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         ]
 
         def _test_fields(fields):
-            response = self.client.get(testapi_url(include_fields=fields))
+            response = self.client.get(self.api_url(include_fields=fields))
             self.assertEqual(response.status_code, 200)
             rows = response.json()["results"]
             for field in fields:
@@ -230,7 +234,7 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         _outlier = TestResultFactory(method__name="Foo", duration=11)  # noqa
         rows = self.api_call_helper(include_fields=["duration_slow", "count"])
 
-        self.assertEqual(self.find_by_methodname(rows, "Foo")["duration_slow"], 10)
+        self.assertEqual(self.find_by("method_name", rows, "Foo")["duration_slow"], 10)
 
     def test_duration_fast(self):
         """Test counting high durations"""
@@ -239,7 +243,7 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         _outlier = TestResultFactory(method__name="Foo", duration=1)  # noqa
         rows = self.api_call_helper(include_fields=["duration_slow", "count"])
 
-        self.assertEqual(self.find_by_methodname(rows, "Foo")["duration_slow"], 2)
+        self.assertEqual(self.find_by("method_name", rows, "Foo")["duration_slow"], 2)
 
     def test_count_failures(self):
         """Test counting failed tests"""
@@ -247,9 +251,12 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         self.identical_tests_helper(method_name="FailingTest", count=10, outcome="Pass")
         rows = self.api_call_helper(include_fields=["failures", "success_percentage"])
 
-        self.assertEqual(self.find_by_methodname(rows, "FailingTest")["failures"], 15)
         self.assertEqual(
-            self.find_by_methodname(rows, "FailingTest")["success_percentage"], 10 / 25
+            self.find_by("method_name", rows, "FailingTest")["failures"], 15
+        )
+        self.assertEqual(
+            self.find_by("method_name", rows, "FailingTest")["success_percentage"],
+            10 / 25,
         )
 
     def test_split_by_repo(self):
@@ -262,10 +269,12 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         )
         rows = self.api_call_helper(include_fields="count", group_by="repo")
 
-        self.assertEqual(self.find_by_methodname(rows, "HedaTest")["count"], 15)
-        self.assertEqual(self.find_by_methodname(rows, "HedaTest")["repo"], "HEDA")
-        self.assertEqual(self.find_by_methodname(rows, "NPSPTest")["count"], 20)
-        self.assertEqual(self.find_by_methodname(rows, "NPSPTest")["repo"], "Cumulus")
+        self.assertEqual(self.find_by("method_name", rows, "HedaTest")["count"], 15)
+        self.assertEqual(self.find_by("method_name", rows, "HedaTest")["repo"], "HEDA")
+        self.assertEqual(self.find_by("method_name", rows, "NPSPTest")["count"], 20)
+        self.assertEqual(
+            self.find_by("method_name", rows, "NPSPTest")["repo"], "Cumulus"
+        )
 
     def test_split_by_flow(self):
         """Test splitting on flow"""
@@ -366,33 +375,61 @@ class TestTestMethodPerfRESTAPI(APITestCase):
         self.assertTrue(rows[0]["success_percentage"] > rows[-1]["success_percentage"])
 
     def test_order_by_unknown_field(self):
-        response = self.client.get(testapi_url(o="fjioesjfoi"))
+        response = self.client.get(self.api_url(o="fjioesjfoi"))
         self.assertEqual(response.status_code, 400)
         response.json()  # should still be able to parse it
 
     def test_include_unknown_field(self):
-        response = self.client.get(testapi_url(include_fields=["fjioesjfofi"]))
+        response = self.client.get(self.api_url(include_fields=["fjioesjfofi"]))
         self.assertEqual(response.status_code, 400)
         response.json()  # should still be able to parse it
 
     def test_group_by_unknown_field(self):
-        response = self.client.get(testapi_url(include_fields=["fesafs"]))
+        response = self.client.get(self.api_url(include_fields=["fesafs"]))
         self.assertEqual(response.status_code, 400)
         response.json()  # should still be able to parse it
 
     def test_cannot_specify_two_kinds_of_dates(self):
-        response = self.client.get(testapi_url(include_fields=["fesafs"]))
+        response = self.client.get(
+            self.api_url(recentdate="today", daterange_after="2019-03-07")
+        )
         self.assertEqual(response.status_code, 400)
         response.json()  # should still be able to parse it
 
-    def test_filter_by_recent_date_UNIMPLMENTED(self):
-        pass
+    def make_date(self, strdate):
+        return timezone.make_aware(datetime.strptime(strdate, r"%Y-%m-%d"))
 
-    def test_filter_by_date_UNIMPLMENTED(self):
-        pass
+    def test_filter_by_before_and_after_date(self):
+        d = self.make_date
+        TestResultFactory(method__name="Bar1", build_flow__time_end=d("2018-03-08"))
+        TestResultFactory(method__name="Bar2", build_flow__time_end=d("2018-04-08"))
+        TestResultFactory(method__name="Bar3", build_flow__time_end=d("2018-05-08"))
+        TestResultFactory(method__name="Bar4", build_flow__time_end=d("2018-06-08"))
+        rows = self.api_call_helper(
+            daterange_after="2018-04-01", daterange_before="2018-06-01"
+        )
+        self.assertEqual(len(rows), 2)
+        for row in rows:
+            self.assertIn(row["method_name"], ["Bar2", "Bar3"])
+            self.assertNotIn(row["method_name"], ["Bar1", "Bar4"])
+
+    def test_filter_by_recent_date(self):
+        yesterday = timezone.make_aware(datetime.today() - timedelta(1))
+        day_before = timezone.make_aware(datetime.today() - timedelta(2))
+        long_ago = timezone.make_aware(datetime.today() - timedelta(10))
+        long_long_ago = timezone.make_aware(datetime.today() - timedelta(12))
+
+        TestResultFactory(method__name="Bar1", build_flow__time_end=yesterday)
+        TestResultFactory(method__name="Bar2", build_flow__time_end=day_before)
+        TestResultFactory(method__name="Bar3", build_flow__time_end=long_ago)
+        TestResultFactory(method__name="Bar4", build_flow__time_end=long_long_ago)
+        rows = self.api_call_helper(recentdate="week")
+        self.assertEqual(len(rows), 2)
+        for row in rows:
+            self.assertIn(row["method_name"], ["Bar1", "Bar2"])
 
     def test_api_view(self):
-        response = self.client.get(testapi_url(format="api"))
-        print(response)
+        response = self.client.get(self.api_url(format="api"))
+        self.debugmsg(response)
         self.assertEqual(response.status_code, 200)
         self.assertIn("text/html", response["content-type"])
