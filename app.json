@@ -131,13 +131,13 @@
   ],
   "environments": {
     "test": {
+      "addons": ["heroku-postgresql:in-dyno", "heroku-redis:in-dyno"],
       "scripts": {
         "test-setup": "pip install --upgrade -r requirements/test.txt",
         "test": "./heroku_ci.sh"
       },
       "env": {
         "DJANGO_SETTINGS_MODULE": "config.settings.test",
-        "DATABASE_URL": "sqlite:///test.db"
       }
     }
   }
