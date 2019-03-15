@@ -64,12 +64,6 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
         return queryset
 
 
-def turnFilterSetOffByDefaultDecorator(cls):
-    cls.disable_by_default = dir(cls)  # disable all of these fields by default.
-    return cls
-
-
-@turnFilterSetOffByDefaultDecorator
 class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     """A "conditional" filterset for generating the BuildFlow sub-select.
 
@@ -91,12 +85,15 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     and turned on explicitly ("really_filter") when it is created by get_queryset
     """
 
+    disable_by_default = []
+
     repo_choices = (
         Repository.objects.values_list("name", "name").order_by("name").distinct()
     )
     repo = django_filters.rest_framework.ChoiceFilter(
         field_name="build__repo__name", label="Repo Name", choices=repo_choices
     )
+    disable_by_default.append("repo")
 
     branch_choices = (
         Branch.objects.values_list("name", "name").order_by("name").distinct()
@@ -104,11 +101,13 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     branch = django_filters.rest_framework.ChoiceFilter(
         field_name="build__branch__name", label="Branch Name", choices=branch_choices
     )
+    disable_by_default.append("branch")
 
     plan_choices = Plan.objects.values_list("name", "name").order_by("name").distinct()
     plan = django_filters.rest_framework.ChoiceFilter(
         field_name="build__plan__name", label="Plan Name", choices=plan_choices
     )
+    disable_by_default.append("plan")
 
     flow_choices = (
         BuildFlow.objects.values_list("flow", "flow").order_by("flow").distinct()
@@ -116,6 +115,7 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     flow = django_filters.rest_framework.ChoiceFilter(
         field_name="flow", label="Flow Name", choices=flow_choices
     )
+    disable_by_default.append("flow")
 
     recentdate = DateRangeFilter(label="Recent Date", field_name="time_end")
 
@@ -124,6 +124,7 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
         label="Date range",
         widget=DateRangeWidget(attrs={"type": "date"}),
     )
+    disable_by_default.append("daterange")
 
     # This is not really a filter. It's actually just a query input but putting it
     # here lets me get it in the form.
@@ -218,13 +219,17 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
     serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filter_class = TestMethodPerfFilter
-    ordering_param_name = filter_class.ordering_param_name
+    filterset_class = TestMethodPerfFilter
+    ordering_param_name = filterset_class.ordering_param_name
 
     # example URLs:
     # http://localhost:8000/api/testmethod_perf/?repo=gem&plan=Release%20Test&method_name=testCreateNegative
     # http://localhost:8000/api/testmethod_perf/?repo=Cumulus&plan=Feature%20Test&o=avg
     # http://localhost:8000/api/testmethod_perf/?method_name=&repo=&plan=&flow=&recentdate=&daterange_after=&daterange_before=&o=-repo
+
+    @property
+    def orderby_field(self):
+        return self.request.query_params.get(self.ordering_param_name)
 
     def _get_buildflows(self):
         """Which buildflows do we need to look at? Limit by time, repo, etc.
@@ -247,14 +252,15 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         aggregations = {}
         fields_to_include = params.getlist("include_fields")
 
-        if params.get(self.ordering_param_name):
-            fields_to_include.append(params.get(self.ordering_param_name))
+        if self.orderby_field:
+            fields_to_include.append(self.orderby_field)
 
-        fields = self.filter_class.metrics
+        fields = self.filterset_class.metrics
 
         for fieldname in fields_to_include:
             fieldname = fieldname.strip("-")
-            aggregations[fieldname] = fields[fieldname]
+            if fields.get(fieldname):
+                aggregations[fieldname] = fields[fieldname]
 
         return aggregations
 
@@ -262,10 +268,15 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         """Which fields to split on (or group by, depending on how you think about it"""
         params = self.request.query_params
         output_fields = {}
-
         build_fields = BuildFlowFilterSet.build_fields
-        if params.get("group_by"):
-            for param in params.getlist("group_by"):
+        group_by_fields = params.getlist("group_by")
+        order_by_field = self.orderby_field
+
+        if order_by_field and order_by_field in build_fields:
+            group_by_fields.append(order_by_field)
+
+        if group_by_fields:
+            for param in group_by_fields:
                 output_fields[param] = F("build_flow__" + build_fields[param])
 
         return output_fields
@@ -295,8 +306,8 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             .annotate(**aggregations)
         )
 
-        if not self.request.query_params.get(self.ordering_param_name, None):
-            queryset.order_by("method_name")
+        if not self.orderby_field:
+            queryset = queryset.order_by("method_name")
 
         return queryset
 
