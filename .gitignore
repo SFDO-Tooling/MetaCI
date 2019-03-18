@@ -60,6 +60,7 @@ node_modules/
 
 # virtual environments
 .env
+.envrc
 local_setup.sh
 
 # User-uploaded media
