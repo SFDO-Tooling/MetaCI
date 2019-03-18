@@ -18,10 +18,6 @@ class _TestingHelpers:
         client = APIClient()
         client.force_authenticate(user)
         response = client.get("/api/")
-        if response.status_code == 400 and "DisallowedHost" in str(response.content):
-            cls.debugmsg("**** YOU MAY NEED TO ADD AN ALLOWED_HOSTS TO YOUR TEST.PY")
-            raise (Exception(response))
-
         assert response.status_code == 200, response.content
         return client, user
 
