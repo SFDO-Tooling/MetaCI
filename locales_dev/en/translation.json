@@ -1,0 +1,23 @@
+{
+  "404": "404",
+  "Authentication Error": "Authentication Error",
+  "Cancel": "Cancel",
+  "Continue": "Continue",
+  "Copyright 2019 Salesforce.org. All rights reserved.": "Copyright 2019 Salesforce.org. All rights reserved.",
+  "Custom Domain": "Custom Domain",
+  "Log In": "Log In",
+  "Log In With a Different Org": "Log In With a Different Org",
+  "Log Out": "Log Out",
+  "Meta CI": "Meta CI",
+  "Production or Developer Org": "Production or Developer Org",
+  "Sandbox or Scratch Org": "Sandbox or Scratch Org",
+  "This is sample intro text, where your content might live.": "This is sample intro text, where your content might live.",
+  "To go to your company’s login page, enter the custom domain name.": "To go to your company’s login page, enter the custom domain name.",
+  "Use Custom Domain": "Use Custom Domain",
+  "Welcome to Meta CI!": "Welcome to Meta CI!",
+  "You are in offline mode. We are trying to reconnect, but you may need to": "You are in offline mode. We are trying to reconnect, but you may need to",
+  "anErrorOccurred": "An error occurred. Try the <1>home page</1>?",
+  "errorWithAccount": "An error occurred with your account. Try the <2>home page</2>?",
+  "pageCannotBeFound": "That page cannot be found. Try the <2>home page</2>?",
+  "reload the page.": "reload the page."
+}

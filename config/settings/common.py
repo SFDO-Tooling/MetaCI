@@ -58,6 +58,7 @@ THIRD_PARTY_APPS = (
     "allauth.socialaccount.providers.github",  # github
     "crispy_forms",  # Form layouts
     "django_filters",  # view helpers for filtering models
+    "django_js_reverse",  # allow JS to reverse URLs
     "django_rq",
     "django_slds",  # Salesforce Lightning Design System
     "django_slds_crispyforms",  # SLDS theme for crispyforms
@@ -174,7 +175,8 @@ TEMPLATES = [
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
-        "DIRS": [str(APPS_DIR.path("templates"))],
+        # This gets overridden in settings.production:
+        "DIRS": [str(ROOT_DIR.path("dist")), str(APPS_DIR.path("templates"))],
         "OPTIONS": {
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
             "debug": DEBUG,
@@ -212,6 +214,7 @@ STATIC_URL = "/static/"
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (str(APPS_DIR.path("static")),)
+STATICFILES_DIRS = [str(ROOT_DIR.path("dist")), str(ROOT_DIR.path("locales"))]
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = (
@@ -350,3 +353,6 @@ REQUEST_ID_RESPONSE_HEADER = "X-Request-ID"
 
 # django-guardian settings
 GUARDIAN_MONKEY_PATCH = False
+
+JS_REVERSE_JS_VAR_NAME = "api_urls"
+JS_REVERSE_EXCLUDE_NAMESPACES = ["admin", "admin_rest"]

@@ -72,6 +72,7 @@ mailhog
 
 
 staticfiles/
+dist/
 
 # Virtualenv
 venv
