@@ -148,10 +148,7 @@ STATICFILES_DIRS = (
     str(ROOT_DIR.path("locales")),
 )
 
-TEMPLATES[0]["DIRS"] = [
-    str(PROJECT_ROOT / "dist" / "prod"),
-    str(APPS_DIR / "templates"),
-]
+TEMPLATES[0]["DIRS"] = [str(ROOT_DIR / "dist" / "prod"), str(APPS_DIR / "templates")]
 
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
