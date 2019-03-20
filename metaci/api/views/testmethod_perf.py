@@ -11,7 +11,7 @@ from django_filters.rest_framework import DateRangeFilter
 
 from postgres_stats.aggregates import Percentile
 
-from rest_framework import generics, exceptions, viewsets
+from rest_framework import generics, exceptions, viewsets, pagination
 
 from metaci.testresults.models import TestResult
 from metaci.build.models import BuildFlow
@@ -62,6 +62,12 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
 
     def dummy_filter(self, queryset, name, value):
         return queryset
+
+
+class StandardResultsSetPagination(pagination.PageNumberPagination):
+    page_size = 50
+    page_size_query_param = "page_size"
+    max_page_size = 1000
 
 
 class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
@@ -227,6 +233,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filterset_class = TestMethodPerfFilter
+    pagination_class = StandardResultsSetPagination
     ordering_param_name = filterset_class.ordering_param_name
 
     # example URLs:
