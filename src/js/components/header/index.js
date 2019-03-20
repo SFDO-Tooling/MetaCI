@@ -8,24 +8,20 @@ import { t } from 'i18next';
 
 import routes from 'utils/routes';
 import { logout } from 'store/user/actions';
-import { selectSocketState } from 'store/socket/selectors';
 import { selectUserState } from 'store/user/selectors';
 import Login from 'components/header/login';
 import Logout from 'components/header/logout';
 import OfflineAlert from 'components/offlineAlert';
 import type { AppState } from 'store';
-import type { Socket } from 'store/socket/reducer';
 import type { User } from 'store/user/reducer';
 
 type Props = {
   user: User,
   doLogout: typeof logout,
-  socket: Socket,
 };
 
-const Header = ({ user, doLogout, socket }: Props) => (
+const Header = ({ user, doLogout }: Props) => (
   <>
-    {socket ? null : <OfflineAlert />}
     <PageHeader
       className="global-header
         slds-p-horizontal_x-large
@@ -50,7 +46,6 @@ const Header = ({ user, doLogout, socket }: Props) => (
 
 const select = (appState: AppState) => ({
   user: selectUserState(appState),
-  socket: selectSocketState(appState),
 });
 
 const actions = {
