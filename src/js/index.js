@@ -25,11 +25,13 @@ import ErrorBoundary from 'components/error';
 import Footer from 'components/footer';
 import FourOhFour from 'components/404';
 import Header from 'components/header';
+import PerfTable from 'components/perftable';
 import getApiFetch from 'utils/api';
 import reducer from 'store';
 import { logError } from 'utils/logging';
 import { login } from 'store/user/actions';
 import { routePatterns } from 'utils/routes';
+
 
 const SF_logo = require('images/salesforce-logo.png');
 
@@ -39,9 +41,12 @@ const Home = () => (
       slds-p-around_x-large"
   >
     <h1 className="slds-text-heading_large">{t('Welcome to Meta CI!')}</h1>
+    <PerfTable />
     <p>{t('This is sample intro text, where your content might live.')}</p>
   </div>
 );
+
+
 
 const App = () => (
   <DocumentTitle title={t('Meta CI')}>

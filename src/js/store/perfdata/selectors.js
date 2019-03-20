@@ -1,6 +1,6 @@
 // @flow
 
 import type { AppState } from 'store';
-import type { PerfData } from 'store/perfdata/reducer';
+import type { PerfDataState } from 'store/perfdata/reducer';
 
-export const selectUserState = (appState: AppState): PerfData => appState.perfData;
+export const selectPerfState = (appState: AppState): PerfDataState => appState.perfData;

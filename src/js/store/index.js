@@ -6,11 +6,11 @@ import type { CombinedReducer } from 'redux';
 import userReducer from 'store/user/reducer';
 import perfDataReducer from 'store/perfdata/reducer'
 import type { User } from 'store/user/reducer';
-import type { PerfData } from 'store/perfdata/reducer';
+import type { PerfDataState } from 'store/perfdata/reducer';
 
 export type AppState = {
   +user: User,
-  +perfData: PerfData,
+  +perfData: PerfDataState,
 };
 
 type Action = { +type: string };

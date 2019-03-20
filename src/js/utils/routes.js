@@ -1,7 +1,7 @@
 // @flow
 
 const routes = {
-  home: () => '/',
+  home: () => '/testperf',
 };
 
 export const routePatterns = {
