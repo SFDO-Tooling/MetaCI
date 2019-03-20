@@ -9,12 +9,23 @@ type PerfDataLoading = { type: 'PERF_DATA_LOADING', payload: PerfData };
 
 export type PerfDataAction = PerfDataAvailable | PerfDataLoading;
 
-export const perfRESTFetch = (): ThunkAction => (dispatch, getState, { apiFetch }) => {
-  dispatch({ type: 'PERF_DATA_LOADING' })
-  apiFetch("/api/testmethod_perf?include_fields=duration_average&group_by=repo", {
+function encodeQueryString(params){
+  var queryString = Object.keys(params).map((key) => {
+    return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
+  }).join('&');
+  return queryString;
+}
+
+export const perfRESTFetch = (url?: string, options?: {}):
+        ThunkAction => (dispatch, getState, { apiFetch }) => {
+  dispatch({ type: 'PERF_DATA_LOADING', payload: url });
+  url = url || "/api/testmethod_perf?include_fields=duration_average&group_by=repo&page_size=10"
+  if(options){
+    url = url + "&"+ encodeQueryString(options);
+  }
+  apiFetch(url, {
     method: 'GET',
   }).then((payload) => {
-    /* istanbul ignore else */
     return dispatch({ type: 'PERF_DATA_AVAILABLE', payload });
   });
 }
