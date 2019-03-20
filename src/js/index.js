@@ -42,11 +42,8 @@ const Home = () => (
   >
     <h1 className="slds-text-heading_large">{t('Welcome to Meta CI!')}</h1>
     <PerfTable />
-    <p>{t('This is sample intro text, where your content might live.')}</p>
   </div>
 );
-
-
 
 const App = () => (
   <DocumentTitle title={t('Meta CI')}>
