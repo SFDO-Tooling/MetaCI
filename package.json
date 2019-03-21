@@ -61,7 +61,6 @@
     "file-loader": "^3.0.1",
     "flow-bin": "^0.93.0",
     "flow-typed": "^2.5.1",
-    "flow-types": "^1.0.0",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.1",
     "gulp-cssnano": "^2.1.2",
