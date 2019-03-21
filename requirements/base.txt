@@ -30,12 +30,12 @@ awesome-slugify==1.6.5
 
 # Redis support
 django-redis==4.10.0
-redis==3.2.0
+redis==3.2.1
 
 # Django RQ
 rq==0.13.0
 rq-scheduler==0.9.0
-django-rq==1.3.0
+django-rq==1.3.1
 django-rq-scheduler==1.1.1
 
 # CumulusCI
@@ -69,7 +69,7 @@ django-log-request-id==1.3.2
 psycopg2-binary==2.7.7
 
 # django-storages for S3
-boto3==1.9.112
+boto3==1.9.116
 django-storages==1.7.1
 
 # JSON web token
@@ -77,6 +77,9 @@ PyJWT==1.7.1
 
 # Django Defender
 django-defender==0.6.0
+
+# Django Postgres Stats
+django-postgres-stats==1.0.0
 
 # SFDO Template Helpers for authorization middleware and other helpers
 -e git+https://github.com/SFDO-Tooling/sfdo-template-helpers.git@v0.6.0#egg=sfdo_template_helpers
