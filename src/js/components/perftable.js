@@ -7,7 +7,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { useEffect } from 'react';
 import { withRouter } from 'react-router';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import queryString from 'query-string';
 
@@ -47,7 +47,7 @@ const columns = [
 	/>,
 ];
 
-const addIds = (rows : [{}]) => {
+const addIds = (rows : [{[string]: mixed}]) => {
     return rows.map((row)=>{return {...row, id: Object.values(row).toString()}})
 }
 
@@ -56,8 +56,6 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, perfdatastate, match, location, hi
   useEffect(() => {
       doPerfRESTFetch(null, queryParts);
     }, []);
-
-    console.log("****", window.location.search)
 
     const changeUrl = (queryParts: {[string] : string}) => {
       history.push({
@@ -69,11 +67,15 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, perfdatastate, match, location, hi
     const goPageFromUrl = (url: string) => {
       var qs = url.split("?", 2)[1];
       var qParts = queryString.parse(qs);
-      var page = qParts["page"];
-      getDataFromQueryParams({page}); // TODO: next
+      var pageParam = qParts["page"];
+      if(Array.isArray(pageParam) ){
+        getDataFromQueryParams({page: pageParam[1]});
+      }else if(typeof page === 'string' ){
+        getDataFromQueryParams({page});
+      }
     };
 
-    const getDataFromQueryParams = (params: {}) => {
+    const getDataFromQueryParams = (params: {[string]: string}) => {
       changeUrl({...queryParts, ...params});
       doPerfRESTFetch(null, {...queryParts, ...params});
     }
@@ -111,7 +113,7 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, perfdatastate, match, location, hi
     var page_size = custom_page_size ? parseInt(custom_page_size) : 
                         get(perfdatastate, "perfdata.results.length") || -1;
 
-    /* https://appexchange.salesforce.com/listingDetail?listingId=a0N3A00000E9TBZUA3*/
+    /* https://appexchange.salesforce.com/listingDetail?listingId=a0N3A00000E9TBZUA3 */
     const PerfDataTableFooter = () => (
       <div className="slds-card__footer slds-grid" >
         { items.length>0 &&
@@ -156,7 +158,6 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, perfdatastate, match, location, hi
   const actions = {
     doPerfRESTFetch: perfRESTFetch,
   };
-  
   
   const PerfTable: React.ComponentType<{}> = connect(select, actions)(
     withRouter(UnwrappedPerfTable),
