@@ -113,6 +113,7 @@
     "flow": "flow",
     "stylelint": "stylelint 'src/sass/**/*.scss'",
     "flake8": "flake8 manage.py metadeploy/ config/",
+    "flow-typed": "flow-typed update -s -i dev",
     "isort": "isort -rc manage.py metadeploy/ config/",
     "black": "black manage.py metadeploy/ config/",
     "lintpy": "run-s isort black flake8",
