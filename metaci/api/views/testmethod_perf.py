@@ -145,6 +145,8 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
 class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.FilterSet):
     """This filterset works on the output queries"""
 
+    __test__ = False  # Tell pytest that this is not a test.
+
     method_name = django_filters.rest_framework.CharFilter(
         field_name="method_name", label="Method Name"
     )
@@ -223,6 +225,8 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     Note that the number of build flows covered is limited to **BUILD_FLOWS_LIMIT** for performance reasons. You can
     change this default with the build_flows_limit parameter.
     """
+
+    __test__ = False  # Tell pytest that this is not a test.
 
     serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
