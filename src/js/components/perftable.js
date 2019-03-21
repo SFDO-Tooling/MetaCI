@@ -67,9 +67,9 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, perfdatastate, match, location, hi
     const goPageFromUrl = (url: string) => {
       var qs = url.split("?", 2)[1];
       var qParts = queryString.parse(qs);
-      var pageParam = qParts["page"];
-      if(Array.isArray(pageParam) ){
-        getDataFromQueryParams({page: pageParam[1]});
+      var page = qParts["page"];
+      if(Array.isArray(page) ){
+        getDataFromQueryParams({page: page[1]});
       }else if(typeof page === 'string' ){
         getDataFromQueryParams({page});
       }
