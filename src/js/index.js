@@ -7,6 +7,7 @@ import IconSettings from '@salesforce/design-system-react/components/icon-settin
 import logger from 'redux-logger';
 import settings from '@salesforce/design-system-react/components/settings';
 import thunk from 'redux-thunk';
+import { withRouter } from 'react-router';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
@@ -35,15 +36,17 @@ import { routePatterns } from 'utils/routes';
 
 const SF_logo = require('images/salesforce-logo.png');
 
-const Home = () => (
+const HomeNoRouter = ({ match, location, history }) => (
   <div
     className="slds-text-longform
       slds-p-around_x-large"
   >
     <h1 className="slds-text-heading_large">{t('Welcome to Meta CI!')}</h1>
-    <PerfTable />
+    <PerfTable/>
   </div>
 );
+
+const Home = withRouter(HomeNoRouter);
 
 const App = () => (
   <DocumentTitle title={t('Meta CI')}>
