@@ -83,6 +83,33 @@ Then run the initial migrations::
 
     python manage.py migrate
 
+Run this command to create a necessary repeatable django-rq job in the database::
+
+    ./manage.py metaci_scheduled_jobs
+
+Copying the production database
+-------------------------------
+
+Alternatively, if you'd like to fetch a copy of production data from Heroku,
+skip creating the database, and then do this::
+
+    heroku pg:pull mrbelvedereci::WHITE metaci
+
+You'll need to create a new superuser to log in. Log in to the admin panel with that user and update your Site record to point to localhost. This will enable you to log in as usual. Next, disable and enable the repeating jobs in django admin. Finally, delete all the persistent orgs as a safety precaution.
+
+You may want to make a local backup of the db since it takes a while to download:
+
+    createdb -T metaci-dev metaci-dev-bak
+
+
+Creating a superuser
+--------------------
+
+To use the Django admin UI, you'll need to create a superuser::
+
+    ./manage.py createsuperuser
+
+
 Running the server
 ------------------
 
@@ -96,6 +123,7 @@ To run the local development server::
 
     yarn serve
 
+This starts a process running Django, a process running Node, and an ``rq`` worker process.
 The running server will be available at `<http://localhost:8080/>`_.
 
 .. _Redis Quick Start: https://redis.io/topics/quickstart
@@ -156,3 +184,11 @@ translations to ``locales/<language>/translation.json``.
 
 .. _GNU gettext toolset: https://www.gnu.org/software/gettext/
 .. _user language is auto-detected at runtime: https://github.com/i18next/i18next-browser-languageDetector
+
+
+Developing with SLDS
+--------------------
+
+MetaCI uses https://github.com/SalesforceFoundation/django-slds which imports version 2.1.2 of the Salesforce Lightning Design System.
+
+You can find a CSS and component reference archived here: https://archive-2_1_2.lightningdesignsystem.com/
