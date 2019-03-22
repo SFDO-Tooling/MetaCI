@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 import random
 from datetime import timedelta, datetime
 from django.utils import timezone
+from django.urls import reverse
 
 from rest_framework.test import APIClient, APITestCase
 
@@ -24,7 +25,7 @@ class _TestingHelpers:
     def api_url(self, **kwargs):
         params = urlencode(kwargs, True)
         self.debugmsg("QueryParams", params)
-        return r"/api/testmethod_perf/?" + params
+        return reverse("testmethod_perf-list") + "?" + params
 
     def find_by(self, fieldname, objs, value):
         if type(objs) == dict:

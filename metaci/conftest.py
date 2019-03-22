@@ -29,7 +29,7 @@ class PlanRepositoryFactory(factory.django.DjangoModelFactory):
     repo = factory.SubFactory(RepositoryFactory)
 
 
-class Branch(factory.django.DjangoModelFactory):
+class BranchFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Branch
 

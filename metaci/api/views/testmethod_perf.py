@@ -148,7 +148,9 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
         build_fields[name] = fields_and_stuff[name].field_name
 
 
-class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.FilterSet):
+class TestMethodPerfFilterSet(
+    BuildFlowFilterSet, django_filters.rest_framework.FilterSet
+):
     """This filterset works on the output queries"""
 
     method_name = django_filters.rest_framework.CharFilter(
@@ -232,7 +234,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
     serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filterset_class = TestMethodPerfFilter
+    filterset_class = TestMethodPerfFilterSet
     pagination_class = StandardResultsSetPagination
     ordering_param_name = filterset_class.ordering_param_name
 
