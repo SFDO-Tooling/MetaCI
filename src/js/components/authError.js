@@ -9,7 +9,6 @@ import { t } from 'i18next';
 
 import routes from 'utils/routes';
 import { selectUserState } from 'store/user/selectors';
-import Login from 'components/header/login';
 import { EmptyIllustration } from 'components/404';
 import type { AppState } from 'store';
 import type { InitialProps } from 'components/utils';
@@ -27,12 +26,6 @@ const AuthError = ({ user }: { user: UserType }) => (
         }
       />
       <div className="slds-align_absolute-center">
-        <Login
-          id="auth-error-login"
-          label={user ? t('Log In With a Different Org') : t('Log In')}
-          buttonClassName="slds-p-horizontal_xxx-small"
-          buttonVariant="base"
-        />
       </div>
     </>
   </DocumentTitle>

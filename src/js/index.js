@@ -62,11 +62,7 @@ const App = () => (
             slds-shrink-none"
         >
           <ErrorBoundary>
-            <Switch>
-              <Route exact path={routePatterns.home()} component={Home} />
-              <Route path={routePatterns.auth_error()} component={AuthError} />
-              <Route component={FourOhFour} />
-            </Switch>
+            <PerfTable/>
           </ErrorBoundary>
         </div>
         <Footer logoSrc={SF_logo} />

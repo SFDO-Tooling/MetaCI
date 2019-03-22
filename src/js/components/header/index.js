@@ -9,9 +9,6 @@ import { t } from 'i18next';
 import routes from 'utils/routes';
 import { logout } from 'store/user/actions';
 import { selectUserState } from 'store/user/selectors';
-import Login from 'components/header/login';
-import Logout from 'components/header/logout';
-import OfflineAlert from 'components/offlineAlert';
 import type { AppState } from 'store';
 import type { User } from 'store/user/reducer';
 
@@ -36,9 +33,7 @@ const Header = ({ user, doLogout }: Props) => (
           <span>{t('Meta CI')}</span>
         </Link>
       }
-      navRight={
-        <>{user ? <Logout user={user} doLogout={doLogout} /> : <Login />}</>
-      }
+
       variant="objectHome"
     />
   </>
