@@ -36,18 +36,6 @@ import { routePatterns } from 'utils/routes';
 
 const SF_logo = require('images/salesforce-logo.png');
 
-const HomeNoRouter = ({ match, location, history }) => (
-  <div
-    className="slds-text-longform
-      slds-p-around_x-large"
-  >
-    <h1 className="slds-text-heading_large">{t('Welcome to Meta CI!')}</h1>
-    <PerfTable/>
-  </div>
-);
-
-const Home = withRouter(HomeNoRouter);
-
 const App = () => (
   <DocumentTitle title={t('Meta CI')}>
     <div
@@ -56,20 +44,14 @@ const App = () => (
         slds-grid_vertical"
     >
       <ErrorBoundary>
-        <Header />
         <div
-          className="slds-grow
+          className="slds-p-around_x-large slds-grow
             slds-shrink-none"
         >
           <ErrorBoundary>
-            <Switch>
-              <Route exact path={routePatterns.home()} component={Home} />
-              <Route path={routePatterns.auth_error()} component={AuthError} />
-              <Route component={FourOhFour} />
-            </Switch>
+            <PerfTable/>
           </ErrorBoundary>
         </div>
-        <Footer logoSrc={SF_logo} />
       </ErrorBoundary>
     </div>
   </DocumentTitle>
