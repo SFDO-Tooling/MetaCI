@@ -5,23 +5,35 @@ from metaci.api.views.testmethod_perf import BuildFlowFilterSet, TestMethodPerfF
 
 class TestMethodPerfUIApiView(viewsets.ViewSet):
     def list(self, request, format=None):
-        buildflow_filters = self.collect_filter_defs(BuildFlowFilterSet)
-        testmethod_filters = self.collect_filter_defs(TestMethodPerfFilterSet)
+        choice_filters, other_buildflow_filters = self.collect_filter_defs(
+            BuildFlowFilterSet
+        )
+        testmethod_choice_filters, other_testmethod_filters = self.collect_filter_defs(
+            TestMethodPerfFilterSet
+        )
 
         json = {
-            "buildflow_filters": buildflow_filters,
-            "includable_fields": testmethod_filters["include_fields"]["choices"],
-            "group_by_fields": testmethod_filters["group_by"]["choices"],
+            "buildflow_filters": {
+                "choice_filters": choice_filters,
+                "other_buildflow_filters": other_buildflow_filters,
+            },
+            "includable_fields": testmethod_choice_filters["include_fields"]["choices"],
+            "group_by_fields": testmethod_choice_filters["group_by"]["choices"],
         }
+
         return response.Response(json)
 
     def collect_filter_defs(self, filterSet):
-        rc = {}
+        choice_filters = {}
+        other_filters = {}
         for name, filter in filterSet.get_filters().items():
             if filter.extra.get("choices"):
-                choices = [name for (name, value) in filter.extra["choices"]]
+                choices = filter.extra["choices"]
             else:
                 choices = None
             obj = {"name": name, "label": filter._label, "choices": choices}
-            rc[name] = obj
-        return rc
+            if choices:
+                choice_filters[name] = obj
+            else:
+                other_filters[name] = obj
+        return choice_filters, other_filters

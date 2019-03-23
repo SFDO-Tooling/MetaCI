@@ -67,13 +67,13 @@ class TestTestMethodPerfUI_RESTAPI(APITestCase, _TestingHelpers):
 
     def test_includable_fields(self):
         obj = self.get_api_results()
-        includable_fields = obj["includable_fields"]
+        includable_fields = keys(obj["includable_fields"])
         self.assertIn("duration_average", includable_fields)
         self.assertIn("count", includable_fields)
 
     def test_group_by_fields(self):
         obj = self.get_api_results()
-        group_by_fields = obj["group_by_fields"]
+        group_by_fields = keys(obj["group_by_fields"])
         self.assertIn("repo", group_by_fields)
         self.assertIn("branch", group_by_fields)
         self.assertIn("plan", group_by_fields)
@@ -82,15 +82,31 @@ class TestTestMethodPerfUI_RESTAPI(APITestCase, _TestingHelpers):
     def test_buildflow_filters(self):
         obj = self.get_api_results()
         buildflow_filters = obj["buildflow_filters"]
-        self.assertIn("repo", buildflow_filters)
-        self.assertIn("branch", buildflow_filters)
-        self.assertIn("plan", buildflow_filters)
-        self.assertIn("flow", buildflow_filters)
-        self.assertIn("Repo1", buildflow_filters["repo"]["choices"])
-        self.assertIn("Repo2", buildflow_filters["repo"]["choices"])
-        self.assertIn("Plan1", buildflow_filters["plan"]["choices"])
-        self.assertIn("Plan2", buildflow_filters["plan"]["choices"])
-        self.assertIn("Branch1", buildflow_filters["branch"]["choices"])
-        self.assertIn("Branch2", buildflow_filters["branch"]["choices"])
-        self.assertIn("Flow1", buildflow_filters["flow"]["choices"])
-        self.assertIn("Flow2", buildflow_filters["flow"]["choices"])
+
+        self.assertIn("choice_filters", buildflow_filters)
+        self.assertIn("other_buildflow_filters", buildflow_filters)
+
+        choice_filters = buildflow_filters["choice_filters"]
+        self.assertIn("repo", choice_filters)
+        self.assertIn("branch", choice_filters)
+        self.assertIn("plan", choice_filters)
+        self.assertIn("flow", choice_filters)
+        self.assertIn("recentdate", choice_filters)
+
+        other_buildflow_filters = buildflow_filters["other_buildflow_filters"]
+
+        self.assertIn("daterange", other_buildflow_filters)
+        self.assertIn("build_flows_limit", other_buildflow_filters)
+
+        self.assertIn("Repo1", keys(choice_filters["repo"]["choices"]))
+        self.assertIn("Repo2", keys(choice_filters["repo"]["choices"]))
+        self.assertIn("Plan1", keys(choice_filters["plan"]["choices"]))
+        self.assertIn("Plan2", keys(choice_filters["plan"]["choices"]))
+        self.assertIn("Branch1", keys(choice_filters["branch"]["choices"]))
+        self.assertIn("Branch2", keys(choice_filters["branch"]["choices"]))
+        self.assertIn("Flow1", keys(choice_filters["flow"]["choices"]))
+        self.assertIn("Flow2", keys(choice_filters["flow"]["choices"]))
+
+
+def keys(list_of_pairs):
+    return [pair[0] for pair in list_of_pairs]
