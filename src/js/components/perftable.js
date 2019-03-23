@@ -8,6 +8,7 @@ import * as ReactDOM from 'react-dom';
 import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import zip from 'lodash/zip';
+import debounce from 'lodash/debounce';
 
 import queryString from 'query-string';
 
@@ -22,6 +23,8 @@ import DataTableColumn from '@salesforce/design-system-react/components/data-tab
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
 import Accordion from '@salesforce/design-system-react/components/accordion'; 
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel'; 
+import Input from '@salesforce/design-system-react/components/input'; 
+import Tooltip from '@salesforce/design-system-react/components/tooltip'; 
 
 import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';
@@ -42,8 +45,14 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
                           match, location, history }) => {
     console.log("Here we go");
     const default_query_params = {page_size: 10, include_fields : ["repo", "duration_average"]};
-    const queryParts = () => 
-        ({ ...default_query_params, ...queryString.parse(window.location.search)});
+    const queryParts = (name?:string) => {
+        let parts = { ...default_query_params, ...queryString.parse(window.location.search)};
+        if(name){
+          return parts[name];
+        }else{
+          return parts;
+        }
+    }
     useEffect(() => {
         doPerfRESTFetch(null, queryParts());
         return(()=>{console.log("UNMOUNTING PerfTable 1")});
@@ -73,7 +82,7 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
 
     const getDataFromQueryParams = (params?: {[string]: string | string[]}) => {
       changeUrl({...queryParts(), ...params});
-      doPerfRESTFetch(null, {...queryParts(), ...params});
+      doPerfRESTFetch(null, queryParts());
     }
 
     const doSort = (sortColumn, ...rest) => {
@@ -93,35 +102,84 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       items = [];
     }
 
-    const BuildFilterPickers = () => {
+    type FilterOption = {
+      id: string,
+      label: string
+    }
+
+    type Filter = {
+      name: string,
+      choices?: FilterOption,
+      currentValue?: string,
+    };
+
+    const gatherFilters = () : Filter[] => {
+      let filters:Filter[] = [];
       const choiceFilters = get(perfdataUIstate, "uidata.buildflow_filters.choice_filters", {});
-      return Object.keys(choiceFilters).map((fieldname) => {
-        let value = choiceFilters[fieldname];
-        let choices = value["choices"].map((pair)=>({id: pair[0], label: pair[1]}));
-        return <React.Fragment>
+      Object.keys(choiceFilters).map((fieldname) => {
+        let filterDef = choiceFilters[fieldname];
+        let choices = filterDef["choices"].map((pair)=>({id: pair[0], label: pair[1]}));
+        let currentValue = queryParts()[fieldname];
+        filters.push({name: fieldname, choices, currentValue});
+      });
+
+      return filters;
+    }
+
+    const BuildFilterPickers = ({filters}) => {
+      return filters.filter((filter)=>filter.choices).map((filter)=>{
+        console.log("FN", filter.name);
+        return <React.Fragment key={filter.name}>
           <FilterPicker
-            key={fieldname}
-            field_name={fieldname}
-            choices={choices}
-            value={queryParts()[fieldname]}
-            onSelect={(value)=>{getDataFromQueryParams({[fieldname]: value})}} />
-            <br/>
+            key={filter.name}
+            field_name={filter.name}
+            choices={filter.choices}
+            value={filter.currentValue}
+            onSelect={(value)=>{getDataFromQueryParams({[filter.name]: value})}} />
+            <br key={filter.name + "br"}/>
+            {/* TODO: try to simplify call to getDataFromQueryParams */}
         </React.Fragment>
       });
     }
+
+    const debouncedAPICall = debounce(getDataFromQueryParams, 2000, {trailing: true});
+    
+    const debouncedChangeParams = (params) => {
+      changeUrl(params);
+      debouncedAPICall();
+    }
+
+    const OptionsPanel = () => (
+      <Input
+      label="Page Size"
+      fieldLevelHelpTooltip={
+        <Tooltip
+          align="top left"
+          content="Number of rows to fetch per page"
+        />
+      }
+      onChange={(event, {value})=> debouncedChangeParams({page_size: value})}
+      defaultValue={queryParts("page_size")}
+    />)
 
     // These go outside the accordion because it seems to be created
     // and destroyed more often than Kenny. Unclear why.
     const [perfPanelColumnsExpanded, setPerfPanelColumnsExpanded] = useState(false);
     const [perfPanelFiltersExpanded, setPerfPanelFiltersExpanded] = useState(false);
+    const [perfPanelOptionsExpanded, setPerfPanelOptionsExpanded] = useState(false);
 
     const PerfAccordian = () => {
       useEffect(() => {
         return(()=>{console.log("UNMOUNTING ACCORDIAN")});
       });
 
+      var filters = gatherFilters();
+      var filtersWithValues = filters.filter((f)=>f.currentValue).length;
+
+      console.log(filters);
+
       return (
-        <Accordion>
+        <Accordion key="perfUIMainAccordion">
           <AccordionPanel id="perfPanelColumns"
                 key="perfPanelColumns"
                 summary="Columns" 
@@ -132,10 +190,17 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
           </AccordionPanel>
           <AccordionPanel id="perfPanelFilters"
                 key="perfPanelFilters"
-                summary="Filters"
+                summary={"Filters" + (filtersWithValues>0 ? " (" + filtersWithValues + ")" : "" )}
                 expanded={perfPanelFiltersExpanded}
                 onTogglePanel={()=>{setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded)}}>
-                  <BuildFilterPickers />
+                  <BuildFilterPickers filters={filters}/>
+          </AccordionPanel>
+          <AccordionPanel id="perfPanelOptions"
+                key="perfPanelOptions"
+                summary="Options"
+                expanded={perfPanelOptionsExpanded}
+                onTogglePanel={()=>{setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded)}}>
+              <OptionsPanel />
           </AccordionPanel>
         </Accordion>
       )
@@ -161,7 +226,11 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
                         get(perfdatastate, "perfdata.results.length") || -1;
 
     /* https://appexchange.salesforce.com/listingDetail?listingId=a0N3A00000E9TBZUA3 */
-    const PerfDataTableFooter = () => (
+    const PerfDataTableFooter = () => {
+      useEffect(() => {
+        return ()=>{console.log("Unmounting footer");}
+      });
+      return (
       <div className="slds-card__footer slds-grid" >
         { items.length>0 &&
           <React.Fragment>
@@ -182,7 +251,7 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
           </React.Fragment>
         }
       </div>
-    )
+    )}
 
     const columns = () => {
       let columns;
@@ -222,7 +291,8 @@ const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     }
 
     console.log("RE-RENDERING");
-    return <div>
+    useEffect(()=>{return ()=>{console.log("unmounting whole")}});
+    return <div key="perfContainerDiv">
       <PerfAccordian key="thePerfAccordian"/>
 			<div style={{ position: 'relative'}}>
             <PerfDataTableSpinner/>
