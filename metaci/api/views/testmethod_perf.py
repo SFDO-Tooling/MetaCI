@@ -1,4 +1,5 @@
 import copy
+from collections import namedtuple
 
 from django.db.models import FloatField
 from django.db.models.functions import Cast
@@ -168,39 +169,57 @@ class TestMethodPerfFilterSet(
         label="Split On (multi-select okay)", choices=group_by_choices, method=dummy
     )
 
+    FieldType = namedtuple("FieldType", ["label", "aggregation"])
+
     metrics = {
-        "duration_average": Avg("duration"),
-        "duration_slow": NearMax("duration"),
-        "duration_fast": NearMin("duration"),
-        "duration_stddev": StdDev("duration"),
-        "duration_coefficient_var": StdDev("duration") / Avg("duration"),
-        "cpu_usage_average": Avg("test_cpu_time_used"),
-        "cpu_usage_low": NearMin("test_cpu_time_used"),
-        "cpu_usage_high": NearMax("test_cpu_time_used"),
-        "count": Count("id"),
-        "failures": Count("id", filter=Q(outcome="Fail")),
-        "assertion_failures": Count(
-            "id", filter=Q(message__startswith="System.AssertException")
+        "duration_average": FieldType("Duration: Average", Avg("duration")),
+        "duration_slow": FieldType("Duration: Slow", NearMax("duration")),
+        "duration_fast": FieldType("Duration: Fast", NearMin("duration")),
+        "duration_stddev": FieldType("Duration: Stddev", StdDev("duration")),
+        "duration_coefficient_var": FieldType(
+            "Duration: VarCoef", StdDev("duration") / Avg("duration")
         ),
-        "DML_failures": Count(
-            "id", filter=Q(message__startswith="System.DmlException")
+        "cpu_usage_average": FieldType("CPU Usage: Average", Avg("test_cpu_time_used")),
+        "cpu_usage_low": FieldType("CPU Usage: Low", NearMin("test_cpu_time_used")),
+        "cpu_usage_high": FieldType("CPU Usage: High", NearMax("test_cpu_time_used")),
+        "count": FieldType("Count", Count("id")),
+        "failures": FieldType("Failures", Count("id", filter=Q(outcome="Fail"))),
+        "assertion_failures": FieldType(
+            "Assertion Failures",
+            Count("id", filter=Q(message__startswith="System.AssertException")),
         ),
-        "Other_failures": Count(
-            "id",
-            filter=~Q(message__startswith="System.DmlException")
-            & ~Q(message__startswith="System.AssertException"),
+        "DML_failures": FieldType(
+            "DML Failures",
+            Count("id", filter=Q(message__startswith="System.DmlException")),
         ),
-        "success_percentage": Cast(Count("id", filter=Q(outcome="Pass")), FloatField())
-        / Cast(Count("id"), FloatField()),
+        "Other_failures": FieldType(
+            "Other Failures",
+            Count(
+                "id",
+                filter=~Q(message__startswith="System.DmlException")
+                & ~Q(message__startswith="System.AssertException"),
+            ),
+        ),
+        "success_percentage": FieldType(
+            "Success Percentage",
+            Cast(Count("id", filter=Q(outcome="Pass")), FloatField())
+            / Cast(Count("id"), FloatField()),
+        ),
     }
 
-    metric_choices = tuple(zip(metrics.keys(), metrics.keys()))
+    metric_choices = tuple((key, field.label) for key, field in metrics.items())
+    includable_fields = metric_choices + tuple(
+        zip(
+            BuildFlowFilterSet.build_fields.keys(),
+            BuildFlowFilterSet.build_fields.keys(),
+        )
+    )
     include_fields = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Include (multi-select okay)", choices=metric_choices, method=dummy
+        label="Include (multi-select okay)", choices=includable_fields, method=dummy
     )
 
     ordering_fields = (
-        metric_choices
+        tuple((name, name) for (name, label) in metric_choices)
         + group_by_choices
         + (
             ("method_name", "method_name"),
@@ -269,14 +288,13 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         fields_to_include = params.getlist("include_fields")
 
         if self.orderby_field:
-            fields_to_include.append(self.orderby_field)
+            fields_to_include.append(self.orderby_field.strip("-"))
 
         fields = self.filterset_class.metrics
 
         for fieldname in fields_to_include:
-            fieldname = fieldname.strip("-")
             if fields.get(fieldname):
-                aggregations[fieldname] = fields[fieldname]
+                aggregations[fieldname] = fields[fieldname].aggregation
 
         return aggregations
 
@@ -288,8 +306,20 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         group_by_fields = params.getlist("group_by")
         order_by_field = self.orderby_field
 
+        # if the order_by field is a build field
+        # then we need to group by it.
         if order_by_field and order_by_field in build_fields:
             group_by_fields.append(order_by_field)
+
+        # if it is in the include_fields list, lets add
+        # it too, with group-by behaviour.
+        # TODO: Test this logic
+        fields_to_include = params.getlist("include_fields")
+        build_fields_in_include_fields = set(fields_to_include).intersection(
+            set(build_fields.keys())
+        )
+        for fieldname in build_fields_in_include_fields:
+            group_by_fields.append(fieldname)
 
         if group_by_fields:
             for param in group_by_fields:
