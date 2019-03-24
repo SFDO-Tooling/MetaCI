@@ -29,6 +29,7 @@ import Tooltip from '@salesforce/design-system-react/components/tooltip';
 import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';
 import DateRangePicker from './dateRangePicker';
+import PerfTableOptionsUI from './perfTableOptionsUI';
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
@@ -36,16 +37,13 @@ import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
 
 const default_columns = ["Method Name", "Duration"];
 
-const addIds = (rows : [{[string]: mixed}]) => {
-    return rows.map((row)=>{return {...row, id: Object.values(row).toString()}})
-}
 
-const ShowRenderTime = () => null
- // {<p>{(new Date()).toString()}</p>}
+export const ShowRenderTime = () =>
+ <p>{(new Date()).toString()}</p>
 
-const default_query_params = {page_size: 10, include_fields : ["repo", "duration_average"]};
+export const default_query_params = {page_size: 10, include_fields : ["repo", "duration_average"]};
 
-const queryParts = (name?:string) => {
+export const queryParts = (name?:string) => {
   let parts = { ...default_query_params, ...queryString.parse(window.location.search)};
   if(name){
     return parts[name];
@@ -54,156 +52,14 @@ const queryParts = (name?:string) => {
   }
 }
 
-const debouncedChangeUrlObj = {}
-const debouncedChangeUrl = (...args) => debouncedChangeUrlObj.func(...args);
-const debouncer = debounce(debouncedChangeUrl, 1000);
 
-const QueryBoundTextInput = ({ label, defaultValue, onValueUpdate,
-          tooltip }) => {  
-  debouncedChangeUrlObj["func"] = onValueUpdate
-
-  return <Input
-          label={label}
-          fieldLevelHelpTooltip={
-    <Tooltip
-      align="top left"
-      content={tooltip}
-    />
-  }
-  defaultValue={defaultValue}
-  onChange={(event,{value})=>debouncer(value)}
-  />
+/**
+ * Add iDs to table values for consumption by the SLDS DataTable
+ * @param {*} rows hashes from database
+ */
+const addIds = (rows : [{[string]: mixed}]) => {
+  return rows.map((row, index)=>{return {...row, id: index.toString()}})
 }
-
-
-const BuildFilterPickers = ({filters, getDataFromQueryParams}) => {
-  return filters.filter((filter)=>filter.choices).map((filter)=>{
-    console.log("FN", filter.name);
-    return <React.Fragment key={filter.name}>
-      <FilterPicker
-        key={filter.name}
-        field_name={filter.name}
-        choices={filter.choices}
-        value={filter.currentValue}
-        onSelect={(value)=>{getDataFromQueryParams({[filter.name]: value})}} />
-        <br key={filter.name + "br"}/>
-        {/* TODO: try to simplify call to getDataFromQueryParams */}
-    </React.Fragment>
-  });
-}
-
-let PerfAccordian: React.ComponentType<{}> = ({history, perfdatastate, doPerfRESTFetch, perfdataUIstate}) => {
-
-  const changeUrl = (newQueryParts: {[string] : string | string[] | null | typeof undefined}) => {
-    history.push({
-       pathname: window.location.pathname,
-      search: queryString.stringify({...queryParts(), ...newQueryParts, page: undefined})
-    })
-  };
-
-  const getDataFromQueryParams = (params?: {[string]: string | string[]}) => {
-    changeUrl({...queryParts(), ...params});
-    doPerfRESTFetch(null, queryParts());
-  }
-
-  
-  type FilterOption = {
-    id: string,
-    label: string
-  }
-
-  type Filter = {
-    name: string,
-    choices?: FilterOption,
-    currentValue?: string,
-  };
-
-  const gatherFilters = () : Filter[] => {
-    let filters:Filter[] = [];
-    const choiceFilters = get(perfdataUIstate, "uidata.buildflow_filters.choice_filters", {});
-    Object.keys(choiceFilters).map((fieldname) => {
-      let filterDef = choiceFilters[fieldname];
-      let choices = filterDef["choices"].map((pair)=>({id: pair[0], label: pair[1]}));
-      let currentValue = queryParts()[fieldname];
-      filters.push({name: fieldname, choices, currentValue});
-    });
-
-    return filters;
-  }
-
-
-  // These go outside the accordion because it seems to be created
-  // and destroyed more often than Kenny. Unclear why.
-    useEffect(() => {
-      return(()=>{console.log("UNMOUNTING ACCORDIAN")});
-    });
-
-    const [perfPanelColumnsExpanded, setPerfPanelColumnsExpanded] = useState(false);
-    const [perfPanelFiltersExpanded, setPerfPanelFiltersExpanded] = useState(false);
-    const [perfPanelOptionsExpanded, setPerfPanelOptionsExpanded] = useState(false);  
-
-    var filters = gatherFilters();
-    var filtersWithValues = filters.filter((f)=>f.currentValue).length;
-
-    console.log(filters);
-
-    return (
-      <Accordion key="perfUIMainAccordion">
-        <ShowRenderTime/>
-        <AccordionPanel id="perfPanelColumns"
-              key="perfPanelColumns"
-              summary="Columns" 
-              expanded={perfPanelColumnsExpanded}
-              onTogglePanel={()=>setPerfPanelColumnsExpanded(!perfPanelColumnsExpanded)}>
-              <FieldPicker key="PerfDataTableFieldPicker" 
-                  onChange={getDataFromQueryParams}/>
-        </AccordionPanel>
-        <AccordionPanel id="perfPanelFilters"
-              key="perfPanelFilters"
-              summary={"Filters" + (filtersWithValues>0 ? " (" + filtersWithValues + ")" : "" )}
-              expanded={perfPanelFiltersExpanded}
-              onTogglePanel={()=>{setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded)}}>
-                <BuildFilterPickers filters={filters} getDataFromQueryParams={getDataFromQueryParams}/>
-                <DateRangePicker 
-                      onChange={(name, data) => getDataFromQueryParams({[name]: data})}
-                      startName="daterange_after"
-                      endName="daterange_before"/>
-        </AccordionPanel>
-        <AccordionPanel id="perfPanelOptions"
-              key="perfPanelOptions"
-              summary="Options"
-              expanded={perfPanelOptionsExpanded}
-              onTogglePanel={()=>{setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded)}}>
-            <QueryBoundTextInput defaultValue={queryParts("page_size")} 
-                          label="Page Size"
-                          tooltip="Number of rows to fetch per page"
-                           onValueUpdate={(value)=>getDataFromQueryParams({page_size: value})}/>
-            <QueryBoundTextInput defaultValue={queryParts("build_flows_limit")} 
-                          label="Build Flows Limit"
-                          tooltip="Max number of buildflows to aggregate (performance optimization)"
-                           onValueUpdate={(value)=>getDataFromQueryParams({build_flows_limit: value})}/>
-            <ShowRenderTime/>
-        </AccordionPanel>
-      </Accordion>
-    )
-  }
-
-const select = (appState: AppState) => {
-  console.log("Selecting", selectPerfState(appState));
-  return {
-    perfdatastate: selectPerfState(appState),
-    perfdataUIstate: selectPerf_UI_State(appState),
-  }};
-
-const actions = {
-  doPerfRESTFetch: perfRESTFetch,
-  doPerfREST_UI_Fetch: perfREST_UI_Fetch,
-};
-
-PerfAccordian = withRouter(connect(select, actions)(
-  PerfAccordian,
-));
-
 
 const PerfDataTableSpinner = ({status}) => {
   useEffect(() => {
@@ -265,7 +121,7 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     };  
 
     var page = parseInt(queryParts()["page"]||"1") - 1;
-    var custom_page_size = queryParts()["page_size"];
+    var custom_page_size = queryParts("page_size");
     var page_size = custom_page_size ? parseInt(custom_page_size) : 
                         get(perfdatastate, "perfdata.results.length") || -1;
 
@@ -349,7 +205,7 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     useEffect(()=>{return ()=>{console.log("unmounting whole")}});
     return <div key="perfContainerDiv">
       <ShowRenderTime/>
-      <PerfAccordian key="thePerfAccordian"/>
+      <PerfTableOptionsUI getDataFromQueryParams={getDataFromQueryParams} key="thePerfAccordian"/>
 			<div style={{ position: 'relative'}}>
             <ShowRenderTime/>
             <PerfDataTableSpinner status={get(perfdatastate, "status")}/>
