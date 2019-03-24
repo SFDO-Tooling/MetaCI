@@ -26,7 +26,6 @@ import ErrorBoundary from 'components/error';
 import Footer from 'components/footer';
 import FourOhFour from 'components/404';
 import Header from 'components/header';
-import SimplePerfTable from 'components/simplePerfTable';
 import PerfTable from 'components/perfTable';
 import getApiFetch from 'utils/api';
 import reducer from 'store';
