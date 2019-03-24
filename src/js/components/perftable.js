@@ -281,7 +281,7 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
             <div className="slds-col slds-size--1-of-2"
                   style={{ textAlign: "left" }}>
                           Showing {page * page_size} to {' '}
-                                {(page + 1) * page_size} {' '}
+                                {Math.min((page + 1) * page_size, )} {' '}
                           of  {perfdatastate.perfdata.count} records
             </div>
             <div className="slds-col slds-size--1-of-2">
