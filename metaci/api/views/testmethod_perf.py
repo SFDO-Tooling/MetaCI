@@ -23,6 +23,11 @@ from metaci.plan.models import Plan
 from django.db import connection
 
 
+class DEFAULTS:
+    buildflows_limit = 100
+    page_size = 20
+
+
 def NearMin(field):
     "DB Statistical function for almost the minimum but not quite."
     return Percentile(field, 0.5, output_field=FloatField())
@@ -66,7 +71,7 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
 
 
 class StandardResultsSetPagination(pagination.PageNumberPagination):
-    page_size = 50
+    page_size = DEFAULTS.page_size
     page_size_query_param = "page_size"
     max_page_size = 1000
 
@@ -235,9 +240,6 @@ class TestMethodPerfFilterSet(
     ordering_param_name = "o"
 
 
-BUILD_FLOWS_LIMIT = 100
-
-
 class MetaCIApiException(exceptions.APIException):
     status_code = 400
     default_detail = "Validation Error."
@@ -247,7 +249,7 @@ class MetaCIApiException(exceptions.APIException):
 class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     """A view for lists of aggregated test metrics.
 
-    Note that the number of build flows covered is limited to **BUILD_FLOWS_LIMIT** for performance reasons. You can
+    Note that the number of build flows covered is limited to **DEFAULTS.buildflows_limit** for performance reasons. You can
     change this default with the build_flows_limit parameter.
     """
 
@@ -272,7 +274,9 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         Also limits # of returned buildflows for performance reasons
         """
         params = self.request.query_params
-        build_flows_limit = int(params.get("build_flows_limit") or BUILD_FLOWS_LIMIT)
+        build_flows_limit = int(
+            params.get("build_flows_limit") or DEFAULTS.buildflows_limit
+        )
 
         buildflows = BuildFlow.objects.filter(tests_total__gte=1)
         buildflows = BuildFlowFilterSet(
@@ -363,5 +367,5 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 # A bit of hackery to make a dynamic docstring, because the docstring
 # appears in the UI.
 TestMethodPerfListView.__doc__ = TestMethodPerfListView.__doc__.replace(
-    "BUILD_FLOWS_LIMIT", str(BUILD_FLOWS_LIMIT)
+    "DEFAULTS.buildflows_limit", str(DEFAULTS.buildflows_limit)
 )

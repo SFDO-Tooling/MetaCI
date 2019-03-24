@@ -1,9 +1,19 @@
 from rest_framework import viewsets, response
 
-from metaci.api.views.testmethod_perf import BuildFlowFilterSet, TestMethodPerfFilterSet
+from metaci.api.views.testmethod_perf import (
+    BuildFlowFilterSet,
+    TestMethodPerfFilterSet,
+    DEFAULTS,
+)
 
 
 class TestMethodPerfUIApiView(viewsets.ViewSet):
+    defaults = [
+        (item, value)
+        for (item, value) in DEFAULTS.__dict__.items()
+        if not item.startswith("_")
+    ]
+
     def list(self, request, format=None):
         choice_filters, other_buildflow_filters = self.collect_filter_defs(
             BuildFlowFilterSet
@@ -19,6 +29,7 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
             },
             "includable_fields": testmethod_choice_filters["include_fields"]["choices"],
             "group_by_fields": testmethod_choice_filters["group_by"]["choices"],
+            "defaults": dict(self.defaults),
         }
 
         return response.Response(json)
