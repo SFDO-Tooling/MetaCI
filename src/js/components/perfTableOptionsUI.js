@@ -13,9 +13,7 @@ import debounce from 'lodash/debounce';
 import queryString from 'query-string';
 
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 import type { AppState } from 'store';
-import type { InitialProps } from 'components/utils';
 import { t } from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
@@ -169,8 +167,8 @@ const actions = {
     doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 
-PerfTableOptionsUI = withRouter(connect(select, actions)(
-    PerfTableOptionsUI,
-));
 
-export default PerfTableOptionsUI;
+let PerfTableOptionsUIConnected: React.ComponentType<{}> = 
+    connect(select, actions)( PerfTableOptionsUI );
+
+export default PerfTableOptionsUIConnected;

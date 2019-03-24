@@ -8,7 +8,6 @@ import * as ReactDOM from 'react-dom';
 import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import zip from 'lodash/zip';
-import debounce from 'lodash/debounce';
 
 import queryString from 'query-string';
 
@@ -21,10 +20,6 @@ import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
-import Accordion from '@salesforce/design-system-react/components/accordion'; 
-import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel'; 
-import Input from '@salesforce/design-system-react/components/input'; 
-import Tooltip from '@salesforce/design-system-react/components/tooltip'; 
 
 import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';
