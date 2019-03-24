@@ -40,8 +40,8 @@ const addIds = (rows : [{[string]: mixed}]) => {
     return rows.map((row)=>{return {...row, id: Object.values(row).toString()}})
 }
 
-const ShowRenderTime = () =>
-  <p>{(new Date()).toString()}</p>
+const ShowRenderTime = () => null
+ // {<p>{(new Date()).toString()}</p>}
 
 const default_query_params = {page_size: 10, include_fields : ["repo", "duration_average"]};
 
@@ -54,13 +54,13 @@ const queryParts = (name?:string) => {
   }
 }
 
+const debouncedChangeUrlObj = {}
+const debouncedChangeUrl = (...args) => debouncedChangeUrlObj.func(...args);
+const debouncer = debounce(debouncedChangeUrl, 1000);
+
 const QueryBoundTextInput = ({ label, defaultValue, onValueUpdate,
           tooltip }) => {  
-  const val = debounce((value) => onValueUpdate(value), 1000)
-  let [debouncedChangeUrl, setDebouncer] = useState(
-    [val]
-  );
-  debouncedChangeUrl = debouncedChangeUrl[0];
+  debouncedChangeUrlObj["func"] = onValueUpdate
 
   return <Input
           label={label}
@@ -71,7 +71,7 @@ const QueryBoundTextInput = ({ label, defaultValue, onValueUpdate,
     />
   }
   defaultValue={defaultValue}
-  onChange={(event,{value})=>debouncedChangeUrl(value)}
+  onChange={(event,{value})=>debouncer(value)}
   />
 }
 
@@ -97,7 +97,7 @@ let PerfAccordian: React.ComponentType<{}> = ({history, perfdatastate, doPerfRES
   const changeUrl = (newQueryParts: {[string] : string | string[] | null | typeof undefined}) => {
     history.push({
        pathname: window.location.pathname,
-      search: queryString.stringify({...queryParts(), ...newQueryParts})
+      search: queryString.stringify({...queryParts(), ...newQueryParts, page: undefined})
     })
   };
 
