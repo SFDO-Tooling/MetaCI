@@ -25,10 +25,14 @@ import type { InitialProps } from 'components/utils';
 
 type Props = {
   onChange: () => null,
-  perfdataUIstate: { [string]: mixed }
+  perfdataUIstate?: { [string]: mixed }, 
 }
 
-const FieldPicker = ({ history, onChange, perfdataUIstate }) => {
+type ReduxProps = {
+  perfdataUIstate?: { [string]: mixed }, 
+}
+
+const FieldPicker = ({ history, onChange, perfdataUIstate }: Props & ReduxProps & InitialProps)  =>  {
   const columnOptions = () => {
     let columns: [string, string][] = [["Loading", "Loading"]];
     let server_column_options: [string, string][] = get(perfdataUIstate, "uidata.includable_fields");
@@ -84,7 +88,7 @@ const getSelectionFromUrl = (options) => {
   }
 }
 
-const queryStringFromSelection = (selection) => {
+const queryStringFromSelection = (selection: Array<{id: string}>) => {
   let include_fields = selection.map((selection) => selection.id);
   let newQueryParams = { include_fields };
   let oldQueryParams = queryString.parse(window.location.search);
@@ -102,8 +106,8 @@ const actions = {
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 
-const ConnectedFieldPicker: React.ComponentType<any> = withRouter(connect(select, actions)(
-  FieldPicker,
-));
+const ConnectedFieldPicker: React.ComponentType<Props> = connect(select, actions)(
+  withRouter(FieldPicker),
+);
 
 export default ConnectedFieldPicker;
