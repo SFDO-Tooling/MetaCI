@@ -151,7 +151,6 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     const columns = () => {
       let columns;
       if(items.length>0){
-        debugger;
         let columnNames = Object.keys(items[0]).filter((item)=>item!="id");
         return zip(columnNames, columnNames);
       }else{
