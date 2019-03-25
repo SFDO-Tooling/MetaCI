@@ -11,13 +11,13 @@ import queryString from 'query-string';
 
 import { connect } from 'react-redux';
 import type { AppState } from 'store';
-// flowling  untyped-import:off
+// flowlint  untyped-import:off
 import { t } from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
 import Input from '@salesforce/design-system-react/components/input';
 import Tooltip from '@salesforce/design-system-react/components/tooltip';
-  // flowlint untyped-type-import:error
+// flowlint untyped-type-import:error
 
 import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';

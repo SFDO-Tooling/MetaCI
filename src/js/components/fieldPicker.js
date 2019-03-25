@@ -12,23 +12,23 @@ import get from 'lodash/get';
 
 import queryString from 'query-string';
 
-// flowling  untyped-import:off
+// flowlint  untyped-import:off
 import Combobox from '@salesforce/design-system-react/components/combobox';
 import Icon from '@salesforce/design-system-react/components/icon';
-// flowling  untyped-import:error
+// flowlint  untyped-import:error
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
 import type { AppState } from 'store';
+import type { InitialProps } from 'components/utils';
 
 type Props = {
-  history: RouterHistory,
   onChange: () => null,
   perfdataUIstate: { [string]: mixed }
 }
 
-const FieldPicker: React.ComponentType<Props> = ({ history, onChange, perfdataUIstate }) => {
+const FieldPicker = ({ history, onChange, perfdataUIstate }) => {
   const columnOptions = () => {
     let columns: [string, string][] = [["Loading", "Loading"]];
     let server_column_options: [string, string][] = get(perfdataUIstate, "uidata.includable_fields");
