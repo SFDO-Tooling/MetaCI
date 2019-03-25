@@ -53,8 +53,8 @@ const FieldPicker = ({ history, onChange, perfdataUIstate }) => {
     <Combobox
       id="combobox-readonly-multiple"
       events={{
-        onRequestRemoveSelectedOption: changeURL,
-        onSelect: changeURL,
+        onRequestRemoveSelectedOption: (event, data) => changeURL(data),
+        onSelect:  (event, data) => changeURL(data),
       }}
       labels={{
         label: 'Column',
