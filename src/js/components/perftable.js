@@ -215,19 +215,19 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     </div>
   };
   
-const select2 = (appState: AppState) => {
+const select = (appState: AppState) => {
   console.log("Selecting", selectPerfState(appState));
   return {
     perfdatastate: selectPerfState(appState),
     perfdataUIstate: selectPerf_UI_State(appState),
   }};
 
-const actions2 = {
+const actions = {
   doPerfRESTFetch: perfRESTFetch,
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 
-const WrappedPerfTable: React.ComponentType<{}> = withRouter(connect(select2, actions2)(
+const WrappedPerfTable: React.ComponentType<{}> = withRouter(connect(select, actions)(
   PerfTable,
 ));
 
