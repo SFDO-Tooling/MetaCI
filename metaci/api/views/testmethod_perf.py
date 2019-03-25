@@ -24,7 +24,7 @@ from django.db import connection
 
 
 class DEFAULTS:
-    buildflows_limit = 100
+    build_flows_limit = 100
     page_size = 20
 
 
@@ -249,7 +249,7 @@ class MetaCIApiException(exceptions.APIException):
 class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     """A view for lists of aggregated test metrics.
 
-    Note that the number of build flows covered is limited to **DEFAULTS.buildflows_limit** for performance reasons. You can
+    Note that the number of build flows covered is limited to **DEFAULTS.build_flows_limit** for performance reasons. You can
     change this default with the build_flows_limit parameter.
     """
 
@@ -268,22 +268,22 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     def orderby_field(self):
         return self.request.query_params.get(self.ordering_param_name)
 
-    def _get_buildflows(self):
-        """Which buildflows do we need to look at? Limit by time, repo, etc.
+    def _get_build_flows(self):
+        """Which build_flows do we need to look at? Limit by time, repo, etc.
 
-        Also limits # of returned buildflows for performance reasons
+        Also limits # of returned build_flows for performance reasons
         """
         params = self.request.query_params
         build_flows_limit = int(
-            params.get("build_flows_limit") or DEFAULTS.buildflows_limit
+            params.get("build_flows_limit") or DEFAULTS.build_flows_limit
         )
 
-        buildflows = BuildFlow.objects.filter(tests_total__gte=1)
-        buildflows = BuildFlowFilterSet(
-            self.request.GET, buildflows, really_filter=True
+        build_flows = BuildFlow.objects.filter(tests_total__gte=1)
+        build_flows = BuildFlowFilterSet(
+            self.request.GET, build_flows, really_filter=True
         ).qs
 
-        return buildflows.order_by("-time_end")[0:build_flows_limit]
+        return build_flows.order_by("-time_end")[0:build_flows_limit]
 
     def _get_aggregation_fields(self):
         """What fields should appear in the output?"""
@@ -346,13 +346,13 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         set_timeout(20)
         self._check_params()
 
-        buildflows = self._get_buildflows()
+        build_flows = self._get_build_flows()
         splitter_fields = self._get_splitter_fields()
         aggregations = self._get_aggregation_fields()
 
         queryset = (
             TestResult.objects.filter(
-                build_flow_id__in=buildflows, duration__isnull=False
+                build_flow_id__in=build_flows, duration__isnull=False
             )
             .values(method_name=F("method__name"), **splitter_fields)
             .annotate(**aggregations)
@@ -367,5 +367,5 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 # A bit of hackery to make a dynamic docstring, because the docstring
 # appears in the UI.
 TestMethodPerfListView.__doc__ = TestMethodPerfListView.__doc__.replace(
-    "DEFAULTS.buildflows_limit", str(DEFAULTS.buildflows_limit)
+    "DEFAULTS.build_flows_limit", str(DEFAULTS.build_flows_limit)
 )
