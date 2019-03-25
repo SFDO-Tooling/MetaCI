@@ -30,6 +30,74 @@ import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
 
+let PerfTableOptionsUI: React.ComponentType<{}> = ({ getDataFromQueryParams, perfdataUIstate })  => {
+
+    // useful for debugging for now
+    useEffect(() => {
+        return (() => { console.log("UNMOUNTING ACCORDIAN") });
+    });
+
+    const [perfPanelColumnsExpanded, setPerfPanelColumnsExpanded] = useState(false);
+    const [perfPanelFiltersExpanded, setPerfPanelFiltersExpanded] = useState(false);
+    const [perfPanelOptionsExpanded, setPerfPanelOptionsExpanded] = useState(false);
+
+    var filters = gatherFilters(perfdataUIstate);
+    var filtersWithValues = filters.filter((f) => f.currentValue).length;
+
+    console.log(filters);
+
+    const getDefaultValue = (field_name:string) : string =>  {
+        return queryParts(field_name)
+                    ||get(perfdataUIstate, "uidata.defaults." + field_name)
+                    ||"MISSING_DEFAULT";
+    }
+
+    return (
+        <Accordion key="perfUIMainAccordion">
+            <ShowRenderTime />
+            <AccordionPanel id="perfPanelColumns"
+                key="perfPanelColumns"
+                summary="Columns"
+                expanded={perfPanelColumnsExpanded}
+                onTogglePanel={() => setPerfPanelColumnsExpanded(!perfPanelColumnsExpanded)}>
+                <FieldPicker key="PerfDataTableFieldPicker"
+                    onChange={getDataFromQueryParams} />
+            </AccordionPanel>
+            <AccordionPanel id="perfPanelFilters"
+                key="perfPanelFilters"
+                summary={"Filters" + (filtersWithValues > 0 ? " (" + filtersWithValues + ")" : "")}
+                expanded={perfPanelFiltersExpanded}
+                onTogglePanel={() => { setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded) }}>
+                <BuildFilterPickers filters={filters} getDataFromQueryParams={getDataFromQueryParams} />
+                <DateRangePicker
+                    onChange={(name, data) => getDataFromQueryParams({ [name]: data })}
+                    startName="daterange_after"
+                    endName="daterange_before" />
+            </AccordionPanel>
+            <AccordionPanel id="perfPanelOptions"
+                key="perfPanelOptions"
+                summary="Options"
+                expanded={perfPanelOptionsExpanded}
+                onTogglePanel={() => { setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded) }}>
+                {get( perfdataUIstate,  "status") === "UI_DATA_AVAILABLE" && 
+                <React.Fragment>
+                    <QueryBoundTextInput defaultValue={getDefaultValue("page_size")}
+                        label="Page Size"
+                        tooltip="Number of rows to fetch per page"
+                        onValueUpdate={(value) => getDataFromQueryParams({ page_size: value })} />
+                    <QueryBoundTextInput 
+                        defaultValue={getDefaultValue("build_flows_limit")}
+                        label="Build Flows Limit"
+                        tooltip="Max number of build_flows to aggregate (performance optimization)"
+                        onValueUpdate={(value) => getDataFromQueryParams({ build_flows_limit: value })} />
+                <ShowRenderTime />
+                </React.Fragment>
+                }
+            </AccordionPanel>
+        </Accordion>
+    )
+}
+
 const QueryBoundTextInput = ({ label, defaultValue, onValueUpdate,
     tooltip }) => {
     // debounce to reduce redraws while typing
@@ -73,88 +141,30 @@ const BuildFilterPickers = ({ filters, getDataFromQueryParams }) => {
     });
 }
 
-let PerfTableOptionsUI: React.ComponentType<{}> = ({ getDataFromQueryParams, perfdataUIstate }) => {
+type FilterOption = {
+    id: string,
+    label: string
+}
 
-    type FilterOption = {
-        id: string,
-        label: string
-    }
+type Filter = {
+    name: string,
+    choices?: FilterOption,
+    currentValue?: string,
+};
 
-    type Filter = {
-        name: string,
-        choices?: FilterOption,
-        currentValue?: string,
-    };
-
-    const gatherFilters = (): Filter[] => {
-        let filters: Filter[] = [];
-        const choiceFilters = get(perfdataUIstate, "uidata.buildflow_filters.choice_filters", {});
-        Object.keys(choiceFilters).map((fieldname) => {
-            let filterDef = choiceFilters[fieldname];
-            let choices = filterDef["choices"].map((pair) => ({ id: pair[0], label: pair[1] }));
-            let currentValue = queryParts()[fieldname];
-            filters.push({ name: fieldname, choices, currentValue });
-        });
-
-        return filters;
-    }
-
-
-    // These go outside the accordion because it seems to be created
-    // and destroyed more often than Kenny. Unclear why.
-    useEffect(() => {
-        return (() => { console.log("UNMOUNTING ACCORDIAN") });
+const gatherFilters = (perfdataUIstate): Filter[] => {
+    let filters: Filter[] = [];
+    const choiceFilters = get(perfdataUIstate, "uidata.buildflow_filters.choice_filters", {});
+    Object.keys(choiceFilters).map((fieldname) => {
+        let filterDef = choiceFilters[fieldname];
+        let choices = filterDef["choices"].map((pair) => ({ id: pair[0], label: pair[1] }));
+        let currentValue = queryParts()[fieldname];
+        filters.push({ name: fieldname, choices, currentValue });
     });
 
-    const [perfPanelColumnsExpanded, setPerfPanelColumnsExpanded] = useState(false);
-    const [perfPanelFiltersExpanded, setPerfPanelFiltersExpanded] = useState(false);
-    const [perfPanelOptionsExpanded, setPerfPanelOptionsExpanded] = useState(false);
-
-    var filters = gatherFilters();
-    var filtersWithValues = filters.filter((f) => f.currentValue).length;
-
-    console.log(filters);
-
-    return (
-        <Accordion key="perfUIMainAccordion">
-            <ShowRenderTime />
-            <AccordionPanel id="perfPanelColumns"
-                key="perfPanelColumns"
-                summary="Columns"
-                expanded={perfPanelColumnsExpanded}
-                onTogglePanel={() => setPerfPanelColumnsExpanded(!perfPanelColumnsExpanded)}>
-                <FieldPicker key="PerfDataTableFieldPicker"
-                    onChange={getDataFromQueryParams} />
-            </AccordionPanel>
-            <AccordionPanel id="perfPanelFilters"
-                key="perfPanelFilters"
-                summary={"Filters" + (filtersWithValues > 0 ? " (" + filtersWithValues + ")" : "")}
-                expanded={perfPanelFiltersExpanded}
-                onTogglePanel={() => { setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded) }}>
-                <BuildFilterPickers filters={filters} getDataFromQueryParams={getDataFromQueryParams} />
-                <DateRangePicker
-                    onChange={(name, data) => getDataFromQueryParams({ [name]: data })}
-                    startName="daterange_after"
-                    endName="daterange_before" />
-            </AccordionPanel>
-            <AccordionPanel id="perfPanelOptions"
-                key="perfPanelOptions"
-                summary="Options"
-                expanded={perfPanelOptionsExpanded}
-                onTogglePanel={() => { setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded) }}>
-                <QueryBoundTextInput defaultValue={queryParts("page_size")}
-                    label="Page Size"
-                    tooltip="Number of rows to fetch per page"
-                    onValueUpdate={(value) => getDataFromQueryParams({ page_size: value })} />
-                <QueryBoundTextInput defaultValue={queryParts("build_flows_limit")}
-                    label="Build Flows Limit"
-                    tooltip="Max number of buildflows to aggregate (performance optimization)"
-                    onValueUpdate={(value) => getDataFromQueryParams({ build_flows_limit: value })} />
-                <ShowRenderTime />
-            </AccordionPanel>
-        </Accordion>
-    )
+    return filters;
 }
+
 
 const select = (appState: AppState) => {
     console.log("Selecting", selectPerfState(appState));
