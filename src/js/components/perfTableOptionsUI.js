@@ -1,7 +1,4 @@
 // @flow
-/* flowlint
- *   untyped-import:off
- */
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -14,11 +11,13 @@ import queryString from 'query-string';
 
 import { connect } from 'react-redux';
 import type { AppState } from 'store';
+// flowling  untyped-import:off
 import { t } from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
 import Input from '@salesforce/design-system-react/components/input';
 import Tooltip from '@salesforce/design-system-react/components/tooltip';
+  // flowlint untyped-type-import:error
 
 import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';
@@ -30,7 +29,12 @@ import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
 
-let PerfTableOptionsUI: React.ComponentType<{}> = ({ getDataFromQueryParams, perfdataUIstate })  => {
+type Props = {
+    getDataFromQueryParams : (string) => number,
+    perfdataUIstate? : {[string]: mixed}
+}
+
+let PerfTableOptionsUI: React.ComponentType<Props> = ({ getDataFromQueryParams, perfdataUIstate })  => {
 
     // useful for debugging for now
     useEffect(() => {
