@@ -33,8 +33,8 @@ import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
 const default_columns = ["Method Name", "Duration"];
 
 
-export const ShowRenderTime = () =>
- <p>{(new Date()).toString()}</p>
+export const ShowRenderTime = () => null
+// <p>{(new Date()).toString()}</p>
 
 export const default_query_params = {page_size: 10, include_fields : ["repo", "duration_average"]};
 
@@ -151,6 +151,7 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     const columns = () => {
       let columns;
       if(items.length>0){
+        debugger;
         let columnNames = Object.keys(items[0]).filter((item)=>item!="id");
         return zip(columnNames, columnNames);
       }else{
