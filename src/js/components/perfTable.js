@@ -23,7 +23,6 @@ import DataTableCell from '@salesforce/design-system-react/components/data-table
 
 import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';
-import DateRangePicker from './dateRangePicker';
 import PerfTableOptionsUI from './perfTableOptionsUI';
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
@@ -91,7 +90,7 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       items = [];
     }
 
-    const getDataFromQueryParams = (params?: {[string]: string | string[]}) => {
+    const fetchServerData = (params?: {[string]: string | string[]}) => {
       changeUrl({...queryParts(), ...params});
       doPerfRESTFetch(null, queryParts());
     }
@@ -109,9 +108,9 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       var qParts = queryString.parse(qs);
       var page = qParts["page"];
       if(Array.isArray(page) ){
-        getDataFromQueryParams({page: page[1]});
+        fetchServerData({page: page[1]});
       }else if(typeof page === 'string' ){
-        getDataFromQueryParams({page});
+        fetchServerData({page});
       }
     };  
 
@@ -192,7 +191,7 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       if (sortDirection === 'desc') {
         sortProperty = "-" + sortProperty
       }
-      getDataFromQueryParams({o: sortProperty, page: '1'});
+      fetchServerData({o: sortProperty, page: '1'});
     };
   
   
@@ -200,7 +199,7 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     useEffect(()=>{return ()=>{console.log("unmounting whole")}});
     return <div key="perfContainerDiv">
       <ShowRenderTime/>
-      <PerfTableOptionsUI getDataFromQueryParams={getDataFromQueryParams} key="thePerfAccordian"/>
+      <PerfTableOptionsUI fetchServerData={fetchServerData} key="thePerfAccordian"/>
 			<div style={{ position: 'relative'}}>
             <ShowRenderTime/>
             <PerfDataTableSpinner status={get(perfdatastate, "status")}/>

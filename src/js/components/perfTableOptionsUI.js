@@ -30,11 +30,11 @@ import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
 
 type Props = {
-    getDataFromQueryParams : (string) => number,
+    fetchServerData : (string) => number,
     perfdataUIstate? : {[string]: mixed}
 }
 
-let PerfTableOptionsUI: React.ComponentType<Props> = ({ getDataFromQueryParams, perfdataUIstate })  => {
+let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdataUIstate })  => {
 
     // useful for debugging for now
     useEffect(() => {
@@ -51,9 +51,14 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ getDataFromQueryParams, 
     console.log(filters);
 
     const getDefaultValue = (field_name:string) : string =>  {
-        return queryParts(field_name)
-                    ||get(perfdataUIstate, "uidata.defaults." + field_name)
-                    ||"MISSING_DEFAULT";
+        let defaultVal:string;
+        if(field_name=="method_name"){
+            defaultVal = ""
+        }else{
+            defaultVal = get(perfdataUIstate, "uidata.defaults." + field_name)
+                ||"MISSING_DEFAULT"
+        }
+        return queryParts(field_name) || defaultVal;
     }
 
     return (
@@ -65,18 +70,24 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ getDataFromQueryParams, 
                 expanded={perfPanelColumnsExpanded}
                 onTogglePanel={() => setPerfPanelColumnsExpanded(!perfPanelColumnsExpanded)}>
                 <FieldPicker key="PerfDataTableFieldPicker"
-                    onChange={getDataFromQueryParams} />
+                    onChange={fetchServerData} />
             </AccordionPanel>
             <AccordionPanel id="perfPanelFilters"
                 key="perfPanelFilters"
                 summary={"Filters" + (filtersWithValues > 0 ? " (" + filtersWithValues + ")" : "")}
                 expanded={perfPanelFiltersExpanded}
                 onTogglePanel={() => { setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded) }}>
-                <BuildFilterPickers filters={filters} getDataFromQueryParams={getDataFromQueryParams} />
+                <BuildFilterPickers filters={filters} fetchServerData={fetchServerData} />
                 <DateRangePicker
-                    onChange={(name, data) => getDataFromQueryParams({ [name]: data })}
+                    onChange={(name, data) => fetchServerData({ [name]: data })}
                     startName="daterange_after"
-                    endName="daterange_before" />
+                    endName="daterange_before"
+                    startValue={new Date(getDefaultValue("daterange_after"))}
+                    endValue={new Date (getDefaultValue("daterange_before"))} />
+                <QueryBoundTextInput defaultValue={getDefaultValue("method_name")}
+                        label="Method Name"
+                        tooltip="Method to query"
+                        onValueUpdate={(value) => fetchServerData({ method_name: value })} />
             </AccordionPanel>
             <AccordionPanel id="perfPanelOptions"
                 key="perfPanelOptions"
@@ -88,12 +99,12 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ getDataFromQueryParams, 
                     <QueryBoundTextInput defaultValue={getDefaultValue("page_size")}
                         label="Page Size"
                         tooltip="Number of rows to fetch per page"
-                        onValueUpdate={(value) => getDataFromQueryParams({ page_size: value })} />
+                        onValueUpdate={(value) => fetchServerData({ page_size: value })} />
                     <QueryBoundTextInput 
                         defaultValue={getDefaultValue("build_flows_limit")}
                         label="Build Flows Limit"
                         tooltip="Max number of build_flows to aggregate (performance optimization)"
-                        onValueUpdate={(value) => getDataFromQueryParams({ build_flows_limit: value })} />
+                        onValueUpdate={(value) => fetchServerData({ build_flows_limit: value })} />
                 <ShowRenderTime />
                 </React.Fragment>
                 }
@@ -128,21 +139,38 @@ const QueryBoundTextInput = ({ label, defaultValue, onValueUpdate,
     />
 }
 
-
-const BuildFilterPickers = ({ filters, getDataFromQueryParams }) => {
-    return filters.filter((filter) => filter.choices).map((filter) => {
-        console.log("FN", filter.name);
-        return <React.Fragment key={filter.name}>
-            <FilterPicker
+const BuildFilterPicker = ({ filter, fetchServerData }) => {
+    return <FilterPicker
                 key={filter.name}
                 field_name={filter.name}
                 choices={filter.choices}
                 value={filter.currentValue}
-                onSelect={(value) => { getDataFromQueryParams({ [filter.name]: value }) }} />
-            <br key={filter.name + "br"} />
-            {/* TODO: try to simplify call to getDataFromQueryParams */}
-        </React.Fragment>
-    });
+                onSelect={(value) => { fetchServerData({ [filter.name]: value }) }} />
+}
+
+
+const BuildFilterPickers = ({ filters, fetchServerData }) => {
+    let choice_filters = filters.filter((filter) => filter.choices);
+    let first4 = choice_filters.slice(0,4);
+    let rest = choice_filters.slice(4);
+    let first_row= <div class="slds-grid slds-gutters">
+        {
+            first4.map((filter) => 
+                <div class="slds-col "
+                         key={filter.name}>
+                         <BuildFilterPicker filter={filter} fetchServerData={fetchServerData}/>
+                        </div>
+            )
+        }                         
+        </div>
+    let other_html = rest.map((filter) => 
+             <BuildFilterPicker filter={filter} 
+                fetchServerData={fetchServerData}/>);
+
+    return <React.Fragment>
+        {first_row}
+        {other_html}
+    </React.Fragment>
 }
 
 type FilterOption = {
@@ -157,6 +185,7 @@ type Filter = {
 };
 
 const gatherFilters = (perfdataUIstate): Filter[] => {
+    // TODO: handle all filters here
     let filters: Filter[] = [];
     const choiceFilters = get(perfdataUIstate, "uidata.buildflow_filters.choice_filters", {});
     Object.keys(choiceFilters).map((fieldname) => {
