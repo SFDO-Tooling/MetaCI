@@ -26,9 +26,10 @@ class FilterPicker extends React.Component<{}> {
 	constructor(props) {
 		super(props);
 
+		let selected = this.props.choices.filter((value)=>value.id===this.props.value);
 		this.state = {
-			inputValue: this.props.value,
-			selection: [],
+			inputValue: "",
+			selection: selected,
 		};
 	}
 
@@ -36,6 +37,7 @@ class FilterPicker extends React.Component<{}> {
 		return (
 			<Combobox
 			id="combobox-inline-single"
+			placeholder={this.props.field_name}
 			events={{
 				onChange: (event, { value }) => {
 					this.setState({ inputValue: value });
@@ -45,6 +47,7 @@ class FilterPicker extends React.Component<{}> {
 						inputValue: '',
 						selection: data.selection,
 					});
+					this.props.onSelect(undefined);
 				},
 				onSubmit: (event, { value }) => {
 					this.setState({
@@ -78,11 +81,13 @@ class FilterPicker extends React.Component<{}> {
 			}}
 			labels={{
 				placeholder: 'Select ' + this.props.field_name,
+				placeholderReadOnly: 'Select ' + this.props.field_name,
 			}}
 			options={comboboxFilterAndLimit({
 				inputValue: this.state.inputValue,
 				options: this.props.choices,
 				selection: this.state.selection,
+				limit: 20,
 			})}
 			selection={this.state.selection}
 			value={
@@ -90,7 +95,7 @@ class FilterPicker extends React.Component<{}> {
 					? this.state.selectedOption.label
 					: this.state.inputValue
 			}
-			variant="inline-listbox"
+			variant="base"
 		/>
 		);
 	}
