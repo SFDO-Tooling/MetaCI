@@ -30,6 +30,11 @@ urlpatterns = [
         name="repo_orgs",
     ),
     url(
+        r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/perf",
+        repository_views.repo_perf,
+        name="repo_perf",
+    ),
+    url(
         r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/*$",
         repository_views.repo_detail,
         name="repo_detail",

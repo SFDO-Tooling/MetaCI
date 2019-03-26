@@ -101,6 +101,15 @@ def repo_orgs(request, owner, name):
     return render(request, "repository/repo_orgs.html", context=context)
 
 
+def repo_perf(request, owner, name):
+    repo = Repository.objects.get_for_user_or_404(
+        request.user, {"owner": owner, "name": name}
+    )
+
+    context = {"repo": repo}
+    return render(request, "repository/repo_perf.html", context=context)
+
+
 def branch_detail(request, owner, name, branch):
     repo = Repository.objects.get_for_user_or_404(
         request.user, {"owner": owner, "name": name}

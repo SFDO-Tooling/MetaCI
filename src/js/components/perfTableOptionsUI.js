@@ -44,6 +44,7 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdat
     const [perfPanelColumnsExpanded, setPerfPanelColumnsExpanded] = useState(false);
     const [perfPanelFiltersExpanded, setPerfPanelFiltersExpanded] = useState(false);
     const [perfPanelOptionsExpanded, setPerfPanelOptionsExpanded] = useState(false);
+    const [perfPanelDatesExpanded, setPerfPanelDatesExpanded] = useState(false);
 
     var filters = gatherFilters(perfdataUIstate);
     var filtersWithValues = filters.filter((f) => f.currentValue).length;
@@ -88,6 +89,13 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdat
                         label="Method Name"
                         tooltip="Method to query"
                         onValueUpdate={(value) => fetchServerData({ method_name: value })} />
+            </AccordionPanel>
+            {/* TODO: highlight whether date has been set or not */ }
+            <AccordionPanel id="perfPaneDates"
+                key="perfPaneDates"
+                summary={"Dates"}
+                expanded={perfPanelDatesExpanded}
+                onTogglePanel={() => { setPerfPanelDatesExpanded(!perfPanelDatesExpanded) }}>
             </AccordionPanel>
             <AccordionPanel id="perfPanelOptions"
                 key="perfPanelOptions"
@@ -150,27 +158,17 @@ const BuildFilterPicker = ({ filter, fetchServerData }) => {
 
 
 const BuildFilterPickers = ({ filters, fetchServerData }) => {
-    let choice_filters = filters.filter((filter) => filter.choices);
-    let first4 = choice_filters.slice(0,4);
-    let rest = choice_filters.slice(4);
-    let first_row= <div class="slds-grid slds-gutters">
+    let choice_filters = filters.filter((filter) => filter.choices && filter.name!=="recentdate");
+    return <div key="grid" className="slds-grid slds-wrap slds-gutters">
         {
-            first4.map((filter) => 
-                <div class="slds-col "
+            choice_filters.map((filter) => 
+                <div key={filter.name} className="slds-col "
                          key={filter.name}>
-                         <BuildFilterPicker filter={filter} fetchServerData={fetchServerData}/>
+                         <BuildFilterPicker key={filter.name} filter={filter} fetchServerData={fetchServerData}/>
                         </div>
             )
         }                         
         </div>
-    let other_html = rest.map((filter) => 
-             <BuildFilterPicker filter={filter} 
-                fetchServerData={fetchServerData}/>);
-
-    return <React.Fragment>
-        {first_row}
-        {other_html}
-    </React.Fragment>
 }
 
 type FilterOption = {
