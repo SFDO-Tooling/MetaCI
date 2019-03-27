@@ -39,13 +39,17 @@ export const default_query_params = {page_size: 10, include_fields : ["repo", "d
 
 export const queryParts = (name?:string) => {
   let parts = { ...default_query_params, ...queryString.parse(window.location.search)};
+
   if(name){
     return parts[name];
   }else{
     return parts;
   }
 }
-
+export const changeUrl = (newQueryParts: {[string] : string | string[] | null | typeof undefined}) => {
+  let qs = queryString.stringify({...queryParts(), ...newQueryParts});
+  window.history.pushState(null, "", window.location.pathname+"?"+qs);
+};
 
 /**
  * Add iDs to table values for consumption by the SLDS DataTable
@@ -95,12 +99,6 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       doPerfRESTFetch(null, queryParts());
     }
   
-    const changeUrl = (newQueryParts: {[string] : string | string[] | null | typeof undefined}) => {
-      history.push({
-         pathname: window.location.pathname,
-        search: queryString.stringify({...queryParts(), ...newQueryParts})
-      })
-    };
   
 
     const goPageFromUrl = (url: string) => {
