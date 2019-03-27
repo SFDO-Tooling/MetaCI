@@ -28,7 +28,6 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
                 "other_buildflow_filters": other_buildflow_filters,
             },
             "includable_fields": testmethod_choice_filters["include_fields"]["choices"],
-            "group_by_fields": testmethod_choice_filters["group_by"]["choices"],
             "defaults": dict(self.defaults),
         }
 

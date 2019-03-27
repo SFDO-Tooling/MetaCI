@@ -71,14 +71,6 @@ class TestTestMethodPerfUI_RESTAPI(APITestCase, _TestingHelpers):
         self.assertIn("duration_average", includable_fields)
         self.assertIn("count", includable_fields)
 
-    def test_group_by_fields(self):
-        obj = self.get_api_results()
-        group_by_fields = keys(obj["group_by_fields"])
-        self.assertIn("repo", group_by_fields)
-        self.assertIn("branch", group_by_fields)
-        self.assertIn("plan", group_by_fields)
-        self.assertIn("flow", group_by_fields)
-
     def test_buildflow_filters(self):
         obj = self.get_api_results()
         buildflow_filters = obj["buildflow_filters"]
