@@ -26,7 +26,7 @@ import ErrorBoundary from 'components/error';
 import Footer from 'components/footer';
 import FourOhFour from 'components/404';
 import Header from 'components/header';
-import PerfTable from 'components/perfTable';
+import PerfTable, { changeUrl } from 'components/perfTable';
 import getApiFetch from 'utils/api';
 import reducer from 'store';
 import { logError } from 'utils/logging';
@@ -40,7 +40,6 @@ const App = () => (
   <DocumentTitle title={t('Meta CI')}>
     <div
       className="slds-grid
-        slds-grid_frame
         slds-grid_vertical"
     >
       <ErrorBoundary>
@@ -104,6 +103,12 @@ init_i18n(() => {
 
     // Set App element (used for react-SLDS modals)
     settings.setAppElement(el);
+
+    /* Special case for getting repo name from URL path into query params with other filters */
+    if( window.location.pathname.indexOf("/repos/")>=0){
+      let pathParts = window.location.pathname.split("/");
+      changeUrl({repo: pathParts[pathParts-2]})
+    }
 
     ReactDOM.render(
       <Provider store={appStore}>
