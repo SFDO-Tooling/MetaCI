@@ -28,6 +28,9 @@ class DEFAULTS:
     page_size = 20
 
 
+FieldType = namedtuple("FieldType", ["label", "aggregation"])
+
+
 def NearMin(field):
     "DB Statistical function for almost the minimum but not quite."
     return Percentile(field, 0.5, output_field=FloatField())
@@ -160,23 +163,14 @@ class TestMethodPerfFilterSet(
     """This filterset works on the output queries"""
 
     method_name = django_filters.rest_framework.CharFilter(
-        field_name="method_name", label="Method Name"
+        field_name="method_name", label="Method Name", lookup_expr="icontains"
     )
 
     def dummy(queryset, name, value):
         return queryset
 
-    group_by_choices = tuple(
-        (name, name) for name in BuildFlowFilterSet.build_fields.keys()
-    )
-
-    group_by = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Split On (multi-select okay)", choices=group_by_choices, method=dummy
-    )
-
-    FieldType = namedtuple("FieldType", ["label", "aggregation"])
-
     metrics = {
+        "method_name": FieldType("Method Name", F("method__name")),
         "duration_average": FieldType("Duration: Average", Avg("duration")),
         "duration_slow": FieldType("Duration: Slow", NearMax("duration")),
         "duration_fast": FieldType("Duration: Fast", NearMin("duration")),
@@ -223,19 +217,7 @@ class TestMethodPerfFilterSet(
         label="Include (multi-select okay)", choices=includable_fields, method=dummy
     )
 
-    ordering_fields = (
-        tuple((name, name) for (name, label) in metric_choices)
-        + group_by_choices
-        + (
-            ("method_name", "method_name"),
-            ("count", "count"),
-            ("failures", "failures"),
-            ("assertion_failures", "assertion_failures"),
-            ("DML_failures", "DML_failures"),
-            ("Other_failures", "Other_failures"),
-            ("success_percentage", "success_percentage"),
-        )
-    )
+    ordering_fields = tuple((name, name) for (name, label) in metric_choices)
     o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
     ordering_param_name = "o"
 
@@ -289,6 +271,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         """What fields should appear in the output?"""
         params = self.request.query_params
         aggregations = {}
+
         fields_to_include = params.getlist("include_fields")
 
         if self.orderby_field:
@@ -303,11 +286,11 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         return aggregations
 
     def _get_splitter_fields(self):
-        """Which fields to split on (or group by, depending on how you think about it"""
+        """Which fields to split on (or group by, depending on how you think about it)"""
         params = self.request.query_params
         output_fields = {}
         build_fields = BuildFlowFilterSet.build_fields
-        group_by_fields = params.getlist("group_by")
+        group_by_fields = []
         order_by_field = self.orderby_field
 
         # if the order_by field is a build field
@@ -362,6 +345,51 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             queryset = queryset.order_by("method_name")
 
         return queryset
+
+
+class TestMethodResultFilterSet(
+    BuildFlowFilterSet, django_filters.rest_framework.FilterSet
+):
+    method_name = TestMethodPerfFilterSet.get_filters()["method_name"]
+
+    dummy = TestMethodPerfFilterSet.dummy
+
+    # this field should be renamed. These aren't really metrics.
+    metrics = {
+        "method_name": FieldType("Method Name", F("method_name")),
+        "duration": FieldType("Duration", F("duration")),
+        "cpu_usage": FieldType("CPU Usage", F("test_cpu_time_used")),
+        "outcome": FieldType("Failures", F("outcome")),
+        "id": FieldType("Id", F("id")),
+        "date": FieldType("Date", F("build_flow__time_end")),
+        "type": FieldType("Type", F("method__testclass__test_type")),
+    }
+
+    metric_choices = tuple((key, field.label) for key, field in metrics.items())
+    includable_fields = metric_choices + tuple(
+        zip(
+            BuildFlowFilterSet.build_fields.keys(),
+            BuildFlowFilterSet.build_fields.keys(),
+        )
+    )
+
+    include_fields = django_filters.rest_framework.MultipleChoiceFilter(
+        label="Include (multi-select okay)", choices=includable_fields, method=dummy
+    )
+
+    ordering_fields = [(key, key) for (key, field) in includable_fields]
+    print("OOO", list(ordering_fields))
+
+    o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
+    ordering_param_name = "o"
+
+
+class TestMethodResultListView(TestMethodPerfListView):
+    serializer_class = SimpleDictSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filterset_class = TestMethodResultFilterSet
+    pagination_class = StandardResultsSetPagination
+    ordering_param_name = filterset_class.ordering_param_name
 
 
 # A bit of hackery to make a dynamic docstring, because the docstring
