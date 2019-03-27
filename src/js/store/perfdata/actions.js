@@ -20,7 +20,7 @@ export const perfRESTFetch = (url?: string, params?: {}):
         ThunkAction => (dispatch, getState, { apiFetch }) => {
   dispatch({ type: 'PERF_DATA_LOADING', payload: url });
   // todo use reverse
-  url = url || "/api/testmethod_perf?group_by=repo"
+  url = url || "/api/testmethod_perf?"
   if(params){
     url = url + "&"+ queryString.stringify(params);
   }
