@@ -107,7 +107,7 @@ init_i18n(() => {
     /* Special case for getting repo name from URL path into query params with other filters */
     if( window.location.pathname.indexOf("/repos/")>=0){
       let pathParts = window.location.pathname.split("/");
-      changeUrl({repo: pathParts[pathParts-2]})
+      changeUrl({repo: pathParts[pathParts.length-2]})
     }
 
     ReactDOM.render(
