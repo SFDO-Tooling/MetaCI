@@ -100,7 +100,12 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     }
   
   
-
+    /*
+     * Extract the page from the server-generated URL
+     * 
+     * TODO: this code may be obsolete as of March 27
+     * 
+     */
     const goPageFromUrl = (url: string) => {
       var qs = url.split("?", 2)[1];
       var qParts = queryString.parse(qs);
@@ -109,6 +114,8 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
         fetchServerData({page: page[1]});
       }else if(typeof page === 'string' ){
         fetchServerData({page});
+      }else{
+        fetchServerData({page: undefined});
       }
     };  
 
@@ -133,10 +140,10 @@ const PerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
                           of  {perfdatastate.perfdata.count} records
             </div>
             <div className="slds-col slds-size--1-of-2">
-                      <button onClick={()=>goPageFromUrl(perfdatastate.perfdata.previous)}
+                      <button onClick={()=>doPerfRESTFetch(perfdatastate.perfdata.previous)}
                         className="slds-button slds-button--brand"
                         disabled={!get(perfdatastate, "perfdata.previous")}>Previous</button>
-                      <button onClick={()=>goPageFromUrl(perfdatastate.perfdata.next)}
+                      <button onClick={()=>doPerfRESTFetch(perfdatastate.perfdata.next)}
                         className="slds-button slds-button--brand"
                         disabled={!get(perfdatastate, "perfdata.next")}>Next</button>
             </div>
