@@ -35,6 +35,11 @@ urlpatterns = [
         name="repo_perf",
     ),
     url(
+        r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/tests",
+        repository_views.repo_tests,
+        name="repo_tests",
+    ),
+    url(
         r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/*$",
         repository_views.repo_detail,
         name="repo_detail",

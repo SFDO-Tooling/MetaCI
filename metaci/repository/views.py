@@ -14,7 +14,6 @@ from django.views.decorators.http import require_POST
 from metaci.repository.models import Branch
 from metaci.repository.models import Repository
 from metaci.release.models import Release
-from metaci.plan.models import Plan, PlanRepository
 from metaci.build.models import Build
 from metaci.build.utils import view_queryset
 
@@ -108,6 +107,9 @@ def repo_perf(request, owner, name):
 
     context = {"repo": repo}
     return render(request, "repository/repo_perf.html", context=context)
+
+
+repo_tests = repo_perf
 
 
 def branch_detail(request, owner, name, branch):
