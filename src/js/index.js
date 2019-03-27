@@ -48,7 +48,10 @@ const App = () => (
             slds-shrink-none"
         >
           <ErrorBoundary>
-            <PerfTable/>
+            <Switch>
+             <Route path="/repos" component={PerfTable} />
+             <Route path="/tests" component={PerfTable} />
+            </Switch>
           </ErrorBoundary>
         </div>
       </ErrorBoundary>
