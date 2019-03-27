@@ -43,7 +43,6 @@ https://github.com/SFDO-Tooling/CumulusCI/tarball/master
 requests==2.21.0
 
 # Salesforce Lightning Design System for Django
-django-slds==0.1.2
 django-slds-crispyforms==0.1.0  # pyup: ignore # there are releases with no package
 
 ansi2html==1.5.2

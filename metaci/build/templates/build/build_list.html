@@ -47,7 +47,7 @@
         <div
           class="slds-truncate slds-badge {% if build.get_status == 'fail' or build.get_status == 'error' %}slds-theme--error{% elif build.get_status == 'success' %}slds-theme--success{% endif %}"
           title="{{ build.get_status }}">
-          {{ build.get_status }}
+          {{ build.get_status.upper }}
         </div>
       </td>
       <td data-label="Repository">
