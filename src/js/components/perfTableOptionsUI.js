@@ -46,21 +46,33 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdat
     const [perfPanelOptionsExpanded, setPerfPanelOptionsExpanded] = useState(false);
     const [perfPanelDatesExpanded, setPerfPanelDatesExpanded] = useState(false);
 
-    var filters = gatherFilters(perfdataUIstate);
-    var filtersWithValues = filters.filter((f) => f.currentValue).length;
-
-    console.log(filters);
-
     const getDefaultValue = (field_name:string) : string =>  {
         let defaultVal:string;
         if(field_name=="method_name"){
             defaultVal = ""
         }else{
             defaultVal = get(perfdataUIstate, "uidata.defaults." + field_name)
-                ||"MISSING_DEFAULT"
         }
         return queryParts(field_name) || defaultVal;
     }
+
+    const gatherFilters = (perfdataUIstate): Filter[] => {
+        // TODO: handle all filters here
+        let filters: Filter[] = [];
+        const choiceFilters = get(perfdataUIstate, "uidata.buildflow_filters.choice_filters", {});
+        Object.keys(choiceFilters).map((fieldname) => {
+            let filterDef = choiceFilters[fieldname];
+            let choices = filterDef["choices"].map((pair) => ({ id: pair[0], label: pair[1] }));
+            let currentValue = getDefaultValue(fieldname);
+            filters.push({ name: fieldname, choices, currentValue });
+        });
+    
+        return filters;
+    }
+    
+    var filters = gatherFilters(perfdataUIstate);
+    console.log("Filter values", filters.map((f) => f.currentValue));
+    var filtersWithValues = filters.filter((f) => f.currentValue && f.currentValue!="MISSING_DEFAULT").length;
 
     return (
         <Accordion key="perfUIMainAccordion">
@@ -79,12 +91,6 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdat
                 expanded={perfPanelFiltersExpanded}
                 onTogglePanel={() => { setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded) }}>
                 <BuildFilterPickers filters={filters} fetchServerData={fetchServerData} />
-                <DateRangePicker
-                    onChange={(name, data) => fetchServerData({ [name]: data })}
-                    startName="daterange_after"
-                    endName="daterange_before"
-                    startValue={new Date(getDefaultValue("daterange_after"))}
-                    endValue={new Date (getDefaultValue("daterange_before"))} />
                 <QueryBoundTextInput defaultValue={getDefaultValue("method_name")}
                         label="Method Name"
                         tooltip="Method to query"
@@ -93,9 +99,15 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdat
             {/* TODO: highlight whether date has been set or not */ }
             <AccordionPanel id="perfPaneDates"
                 key="perfPaneDates"
-                summary={"Dates"}
+                summary={"Date Range"}
                 expanded={perfPanelDatesExpanded}
                 onTogglePanel={() => { setPerfPanelDatesExpanded(!perfPanelDatesExpanded) }}>
+                <DateRangePicker
+                    onChange={(name, data) => fetchServerData({ [name]: data })}
+                    startName="daterange_after"
+                    endName="daterange_before"
+                    startValue={new Date(getDefaultValue("daterange_after"))}
+                    endValue={new Date (getDefaultValue("daterange_before"))} />
             </AccordionPanel>
             <AccordionPanel id="perfPanelOptions"
                 key="perfPanelOptions"
@@ -181,21 +193,6 @@ type Filter = {
     choices?: FilterOption,
     currentValue?: string,
 };
-
-const gatherFilters = (perfdataUIstate): Filter[] => {
-    // TODO: handle all filters here
-    let filters: Filter[] = [];
-    const choiceFilters = get(perfdataUIstate, "uidata.buildflow_filters.choice_filters", {});
-    Object.keys(choiceFilters).map((fieldname) => {
-        let filterDef = choiceFilters[fieldname];
-        let choices = filterDef["choices"].map((pair) => ({ id: pair[0], label: pair[1] }));
-        let currentValue = queryParts()[fieldname];
-        filters.push({ name: fieldname, choices, currentValue });
-    });
-
-    return filters;
-}
-
 
 const select = (appState: AppState) => {
     console.log("Selecting", selectPerfState(appState));
