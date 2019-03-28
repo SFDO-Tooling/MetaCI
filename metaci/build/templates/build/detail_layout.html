@@ -41,7 +41,7 @@
       <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">Status</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ build.get_status }}">
         <div
-          class="slds-badge {% if build.get_status == 'fail' or build.get_status == 'error' %}slds-theme--error{% elif build.get_status == 'success' %}slds-theme--success{% endif %}">
+          class="slds-badge {% if build.get_status == 'fail' %} slds-theme--error {% elif build.get_status == 'error' %}slds-theme--warning{% elif build.get_status == 'success' %}slds-theme--success{% endif %}">
           {{ build.get_status }}
         </div>
       </p>

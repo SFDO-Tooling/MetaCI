@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# flake8: noqa: F405
 """
 Local settings
 
@@ -10,9 +11,10 @@ Local settings
 - Add django-extensions as app
 """
 
-import socket
 import os
-from .common import *  # noqa
+import socket
+
+from .common import *
 
 # DEBUG
 # ------------------------------------------------------------------------------
@@ -126,3 +128,5 @@ SFDX_HUB_KEY = env("SFDX_HUB_KEY")
 SFDX_HUB_USERNAME = env("SFDX_HUB_USERNAME")
 
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", False)
+
+SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)

@@ -72,6 +72,7 @@ mailhog
 
 
 staticfiles/
+dist/
 
 # Virtualenv
 venv
@@ -79,8 +80,16 @@ venv
 # databases
 *.db
 
+# redis dump
+dump.rdb
+
 # backup
 *.bak
 
 # pyenv
 .python-version
+
+# JS dependencies
+requirements/node*
+requirements/yarn*
+/node

@@ -142,6 +142,17 @@ TEMPLATES[0]["OPTIONS"]["loaders"] = [
     )
 ]
 
+STATICFILES_DIRS = (
+    str(APPS_DIR.path("static")),
+    str(ROOT_DIR.path("dist", "prod")),
+    str(ROOT_DIR.path("locales")),
+)
+
+TEMPLATES[0]["DIRS"] = [
+    str(ROOT_DIR.path("dist", "prod")),
+    str(APPS_DIR.path("templates")),
+]
+
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
 

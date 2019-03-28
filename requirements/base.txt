@@ -43,7 +43,6 @@ https://github.com/SFDO-Tooling/CumulusCI/tarball/master
 requests==2.21.0
 
 # Salesforce Lightning Design System for Django
-django-slds==0.1.2
 django-slds-crispyforms==0.1.0  # pyup: ignore # there are releases with no package
 
 ansi2html==1.5.2
@@ -83,3 +82,7 @@ django-postgres-stats==1.0.0
 
 # SFDO Template Helpers for authorization middleware and other helpers
 -e git+https://github.com/SFDO-Tooling/sfdo-template-helpers.git@v0.6.0#egg=sfdo_template_helpers
+
+# Let Javascript refer to Django URLs by name
+django-js-reverse==0.8.2
+

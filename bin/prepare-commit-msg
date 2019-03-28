@@ -1,0 +1,64 @@
+#!/bin/sh
+
+GIT_PARAMS_ARRAY=($HUSKY_GIT_PARAMS)
+MSG_FILE=${GIT_PARAMS_ARRAY[0]}
+COMMIT_MSG=`cat $MSG_FILE`
+CHANGED=$(git diff --cached --name-only)
+
+prepend_emoji () {
+    EMOJI=$1
+    COMMIT_MSG="$EMOJI $COMMIT_MSG"
+}
+
+has_pip () {
+    if [[ $CHANGED == *"requirements/base.txt"*     ||
+          $CHANGED == *"requirements/test.txt"*     ||
+          $CHANGED == *"requirements/local.txt"*    ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+has_migrations () {
+    if [[ $CHANGED == *"migrations"* ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+has_yarn () {
+    if [[ $CHANGED == *"yarn.lock"* ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+has_nodepocalypse () {
+    if [[ $CHANGED == *"bin/unpack-node"* ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+if has_nodepocalypse; then
+    prepend_emoji 🙀
+else
+    if has_yarn; then
+        prepend_emoji 🐈
+    fi
+fi
+
+if has_migrations; then
+    prepend_emoji 🛢
+fi
+
+if has_pip; then
+    prepend_emoji 📦
+fi
+
+echo "$COMMIT_MSG" > "$MSG_FILE"

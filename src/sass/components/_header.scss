@@ -1,0 +1,8 @@
+// Header
+// ======
+
+.global-header {
+  @include z-index('global-header');
+  border-radius: 0;
+  background: $color-background-backdrop-tint;
+}

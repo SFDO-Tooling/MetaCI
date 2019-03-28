@@ -38,6 +38,11 @@ urlpatterns = [
     url(r"^hirefire/", include("metaci.hirefire.urls")),
     url(r"^repos/", include("metaci.repository.urls")),
     url(r"^webhook/github/push$", github_push_webhook, name="github_push_webhook"),
+    url(
+        r"^testperf$",
+        TemplateView.as_view(template_name="testperf.html"),
+        name="frontend",
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

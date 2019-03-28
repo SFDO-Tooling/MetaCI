@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+
+    <!-- Styles --
+    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.chunks.vendors.css[0] %>" type="text/css">
+    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.chunks.app.css[0] %>" type="text/css">
+    -->
+  </head>
+  <body>
+    <main id="app" class="slds-grid slds-grid_vertical">
+      <div role="status" class="slds-spinner slds-spinner_large">
+        <span class="slds-assistive-text">Loading…</span>
+        <div class="slds-spinner__dot-a"></div>
+        <div class="slds-spinner__dot-b"></div>
+      </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.runtime.entry %>"></script>
+    <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.vendors.entry %>"></script>
+    <!--
+    {% if GLOBALS.SENTRY_DSN_PUBLIC %}
+      <!-- Insert Raven JS - ->
+      <script id="js-raven-setup" type="application/json">
+        {
+          "dsn": "{{ GLOBALS.SENTRY_DSN_PUBLIC }}"
+        }
+      </script>
+      <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.raven.entry %>"></script>
+    {% endif %}
+    -->
+    <script type="text/javascript" charset="utf-8">
+    </script>
+    <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.app.entry %>"></script>
+  </body>
+</html>

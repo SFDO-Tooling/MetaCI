@@ -1,4 +1,5 @@
 import copy
+from collections import namedtuple
 
 from django.db.models import FloatField
 from django.db.models.functions import Cast
@@ -7,11 +8,10 @@ from django.db.models import F, Avg, Count, Q, StdDev
 
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
-from django_filters.rest_framework import DateRangeFilter
 
 from postgres_stats.aggregates import Percentile
 
-from rest_framework import generics, exceptions, viewsets
+from rest_framework import generics, exceptions, viewsets, pagination
 
 from metaci.testresults.models import TestResult
 from metaci.build.models import BuildFlow
@@ -20,6 +20,15 @@ from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
 
 from django.db import connection
+
+
+class DEFAULTS:
+    build_flows_limit = 100
+    page_size = 50
+    max_page_size = 100
+
+
+FieldType = namedtuple("FieldType", ["label", "aggregation"])
 
 
 def NearMin(field):
@@ -44,7 +53,7 @@ def set_timeout(timeout):
 
 class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
     """A bit of a hack class. Use carefully!
-    
+
     This is a bit of a hack to allow two filtersets to work together in
     generating the djago-filter config form but to have only one of them
     actually filter the output queryset. The other filters a queryset of
@@ -64,6 +73,12 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
         return queryset
 
 
+class StandardResultsSetPagination(pagination.PageNumberPagination):
+    page_size = DEFAULTS.page_size
+    page_size_query_param = "page_size"
+    max_page_size = DEFAULTS.max_page_size
+
+
 class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     """A "conditional" filterset for generating the BuildFlow sub-select.
 
@@ -81,7 +96,7 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     output queryset based on these filters because it is actually the
     sub-query that we need to filter.
 
-    Accordingly, its fields are turned off by default (see disable_by_default) 
+    Accordingly, its fields are turned off by default (see disable_by_default)
     and turned on explicitly ("really_filter") when it is created by get_queryset
     """
 
@@ -117,8 +132,11 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     )
     disable_by_default.append("flow")
 
-    recentdate = DateRangeFilter(label="Recent Date", field_name="time_end")
-    disable_by_default.append("recentdate")
+    # Django-filter's DateRangeFilter is kind of ... special
+    # disable until we can fix it.
+    #
+    # recentdate = DateRangeFilter(label="Recent Date", field_name="time_end")
+    # disable_by_default.append("recentdate")
 
     daterange = django_filters.rest_framework.DateFromToRangeFilter(
         field_name="time_end",
@@ -128,7 +146,7 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     disable_by_default.append("daterange")
 
     # This is not really a filter. It's actually just a query input but putting it
-    # here lets me get it in the form.
+    # here lets me get it in the django-filters form.
     build_flows_limit = django_filters.rest_framework.NumberFilter(
         method="dummy_filter", label="Build Flows Limit (default: 100)"
     )
@@ -142,73 +160,90 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
         build_fields[name] = fields_and_stuff[name].field_name
 
 
-class TestMethodPerfFilter(BuildFlowFilterSet, django_filters.rest_framework.FilterSet):
+class TestMethodPerfFilterSet(
+    BuildFlowFilterSet, django_filters.rest_framework.FilterSet
+):
     """This filterset works on the output queries"""
 
+    success_percentage_gt = django_filters.rest_framework.NumberFilter(
+        label="Success percentage above",
+        field_name="success_percentage",
+        lookup_expr="gt",
+    )
+
+    success_percentage_lt = django_filters.rest_framework.NumberFilter(
+        label="Success percentage below",
+        field_name="success_percentage",
+        lookup_expr="lt",
+    )
+
+    count_gt = django_filters.rest_framework.NumberFilter(
+        label="Count above", field_name="count", lookup_expr="gt"
+    )
+
+    count_lt = django_filters.rest_framework.NumberFilter(
+        label="Count below", field_name="count", lookup_expr="lt"
+    )
+
     method_name = django_filters.rest_framework.CharFilter(
-        field_name="method_name", label="Method Name"
+        field_name="method_name", label="Method Name", lookup_expr="icontains"
     )
 
     def dummy(queryset, name, value):
         return queryset
 
-    group_by_choices = tuple(
-        (name, name) for name in BuildFlowFilterSet.build_fields.keys()
-    )
-
-    group_by = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Split On (multi-select okay)", choices=group_by_choices, method=dummy
-    )
-
     metrics = {
-        "duration_average": Avg("duration"),
-        "duration_slow": NearMax("duration"),
-        "duration_fast": NearMin("duration"),
-        "duration_stddev": StdDev("duration"),
-        "duration_coefficient_var": StdDev("duration") / Avg("duration"),
-        "cpu_usage_average": Avg("test_cpu_time_used"),
-        "cpu_usage_low": NearMin("test_cpu_time_used"),
-        "cpu_usage_high": NearMax("test_cpu_time_used"),
-        "count": Count("id"),
-        "failures": Count("id", filter=Q(outcome="Fail")),
-        "assertion_failures": Count(
-            "id", filter=Q(message__startswith="System.AssertException")
+        "method_name": FieldType("Method Name", F("method__name")),
+        "duration_average": FieldType("Duration: Average", Avg("duration")),
+        "duration_slow": FieldType("Duration: Slow", NearMax("duration")),
+        "duration_fast": FieldType("Duration: Fast", NearMin("duration")),
+        "duration_stddev": FieldType("Duration: Stddev", StdDev("duration")),
+        "duration_coefficient_var": FieldType(
+            "Duration: VarCoef", StdDev("duration") / Avg("duration")
         ),
-        "DML_failures": Count(
-            "id", filter=Q(message__startswith="System.DmlException")
+        "cpu_usage_average": FieldType("CPU Usage: Average", Avg("test_cpu_time_used")),
+        "cpu_usage_low": FieldType("CPU Usage: Low", NearMin("test_cpu_time_used")),
+        "cpu_usage_high": FieldType("CPU Usage: High", NearMax("test_cpu_time_used")),
+        "count": FieldType("Count", Count("id")),
+        "failures": FieldType("Failures", Count("id", filter=Q(outcome="Fail"))),
+        "assertion_failures": FieldType(
+            "Assertion Failures",
+            Count("id", filter=Q(message__startswith="System.AssertException")),
         ),
-        "Other_failures": Count(
-            "id",
-            filter=~Q(message__startswith="System.DmlException")
-            & ~Q(message__startswith="System.AssertException"),
+        "DML_failures": FieldType(
+            "DML Failures",
+            Count("id", filter=Q(message__startswith="System.DmlException")),
         ),
-        "success_percentage": Cast(Count("id", filter=Q(outcome="Pass")), FloatField())
-        / Cast(Count("id"), FloatField()),
+        "Other_failures": FieldType(
+            "Other Failures",
+            Count(
+                "id",
+                filter=~Q(message__startswith="System.DmlException")
+                & ~Q(message__startswith="System.AssertException"),
+            ),
+        ),
+        "success_percentage": FieldType(
+            "Success Percentage",
+            Cast(Count("id", filter=Q(outcome="Pass")), FloatField())
+            / Cast(Count("id"), FloatField())
+            * 100,
+        ),
     }
 
-    metric_choices = tuple(zip(metrics.keys(), metrics.keys()))
-    include_fields = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Include (multi-select okay)", choices=metric_choices, method=dummy
-    )
-
-    ordering_fields = (
-        metric_choices
-        + group_by_choices
-        + (
-            ("method_name", "method_name"),
-            ("count", "count"),
-            ("failures", "failures"),
-            ("assertion_failures", "assertion_failures"),
-            ("DML_failures", "DML_failures"),
-            ("Other_failures", "Other_failures"),
-            ("success_percentage", "success_percentage"),
+    metric_choices = tuple((key, field.label) for key, field in metrics.items())
+    includable_fields = metric_choices + tuple(
+        zip(
+            BuildFlowFilterSet.build_fields.keys(),
+            BuildFlowFilterSet.build_fields.keys(),
         )
     )
+    include_fields = django_filters.rest_framework.MultipleChoiceFilter(
+        label="Include (multi-select okay)", choices=includable_fields, method=dummy
+    )
+
+    ordering_fields = tuple((name, name) for (name, label) in metric_choices)
     o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
     ordering_param_name = "o"
-
-
-BUILD_FLOWS_LIMIT = 100
 
 
 class MetaCIApiException(exceptions.APIException):
@@ -220,13 +255,14 @@ class MetaCIApiException(exceptions.APIException):
 class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     """A view for lists of aggregated test metrics.
 
-    Note that the number of build flows covered is limited to **BUILD_FLOWS_LIMIT** for performance reasons. You can
+    Note that the number of build flows covered is limited to **DEFAULTS.build_flows_limit** for performance reasons. You can
     change this default with the build_flows_limit parameter.
     """
 
     serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filterset_class = TestMethodPerfFilter
+    filterset_class = TestMethodPerfFilterSet
+    pagination_class = StandardResultsSetPagination
     ordering_param_name = filterset_class.ordering_param_name
 
     # example URLs:
@@ -238,49 +274,74 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     def orderby_field(self):
         return self.request.query_params.get(self.ordering_param_name)
 
-    def _get_buildflows(self):
-        """Which buildflows do we need to look at? Limit by time, repo, etc.
+    def _get_build_flows(self):
+        """Which build_flows do we need to look at? Limit by time, repo, etc.
 
-        Also limits # of returned buildflows for performance reasons
+        Also limits # of returned build_flows for performance reasons
         """
         params = self.request.query_params
-        build_flows_limit = int(params.get("build_flows_limit") or BUILD_FLOWS_LIMIT)
+        build_flows_limit = int(
+            params.get("build_flows_limit") or DEFAULTS.build_flows_limit
+        )
 
-        buildflows = BuildFlow.objects.filter(tests_total__gte=1)
-        buildflows = BuildFlowFilterSet(
-            self.request.GET, buildflows, really_filter=True
+        build_flows = BuildFlow.objects.filter(tests_total__gte=1)
+        build_flows = BuildFlowFilterSet(
+            self.request.GET, build_flows, really_filter=True
         ).qs
 
-        return buildflows.order_by("-time_end")[0:build_flows_limit]
+        return build_flows.order_by("-time_end")[0:build_flows_limit]
 
     def _get_aggregation_fields(self):
         """What fields should appear in the output?"""
         params = self.request.query_params
         aggregations = {}
-        fields_to_include = params.getlist("include_fields")
 
-        if self.orderby_field:
-            fields_to_include.append(self.orderby_field)
+        fields_to_include = params.getlist("include_fields")
+        filters = self.filterset_class.get_filters()
+        # method_name is mentioned in several places in here because
+        # Django doesn't like it if we add it to the annotation list
+        # when it is already a field_name always
+
+        # every field we want to filter on should be in the annotation list
+        for param, value in params.items():
+            if value and filters.get(param) and param != "method_name":
+                fields_to_include.append(filters[param].field_name)
+
+        # the field we want to order on should be in the annotation list
+        if self.orderby_field and self.orderby_field.strip("-") != "method_name":
+            fields_to_include.append(self.orderby_field.strip("-"))
 
         fields = self.filterset_class.metrics
 
+        # every field explicitly asked for
         for fieldname in fields_to_include:
-            fieldname = fieldname.strip("-")
             if fields.get(fieldname):
-                aggregations[fieldname] = fields[fieldname]
+                aggregations[fieldname] = fields[fieldname].aggregation
 
         return aggregations
 
     def _get_splitter_fields(self):
-        """Which fields to split on (or group by, depending on how you think about it"""
+        """Which fields to split on (or group by, depending on how you think about it)"""
         params = self.request.query_params
         output_fields = {}
         build_fields = BuildFlowFilterSet.build_fields
-        group_by_fields = params.getlist("group_by")
+        group_by_fields = []
         order_by_field = self.orderby_field
 
+        # if the order_by field is a build field
+        # then we need to group by it.
         if order_by_field and order_by_field in build_fields:
             group_by_fields.append(order_by_field)
+
+        # if it is in the include_fields list, lets add
+        # it too, with group-by behaviour.
+        # TODO: Test this logic
+        fields_to_include = params.getlist("include_fields")
+        build_fields_in_include_fields = set(fields_to_include).intersection(
+            set(build_fields.keys())
+        )
+        for fieldname in build_fields_in_include_fields:
+            group_by_fields.append(fieldname)
 
         if group_by_fields:
             for param in group_by_fields:
@@ -303,13 +364,13 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         set_timeout(20)
         self._check_params()
 
-        buildflows = self._get_buildflows()
+        build_flows = self._get_build_flows()
         splitter_fields = self._get_splitter_fields()
         aggregations = self._get_aggregation_fields()
 
         queryset = (
             TestResult.objects.filter(
-                build_flow_id__in=buildflows, duration__isnull=False
+                build_flow_id__in=build_flows, duration__isnull=False
             )
             .values(method_name=F("method__name"), **splitter_fields)
             .annotate(**aggregations)
@@ -321,8 +382,52 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         return queryset
 
 
+class TestMethodResultFilterSet(
+    BuildFlowFilterSet, django_filters.rest_framework.FilterSet
+):
+    method_name = TestMethodPerfFilterSet.get_filters()["method_name"]
+
+    dummy = TestMethodPerfFilterSet.dummy
+
+    # this field should be renamed. These aren't really metrics.
+    metrics = {
+        "method_name": FieldType("Method Name", F("method_name")),
+        "duration": FieldType("Duration", F("duration")),
+        "cpu_usage": FieldType("CPU Usage", F("test_cpu_time_used")),
+        "outcome": FieldType("Failures", F("outcome")),
+        "id": FieldType("Id", F("id")),
+        "date": FieldType("Date", F("build_flow__time_end")),
+        "type": FieldType("Type", F("method__testclass__test_type")),
+    }
+
+    metric_choices = tuple((key, field.label) for key, field in metrics.items())
+    includable_fields = metric_choices + tuple(
+        zip(
+            BuildFlowFilterSet.build_fields.keys(),
+            BuildFlowFilterSet.build_fields.keys(),
+        )
+    )
+
+    include_fields = django_filters.rest_framework.MultipleChoiceFilter(
+        label="Include (multi-select okay)", choices=includable_fields, method=dummy
+    )
+
+    ordering_fields = [(key, key) for (key, field) in includable_fields]
+
+    o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
+    ordering_param_name = "o"
+
+
+class TestMethodResultListView(TestMethodPerfListView):
+    serializer_class = SimpleDictSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filterset_class = TestMethodResultFilterSet
+    pagination_class = StandardResultsSetPagination
+    ordering_param_name = filterset_class.ordering_param_name
+
+
 # A bit of hackery to make a dynamic docstring, because the docstring
 # appears in the UI.
 TestMethodPerfListView.__doc__ = TestMethodPerfListView.__doc__.replace(
-    "BUILD_FLOWS_LIMIT", str(BUILD_FLOWS_LIMIT)
+    "DEFAULTS.build_flows_limit", str(DEFAULTS.build_flows_limit)
 )
