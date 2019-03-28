@@ -85,3 +85,8 @@ venv
 
 # pyenv
 .python-version
+
+# JS dependencies
+requirements/node*
+requirements/yarn*
+/node

@@ -101,13 +101,15 @@
     "webpack-merge": "^4.2.1"
   },
   "engines": {
-    "node": ">=0.8.0",
-    "yarn": "1.13.0"
+    "node": "10.15.3",
+    "yarn": "1.15.2"
   },
   "scripts": {
     "webpack:serve": "webpack-dev-server --config webpack.dev.js",
     "django:serve": "python manage.py runserver",
     "redis:clear": "redis-cli FLUSHALL",
+    "rq:work": "python manage.py rqworker default short",
+    "serve": "run-p django:serve webpack:serve rq:work",
     "prettier": "prettier --write '*.js' '.*.js' 'src/js/*.js' 'src/js/**/*.js' 'test/js/*.js' 'test/js/**/*.js' 'src/sass/**/*.scss'",
     "eslint": "eslint '*.js' 'src/js/*.js' 'src/js/**/*.js' 'test/js/*.js' 'test/js/**/*.js'",
     "flow": "flow",
