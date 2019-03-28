@@ -1,4 +1,5 @@
 from metaci.conftest import StaffSuperuserFactory, TestResultFactory
+import pytest
 
 from urllib.parse import urlencode
 import random
@@ -49,6 +50,7 @@ class _TestingHelpers:
             TestResultFactory(**fields, build_flow__tests_total=1, method=t1.method)
 
 
+@pytest.mark.filterwarnings("ignore: Using the add method")
 class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
     """Test the testmethodperf REST API"""
 
@@ -309,6 +311,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             self.assertIn(row["method_name"], ["Bar2", "Bar3"])
             self.assertNotIn(row["method_name"], ["Bar1", "Bar4"])
 
+    @pytest.mark.filterwarnings("ignore:DateTimeField")
     def test_filter_by_recent_date(self):
         yesterday = timezone.make_aware(datetime.today() - timedelta(1))
         day_before = timezone.make_aware(datetime.today() - timedelta(2))
