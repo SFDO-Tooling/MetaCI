@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 import random
 from datetime import timedelta, datetime
 from django.utils import timezone
+from django.urls import reverse
 
 from rest_framework.test import APIClient, APITestCase
 
@@ -25,7 +26,7 @@ class _TestingHelpers:
     def api_url(self, **kwargs):
         params = urlencode(kwargs, True)
         self.debugmsg("QueryParams", params)
-        return r"/api/testmethod_perf/?" + params
+        return reverse("testmethod_perf-list") + "?" + params
 
     def find_by(self, fieldname, objs, value):
         if type(objs) == dict:
@@ -154,7 +155,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         )
         self.assertEqual(
             self.find_by("method_name", rows, "FailingTest")["success_percentage"],
-            10 / 25,
+            (10 / 25) * 100,
         )
 
     def test_split_by_repo(self):
@@ -165,7 +166,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.insert_identical_tests(
             method_name="NPSPTest", count=20, build_flow__build__repo__name="Cumulus"
         )
-        rows = self.get_api_results(include_fields="count", group_by="repo")
+        rows = self.get_api_results(include_fields=["count", "repo"])
 
         self.assertEqual(self.find_by("method_name", rows, "HedaTest")["count"], 15)
         self.assertEqual(self.find_by("method_name", rows, "HedaTest")["repo"], "HEDA")
@@ -182,7 +183,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.insert_identical_tests(
             method_name="HedaTest", count=20, build_flow__flow="ci_beta"
         )
-        rows = self.get_api_results(include_fields="count", group_by="flow")
+        rows = self.get_api_results(include_fields=["count", "flow"])
 
         for row in rows:
             self.assertIn(row["flow"], ["ci_feature", "ci_beta", "rida"])
@@ -204,7 +205,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.insert_identical_tests(
             count=9, build_flow__build__repo__name="Cumulus", build_flow__flow="Flow2"
         )
-        rows = self.get_api_results(include_fields="count", group_by=["flow"])
+        rows = self.get_api_results(include_fields=["count", "flow"])
 
         self.assertEqual(self.find_by("flow", rows, "Flow1")["count"], 10)
         self.assertEqual(self.find_by("flow", rows, "Flow2")["count"], 14)
@@ -231,7 +232,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             build_flow__build__repo__name="Cumulus",
             build_flow__build__plan__name="plan2",
         )
-        rows = self.get_api_results(include_fields="count", group_by=["plan"])
+        rows = self.get_api_results(include_fields=["count", "plan"])
 
         self.assertEqual(self.find_by("plan", rows, "plan1")["count"], 10)
         self.assertEqual(self.find_by("plan", rows, "plan2")["count"], 14)
@@ -312,6 +313,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             self.assertNotIn(row["method_name"], ["Bar1", "Bar4"])
 
     @pytest.mark.filterwarnings("ignore:DateTimeField")
+    @pytest.mark.skip(reason="feature current turned off")
     def test_filter_by_recent_date(self):
         yesterday = timezone.make_aware(datetime.today() - timedelta(1))
         day_before = timezone.make_aware(datetime.today() - timedelta(2))

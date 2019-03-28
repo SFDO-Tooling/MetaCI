@@ -30,6 +30,18 @@ urlpatterns = [
         name="repo_orgs",
     ),
     url(
+        r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/perf",
+        repository_views.repo_perf,
+        name="repo_perf",
+        kwargs={"tab": "perf"},
+    ),
+    url(
+        r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/tests",
+        repository_views.repo_tests,
+        name="repo_tests",
+        kwargs={"tab": "tests"},
+    ),
+    url(
         r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/*$",
         repository_views.repo_detail,
         name="repo_detail",

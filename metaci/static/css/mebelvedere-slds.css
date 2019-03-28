@@ -2,6 +2,10 @@
   z-index: 1;
 }
 
+.slds-theme--shade {
+  background-color: #f4f6f9 !important;
+}
+
 .iframe-container {
   overflow: hidden;
   padding-top: 56.25%;
@@ -15,4 +19,44 @@
    position: absolute;
    top: 0;
    width: 100%;
+}
+
+/* These styles are intended to emulate the old SLDS until we have
+ * a chance to do a full redesign based on the new one.
+ */
+.slds-table th, .slds-table td{
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.slds-badge{
+  font-weight: inherit;
+  font-size: 0.625rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.slds-page-header {
+  background: #f7f9fb;
+}
+
+.slds-table th {
+  font-weight: 400 !important;
+}
+
+.slds-text-title--caps {
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: #54698d;
+  text-transform: uppercase;
+  letter-spacing: 0.0625rem;
+}
+
+html {
+  font-family: "Salesforce Sans", Arial, sans-serif;
+  font-size: 100%;
+  line-height: 1.5;
+  background: white;
+  color: #16325c;
+  -webkit-tap-highlight-color: transparent;
 }

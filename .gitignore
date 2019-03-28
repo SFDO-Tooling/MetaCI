@@ -80,6 +80,9 @@ venv
 # databases
 *.db
 
+# redis dump
+dump.rdb
+
 # backup
 *.bak
 

@@ -26,7 +26,8 @@ import ErrorBoundary from 'components/error';
 import Footer from 'components/footer';
 import FourOhFour from 'components/404';
 import Header from 'components/header';
-import PerfTable from 'components/perftable';
+import PerfTable from 'components/perfTable';
+import TestMethodsResultsTable from 'components/testMethodResultsTable';
 import getApiFetch from 'utils/api';
 import reducer from 'store';
 import { logError } from 'utils/logging';
@@ -36,36 +37,24 @@ import { routePatterns } from 'utils/routes';
 
 const SF_logo = require('images/salesforce-logo.png');
 
-const HomeNoRouter = ({ match, location, history }) => (
-  <div
-    className="slds-text-longform
-      slds-p-around_x-large"
-  >
-    <h1 className="slds-text-heading_large">{t('Welcome to Meta CI!')}</h1>
-    <PerfTable/>
-  </div>
-);
-
-const Home = withRouter(HomeNoRouter);
-
 const App = () => (
   <DocumentTitle title={t('Meta CI')}>
     <div
       className="slds-grid
-        slds-grid_frame
         slds-grid_vertical"
     >
       <ErrorBoundary>
-        <Header />
         <div
-          className="slds-grow
+          className="slds-p-around_x-large slds-grow
             slds-shrink-none"
         >
           <ErrorBoundary>
-            <PerfTable/>
+            <Switch>
+             <Route path="/repos/:owner/:repo/perf" component={PerfTable} />
+             <Route path="/repos/:owner/:repo/tests" component={TestMethodsResultsTable} />
+            </Switch>
           </ErrorBoundary>
         </div>
-        <Footer logoSrc={SF_logo} />
       </ErrorBoundary>
     </div>
   </DocumentTitle>
@@ -118,6 +107,12 @@ init_i18n(() => {
 
     // Set App element (used for react-SLDS modals)
     settings.setAppElement(el);
+
+    // TODO: Delete this in April, 2019.
+    // if( window.location.pathname.match(/\/repos\/.*\/perf/)>=0){
+    //   let pathParts = window.location.pathname.split("/");
+    //   changeUrl({repo: pathParts[pathParts.length-2]})
+    // }
 
     ReactDOM.render(
       <Provider store={appStore}>

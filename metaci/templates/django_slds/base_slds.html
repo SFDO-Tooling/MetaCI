@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+  <head>
+    <title>{% block base_title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static "design-system/assets/styles/salesforce-lightning-design-system.css" %}">
+    <style>
+      .slds-form--stacked legend {
+        padding-top: 1.0rem;
+        font-size: 1.0rem;
+      }
+
+      .slds-form--stacked legend.slds-form-element__label {
+        padding-top: 0;
+        font-size: .75rem;
+      }
+    </style>
+    {% block base_head %}{% endblock %}
+  </head>
+  <body>
+    {% block base_body_wrapper_header %}{% endblock %}
+    <div class="slds-grid slds-wrap">
+      <nav class="slds-col slds-size--1-of-1">
+       {% block base_page_header %}
+       <div class="slds-page-header" role="banner">
+         <div class="slds-grid">
+           <div class="slds-col slds-has-flexi-truncate">
+             <div class="slds-media">
+               <div class="slds-media__figure">
+                 <svg aria-hidden="true" class="slds-icon slds-icon--large slds-icon-standard-user">
+                   <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#user"></use>
+                 </svg>
+               </div>
+               <div class="slds-media__body">
+                 <p class="slds-text-heading--label">Record Type</p>
+                 <div class="slds-grid">
+                   <h1 class="slds-text-heading--medium slds-m-right--small slds-truncate slds-align-middle" title="Record Title">Record Title</h1>
+                   <div class="slds-col slds-shrink-none">
+                     <button class="slds-button slds-button--neutral slds-not-selected" aria-live="assertive">
+                       <span class="slds-text-not-selected">
+                         <svg aria-hidden="true" class="slds-button__icon--stateful slds-button__icon--left">
+                           <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#add"></use>
+                         </svg>Follow</span>
+                       <span class="slds-text-selected">
+                         <svg aria-hidden="true" class="slds-button__icon--stateful slds-button__icon--left">
+                           <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#check"></use>
+                         </svg>Following</span>
+                       <span class="slds-text-selected-focus">
+                         <svg aria-hidden="true" class="slds-button__icon--stateful slds-button__icon--left">
+                           <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                         </svg>Unfollow</span>
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="slds-col slds-no-flex slds-align-bottom">
+             <div class="slds-button-group" role="group">
+               <button class="slds-button slds-button--neutral">Edit</button>
+               <button class="slds-button slds-button--neutral">Delete</button>
+               <button class="slds-button slds-button--neutral">Clone</button>
+               <div class="slds-button--last">
+                 <button class="slds-button slds-button--icon-border-filled">
+                   <svg aria-hidden="true" class="slds-button__icon">
+                     <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>
+                   </svg>
+                   <span class="slds-assistive-text">More</span>
+                 </button>
+               </div>
+             </div>
+           </div>
+         </div>
+         <div class="slds-grid slds-page-header__detail-row">
+           <div class="slds-col--padded slds-size--1-of-4">
+             <dl>
+               <dt>
+                 <p class="slds-truncate" title="Field 1">Field 1</p>
+               </dt>
+               <dd>
+                 <p class="slds-text-body--regular slds-truncate" title="Description that demonstrates truncation with a long text field">Description that demonstrates truncation with a long text field</p>
+               </dd>
+             </dl>
+           </div>
+           <div class="slds-col--padded slds-size--1-of-4">
+             <dl>
+               <dt>
+                 <p class="slds-text-heading--label slds-truncate" title="Field2 (3)">Field 2 (3)
+                   <button class="slds-button slds-button--icon-bare">
+                     <svg aria-hidden="true" class="slds-button__icon slds-button__icon--small">
+                       <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>
+                     </svg>
+                     <span class="slds-assistive-text">More Actions</span>
+                   </button>
+                 </p>
+               </dt>
+               <dd>
+                 <p class="slds-text-body--regular">Multiple Values</p>
+               </dd>
+             </dl>
+           </div>
+           <div class="slds-col--padded slds-size--1-of-4">
+             <dl>
+               <dt>
+                 <p class="slds-text-heading--label slds-truncate" title="Field 3">Field 3</p>
+               </dt>
+               <dd><a href="#">Hyperlink</a></dd>
+             </dl>
+           </div>
+           <div class="slds-col--padded slds-size--1-of-4">
+             <dl>
+               <dt>
+                 <p class="slds-text-heading--label slds-truncate" title="Field 4">Field 4</p>
+               </dt>
+               <dd>
+                 <p>
+                   <span>Description (2-line truncation—must use JS to t...</span>
+                 </p>
+               </dd>
+             </dl>
+           </div>
+         </div>
+       </div> 
+       {% endblock %}
+      </nav>
+      <main class="slds-col slds-size--1-of-1 slds-col--padded-large">
+        {% block base_body %}{% endblock %}
+      </main>
+      <section class="slds-col slds-size--1-of-1 slds-col--padded-large">
+        {% block base_footer %}{% endblock %}
+      </section>
+    </div>
+    {% block base_body_wrapper_footer %}{% endblock %}
+  </body>
+</html>

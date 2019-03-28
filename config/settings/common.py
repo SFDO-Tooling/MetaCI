@@ -60,7 +60,6 @@ THIRD_PARTY_APPS = (
     "django_filters",  # view helpers for filtering models
     "django_js_reverse",  # allow JS to reverse URLs
     "django_rq",
-    "django_slds",  # Salesforce Lightning Design System
     "django_slds_crispyforms",  # SLDS theme for crispyforms
     "guardian",  # Per Object Permissions via django-guardian
     "rest_framework",  # API
@@ -217,6 +216,7 @@ STATICFILES_DIRS = (
     str(APPS_DIR.path("static")),
     str(ROOT_DIR.path("dist")),
     str(ROOT_DIR.path("locales")),
+    str(ROOT_DIR.path("node_modules/@salesforce-ux")),
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
