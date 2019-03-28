@@ -8,7 +8,6 @@ from django.db.models import F, Avg, Count, Q, StdDev
 
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
-from django_filters.rest_framework import DateRangeFilter
 
 from postgres_stats.aggregates import Percentile
 
@@ -25,7 +24,8 @@ from django.db import connection
 
 class DEFAULTS:
     build_flows_limit = 100
-    page_size = 20
+    page_size = 50
+    max_page_size = 100
 
 
 FieldType = namedtuple("FieldType", ["label", "aggregation"])
@@ -53,7 +53,7 @@ def set_timeout(timeout):
 
 class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
     """A bit of a hack class. Use carefully!
-    
+
     This is a bit of a hack to allow two filtersets to work together in
     generating the djago-filter config form but to have only one of them
     actually filter the output queryset. The other filters a queryset of
@@ -76,7 +76,7 @@ class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
 class StandardResultsSetPagination(pagination.PageNumberPagination):
     page_size = DEFAULTS.page_size
     page_size_query_param = "page_size"
-    max_page_size = 1000
+    max_page_size = DEFAULTS.max_page_size
 
 
 class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
@@ -96,7 +96,7 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     output queryset based on these filters because it is actually the
     sub-query that we need to filter.
 
-    Accordingly, its fields are turned off by default (see disable_by_default) 
+    Accordingly, its fields are turned off by default (see disable_by_default)
     and turned on explicitly ("really_filter") when it is created by get_queryset
     """
 
@@ -132,8 +132,11 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     )
     disable_by_default.append("flow")
 
-    recentdate = DateRangeFilter(label="Recent Date", field_name="time_end")
-    disable_by_default.append("recentdate")
+    # Django-filter's DateRangeFilter is kind of ... special
+    # disable until we can fix it.
+    #
+    # recentdate = DateRangeFilter(label="Recent Date", field_name="time_end")
+    # disable_by_default.append("recentdate")
 
     daterange = django_filters.rest_framework.DateFromToRangeFilter(
         field_name="time_end",
@@ -143,7 +146,7 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     disable_by_default.append("daterange")
 
     # This is not really a filter. It's actually just a query input but putting it
-    # here lets me get it in the form.
+    # here lets me get it in the django-filters form.
     build_flows_limit = django_filters.rest_framework.NumberFilter(
         method="dummy_filter", label="Build Flows Limit (default: 100)"
     )
@@ -161,6 +164,26 @@ class TestMethodPerfFilterSet(
     BuildFlowFilterSet, django_filters.rest_framework.FilterSet
 ):
     """This filterset works on the output queries"""
+
+    success_percentage_gt = django_filters.rest_framework.NumberFilter(
+        label="Success percentage above",
+        field_name="success_percentage",
+        lookup_expr="gt",
+    )
+
+    success_percentage_lt = django_filters.rest_framework.NumberFilter(
+        label="Success percentage below",
+        field_name="success_percentage",
+        lookup_expr="lt",
+    )
+
+    count_gt = django_filters.rest_framework.NumberFilter(
+        label="Count above", field_name="count", lookup_expr="gt"
+    )
+
+    count_lt = django_filters.rest_framework.NumberFilter(
+        label="Count below", field_name="count", lookup_expr="lt"
+    )
 
     method_name = django_filters.rest_framework.CharFilter(
         field_name="method_name", label="Method Name", lookup_expr="icontains"
@@ -202,7 +225,8 @@ class TestMethodPerfFilterSet(
         "success_percentage": FieldType(
             "Success Percentage",
             Cast(Count("id", filter=Q(outcome="Pass")), FloatField())
-            / Cast(Count("id"), FloatField()),
+            / Cast(Count("id"), FloatField())
+            * 100,
         ),
     }
 
@@ -273,12 +297,23 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         aggregations = {}
 
         fields_to_include = params.getlist("include_fields")
+        filters = self.filterset_class.get_filters()
+        # method_name is mentioned in several places in here because
+        # Django doesn't like it if we add it to the annotation list
+        # when it is already a field_name always
 
-        if self.orderby_field:
+        # every field we want to filter on should be in the annotation list
+        for param, value in params.items():
+            if value and filters.get(param) and param != "method_name":
+                fields_to_include.append(filters[param].field_name)
+
+        # the field we want to order on should be in the annotation list
+        if self.orderby_field and self.orderby_field.strip("-") != "method_name":
             fields_to_include.append(self.orderby_field.strip("-"))
 
         fields = self.filterset_class.metrics
 
+        # every field explicitly asked for
         for fieldname in fields_to_include:
             if fields.get(fieldname):
                 aggregations[fieldname] = fields[fieldname].aggregation
@@ -378,7 +413,6 @@ class TestMethodResultFilterSet(
     )
 
     ordering_fields = [(key, key) for (key, field) in includable_fields]
-    print("OOO", list(ordering_fields))
 
     o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
     ordering_param_name = "o"
