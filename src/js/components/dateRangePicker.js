@@ -8,8 +8,8 @@ import Datepicker from '@salesforce/design-system-react/components/date-picker';
 import Button from '@salesforce/design-system-react/components/button';
 import { useState } from 'react';
 
-const dateRangePicker = ({onChange, startName, endName, startValue, endValue} : 
-                    {startName: string, endName: string, 
+const dateRangePicker = ({onChange, startName, endName, startValue, endValue} :
+                    {startName: string, endName: string,
                      startValue: Date, endValue: Date,
                         onChange : (string, string | typeof undefined) => void}) => {
     let localOnChange = (name, data) => {
@@ -30,14 +30,13 @@ const dateRangePicker = ({onChange, startName, endName, startValue, endValue} :
     // check for bad or missing dates
     let startValueOrNull = isNaN(startValue.getDate()) ? null : startValue;
     let endValueOrNull = isNaN(endValue.getDate()) ? null : endValue;
-    console.log("StartValue", startValue);
     return (
         <React.Fragment>
             <Datepicker
             key={startDateKey}
             value={startValueOrNull}
             onChange={(event, data) => {localOnChange(startName, data)}}
-        /> 
+        />
         <Button iconCategory="action" variant="icon" iconName="remove"
             onClick={()=>{
                 setStartDateKey(startDateKey+1);
@@ -54,7 +53,7 @@ const dateRangePicker = ({onChange, startName, endName, startValue, endValue} :
             </Button>
 
         </React.Fragment>
-    
+
     )
 }
 

@@ -16,18 +16,26 @@ export type UIDataAction = UIDataAvailable | UIDataLoading;
 
 
 
-export const perfRESTFetch = (url?: string, params?: {}):
+export const perfRESTFetch = (url : string, params?: {}):
         ThunkAction => (dispatch, getState, { apiFetch }) => {
   dispatch({ type: 'PERF_DATA_LOADING', payload: url });
-  // todo use reverse
-  url = url || "/api/testmethod_perf?"
   if(params){
     url = url + "&"+ queryString.stringify(params);
   }
   apiFetch(url, {
     method: 'GET',
   }).then((payload) => {
-    return dispatch({ type: 'PERF_DATA_AVAILABLE', payload });
+    if(payload){
+      if(!payload.error){
+        return dispatch({ type: 'PERF_DATA_AVAILABLE', payload });
+      }else{
+        alert(JSON.stringify(payload.reason));
+        // TODO: PERF_DATA_ERROR is not handled yet
+        return dispatch({ type: 'PERF_DATA_ERROR', payload });
+      }
+    }else{
+      alert("Missing payload from server");
+    }
   });
 }
 
@@ -39,6 +47,7 @@ export const perfREST_UI_Fetch = ():
   apiFetch(url, {
     method: 'GET',
   }).then((payload) => {
+    // TODO: Error handling
     return dispatch({ type: 'UI_DATA_AVAILABLE', payload });
   });
 }

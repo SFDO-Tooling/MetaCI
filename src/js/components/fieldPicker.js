@@ -32,10 +32,12 @@ type ReduxProps = {
   perfdataUIstate?: { [string]: mixed }, 
 }
 
-const FieldPicker = ({ history, onChange, perfdataUIstate }: Props & ReduxProps & InitialProps)  =>  {
+const FieldPicker = ({ history, onChange, perfdataUIstate }: 
+                              Props & ReduxProps & InitialProps)  =>  {
   const columnOptions = () => {
     let columns: [string, string][] = [["Loading", "Loading"]];
-    let server_column_options: [string, string][] = get(perfdataUIstate, "uidata.includable_fields");
+    let server_column_options: [string, string][] = get(perfdataUIstate, 
+                          "uidata.testmethod_perf.includable_fields");
     if (server_column_options) {
       columns = server_column_options;
     }
@@ -61,7 +63,6 @@ const FieldPicker = ({ history, onChange, perfdataUIstate }: Props & ReduxProps 
         onSelect:  (event, data) => changeURL(data),
       }}
       labels={{
-        label: 'Column',
         placeholder: 'Select Columns',
       }}
       multiple

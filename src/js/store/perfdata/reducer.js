@@ -6,7 +6,7 @@ export type PerfData = {
   count: Number,
   next: URL | null,
   previous: URL | null,
-  results: [],
+  results: {}[],
 };
 
 export type PerfDataLoading = {

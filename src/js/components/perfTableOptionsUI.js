@@ -5,7 +5,9 @@ import * as ReactDOM from 'react-dom';
 import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import zip from 'lodash/zip';
+import partition from 'lodash/partition';
 import debounce from 'lodash/debounce';
+import chunk from 'lodash/chunk';
 
 import queryString from 'query-string';
 
@@ -23,7 +25,7 @@ import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';
 import DateRangePicker from './dateRangePicker';
 
-import { queryParts, ShowRenderTime } from './perftable';
+import { queryparams, ShowRenderTime } from './perfTable';
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
@@ -34,18 +36,30 @@ type Props = {
     perfdataUIstate? : {[string]: mixed}
 }
 
-let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdataUIstate })  => {
+const getInitialValue = (filter) : string => {
+    let defaultVal:string;
+    // don't remember why this is special-cased
+    // test removing the special case
+    if(filter.name=="method_name"){
+        defaultVal = "";
+    }else{
+        defaultVal = filter.default;
+    }
+    return queryparams.get(filter.name) || defaultVal;
+}
 
-    // useful for debugging for now
-    useEffect(() => {
-        return (() => { console.log("UNMOUNTING ACCORDIAN") });
-    });
+let PerfTableOptionsUI: React.ComponentType<Props> = (
+            { fetchServerData, perfdataUIstate })  => {
+    let queryParts = queryparams.get;
+    let uiAvailable = get( perfdataUIstate,  "status") === "UI_DATA_AVAILABLE";
 
     const [perfPanelColumnsExpanded, setPerfPanelColumnsExpanded] = useState(false);
     const [perfPanelFiltersExpanded, setPerfPanelFiltersExpanded] = useState(false);
     const [perfPanelOptionsExpanded, setPerfPanelOptionsExpanded] = useState(false);
     const [perfPanelDatesExpanded, setPerfPanelDatesExpanded] = useState(false);
 
+    // TODO: unify this with getInitialValue when all components are
+    //       constructed from Filter objects
     const getDefaultValue = (field_name:string) : string =>  {
         let defaultVal:string;
         if(field_name=="method_name"){
@@ -56,23 +70,45 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdat
         return queryParts(field_name) || defaultVal;
     }
 
-    const gatherFilters = (perfdataUIstate): Filter[] => {
-        // TODO: handle all filters here
-        let filters: Filter[] = [];
-        const choiceFilters = get(perfdataUIstate, "uidata.buildflow_filters.choice_filters", {});
-        Object.keys(choiceFilters).map((fieldname) => {
-            let filterDef = choiceFilters[fieldname];
-            let choices = filterDef["choices"].map((pair) => ({ id: pair[0], label: pair[1] }));
-            let currentValue = getDefaultValue(fieldname);
-            filters.push({ name: fieldname, choices, currentValue });
-        });
-    
+    const gatherFilters = (perfdataUIstate): Field[] => {
+        let filters: Field[] = [];
+        if(!uiAvailable) return filters;
+
+        const buildflow_filters = get(perfdataUIstate,
+                                    "uidata.buildflow_filters");
+        const testmethod_perf_filters = get(perfdataUIstate,
+                            "uidata.testmethod_perf.filters");
+        const all_filters = [...buildflow_filters, ...testmethod_perf_filters];
+        if(all_filters.length){
+            all_filters.map((filterDef)=>{
+                if(get(filterDef, "choices")){
+                    filters.push(
+                        ChoiceField(filterDef,
+                            getInitialValue(filterDef),
+                            fetchServerData));
+                } else if (filterDef.field_type == "DecimalField") {
+                    filters.push(
+                        DecimalField(filterDef,
+                            getInitialValue(filterDef),
+                            fetchServerData));
+                } else if (filterDef.field_type == "CharField") {
+                    filters.push(
+                        CharField(filterDef,
+                            getInitialValue(filterDef),
+                            fetchServerData));
+                }
+            });
+        }
         return filters;
     }
-    
+
     var filters = gatherFilters(perfdataUIstate);
-    console.log("Filter values", filters.map((f) => f.currentValue));
-    var filtersWithValues = filters.filter((f) => f.currentValue && f.currentValue!="MISSING_DEFAULT").length;
+
+    const exclude = ["o", "include_fields", "build_flows_limit"];
+    let filterPanelFilters = filters.filter(
+        (filter)=>!exclude.includes(filter.name))
+    var filterPanelCount = filterPanelFilters.filter((f) =>
+        f.currentValue).length;
 
     return (
         <Accordion key="perfUIMainAccordion">
@@ -87,14 +123,10 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdat
             </AccordionPanel>
             <AccordionPanel id="perfPanelFilters"
                 key="perfPanelFilters"
-                summary={"Filters" + (filtersWithValues > 0 ? " (" + filtersWithValues + ")" : "")}
+                summary={"Filters" + (filterPanelCount > 0 ? " (" + filterPanelCount + ")" : "")}
                 expanded={perfPanelFiltersExpanded}
                 onTogglePanel={() => { setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded) }}>
-                <BuildFilterPickers filters={filters} fetchServerData={fetchServerData} />
-                <QueryBoundTextInput defaultValue={getDefaultValue("method_name")}
-                        label="Method Name"
-                        tooltip="Method to query"
-                        onValueUpdate={(value) => fetchServerData({ method_name: value })} />
+                <AllFilters filters={filterPanelFilters} fetchServerData={fetchServerData}/>
             </AccordionPanel>
             {/* TODO: highlight whether date has been set or not */ }
             <AccordionPanel id="perfPaneDates"
@@ -114,13 +146,13 @@ let PerfTableOptionsUI: React.ComponentType<Props> = ({ fetchServerData, perfdat
                 summary="Options"
                 expanded={perfPanelOptionsExpanded}
                 onTogglePanel={() => { setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded) }}>
-                {get( perfdataUIstate,  "status") === "UI_DATA_AVAILABLE" && 
+                {uiAvailable &&
                 <React.Fragment>
                     <QueryBoundTextInput defaultValue={getDefaultValue("page_size")}
                         label="Page Size"
                         tooltip="Number of rows to fetch per page"
                         onValueUpdate={(value) => fetchServerData({ page_size: value })} />
-                    <QueryBoundTextInput 
+                    <QueryBoundTextInput
                         defaultValue={getDefaultValue("build_flows_limit")}
                         label="Build Flows Limit"
                         tooltip="Max number of build_flows to aggregate (performance optimization)"
@@ -149,6 +181,7 @@ const QueryBoundTextInput = ({ label, defaultValue, onValueUpdate,
     return <Input
         label={label}
         fieldLevelHelpTooltip={
+            tooltip &&
             <Tooltip
                 align="top left"
                 content={tooltip}
@@ -169,33 +202,82 @@ const BuildFilterPicker = ({ filter, fetchServerData }) => {
 }
 
 
-const BuildFilterPickers = ({ filters, fetchServerData }) => {
-    let choice_filters = filters.filter((filter) => filter.choices && filter.name!=="recentdate");
-    return <div key="grid" className="slds-grid slds-wrap slds-gutters">
-        {
-            choice_filters.map((filter) => 
-                <div key={filter.name} className="slds-col "
-                         key={filter.name}>
-                         <BuildFilterPicker key={filter.name} filter={filter} fetchServerData={fetchServerData}/>
-                        </div>
-            )
-        }                         
+
+const TEMPORARILY_UNUSED_DateRangeRenderer = ({ filter, fetchServerData }) => {
+    let startName = filter.name + "_after";
+    let endName = filter.name + "_before"
+    return <DateRangePicker
+                onChange={(name, data) => fetchServerData({ [name]: data })}
+                startName={startName}
+                endName={endName}
+                startValue={new Date()} // new Date(getDefaultValue(startName))}
+                endValue={new Date()} // new Date (getDefaultValue(endName))}
+                />
+}
+
+
+const AllFilters = ({ filters, fetchServerData }) => {
+    return <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
+            {filters.map((filter)=>
+                <div key={filter.name} className="slds-col slds-size_3-of-12">
+                    {filter.render()}
+                </div>
+            )}
         </div>
 }
 
-type FilterOption = {
+type FieldOption = {
     id: string,
     label: string
 }
 
-type Filter = {
+type Field = {
     name: string,
-    choices?: FilterOption,
     currentValue?: string,
+    render: () => React$Element<any>
 };
 
+const ChoiceField = (filter: {name:string, choices:[]},
+                                currentValue, fetchServerData) : Field => {
+
+    let choices_as_objs = filter.choices.map((pair) => (
+            { id: pair[0], label: pair[1] }));
+    return {
+        name: filter.name,
+        choices: choices_as_objs,
+        currentValue,
+        render: () =>
+            <FilterPicker
+                key={filter.name}
+                field_name={filter.name}
+                choices={choices_as_objs}
+                value={currentValue}
+                onSelect={(value) => {
+                    fetchServerData({ [filter.name]: value }) }} />
+
+    };
+}
+
+const CharField = (filter: { name: string,
+                description?: string,
+                label?: string,
+                choices: [] },
+    currentValue?: string, fetchServerData): Field => {
+    return {
+        name: filter.name,
+        currentValue,
+        render: () =>
+            <QueryBoundTextInput defaultValue={currentValue}
+                label={filter.label}
+                tooltip={filter.description}
+                onValueUpdate={(value) =>
+                    fetchServerData({ [filter.name]: value })}/>
+    };
+}
+
+const DecimalField = CharField;
+
 const select = (appState: AppState) => {
-    console.log("Selecting", selectPerfState(appState));
     return {
         perfdataUIstate: selectPerf_UI_State(appState),
     }
@@ -206,7 +288,7 @@ const actions = {
 };
 
 
-let PerfTableOptionsUIConnected: React.ComponentType<{}> = 
+let PerfTableOptionsUIConnected: React.ComponentType<{}> =
     connect(select, actions)( PerfTableOptionsUI );
 
 export default PerfTableOptionsUIConnected;

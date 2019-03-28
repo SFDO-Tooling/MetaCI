@@ -26,7 +26,8 @@ import ErrorBoundary from 'components/error';
 import Footer from 'components/footer';
 import FourOhFour from 'components/404';
 import Header from 'components/header';
-import PerfTable, { changeUrl } from 'components/perfTable';
+import PerfTable from 'components/perfTable';
+import TestMethodsResultsTable from 'components/testMethodResultsTable';
 import getApiFetch from 'utils/api';
 import reducer from 'store';
 import { logError } from 'utils/logging';
@@ -49,8 +50,8 @@ const App = () => (
         >
           <ErrorBoundary>
             <Switch>
-             <Route path="/repos" component={PerfTable} />
-             <Route path="/tests" component={PerfTable} />
+             <Route path="/repos/:owner/:repo/perf" component={PerfTable} />
+             <Route path="/repos/:owner/:repo/tests" component={TestMethodsResultsTable} />
             </Switch>
           </ErrorBoundary>
         </div>
@@ -107,11 +108,11 @@ init_i18n(() => {
     // Set App element (used for react-SLDS modals)
     settings.setAppElement(el);
 
-    /* Special case for getting repo name from URL path into query params with other filters */
-    if( window.location.pathname.indexOf("/repos/")>=0){
-      let pathParts = window.location.pathname.split("/");
-      changeUrl({repo: pathParts[pathParts.length-2]})
-    }
+    // TODO: Delete this in April, 2019.
+    // if( window.location.pathname.match(/\/repos\/.*\/perf/)>=0){
+    //   let pathParts = window.location.pathname.split("/");
+    //   changeUrl({repo: pathParts[pathParts.length-2]})
+    // }
 
     ReactDOM.render(
       <Provider store={appStore}>

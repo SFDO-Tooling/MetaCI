@@ -9,14 +9,17 @@ export type UrlParams = { [string]: string | number | boolean };
 // these HTTP methods do not require CSRF protection
 const csrfSafeMethod = method => /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
 
-const getResponse = resp =>
+const getResponse = (resp, errorStatus) =>
   resp
     .text()
     .then(text => {
       try {
-        return JSON.parse(text);
+        text = JSON.parse(text);
       } catch (err) {
         // swallow error
+      }
+      if(errorStatus){
+        return {error: errorStatus, reason: text};
       }
       return text;
     })
@@ -42,7 +45,7 @@ const getApiFetch = () => (url: string, opts: { [string]: mixed } = {}) => {
           return getResponse(response);
         }
         if (response.status >= 400 && response.status < 500) {
-          return null;
+          return getResponse(response, response.status);
         }
         const error = (new Error(response.statusText): { [string]: mixed });
         error.response = response;
