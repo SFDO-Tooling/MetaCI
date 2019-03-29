@@ -241,7 +241,8 @@ class TestMethodPerfFilterSet(
         label="Include (multi-select okay)", choices=includable_fields, method=dummy
     )
 
-    ordering_fields = tuple((name, name) for (name, label) in metric_choices)
+    ordering_fields = tuple((name, name) for (name, label) in includable_fields)
+    ordering_fields += ("method_name", "method_name")
     o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
     ordering_param_name = "o"
 
