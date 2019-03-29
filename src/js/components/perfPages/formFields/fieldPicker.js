@@ -19,25 +19,25 @@ import Icon from '@salesforce/design-system-react/components/icon';
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
-import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
+import { selectPerfState, selectPerfUIStatus } from 'store/perfdata/selectors';
 import type { AppState } from 'store';
 import type { InitialProps } from 'components/utils';
 
 type Props = {
-  onChange: () => null,
-  perfdataUIstate?: { [string]: mixed }, 
+  onChange: () => void,
+  choices: [string, string][],
+  defaultValue: [string, string][],
 }
 
 type ReduxProps = {
-  perfdataUIstate?: { [string]: mixed }, 
+  perfdataUIstate?: { [string]: mixed },
 }
 
-const FieldPicker = ({ history, onChange, perfdataUIstate }: 
+const FieldPicker = ({ history, onChange, choices, defaultValue }:
                               Props & ReduxProps & InitialProps)  =>  {
   const columnOptions = () => {
-    let columns: [string, string][] = [["Loading", "Loading"]];
-    let server_column_options: [string, string][] = get(perfdataUIstate, 
-                          "uidata.testmethod_perf.includable_fields");
+    let columns: [string, string][] = defaultValue;
+    let server_column_options: [string, string][] = choices;
     if (server_column_options) {
       columns = server_column_options;
     }
@@ -47,13 +47,14 @@ const FieldPicker = ({ history, onChange, perfdataUIstate }:
   let options = columnOptions();
 
   const changeURL = (data) => {
+    debugger;
     history.push({
       pathname: window.location.pathname,
       search: queryStringFromSelection(data.selection)
     });
     if (onChange) onChange();
   };
-  
+
 
   return (
     <Combobox
@@ -97,17 +98,12 @@ const queryStringFromSelection = (selection: Array<{id: string}>) => {
   return qs;
 }
 
-const select = (appState: AppState) => {
-  return {
-    perfdataUIstate: selectPerf_UI_State(appState),
-  }
-};
 
 const actions = {
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 
-const ConnectedFieldPicker: React.ComponentType<Props> = connect(select, actions)(
+const ConnectedFieldPicker: React.ComponentType<Props> = connect(null, actions)(
   withRouter(FieldPicker),
 );
 

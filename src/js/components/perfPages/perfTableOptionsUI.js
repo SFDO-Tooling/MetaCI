@@ -25,59 +25,69 @@ import FieldPicker from './formFIelds/fieldPicker';
 import FilterPicker from './formFIelds/filterPicker';
 import DateRangePicker from './formFIelds/dateRangePicker';
 
-import { queryparams, ShowRenderTime } from './perfTable';
-
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
-import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
+import { selectPerfUIStatus, selectBuildflowFiltersUI } from 'store/perfdata/selectors';
+
 
 type Props = {
-    fetchServerData : (string) => number,
-    perfdataUIstate? : {[string]: mixed}
+    fetchServerData : (params?: {
+        [string]: ?(string | Array<string>)
+      }) => void,
+      queryparams: (name?: string) => string,
+      testmethodPerfUI: {},
 }
 
-const getInitialValue = (filter) : string => {
-    let defaultVal:string;
-    // don't remember why this is special-cased
-    // test removing the special case
-    if(filter.name=="method_name"){
-        defaultVal = "";
-    }else{
-        defaultVal = filter.default;
-    }
-    return queryparams.get(filter.name) || defaultVal;
+type ReduxProps = {
+    perfUIStatus : string,
+    buildflow_filters: {}[],
 }
 
-let PerfTableOptionsUI: React.ComponentType<Props> = (
-            { fetchServerData, perfdataUIstate })  => {
-    let queryParts = queryparams.get;
-    let uiAvailable = get( perfdataUIstate,  "status") === "UI_DATA_AVAILABLE";
-
+let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
+            { fetchServerData, /* A function to trigger fetch */
+                queryparams,    /* A function to get queryparams or defaults */
+                perfUIStatus, /* Has data been loaded yet? */
+                testmethodPerfUI, /* UI Configuration data */
+                buildflow_filters, /* List of filters from server */
+            } : Props & ReduxProps)  => {
+    // is the UI data available? If so, populate the fields. If not,
+    // just show the accordion.
+    let uiAvailable = perfUIStatus == "AVAILABLE";
+    console.log("ST", perfUIStatus);
+    // state for managing the accordion. Maybe a single Map would be better.
     const [perfPanelColumnsExpanded, setPerfPanelColumnsExpanded] = useState(false);
     const [perfPanelFiltersExpanded, setPerfPanelFiltersExpanded] = useState(false);
     const [perfPanelOptionsExpanded, setPerfPanelOptionsExpanded] = useState(false);
     const [perfPanelDatesExpanded, setPerfPanelDatesExpanded] = useState(false);
 
-    // TODO: unify this with getInitialValue when all components are
-    //       constructed from Filter objects
-    const getDefaultValue = (field_name:string) : string =>  {
-        let defaultVal:string;
-        if(field_name=="method_name"){
-            defaultVal = ""
+    // Get the initial value for a form field either from the URL OR
+    // from a default value specified on the server (if either is available)
+    //
+    // Possible that this duplicates work already being done in
+    // queryparams.get.
+    const getInitialValue = (filterOrString: {name:string} | string) :
+                                                            string | string[] => {
+        return queryparams.get(filterOrString);
+
+        if( filterOrString.name === undefined){
+            if( filterOrString.name=="method_name"){
+                // I don't remember why this is special-cased
+                // test removing the special case at some point
+                return queryparams.get(filterOrString.name) || "";
+            }else{
+                return queryparams.get(filterOrString.name);
+            }
         }else{
-            defaultVal = get(perfdataUIstate, "uidata.defaults." + field_name)
+            return queryparams.get(filterOrString);
         }
-        return queryParts(field_name) || defaultVal;
     }
 
     const gatherFilters = (perfdataUIstate): Field[] => {
         let filters: Field[] = [];
         if(!uiAvailable) return filters;
 
-        const buildflow_filters = get(perfdataUIstate,
-                                    "uidata.buildflow_filters");
         const testmethod_perf_filters = get(perfdataUIstate,
-                            "uidata.testmethod_perf.filters");
+                            "filters");
         const all_filters = [...buildflow_filters, ...testmethod_perf_filters];
         if(all_filters.length){
             all_filters.map((filterDef)=>{
@@ -102,7 +112,7 @@ let PerfTableOptionsUI: React.ComponentType<Props> = (
         return filters;
     }
 
-    var filters = gatherFilters(perfdataUIstate);
+    const filters = uiAvailable ? gatherFilters(testmethodPerfUI) : [];
 
     const exclude = ["o", "include_fields", "build_flows_limit"];
     let filterPanelFilters = filters.filter(
@@ -112,21 +122,25 @@ let PerfTableOptionsUI: React.ComponentType<Props> = (
 
     return (
         <Accordion key="perfUIMainAccordion">
-            <ShowRenderTime />
             <AccordionPanel id="perfPanelColumns"
                 key="perfPanelColumns"
                 summary="Columns"
                 expanded={perfPanelColumnsExpanded}
                 onTogglePanel={() => setPerfPanelColumnsExpanded(!perfPanelColumnsExpanded)}>
+                {uiAvailable &&
                 <FieldPicker key="PerfDataTableFieldPicker"
-                    onChange={fetchServerData} />
+                    choices={get(testmethodPerfUI, "includable_fields")}
+                    defaultValue={getInitialValue("include_fields")}
+                    onChange={fetchServerData} />}
             </AccordionPanel>
             <AccordionPanel id="perfPanelFilters"
                 key="perfPanelFilters"
                 summary={"Filters" + (filterPanelCount > 0 ? " (" + filterPanelCount + ")" : "")}
                 expanded={perfPanelFiltersExpanded}
                 onTogglePanel={() => { setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded) }}>
-                <AllFilters filters={filterPanelFilters} fetchServerData={fetchServerData}/>
+                {uiAvailable &&
+                    <AllFilters filters={filterPanelFilters} fetchServerData={fetchServerData}/>
+                }
             </AccordionPanel>
             {/* TODO: highlight whether date has been set or not */ }
             <AccordionPanel id="perfPaneDates"
@@ -134,12 +148,14 @@ let PerfTableOptionsUI: React.ComponentType<Props> = (
                 summary={"Date Range"}
                 expanded={perfPanelDatesExpanded}
                 onTogglePanel={() => { setPerfPanelDatesExpanded(!perfPanelDatesExpanded) }}>
+                {uiAvailable &&
                 <DateRangePicker
                     onChange={(name, data) => fetchServerData({ [name]: data })}
                     startName="daterange_after"
                     endName="daterange_before"
-                    startValue={new Date(getDefaultValue("daterange_after"))}
-                    endValue={new Date (getDefaultValue("daterange_before"))} />
+                    startValue={new Date(getInitialValue("daterange_after"))}
+                    endValue={new Date(getInitialValue("daterange_before"))} />
+                }
             </AccordionPanel>
             <AccordionPanel id="perfPanelOptions"
                 key="perfPanelOptions"
@@ -148,16 +164,15 @@ let PerfTableOptionsUI: React.ComponentType<Props> = (
                 onTogglePanel={() => { setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded) }}>
                 {uiAvailable &&
                 <React.Fragment>
-                    <QueryBoundTextInput defaultValue={getDefaultValue("page_size")}
+                    <QueryBoundTextInput defaultValue={getInitialValue("page_size")}
                         label="Page Size"
                         tooltip="Number of rows to fetch per page"
                         onValueUpdate={(value) => fetchServerData({ page_size: value })} />
                     <QueryBoundTextInput
-                        defaultValue={getDefaultValue("build_flows_limit")}
+                        defaultValue={getInitialValue("build_flows_limit")}
                         label="Build Flows Limit"
                         tooltip="Max number of build_flows to aggregate (performance optimization)"
                         onValueUpdate={(value) => fetchServerData({ build_flows_limit: value })} />
-                <ShowRenderTime />
                 </React.Fragment>
                 }
             </AccordionPanel>
@@ -177,6 +192,7 @@ const QueryBoundTextInput = ({ label, defaultValue, onValueUpdate,
     );
     // unwrap
     debouncedCallback = debouncedChangeUrl.debouncedCallback;
+    console.log(defaultValue);
 
     return <Input
         label={label}
@@ -233,7 +249,7 @@ type FieldOption = {
 
 type Field = {
     name: string,
-    currentValue?: string,
+    currentValue?: mixed,
     render: () => React$Element<any>
 };
 
@@ -262,7 +278,7 @@ const CharField = (filter: { name: string,
                 description?: string,
                 label?: string,
                 choices: [] },
-    currentValue?: string, fetchServerData): Field => {
+    currentValue?: string | string[], fetchServerData): Field => {
     return {
         name: filter.name,
         currentValue,
@@ -279,7 +295,8 @@ const DecimalField = CharField;
 
 const select = (appState: AppState) => {
     return {
-        perfdataUIstate: selectPerf_UI_State(appState),
+        perfUIStatus: selectPerfUIStatus(appState),
+        buildflow_filters: selectBuildflowFiltersUI(appState),
     }
 };
 

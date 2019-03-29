@@ -2,7 +2,7 @@ import copy
 from collections import namedtuple
 
 from django.db.models import FloatField
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Lower
 
 from django.db.models import F, Avg, Count, Q, StdDev
 
@@ -148,7 +148,9 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     # This is not really a filter. It's actually just a query input but putting it
     # here lets me get it in the django-filters form.
     build_flows_limit = django_filters.rest_framework.NumberFilter(
-        method="dummy_filter", label="Build Flows Limit (default: 100)"
+        method="dummy_filter",
+        label="Build Flows Limit (default: 100)",
+        initial=DEFAULTS.build_flows_limit,
     )
 
     fields_and_stuff = locals()
@@ -192,8 +194,8 @@ class TestMethodPerfFilterSet(
     def dummy(queryset, name, value):
         return queryset
 
+    # don't include method_name in this list. Its already passed by default
     metrics = {
-        "method_name": FieldType("Method Name", F("method__name")),
         "duration_average": FieldType("Duration: Average", Avg("duration")),
         "duration_slow": FieldType("Duration: Slow", NearMax("duration")),
         "duration_fast": FieldType("Duration: Fast", NearMin("duration")),
@@ -238,10 +240,14 @@ class TestMethodPerfFilterSet(
         )
     )
     include_fields = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Include (multi-select okay)", choices=includable_fields, method=dummy
+        label="Include (multi-select okay)",
+        choices=includable_fields,
+        method=dummy,
+        initial=["repo", "duration_average"],
     )
 
     ordering_fields = tuple((name, name) for (name, label) in metric_choices)
+    ordering_fields += ("method_name", "method_name")
     o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
     ordering_param_name = "o"
 
@@ -298,22 +304,35 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
         fields_to_include = params.getlist("include_fields")
         filters = self.filterset_class.get_filters()
-        # method_name is mentioned in several places in here because
-        # Django doesn't like it if we add it to the annotation list
-        # when it is already a field_name always
+        fields = self.filterset_class.metrics
 
         # every field we want to filter on should be in the annotation list
         for param, value in params.items():
-            if value and filters.get(param) and param != "method_name":
+            if value and filters.get(param) and fields.get(param):
                 fields_to_include.append(filters[param].field_name)
 
         # the field we want to order on should be in the annotation list
-        if self.orderby_field and self.orderby_field.strip("-") != "method_name":
+        if self.orderby_field:
             fields_to_include.append(self.orderby_field.strip("-"))
 
-        fields = self.filterset_class.metrics
+        # method_name is removed because
+        # Django doesn't like it if we add it to the annotation list
+        # when it is already a field_name
+        if "method_name" in fields_to_include:
+            fields_to_include.remove("method_name")
 
-        # every field explicitly asked for
+        # no fields? Use defaults
+        if fields_to_include == []:
+            filters = self.filterset_class.get_filters()
+            assert filters
+            include_filter = filters["include_fields"]
+            assert include_filter
+            default_include_fields = include_filter.extra["initial"]
+            assert default_include_fields
+
+            fields_to_include.extend(default_include_fields)
+
+        # build a dictionary in the form DRF
         for fieldname in fields_to_include:
             if fields.get(fieldname):
                 aggregations[fieldname] = fields[fieldname].aggregation
@@ -361,7 +380,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
     def get_queryset(self):
         """The main method that the Django infrastructure invokes."""
-        set_timeout(20)
+        set_timeout(5)
         self._check_params()
 
         build_flows = self._get_build_flows()
@@ -377,7 +396,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         )
 
         if not self.orderby_field:
-            queryset = queryset.order_by("method_name")
+            queryset = queryset.order_by(Lower("method_name"))
 
         return queryset
 
@@ -409,7 +428,10 @@ class TestMethodResultFilterSet(
     )
 
     include_fields = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Include (multi-select okay)", choices=includable_fields, method=dummy
+        label="Include (multi-select okay)",
+        choices=includable_fields,
+        method=dummy,
+        initial=["repo", "duration"],
     )
 
     ordering_fields = [(key, key) for (key, field) in includable_fields]

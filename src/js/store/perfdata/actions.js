@@ -6,13 +6,13 @@ import type { ThunkAction } from 'redux-thunk';
 
 import type { PerfData } from 'store/perfdata/reducer';
 
-type PerfDataAvailable = { type: 'PERF_DATA_AVAILABLE', payload: PerfData };
-type PerfDataLoading = { type: 'PERF_DATA_LOADING', payload: PerfData };
-type UIDataAvailable = { type: 'UI_DATA_AVAILABLE', payload: PerfData };
-type UIDataLoading = { type: 'UI_DATA_LOADING', payload: PerfData };
+type PerfDataAvailableAction = { type: 'PERF_DATA_AVAILABLE', payload: PerfData };
+type PerfDataLoadingAction = { type: 'PERF_DATA_LOADING', payload: PerfData };
+type UIDataAvailableAction = { type: 'UI_DATA_AVAILABLE', payload: PerfData };
+type UIDataLoadingAction = { type: 'UI_DATA_LOADING', payload: PerfData };
 
-export type PerfDataAction = PerfDataAvailable | PerfDataLoading;
-export type UIDataAction = UIDataAvailable | UIDataLoading;
+export type PerfDataAction = PerfDataAvailableAction | PerfDataLoadingAction;
+export type UIDataAction = UIDataAvailableAction | UIDataLoadingAction;
 
 
 
@@ -51,4 +51,3 @@ export const perfREST_UI_Fetch = ():
     return dispatch({ type: 'UI_DATA_AVAILABLE', payload });
   });
 }
-

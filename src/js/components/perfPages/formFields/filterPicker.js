@@ -20,8 +20,10 @@ import IconSettings from '@salesforce/design-system-react/components/icon-settin
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
-import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
+import { selectPerfState, selectPerfUIStatus } from 'store/perfdata/selectors';
 
+
+// todo, turn to functional component
 class FilterPicker extends React.Component<{}> {
 	constructor(props) {
 		super(props);
@@ -104,13 +106,13 @@ class FilterPicker extends React.Component<{}> {
 
 const select = (appState: AppState) => {
     return {
-    perfdataUIstate: selectPerf_UI_State(appState),
+//    perfdataUIstate: selectPerfState(appState),
   }};
-  
+
   const actions = {
     doPerfREST_UI_Fetch: perfREST_UI_Fetch,
   };
-  
+
  const ConnectedFilterPicker : React.ComponentType<{}> = withRouter(connect(select, actions)(
 	FilterPicker,
 ));

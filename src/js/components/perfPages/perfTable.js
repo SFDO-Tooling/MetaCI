@@ -13,7 +13,7 @@ import queryString from 'query-string';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import type { AppState } from 'store';
-import type { PerfDataState } from 'store/perfdata/reducer';
+import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 import type { InitialProps } from 'components/utils';
 import { t } from 'i18next';
 import Spinner from '@salesforce/design-system-react/components/spinner';
@@ -21,55 +21,26 @@ import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
 
-import FieldPicker from './formFIelds/fieldPicker';
-import FilterPicker from './formFIelds/filterPicker';
 import PerfTableOptionsUI from './perfTableOptionsUI';
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
-import { selectPerfState, selectPerf_UI_State } from 'store/perfdata/selectors';
+import { selectPerfState,
+         selectPerfUIStatus,
+         selectTestmethodPerfUI,
+       } from 'store/perfdata/selectors';
+
+import { QueryParamHelpers, addIds } from './perfTableUtils';
 
 const DEFAULT_COLUMNS = ["Method Name", "Duration"];
 
-
-export const ShowRenderTime = () => null
-// <p>{(new Date()).toString()}</p>
-
-
-export class QueryParamHelpers{
-  default_params: { [string]: mixed };
-
-  constructor(default_params:{[string]: mixed}) {
-    this.default_params = default_params;
-  }
-
-   get = (name?:string) => {
-    let parts = { ...this.default_params, ...queryString.parse(window.location.search)};
-
-    if(name){
-      return parts[name];
-    }else{
-      return parts;
-    }
-  }
-
-  set = (newQueryParts: {[string] : string | string[] | null | typeof undefined}) => {
-    let qs = queryString.stringify({...this.get(), ...newQueryParts});
-    window.history.pushState(null, "", window.location.pathname+"?"+qs);
-  };
-}
-
-
-/**
- * Add iDs to table values for consumption by the SLDS DataTable
- * @param {*} rows hashes from database
- */
-const addIds = (rows : {}[]) => {
-  return rows.map((row, index)=>{return {...row, id: index.toString()}})
+type SpinnerProps = {
+  status: LoadingStatus;
 }
 
 const PerfDataTableSpinner = ({status}) => {
-  if(status === "PERF_DATA_LOADING"){
+  console.log("STATUS", status);
+  if(status === "LOADING"){
     return <Spinner
       size="small"
       variant="base"
@@ -79,22 +50,24 @@ const PerfDataTableSpinner = ({status}) => {
   return null;
 }
 
-let default_query_params = {page_size: 10, include_fields : ["repo", "duration_average"]};
-export const queryparams = new QueryParamHelpers(default_query_params);
+// TODO: Stronger typing in these
+type ReduxProps = {|
+    perfState: PerfDataState | {},
+    perfUIStatus: LoadingStatus ,
+    testmethodPerfUI: {}
+  |} & typeof actions;
 
 
-type ReduxProps = {doPerfRESTFetch: Function,
-                  doPerfREST_UI_Fetch: Function,
-                  perfdatastate: PerfDataState,
-                  perfdataUIstate:{}};
 type SelfProps = {default_columns: string[]};
 
 export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
-                          perfdatastate, perfdataUIstate,
-                          match, location, history, default_columns }:
+                          perfState, testmethodPerfUI,
+                           perfUIStatus,
+                          match, location, history }:
                               ReduxProps & InitialProps & SelfProps) => {
-    default_columns = default_columns || DEFAULT_COLUMNS;
-
+    let uiAvailable = perfUIStatus=== "AVAILABLE";
+    console.log("ST3", perfUIStatus);
+    let queryparams = new QueryParamHelpers(get(testmethodPerfUI, "defaults", {}));
 
     let queryParts = queryparams.get;
     let changeUrl = queryparams.set;
@@ -111,8 +84,9 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     }, []);
 
     var items;
-    if(perfdatastate && perfdatastate.perfdata){
-      items = addIds(perfdatastate.perfdata.results);
+    if(perfState && perfState.perfdata
+        && Array.isArray(perfState.perfdata.results)){
+      items = addIds(perfState.perfdata.results);
     }else{
       items = [];
     }
@@ -126,10 +100,8 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
 
 
     /*
-     * Extract the page from the server-generated URL
-     *
-     * TODO: this code may be obsolete as of March 27
-     *
+     * Extract the page from the server-generated URL and ensure it is
+     * browser URL before fetching it.
      */
     const goPageFromUrl = (url: string) => {
       var qs = url.split("?", 2)[1];
@@ -147,27 +119,27 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     var page = parseInt(queryParts()["page"]||"1") - 1;
     var custom_page_size = queryParts("page_size");
     var page_size = custom_page_size ? parseInt(custom_page_size) :
-                        get(perfdatastate, "perfdata.results.length") || -1;
-    var previousPage:number|null = get(perfdatastate, "perfdata.previous");
-    var nextPage:number|null = get(perfdatastate, "perfdata.next")
+                        get(perfState, "perfdata.results.length") || -1;
+    var previousPage:string|null = get(perfState, "perfdata.previous");
+    var nextPage:string|null = get(perfState, "perfdata.next")
 
     /* https://appexchange.salesforce.com/listingDetail?listingId=a0N3A00000E9TBZUA3 */
     const PerfDataTableFooter = () => {
       return (
       <div className="slds-card__footer slds-grid" >
-        { items.length>0 && perfdatastate && perfdatastate.perfdata &&
+        { items.length>0 && perfState && !!(perfState.perfdata) &&
           <React.Fragment>
             <div className="slds-col slds-size--1-of-2"
                   style={{ textAlign: "left" }}>
                           Showing {(page * page_size).toString()} to {' '}
-                                {Math.min((page + 1) * page_size, 1).toString()} {' '}
-                          of  {get(perfdatastate, "perfdata.count").toString()} records
+                                {((page + 1) * page_size).toString()} {' '}
+                          of  {get(perfState, "perfdata.count").toString()} records
             </div>
             <div className="slds-col slds-size--1-of-2">
-                      <button onClick={()=>doPerfRESTFetch(previousPage)}
+                      <button onClick={()=>goPageFromUrl(previousPage)}
                         className="slds-button slds-button--brand"
                         disabled={!previousPage}>Previous</button>
-                      <button onClick={()=>doPerfRESTFetch(nextPage)}
+                      <button onClick={()=>goPageFromUrl(nextPage)}
                         className="slds-button slds-button--brand"
                         disabled={!nextPage}>Next</button>
             </div>
@@ -182,6 +154,10 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
         let columnNames = Object.keys(items[0]).filter((item)=>item!="id");
         return zip(columnNames, columnNames);
       }else{
+        // these are really just for looks. If there are no items, they
+        // don't matter. TODO: use included_columns for this instead.
+        let default_columns = queryParts("include_fields") ||
+                              ["Method Name", "Duration"];
         return zip(default_columns, default_columns)
       }
     }
@@ -222,16 +198,16 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       }
       fetchServerData({o: sortProperty, page: '1'});
     };
-
-
+    console.log("ST4, ", perfUIStatus)
     return <div key="perfContainerDiv">
-      <ShowRenderTime/>
       <PerfTableOptionsUI
           fetchServerData={fetchServerData}
+          uiAvailable={uiAvailable}
+          testmethodPerfUI={testmethodPerfUI}
+          queryparams={queryparams}
           key="thePerfAccordian"/>
 			<div style={{ position: 'relative'}}>
-            <ShowRenderTime/>
-            <PerfDataTableSpinner status={get(perfdatastate, "status")}/>
+            <PerfDataTableSpinner status={perfState.status}/>
             <DataTable items={items}
                 fixedLayout={true}
                 onSort={doSort}
@@ -245,9 +221,11 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
 
 const select = (appState: AppState) => {
   return {
-    perfdatastate: selectPerfState(appState),
-    perfdataUIstate: selectPerf_UI_State(appState),
+    perfState: selectPerfState(appState),
+    testmethodPerfUI: selectTestmethodPerfUI(appState),
+    perfUIStatus: selectPerfUIStatus(appState)
   }};
+
 
 const actions = {
   doPerfRESTFetch: (url, queryparts) => perfRESTFetch(url || "/api/testmethod_perf?", queryparts),
