@@ -32,7 +32,7 @@ import { selectPerfState,
 
 import { QueryParamHelpers, addIds } from './perfTableUtils';
 
-import PerfDataTable from './PerfDataTable';
+import PerfDataTable from './perfDataTable';
 
 const DEFAULT_COLUMNS = ["Method Name", "Duration"];
 
