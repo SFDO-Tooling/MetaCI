@@ -21,9 +21,9 @@ import Input from '@salesforce/design-system-react/components/input';
 import Tooltip from '@salesforce/design-system-react/components/tooltip';
 // flowlint untyped-type-import:error
 
-import FieldPicker from './fieldPicker';
-import FilterPicker from './filterPicker';
-import DateRangePicker from './dateRangePicker';
+import FieldPicker from './formFIelds/fieldPicker';
+import FilterPicker from './formFIelds/filterPicker';
+import DateRangePicker from './formFIelds/dateRangePicker';
 
 import { queryparams, ShowRenderTime } from './perfTable';
 

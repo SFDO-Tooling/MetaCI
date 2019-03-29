@@ -21,8 +21,8 @@ import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
 
-import FieldPicker from './fieldPicker';
-import FilterPicker from './filterPicker';
+import FieldPicker from './formFIelds/fieldPicker';
+import FilterPicker from './formFIelds/filterPicker';
 import PerfTableOptionsUI from './perfTableOptionsUI';
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
