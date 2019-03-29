@@ -26,7 +26,7 @@ import ErrorBoundary from 'components/error';
 import Footer from 'components/footer';
 import FourOhFour from 'components/404';
 import Header from 'components/header';
-import PerfTable from 'components/perfPages/perfTable';
+import PerfPage from 'components/perfPages/perfPage';
 import TestMethodsResultsTable from 'components/perfPages/testMethodResultsTable';
 import getApiFetch from 'utils/api';
 import reducer from 'store';
@@ -50,7 +50,7 @@ const App = () => (
         >
           <ErrorBoundary>
             <Switch>
-             <Route path="/repos/:owner/:repo/perf" component={PerfTable} />
+             <Route path="/repos/:owner/:repo/perf" component={PerfPage} />
              <Route path="/repos/:owner/:repo/tests" component={TestMethodsResultsTable} />
             </Switch>
           </ErrorBoundary>

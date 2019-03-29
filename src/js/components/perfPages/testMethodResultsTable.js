@@ -12,7 +12,7 @@ import { selectPerfState,
     selectTestmethodResultUI,
   } from 'store/perfdata/selectors';
 
-import { UnwrappedPerfTable as PerfTable } from "./perfTable";
+import { UnwrappedPerfPage as PerfPage } from "./perfPage";
 
 const DEFAULT_COLUMNS = ["Date", "Method Name", "Duration"];
 
@@ -20,7 +20,7 @@ export const TestMethodResultsTable = (
     {doPerfRESTFetch, doPerfREST_UI_Fetch,
     perfdatastate, perfdataUIstate,
     match, location, history }) => {
-        return PerfTable({doPerfRESTFetch, doPerfREST_UI_Fetch,
+        return PerfPage({doPerfRESTFetch, doPerfREST_UI_Fetch,
             perfdatastate, perfdataUIstate,
             match, location, history,
             default_columns: DEFAULT_COLUMNS})

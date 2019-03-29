@@ -21,7 +21,7 @@ import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
 
-import PerfTableOptionsUI from './perfTableOptionsUI';
+import PerfDataTableOptionsUI from './perfTableOptionsUI';
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
@@ -60,7 +60,7 @@ type ReduxProps = {|
 
 type SelfProps = {default_columns: string[]};
 
-export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
+export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
                           perfState, testmethodPerfUI,
                            perfUIStatus,
                           match, location, history }:
@@ -198,14 +198,7 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       }
       fetchServerData({o: sortProperty, page: '1'});
     };
-    console.log("ST4, ", perfUIStatus)
     return <div key="perfContainerDiv">
-      <PerfTableOptionsUI
-          fetchServerData={fetchServerData}
-          uiAvailable={uiAvailable}
-          testmethodPerfUI={testmethodPerfUI}
-          queryparams={queryparams}
-          key="thePerfAccordian"/>
 			<div style={{ position: 'relative'}}>
             <PerfDataTableSpinner status={perfState.status}/>
             <DataTable items={items}
@@ -232,8 +225,8 @@ const actions = {
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 
-const WrappedPerfTable: React.ComponentType<{}> = withRouter(connect(select, actions)(
-  UnwrappedPerfTable,
+const WrappedPerfDataTable: React.ComponentType<{}> = withRouter(connect(select, actions)(
+  UnwrappedPerfDataTable,
 ));
 
-export default WrappedPerfTable;
+export default WrappedPerfDataTable;
