@@ -29,7 +29,6 @@ export const perfRESTFetch = (url : string, params?: {}):
       if(!payload.error){
         return dispatch({ type: 'PERF_DATA_AVAILABLE', payload });
       }else{
-        alert(JSON.stringify(payload.reason));
         // TODO: PERF_DATA_ERROR is not handled yet
         return dispatch({ type: 'PERF_DATA_ERROR', payload });
       }
@@ -51,7 +50,6 @@ export const perfREST_UI_Fetch = ():
       if (!payload.error) {
         return dispatch({ type: 'UI_DATA_AVAILABLE', payload });
       } else {
-        alert(JSON.stringify(payload.reason));
         // TODO: UI_DATA_ERROR is not handled yet
         return dispatch({ type: 'UI_DATA_ERROR', payload });
       }

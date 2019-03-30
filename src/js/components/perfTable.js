@@ -94,7 +94,10 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
                           match, location, history, default_columns }:
                               ReduxProps & InitialProps & SelfProps) => {
     default_columns = default_columns || DEFAULT_COLUMNS;
-
+  if ((perfdataUIstate && perfdataUIstate.status === "UI_DATA_ERROR") ||
+    (perfdatastate && perfdatastate.status === "PERF_DATA_ERROR")){
+      return <AuthError/>
+    }
 
     let queryParts = queryparams.get;
     let changeUrl = queryparams.set;
@@ -242,6 +245,15 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
         </div>
     </div>
   };
+
+const AuthError = () => {
+  return <main id="app" style={{ textAlign: "center" }} className="slds-grid__vertical slds-page-header">
+    <p className="slds-text-heading--medium">Please ensure you are on the VPN and logged in to view this data.</p>
+    <div style={{ paddingTop: "20px" }} className="slds-brand-band slds-brand-band_large">
+      <p><img src="https://i.gifer.com/G36W.gif" /></p>
+    </div>
+  </main>
+}
 
 const select = (appState: AppState) => {
   return {
