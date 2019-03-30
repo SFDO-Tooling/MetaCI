@@ -24,60 +24,50 @@ import type { AppState } from 'store';
 import type { InitialProps } from 'components/utils';
 
 type Props = {
-  onChange: () => void,
+  onChange: (string[]) => void,
   choices: [string, string][],
-  defaultValue: [string, string][],
-}
+  defaultValue: string[] | string,
+};
 
-type ReduxProps = {
-  perfdataUIstate?: { [string]: mixed },
-}
+type SLDSChoiceOption = {
+  id: string,
+  label: string,
+};
 
-const FieldPicker = ({ history, onChange, choices, defaultValue }:
-                              Props & ReduxProps & InitialProps)  =>  {
-  const columnOptions = () => {
-    let columns: [string, string][] = defaultValue;
-    let server_column_options: [string, string][] = choices;
-    if (server_column_options) {
-      columns = server_column_options;
-    }
-    return columns.map((pair) => ({ id: pair[0], label: pair[1] }));
-  }
+type Options = SLDSChoiceOption[]
 
-  let options = columnOptions();
+const FieldPicker = ({ onChange, choices, defaultValue }: Props)  =>  {
+  console.assert(choices && choices.length, "Choices is empty", choices);
+  let options = choices.map((pair) => ({ id: pair[0], label: pair[1] }));;
 
-  const changeURL = (data) => {
-    debugger;
-    history.push({
-      pathname: window.location.pathname,
-      search: queryStringFromSelection(data.selection)
-    });
-    if (onChange) onChange();
+  const onUpdate = (selections : Options) => {
+    let include_fields = selections.map((selection) => selection.id);
+    onChange(include_fields)
   };
-
 
   return (
     <Combobox
       id="combobox-readonly-multiple"
       events={{
-        onRequestRemoveSelectedOption: (event, data) => changeURL(data),
-        onSelect:  (event, data) => changeURL(data),
+        onRequestRemoveSelectedOption: (event: mixed,
+            data: {selection: Options}) => onUpdate(data.selection),
+        onSelect:  (event: mixed,
+            data: {selection: Options}) => onUpdate(data.selection),
       }}
       labels={{
         placeholder: 'Select Columns',
       }}
       multiple
       options={options}
-      selection={getSelectionFromUrl(options)}
+      selection={getSelectionListFromDefaultValue(options, defaultValue)}
       value=""
       variant="readonly"
     />
   );
 }
 
-const getSelectionFromUrl = (options) => {
-  let oldQueryParams = queryString.parse(window.location.search);
-  let included_field_names = oldQueryParams["include_fields"];
+const getSelectionListFromDefaultValue = (options, stringOrArrayFromURL) => {
+  let included_field_names = stringOrArrayFromURL;
   if (included_field_names != null) {
     if (!Array.isArray(included_field_names)) {
       included_field_names = [included_field_names];
@@ -90,21 +80,4 @@ const getSelectionFromUrl = (options) => {
   }
 }
 
-const queryStringFromSelection = (selection: Array<{id: string}>) => {
-  let include_fields = selection.map((selection) => selection.id);
-  let newQueryParams = { include_fields };
-  let oldQueryParams = queryString.parse(window.location.search);
-  let qs = queryString.stringify({ ...oldQueryParams, ...newQueryParams });
-  return qs;
-}
-
-
-const actions = {
-  doPerfREST_UI_Fetch: perfREST_UI_Fetch,
-};
-
-const ConnectedFieldPicker: React.ComponentType<Props> = connect(null, actions)(
-  withRouter(FieldPicker),
-);
-
-export default ConnectedFieldPicker;
+export default FieldPicker;
