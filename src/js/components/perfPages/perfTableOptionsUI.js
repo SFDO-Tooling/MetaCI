@@ -66,13 +66,22 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
     // Possible that this duplicates work already being done in
     // queryparams.get.
     const getInitialValue = (filterOrString: {name:string} | string) :
-                                            string | string[] => {
-        return queryparams.get(filterOrString);
+                                            string | null => {
+        var stringOrList = queryparams.get(filterOrString);
+        if(Array.isArray(stringOrList)) return stringOrList[0];
+        else return stringOrList;
 
         // There was more complicated code here for special-casing
         // method_name. If you need to revive it, its in commit
         // ca3d2b8a9
+    }
 
+    const getInitialValueList = (filterOrString: { name: string } | string):
+        string[] | null => {
+
+        var stringOrList = queryparams.get(filterOrString);
+        if (Array.isArray(stringOrList)) return stringOrList;
+        else return [stringOrList];
     }
 
     const gatherFilters = (perfdataUIstate): Field[] => {
@@ -113,8 +122,6 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
     var filterPanelCount = filterPanelFilters.filter((f) =>
         f.currentValue).length;
 
-    console.log("XXXYYY", getInitialValue("include_fields"));
-
     return (
         <Accordion key="perfUIMainAccordion">
             <AccordionPanel id="perfPanelColumns"
@@ -125,7 +132,7 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
                 {uiAvailable &&
                 <FieldPicker key="PerfDataTableFieldPicker"
                     choices={get(testmethodPerfUI, "includable_fields")}
-                    defaultValue={getInitialValue("include_fields")}
+                    defaultValue={getInitialValueList("include_fields")}
                     onChange={(data) => fetchServerData({include_fields:data})} />}
             </AccordionPanel>
             <AccordionPanel id="perfPanelFilters"
@@ -237,6 +244,14 @@ const AllFilters = ({ filters, fetchServerData }) => {
         </div>
 }
 
+type FilterDefinition = {
+    name:string,
+    label?: string,
+    description?: string,
+    choices?:[],
+    currentValue?:string,
+}
+
 type FieldOption = {
     id: string,
     label: string
@@ -269,11 +284,9 @@ const ChoiceField = (filter: {name:string, choices:[]},
     };
 }
 
-const CharField = (filter: { name: string,
-                description?: string,
-                label?: string,
-                choices: [] },
-    currentValue?: string | string[], fetchServerData): Field => {
+const CharField = (filter: FilterDefinition,
+    currentValue?: string | string[],
+    fetchServerData): Field => {
     return {
         name: filter.name,
         currentValue,

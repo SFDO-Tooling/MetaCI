@@ -26,7 +26,7 @@ import type { InitialProps } from 'components/utils';
 type Props = {
   onChange: (string[]) => void,
   choices: [string, string][],
-  defaultValue: string[] | string,
+  defaultValue: string[],
 };
 
 type SLDSChoiceOption = {
@@ -66,14 +66,10 @@ const FieldPicker = ({ onChange, choices, defaultValue }: Props)  =>  {
   );
 }
 
-const getSelectionListFromDefaultValue = (options, stringOrArrayFromURL) => {
-  let included_field_names = stringOrArrayFromURL;
-  if (included_field_names != null) {
-    if (!Array.isArray(included_field_names)) {
-      included_field_names = [included_field_names];
-    }
+const getSelectionListFromDefaultValue = (options, defaultValue) => {
+  if (defaultValue != null) {
     // this is for flow's benefit
-    let indexOf = included_field_names.indexOf.bind(included_field_names);
+    let indexOf = defaultValue.indexOf.bind(defaultValue);
 
     let included_options = options.filter((option) => indexOf(option.id) >= 0);
     return included_options;
