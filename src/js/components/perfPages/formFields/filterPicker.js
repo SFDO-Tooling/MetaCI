@@ -1,7 +1,7 @@
-
-//  TODO: Add Flow Checking to this
+// @flow
 
 import * as React from 'react';
+import { useState } from 'react';
 import * as ReactDOM from 'react-dom';
 
 import { connect } from 'react-redux';
@@ -12,50 +12,47 @@ import get from 'lodash/get';
 
 import queryString from 'query-string';
 
+// flowlint  untyped-import:off
 import Combobox from '@salesforce/design-system-react/components/combobox';
 import Icon from '@salesforce/design-system-react/components/icon';
 import comboboxFilterAndLimit from '@salesforce/design-system-react/components/combobox/filter';
 import IconSettings from '@salesforce/design-system-react/components/icon-settings';
+// flowlint  untyped-import:error
 
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfState, selectPerfUIStatus } from 'store/perfdata/selectors';
 
+type Props = {
+	choices : [{id:string}],
+	field_name: string,
+	value: string,
+	onSelect: (mixed) => void,
+}
 
-// todo, turn to functional component
-class FilterPicker extends React.Component<{}> {
-	constructor(props) {
-		super(props);
+const FilterPicker = ({choices, field_name, value, onSelect}: Props) : React.Node =>  {
+		let selected = choices.filter((value)=>value.id===value);
+		let [inputValue, setInputValue] = useState("");
+		let [selection, setSelection] = useState(selected);
 
-		let selected = this.props.choices.filter((value)=>value.id===this.props.value);
-		this.state = {
-			inputValue: "",
-			selection: selected,
-		};
-	}
-
-	render() {
 		return (
 			<Combobox
 			id="combobox-inline-single"
-			placeholder={this.props.field_name}
+			placeholder={field_name}
 			events={{
 				onChange: (event, { value }) => {
-					this.setState({ inputValue: value });
+					setInputValue( value  );
 				},
 				onRequestRemoveSelectedOption: (event, data) => {
-					this.setState({
-						inputValue: '',
-						selection: data.selection,
-					});
-					this.props.onSelect(undefined);
+					setInputValue('');
+					setSelection(data.selection);
+					onSelect();
 				},
 				onSubmit: (event, { value }) => {
-					this.setState({
-						inputValue: '',
-						selection: [
-							...this.state.selection,
+					setInputValue('');
+					setSelection([
+							...selection,
 							{
 								label: value,
 								icon: (
@@ -66,55 +63,33 @@ class FilterPicker extends React.Component<{}> {
 									/>
 								),
 							},
-						],
-					});
+					]);
 				},
 				onSelect: (event, data) => {
-					if (this.props.onSelect && data) {
-						this.props.onSelect(
+					if (onSelect && data) {
+						onSelect(
 							data.selection[0]["id"]
 						);
 					}
-					this.setState({
-						inputValue: '',
-						selection: data.selection,
-					});
+					setInputValue('');
+					setSelection(data.selection);
 				},
 			}}
 			labels={{
-				placeholder: 'Select ' + this.props.field_name,
-				placeholderReadOnly: 'Select ' + this.props.field_name,
+				placeholder: 'Select ' + field_name,
+				placeholderReadOnly: 'Select ' + field_name,
 			}}
 			options={comboboxFilterAndLimit({
-				inputValue: this.state.inputValue,
-				options: this.props.choices,
-				selection: this.state.selection,
+				inputValue: inputValue,
+				options: choices,
+				selection: selection,
 				limit: 20,
 			})}
-			selection={this.state.selection}
-			value={
-				this.state.selectedOption
-					? this.state.selectedOption.label
-					: this.state.inputValue
-			}
+			selection={selection}
+			value={inputValue}
 			variant="base"
 		/>
 		);
-	}
 }
 
-
-const select = (appState: AppState) => {
-    return {
-//    perfdataUIstate: selectPerfState(appState),
-  }};
-
-  const actions = {
-    doPerfREST_UI_Fetch: perfREST_UI_Fetch,
-  };
-
- const ConnectedFilterPicker : React.ComponentType<{}> = withRouter(connect(select, actions)(
-	FilterPicker,
-));
-
-export default ConnectedFilterPicker;
+export default FilterPicker;
