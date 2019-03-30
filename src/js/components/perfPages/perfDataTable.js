@@ -151,8 +151,11 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     const columns = () => {
       let columns;
       if(items.length>0){
-        let columnNames = Object.keys(items[0]).filter((item)=>item!="id");
-        return zip(columnNames, columnNames);
+        let columnIds = Object.keys(items[0]).filter((item)=>item!="id");
+        let columnPairs = columnIds.map((id)=>[
+          id, id
+        ]);
+        return columnPairs;
       }else{
         // these are really just for looks. If there are no items, they
         // don't matter. TODO: use included_columns for this instead.
@@ -166,7 +169,6 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       return (
           columns().map(([name, label])=>
           {
-
             let isSorted:bool = false, sortDirection:string|null = null;
 
             if(queryParts()["o"]===name){
