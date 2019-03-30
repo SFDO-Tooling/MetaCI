@@ -9,17 +9,17 @@ import Input from '@salesforce/design-system-react/components/input';
 import Tooltip from '@salesforce/design-system-react/components/tooltip';
 // flowlint untyped-type-import:error
 
-type QueryBoundTextInputProps = {
-    label: string,
-    defaultValue: string,
+type Props = {
+    label?: string|null,
+    defaultValue?: string|null,
     onValueUpdate: (string) => void,
-    tooltip: string | null,
+    tooltip?: string | null,
 }
 
-const QueryBoundTextInput = ({ label,
+const TextInput = ({ label,
             defaultValue,
             onValueUpdate,
-            tooltip } : QueryBoundTextInputProps) => {
+            tooltip } : Props) => {
     // debounce to reduce redraws while typing
     let debouncedCallback = debounce((value: string) => onValueUpdate(value), 1000)
 
@@ -46,4 +46,4 @@ const QueryBoundTextInput = ({ label,
     />
 }
 
-export default QueryBoundTextInput;
+export default TextInput;

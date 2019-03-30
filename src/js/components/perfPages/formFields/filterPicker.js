@@ -25,17 +25,16 @@ import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 import { selectPerfState, selectPerfUIStatus } from 'store/perfdata/selectors';
 
 type Props = {
-	choices : [{id:string}],
+	choices : {id:string}[],
 	field_name: string,
-	value: string,
+	value?: string|null,
 	onSelect: (mixed) => void,
 }
 
 const FilterPicker = ({choices, field_name, value, onSelect}: Props) : React.Node =>  {
-		let selected = choices.filter((value)=>value.id===value);
+		let selected = value ? choices.filter((choice)=>choice.id===value) : [];
 		let [inputValue, setInputValue] = useState("");
 		let [selection, setSelection] = useState(selected);
-
 		return (
 			<Combobox
 			id="combobox-inline-single"

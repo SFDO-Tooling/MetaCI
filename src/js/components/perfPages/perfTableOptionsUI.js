@@ -1,12 +1,10 @@
 // @flow
 
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import zip from 'lodash/zip';
 import partition from 'lodash/partition';
-import debounce from 'lodash/debounce';
 import chunk from 'lodash/chunk';
 
 import queryString from 'query-string';
@@ -17,13 +15,12 @@ import type { AppState } from 'store';
 import { t } from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
-import Input from '@salesforce/design-system-react/components/input';
-import Tooltip from '@salesforce/design-system-react/components/tooltip';
 // flowlint untyped-type-import:error
 
 import FieldPicker from './formFields/fieldPicker';
 import FilterPicker from './formFields/filterPicker';
 import DateRangePicker from './formFields/dateRangePicker';
+import TextInput from './formFields/textInput';
 
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
@@ -53,7 +50,6 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
     // is the UI data available? If so, populate the fields. If not,
     // just show the accordion.
     let uiAvailable = perfUIStatus == "AVAILABLE";
-    console.log("ST", perfUIStatus);
     // state for managing the accordion. Maybe a single Map would be better.
     const [perfPanelColumnsExpanded, setPerfPanelColumnsExpanded] = useState(false);
     const [perfPanelFiltersExpanded, setPerfPanelFiltersExpanded] = useState(false);
@@ -65,9 +61,9 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
     //
     // Possible that this duplicates work already being done in
     // queryparams.get.
-    const getInitialValue = (filterOrString: {name:string} | string) :
+    const getInitialValue = (param: string) :
                                             string | null => {
-        var stringOrList = queryparams.get(filterOrString);
+        var stringOrList: string | string[] = queryparams.get(param);
         if(Array.isArray(stringOrList)) return stringOrList[0];
         else return stringOrList;
 
@@ -76,10 +72,10 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
         // ca3d2b8a9
     }
 
-    const getInitialValueList = (filterOrString: { name: string } | string):
+    const getInitialValueList = (param: string):
         string[] | null => {
 
-        var stringOrList = queryparams.get(filterOrString);
+        var stringOrList: string | string[] = queryparams.get(param);
         if (Array.isArray(stringOrList)) return stringOrList;
         else return [stringOrList];
     }
@@ -93,20 +89,21 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
         const all_filters = [...buildflow_filters, ...testmethod_perf_filters];
         if(all_filters.length){
             all_filters.map((filterDef)=>{
+                console.log(filterDef.name, getInitialValue(filterDef));
                 if(get(filterDef, "choices")){
                     filters.push(
                         ChoiceField(filterDef,
-                            getInitialValue(filterDef),
+                            getInitialValue(filterDef.name),
                             fetchServerData));
                 } else if (filterDef.field_type == "DecimalField") {
                     filters.push(
                         DecimalField(filterDef,
-                            getInitialValue(filterDef),
+                            getInitialValue(filterDef.name),
                             fetchServerData));
                 } else if (filterDef.field_type == "CharField") {
                     filters.push(
                         CharField(filterDef,
-                            getInitialValue(filterDef),
+                            getInitialValue(filterDef.name),
                             fetchServerData));
                 }
             });
@@ -155,8 +152,8 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
                     onChange={(name, data) => fetchServerData({ [name]: data })}
                     startName="daterange_after"
                     endName="daterange_before"
-                    startValue={new Date(getInitialValue("daterange_after"))}
-                    endValue={new Date(getInitialValue("daterange_before"))} />
+                    startValue={getInitialValue("daterange_after")}
+                    endValue={getInitialValue("daterange_before")} />
                 }
             </AccordionPanel>
             <AccordionPanel id="perfPanelOptions"
@@ -166,73 +163,21 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
                 onTogglePanel={() => { setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded) }}>
                 {uiAvailable &&
                 <React.Fragment>
-                    <QueryBoundTextInput defaultValue={getInitialValue("page_size")}
+                    <TextInput defaultValue={getInitialValue("page_size")}
                         label="Page Size"
                         tooltip="Number of rows to fetch per page"
-                        onValueUpdate={(value) => fetchServerData({ page_size: value })} />
-                    <QueryBoundTextInput
+                        onValueUpdate={(value: string) => fetchServerData({ page_size: value })} />
+                    <TextInput
                         defaultValue={getInitialValue("build_flows_limit")}
                         label="Build Flows Limit"
                         tooltip="Max number of build_flows to aggregate (performance optimization)"
-                        onValueUpdate={(value) => fetchServerData({ build_flows_limit: value })} />
+                        onValueUpdate={(value: string) => fetchServerData({ build_flows_limit: value })} />
                 </React.Fragment>
                 }
             </AccordionPanel>
         </Accordion>
     )
 }
-
-const QueryBoundTextInput = ({ label, defaultValue, onValueUpdate,
-    tooltip }) => {
-    // debounce to reduce redraws while typing
-    let debouncedCallback = debounce((value) => onValueUpdate(value), 1000)
-
-    // store in state so debouncer can have internal history
-    let [debouncedChangeUrl, setDebouncer] = useState(
-        // wrap in obj to prevent magic useState behaviour
-        { debouncedCallback }
-    );
-    // unwrap
-    debouncedCallback = debouncedChangeUrl.debouncedCallback;
-    console.log(defaultValue);
-
-    return <Input
-        label={label}
-        fieldLevelHelpTooltip={
-            tooltip &&
-            <Tooltip
-                align="top left"
-                content={tooltip}
-            />
-        }
-        defaultValue={defaultValue}
-        onChange={(event, { value }) => debouncedCallback(value)}
-    />
-}
-
-const BuildFilterPicker = ({ filter, fetchServerData }) => {
-    return <FilterPicker
-                key={filter.name}
-                field_name={filter.name}
-                choices={filter.choices}
-                value={filter.currentValue}
-                onSelect={(value) => { fetchServerData({ [filter.name]: value }) }} />
-}
-
-
-
-const TEMPORARILY_UNUSED_DateRangeRenderer = ({ filter, fetchServerData }) => {
-    let startName = filter.name + "_after";
-    let endName = filter.name + "_before"
-    return <DateRangePicker
-                onChange={(name, data) => fetchServerData({ [name]: data })}
-                startName={startName}
-                endName={endName}
-                startValue={new Date()} // new Date(getDefaultValue(startName))}
-                endValue={new Date()} // new Date (getDefaultValue(endName))}
-                />
-}
-
 
 const AllFilters = ({ filters, fetchServerData }) => {
     return <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
@@ -248,7 +193,7 @@ type FilterDefinition = {
     name:string,
     label?: string,
     description?: string,
-    choices?:[],
+    choices? :[string, string][],
     currentValue?:string,
 }
 
@@ -260,13 +205,15 @@ type FieldOption = {
 type Field = {
     name: string,
     currentValue?: mixed,
-    render: () => React$Element<any>
+    render: () => React.Node
 };
 
-const ChoiceField = (filter: {name:string, choices:[]},
-                                currentValue, fetchServerData) : Field => {
-
-    let choices_as_objs = filter.choices.map((pair) => (
+const ChoiceField = (filter: FilterDefinition,
+                    currentValue?: string | null,
+                    fetchServerData) : Field => {
+    console.assert(Array.isArray(filter.choices) && filter.choices.length>1);
+    const choices:string[] = (filter.choices:any);
+    let choices_as_objs = choices.map((pair) => (
             { id: pair[0], label: pair[1] }));
     return {
         name: filter.name,
@@ -285,13 +232,13 @@ const ChoiceField = (filter: {name:string, choices:[]},
 }
 
 const CharField = (filter: FilterDefinition,
-    currentValue?: string | string[],
+    currentValue?: string | null,
     fetchServerData): Field => {
     return {
         name: filter.name,
         currentValue,
         render: () =>
-            <QueryBoundTextInput defaultValue={currentValue}
+            <TextInput defaultValue={currentValue}
                 label={filter.label}
                 tooltip={filter.description}
                 onValueUpdate={(value) =>

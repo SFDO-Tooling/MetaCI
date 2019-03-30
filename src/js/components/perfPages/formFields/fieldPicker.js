@@ -26,7 +26,7 @@ import type { InitialProps } from 'components/utils';
 type Props = {
   onChange: (string[]) => void,
   choices: [string, string][],
-  defaultValue: string[],
+  defaultValue?: string[] | null,
 };
 
 type SLDSChoiceOption = {

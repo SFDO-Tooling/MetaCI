@@ -52,7 +52,7 @@ const PerfDataTableSpinner = ({status}) => {
 
 // TODO: Stronger typing in these
 type ReduxProps = {|
-    perfState: PerfDataState | {},
+    perfState: PerfDataState,
     perfUIStatus: LoadingStatus ,
     testmethodPerfUI: {}
   |} & typeof actions;
@@ -120,15 +120,15 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     var custom_page_size = queryParts("page_size");
     var page_size = custom_page_size ? parseInt(custom_page_size) :
                         get(perfState, "perfdata.results.length") || -1;
-    var previousPage:string|null = get(perfState, "perfdata.previous");
-    var nextPage:string|null = get(perfState, "perfdata.next")
+    var previousPage:string = get(perfState, "perfdata.previous") || "";
+    var nextPage:string = get(perfState, "perfdata.next") || "";
 
     /* https://appexchange.salesforce.com/listingDetail?listingId=a0N3A00000E9TBZUA3 */
     const PerfDataTableFooter = () => {
       return (
       <div className="slds-card__footer slds-grid" >
         { items.length>0 && perfState && !!(perfState.perfdata) &&
-          <React.Fragment>
+          <>
             <div className="slds-col slds-size--1-of-2"
                   style={{ textAlign: "left" }}>
                           Showing {(page * page_size).toString()} to {' '}
@@ -143,7 +143,7 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
                         className="slds-button slds-button--brand"
                         disabled={!nextPage}>Next</button>
             </div>
-          </React.Fragment>
+          </>
         }
       </div>
     )}

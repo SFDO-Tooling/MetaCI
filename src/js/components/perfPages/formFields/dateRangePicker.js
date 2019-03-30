@@ -8,11 +8,16 @@ import Datepicker from '@salesforce/design-system-react/components/date-picker';
 import Button from '@salesforce/design-system-react/components/button';
 import { useState } from 'react';
 
+type SLDSDateOption = {
+    formattedDate : string,
+    date: Date,
+};
+
 const dateRangePicker = ({onChange, startName, endName, startValue, endValue} :
                     {startName: string, endName: string,
-                     startValue: Date, endValue: Date,
+                     startValue?: string | null, endValue?: string | null,
                         onChange : (string, string | typeof undefined) => void}) => {
-    let localOnChange = (name, data) => {
+    let localOnChange = (name, data:SLDSDateOption) => {
         if(data.formattedDate===""){
             onChange(name, undefined);
         }else if(data.date.getFullYear()>2015){
@@ -28,14 +33,16 @@ const dateRangePicker = ({onChange, startName, endName, startValue, endValue} :
     let [endDateKey, setEndDateKey] = useState(-1);
 
     // check for bad or missing dates
-    let startValueOrNull = isNaN(startValue.getDate()) ? null : startValue;
-    let endValueOrNull = isNaN(endValue.getDate()) ? null : endValue;
+    let startValueOrNull = null;
+    let endValueOrNull = null;
+    if(startValue) startValueOrNull = new Date(startValue);
+    if(endValue) startValueOrNull = new Date(endValue);
     return (
         <React.Fragment>
             <Datepicker
             key={startDateKey}
             value={startValueOrNull}
-            onChange={(event, data) => {localOnChange(startName, data)}}
+            onChange={(event:mixed, data) => {localOnChange(startName, data)}}
         />
         <Button iconCategory="action" variant="icon" iconName="remove"
             onClick={()=>{
@@ -46,7 +53,7 @@ const dateRangePicker = ({onChange, startName, endName, startValue, endValue} :
         <Datepicker
             key={endDateKey}
             value={endValueOrNull}
-            onChange={(event, data) => {localOnChange(endName, data)}}
+            onChange={(event:mixed, data) => {localOnChange(endName, data)}}
         />
         <Button iconCategory="action" variant="icon" iconName="remove"
             onClick={()=>{onChange(endName, undefined); setEndDateKey(endDateKey-1)} }>

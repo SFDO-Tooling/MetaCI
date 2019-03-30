@@ -38,7 +38,7 @@ const DEFAULT_COLUMNS = ["Method Name", "Duration"];
 
 // TODO: Stronger typing in these
 type ReduxProps = {|
-    perfState: PerfDataState | {},
+    perfState: PerfDataState,
     perfUIStatus: LoadingStatus ,
     testmethodPerfUI: {}
   |} & typeof actions;
