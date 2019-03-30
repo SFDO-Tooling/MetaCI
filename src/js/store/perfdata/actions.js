@@ -8,13 +8,13 @@ import type { PerfData } from 'store/perfdata/reducer';
 
 type PerfDataAvailable = { type: 'PERF_DATA_AVAILABLE', payload: PerfData };
 type PerfDataLoading = { type: 'PERF_DATA_LOADING', payload: PerfData };
+type PerfDataError = { type: 'PERF_DATA_ERROR', payload: string};
 type UIDataAvailable = { type: 'UI_DATA_AVAILABLE', payload: PerfData };
 type UIDataLoading = { type: 'UI_DATA_LOADING', payload: PerfData };
+type UIDataError = { type: 'UI_DATA_ERROR', payload: string };
 
-export type PerfDataAction = PerfDataAvailable | PerfDataLoading;
-export type UIDataAction = UIDataAvailable | UIDataLoading;
-
-
+export type PerfDataAction = PerfDataAvailable | PerfDataLoading | PerfDataError;
+export type UIDataAction = UIDataAvailable | UIDataLoading | UIDataError;
 
 export const perfRESTFetch = (url : string, params?: {}):
         ThunkAction => (dispatch, getState, { apiFetch }) => {
@@ -47,8 +47,16 @@ export const perfREST_UI_Fetch = ():
   apiFetch(url, {
     method: 'GET',
   }).then((payload) => {
-    // TODO: Error handling
-    return dispatch({ type: 'UI_DATA_AVAILABLE', payload });
+    if (payload) {
+      if (!payload.error) {
+        return dispatch({ type: 'UI_DATA_AVAILABLE', payload });
+      } else {
+        alert(JSON.stringify(payload.reason));
+        // TODO: UI_DATA_ERROR is not handled yet
+        return dispatch({ type: 'UI_DATA_ERROR', payload });
+      }
+    } else {
+      alert("Missing payload from server");
+    }
   });
 }
-
