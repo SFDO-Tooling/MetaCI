@@ -1,7 +1,7 @@
 // @flow
 
 import type { PerfDataAction, UIDataAction } from 'store/perfdata/actions';
-
+import type { UIData } from '../../api/testmethod_perf_UI';
 export type PerfData = {
   count: Number,
   next: URL | null,
@@ -24,7 +24,7 @@ export type UIDataLoading = {
 };
 
 export type UIDataAvailable = {
-  status: "AVAILABLE", uidata: {}
+  status: "AVAILABLE", uidata: UIData
 };
 
 export type PerfDataState = PerfDataAvailable | PerfDataLoading;

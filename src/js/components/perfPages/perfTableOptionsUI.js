@@ -25,7 +25,7 @@ import TextInput from './formFields/textInput';
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfUIStatus, selectBuildflowFiltersUI } from 'store/perfdata/selectors';
-
+import type { FilterDefinition } from '../../api/testmethod_perf_UI';
 
 type Props = {
     fetchServerData : (params?: {
@@ -37,7 +37,7 @@ type Props = {
 
 type ReduxProps = {
     perfUIStatus : string,
-    buildflow_filters: {}[],
+    buildflow_filters: FilterDefinition[],
 }
 
 let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
@@ -189,14 +189,6 @@ const AllFilters = ({ filters, fetchServerData }) => {
         </div>
 }
 
-type FilterDefinition = {
-    name:string,
-    label?: string,
-    description?: string,
-    choices? :[string, string][],
-    currentValue?:string,
-}
-
 type FieldOption = {
     id: string,
     label: string
@@ -211,6 +203,7 @@ type Field = {
 const ChoiceField = (filter: FilterDefinition,
                     currentValue?: string | null,
                     fetchServerData) : Field => {
+    // TODO: switch to Sarcastic for this
     console.assert(Array.isArray(filter.choices) && filter.choices.length>1);
     const choices:string[] = (filter.choices:any);
     let choices_as_objs = choices.map((pair) => (

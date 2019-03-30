@@ -8,13 +8,14 @@ import type { PerfData } from 'store/perfdata/reducer';
 
 type PerfDataAvailableAction = { type: 'PERF_DATA_AVAILABLE', payload: PerfData };
 type PerfDataLoadingAction = { type: 'PERF_DATA_LOADING', payload: PerfData };
-type UIDataAvailableAction = { type: 'UI_DATA_AVAILABLE', payload: PerfData };
+type UIDataAvailableAction = { type: 'UI_DATA_AVAILABLE', payload: UIData };
 type UIDataLoadingAction = { type: 'UI_DATA_LOADING', payload: PerfData };
 
 export type PerfDataAction = PerfDataAvailableAction | PerfDataLoadingAction;
 export type UIDataAction = UIDataAvailableAction | UIDataLoadingAction;
 
-
+import type { UIData } from '../../api/testmethod_perf_UI';
+import { assertUIData } from '../../api/testmethod_perf_UI';
 
 export const perfRESTFetch = (url : string, params?: {}):
         ThunkAction => (dispatch, getState, { apiFetch }) => {
@@ -48,6 +49,7 @@ export const perfREST_UI_Fetch = ():
     method: 'GET',
   }).then((payload) => {
     // TODO: Error handling
+    let typedPayload: UIData = assertUIData(payload);
     return dispatch({ type: 'UI_DATA_AVAILABLE', payload });
   });
 }
