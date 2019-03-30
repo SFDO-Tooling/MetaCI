@@ -66,20 +66,13 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
     // Possible that this duplicates work already being done in
     // queryparams.get.
     const getInitialValue = (filterOrString: {name:string} | string) :
-                                                            string | string[] => {
+                                            string | string[] => {
         return queryparams.get(filterOrString);
 
-        if( filterOrString.name === undefined){
-            if( filterOrString.name=="method_name"){
-                // I don't remember why this is special-cased
-                // test removing the special case at some point
-                return queryparams.get(filterOrString.name) || "";
-            }else{
-                return queryparams.get(filterOrString.name);
-            }
-        }else{
-            return queryparams.get(filterOrString);
-        }
+        // There was more complicated code here for special-casing
+        // method_name. If you need to revive it, its in commit
+        // ca3d2b8a9
+
     }
 
     const gatherFilters = (perfdataUIstate): Field[] => {
@@ -120,6 +113,8 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
     var filterPanelCount = filterPanelFilters.filter((f) =>
         f.currentValue).length;
 
+    console.log("XXXYYY", getInitialValue("include_fields"));
+
     return (
         <Accordion key="perfUIMainAccordion">
             <AccordionPanel id="perfPanelColumns"
@@ -131,7 +126,7 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
                 <FieldPicker key="PerfDataTableFieldPicker"
                     choices={get(testmethodPerfUI, "includable_fields")}
                     defaultValue={getInitialValue("include_fields")}
-                    onChange={fetchServerData} />}
+                    onChange={(data) => fetchServerData({include_fields:data})} />}
             </AccordionPanel>
             <AccordionPanel id="perfPanelFilters"
                 key="perfPanelFilters"
