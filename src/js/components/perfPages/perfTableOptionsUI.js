@@ -11,6 +11,8 @@ import queryString from 'query-string';
 
 import { connect } from 'react-redux';
 import type { AppState } from 'store';
+import is, { type AssertionType } from 'sarcastic';
+
 // flowlint  untyped-import:off
 import { t } from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
@@ -26,6 +28,8 @@ import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfUIStatus, selectBuildflowFiltersUI } from 'store/perfdata/selectors';
 import type { FilterDefinition } from '../../api/testmethod_perf_UI';
+
+
 
 type Props = {
     fetchServerData : (params?: {
@@ -89,7 +93,6 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
         const all_filters = [...buildflow_filters, ...testmethod_perf_filters];
         if(all_filters.length){
             all_filters.map((filterDef)=>{
-                console.log(filterDef.name, getInitialValue(filterDef));
                 if(get(filterDef, "choices")){
                     filters.push(
                         ChoiceField(filterDef,
@@ -203,9 +206,8 @@ type Field = {
 const ChoiceField = (filter: FilterDefinition,
                     currentValue?: string | null,
                     fetchServerData) : Field => {
-    // TODO: switch to Sarcastic for this
-    console.assert(Array.isArray(filter.choices) && filter.choices.length>1);
-    const choices:string[] = (filter.choices:any);
+    const choices: string[][] = is(filter.choices,
+        is.arrayOf(is.arrayOf(is.string)));
     let choices_as_objs = choices.map((pair) => (
             { id: pair[0], label: pair[1] }));
     return {
