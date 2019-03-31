@@ -32,8 +32,6 @@ import { selectPerfState,
 
 import { QueryParamHelpers, addIds } from './perfTableUtils';
 
-const DEFAULT_COLUMNS = ["Method Name", "Duration"];
-
 type SpinnerProps = {
   status: LoadingStatus;
 }
@@ -66,8 +64,11 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
                           match, location, history }:
                               ReduxProps & InitialProps & SelfProps) => {
     let uiAvailable = perfUIStatus=== "AVAILABLE";
-    console.log("ST3", perfUIStatus);
     let queryparams = new QueryParamHelpers(get(testmethodPerfUI, "defaults", {}));
+    if ((perfUIStatus === "ERROR") ||
+            (perfState && perfState.status === "ERROR")){
+          return <AuthError/>
+    }
 
     let queryParts = queryparams.get;
     let changeUrl = queryparams.set;
@@ -202,7 +203,7 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     };
     return <div key="perfContainerDiv">
 			<div style={{ position: 'relative'}}>
-            <PerfDataTableSpinner status={perfState.status}/>
+            <PerfDataTableSpinner status={perfState && perfState.status}/>
             <DataTable items={items}
                 fixedLayout={true}
                 onSort={doSort}
@@ -213,6 +214,15 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
         </div>
     </div>
   };
+
+const AuthError = () => {
+  return <main id="app" style={{ textAlign: "center" }} className="slds-grid__vertical slds-page-header">
+    <p className="slds-text-heading--medium">Please ensure you are on the VPN and logged in to view this data.</p>
+    <div style={{ paddingTop: "20px" }} className="slds-brand-band slds-brand-band_large">
+      <p><img src="https://i.gifer.com/G36W.gif" /></p>
+    </div>
+  </main>
+}
 
 const select = (appState: AppState) => {
   return {

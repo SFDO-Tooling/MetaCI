@@ -12,10 +12,9 @@ Production Configurations
 """
 from __future__ import absolute_import, unicode_literals
 
-from django.utils import six
-
 import logging
 
+from django.utils import six
 
 from .common import *  # noqa
 
@@ -146,6 +145,7 @@ STATICFILES_DIRS = (
     str(APPS_DIR.path("static")),
     str(ROOT_DIR.path("dist", "prod")),
     str(ROOT_DIR.path("locales")),
+    str(ROOT_DIR.path("node_modules/@salesforce-ux")),
 )
 
 TEMPLATES[0]["DIRS"] = [

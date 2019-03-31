@@ -51,7 +51,7 @@
       </th>
       <td data-label="Status">
         <div
-          class="slds-truncate slds-badge {% if build.status == 'fail'} slds-theme--error {% elif build.status == 'error' %}slds-theme--warning{% elif build.status == 'success' %}slds-theme--success{% endif %}"
+          class="slds-truncate slds-badge {% if build.status == 'fail'%} slds-theme--error {% elif build.status == 'error' %}slds-theme--warning{% elif build.status == 'success' %}slds-theme--success{% endif %}"
           title="{{ build.status }}">
           {{ build.status }}
         </div>
