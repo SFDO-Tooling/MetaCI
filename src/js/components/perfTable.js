@@ -255,7 +255,7 @@ const AuthError = ({message}:{message:string}) => {
       className="slds-p-around_small"
       theme="lightning-blue"
       style={{textAlign:"center",
-            backgroundImage: "url("+ BrandBannerBackground + "), linear- gradient(to top, rgba(221, 219, 218, 0) 0, #e8e8e8)"}}
+        backgroundImage: "url(" + BrandBannerBackground + "), linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)"}}
     >
       <div className="slds-box slds-theme_default"
         style={{marginLeft:"auto", marginRight:"auto"}}>
@@ -264,7 +264,7 @@ const AuthError = ({message}:{message:string}) => {
       <div>
         <img src="https://i.gifer.com/G36W.gif" />
       </div>
-    </BrandBand>
+  </BrandBand>
 }
 
 const select = (appState: AppState) => {
