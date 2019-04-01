@@ -20,6 +20,7 @@ import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
+import BrandBand from '@salesforce/design-system-react/components/brand-band';
 
 import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';
@@ -96,7 +97,8 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     default_columns = default_columns || DEFAULT_COLUMNS;
   if ((perfdataUIstate && perfdataUIstate.status === "UI_DATA_ERROR") ||
     (perfdatastate && perfdatastate.status === "PERF_DATA_ERROR")){
-      return <AuthError/>
+    return <AuthError
+        message= "Top Secret! Please ensure you are on the VPN and logged in to MetaCI."/>
     }
 
     let queryParts = queryparams.get;
@@ -246,13 +248,21 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     </div>
   };
 
-const AuthError = () => {
-  return <main id="app" style={{ textAlign: "center" }} className="slds-grid__vertical slds-page-header">
-    <p className="slds-text-heading--medium">Please ensure you are on the VPN and logged in to view this data.</p>
-    <div style={{ paddingTop: "20px" }} className="slds-brand-band slds-brand-band_large">
-      <p><img src="https://i.gifer.com/G36W.gif" /></p>
-    </div>
-  </main>
+const AuthError = ({message}:{message:string}) => {
+  return <BrandBand
+      id="brand-band-lightning-blue"
+      className="slds-p-around_small"
+      theme="lightning-blue"
+      style={{textAlign:"center"}}
+    >
+      <div className="slds-box slds-theme_default"
+        style={{marginLeft:"auto", marginRight:"auto"}}>
+        <h3 className="slds-text-heading_label slds-truncate">{message}</h3>
+      </div>
+      <div>
+        <img src="https://i.gifer.com/G36W.gif" />
+      </div>
+    </BrandBand>
 }
 
 const select = (appState: AppState) => {
