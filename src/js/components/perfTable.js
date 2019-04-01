@@ -21,6 +21,7 @@ import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
 import BrandBand from '@salesforce/design-system-react/components/brand-band';
+import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 
 import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';
@@ -253,7 +254,8 @@ const AuthError = ({message}:{message:string}) => {
       id="brand-band-lightning-blue"
       className="slds-p-around_small"
       theme="lightning-blue"
-      style={{textAlign:"center"}}
+      style={{textAlign:"center",
+            backgroundImage: "url("+ BrandBannerBackground + "), linear- gradient(to top, rgba(221, 219, 218, 0) 0, #e8e8e8)"}}
     >
       <div className="slds-box slds-theme_default"
         style={{marginLeft:"auto", marginRight:"auto"}}>
