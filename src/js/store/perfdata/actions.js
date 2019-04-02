@@ -56,7 +56,6 @@ export const perfREST_UI_Fetch = ():
         let typedPayload: UIData = assertUIData(payload);
         return dispatch({ type: 'UI_DATA_AVAILABLE', payload });
       } else {
-        // TODO: UI_DATA_ERROR is not handled yet
         return dispatch({ type: 'UI_DATA_ERROR', payload });
       }
     } else {
