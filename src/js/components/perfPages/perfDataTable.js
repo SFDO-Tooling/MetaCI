@@ -1,7 +1,4 @@
 // @flow
- /* flowlint
-  *   untyped-import:off
-  */
 
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -16,12 +13,14 @@ import type { AppState } from 'store';
 import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 import type { InitialProps } from 'components/utils';
 import { t } from 'i18next';
+// flowlint  untyped-import:off
 import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
 import BrandBand from '@salesforce/design-system-react/components/brand-band';
 import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
+// flowlint  untyped-import:error
 
 import PerfDataTableOptionsUI from './perfTableOptionsUI';
 

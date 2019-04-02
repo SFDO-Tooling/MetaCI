@@ -1,3 +1,5 @@
+// @flow
+
 import queryString from 'query-string';
 
 export class QueryParamHelpers {
@@ -28,6 +30,6 @@ export class QueryParamHelpers {
  * Add iDs to table values for consumption by the SLDS DataTable
  * @param {*} rows hashes from database
  */
-export const addIds = (rows: {}[]) => {
+export const addIds = (rows: {}[]) : {}[] => {
     return rows.map((row, index) => { return { ...row, id: index.toString() } })
 }
