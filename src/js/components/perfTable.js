@@ -166,14 +166,14 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
             <div className="slds-col slds-size--1-of-2"
                   style={{ textAlign: "left" }}>
                           Showing {(page * page_size).toString()} to {' '}
-                                {Math.min((page + 1) * page_size, 1).toString()} {' '}
+                                {((page + 1) * page_size).toString()} {' '}
                           of  {get(perfdatastate, "perfdata.count").toString()} records
             </div>
             <div className="slds-col slds-size--1-of-2">
-                      <button onClick={()=>doPerfRESTFetch(previousPage)}
+                      <button onClick={()=>goPageFromUrl(previousPage)}
                         className="slds-button slds-button--brand"
                         disabled={!previousPage}>Previous</button>
-                      <button onClick={()=>doPerfRESTFetch(nextPage)}
+                      <button onClick={()=>goPageFromUrl(nextPage)}
                         className="slds-button slds-button--brand"
                         disabled={!nextPage}>Next</button>
             </div>
