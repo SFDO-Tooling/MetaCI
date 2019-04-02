@@ -51,10 +51,11 @@ class TestResultManager(models.Manager):
 
         results = OrderedDict()
         for build_flow in build_flows:
-            test_results = build_flow.test_results \
-                .select_related('method') \
-                .select_related('method__testclass') \
+            test_results = (
+                build_flow.test_results.select_related("method")
+                .select_related("method__testclass")
                 .all()
+            )
             for result in test_results:
                 cls = result.method.testclass.name
                 method = result.method.name
@@ -149,29 +150,15 @@ class TestResult(models.Model):
     callouts_used = models.IntegerField(null=True, blank=True)
     callouts_allowed = models.IntegerField(null=True, blank=True)
     callouts_percent = models.IntegerField(null=True, blank=True)
-    test_email_invocations_used = models.IntegerField(
-        null=True, blank=True
-    )
-    test_email_invocations_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_email_invocations_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_email_invocations_used = models.IntegerField(null=True, blank=True)
+    test_email_invocations_allowed = models.IntegerField(null=True, blank=True)
+    test_email_invocations_percent = models.IntegerField(null=True, blank=True)
     test_soql_queries_used = models.IntegerField(null=True, blank=True)
-    test_soql_queries_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_soql_queries_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_soql_queries_allowed = models.IntegerField(null=True, blank=True)
+    test_soql_queries_percent = models.IntegerField(null=True, blank=True)
     test_future_calls_used = models.IntegerField(null=True, blank=True)
-    test_future_calls_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_future_calls_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_future_calls_allowed = models.IntegerField(null=True, blank=True)
+    test_future_calls_percent = models.IntegerField(null=True, blank=True)
     test_dml_rows_used = models.IntegerField(null=True, blank=True)
     test_dml_rows_allowed = models.IntegerField(null=True, blank=True)
     test_dml_rows_percent = models.IntegerField(null=True, blank=True)
@@ -182,38 +169,20 @@ class TestResult(models.Model):
     test_query_rows_allowed = models.IntegerField(null=True, blank=True)
     test_query_rows_percent = models.IntegerField(null=True, blank=True)
     test_dml_statements_used = models.IntegerField(null=True, blank=True)
-    test_dml_statements_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_dml_statements_percent = models.IntegerField(
-        null=True, blank=True
-    )
-    test_mobile_apex_push_used = models.IntegerField(
-        null=True, blank=True
-    )
-    test_mobile_apex_push_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_mobile_apex_push_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_dml_statements_allowed = models.IntegerField(null=True, blank=True)
+    test_dml_statements_percent = models.IntegerField(null=True, blank=True)
+    test_mobile_apex_push_used = models.IntegerField(null=True, blank=True)
+    test_mobile_apex_push_allowed = models.IntegerField(null=True, blank=True)
+    test_mobile_apex_push_percent = models.IntegerField(null=True, blank=True)
     test_heap_size_used = models.IntegerField(null=True, blank=True)
     test_heap_size_allowed = models.IntegerField(null=True, blank=True)
     test_heap_size_percent = models.IntegerField(null=True, blank=True)
     test_sosl_queries_used = models.IntegerField(null=True, blank=True)
-    test_sosl_queries_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_sosl_queries_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_sosl_queries_allowed = models.IntegerField(null=True, blank=True)
+    test_sosl_queries_percent = models.IntegerField(null=True, blank=True)
     test_queueable_jobs_used = models.IntegerField(null=True, blank=True)
-    test_queueable_jobs_allowed = models.IntegerField(
-        null=True, blank=True
-    )
-    test_queueable_jobs_percent = models.IntegerField(
-        null=True, blank=True
-    )
+    test_queueable_jobs_allowed = models.IntegerField(null=True, blank=True)
+    test_queueable_jobs_percent = models.IntegerField(null=True, blank=True)
     test_callouts_used = models.IntegerField(null=True, blank=True)
     test_callouts_allowed = models.IntegerField(null=True, blank=True)
     test_callouts_percent = models.IntegerField(null=True, blank=True)
@@ -274,3 +243,60 @@ class TestResultAsset(models.Model):
         TestResult, related_name="assets", on_delete=models.CASCADE
     )
     asset = models.FileField(upload_to=asset_upload_to)
+
+
+class TestResultPerfSummary(models.Model):
+
+    repo = models.ForeignKey(
+        "repository.Repository",
+        related_name="testresult_perfsummaries",
+        on_delete=models.PROTECT,
+    )
+    branch = models.ForeignKey(
+        "repository.Branch",
+        related_name="testresult_perfsummaries",
+        null=False,
+        blank=False,
+        on_delete=models.PROTECT,
+    )
+
+    flow = models.CharField(max_length=255, null=False, blank=False)
+
+    plan = models.ForeignKey(
+        "plan.Plan",
+        related_name="testresult_perfsummaries",
+        null=False,
+        blank=False,
+        on_delete=models.PROTECT,
+    )
+
+    method = models.ForeignKey(
+        TestMethod,
+        related_name="testresult_perfsummaries",
+        null=False,
+        blank=False,
+        on_delete=models.PROTECT,
+    )
+
+    day = models.DateField(null=False, blank=False)
+
+    duration_average = models.FloatField(null=True, blank=False)
+    duration_slow = models.FloatField(null=True, blank=False)
+    duration_fast = models.FloatField(null=True, blank=False)
+    cpu_usage_average = models.FloatField(null=True, blank=False)
+    cpu_usage_low = models.FloatField(null=True, blank=False)
+    cpu_usage_high = models.FloatField(null=True, blank=False)
+
+    count = models.IntegerField(null=False, blank=False)
+
+    failures = models.IntegerField(null=False, blank=False)
+
+    class Meta:
+        verbose_name = "Test Results Performance Summary"
+        verbose_name_plural = "Test Results Performance Summaries"
+        db_table = "testresult_perfsummary"
+        unique_together = ("repo", "branch", "flow", "plan", "method", "day")
+        indexes = [models.Index(fields=unique_together, name="lookup")]
+
+    def __str__(self):
+        return self.name
