@@ -246,7 +246,6 @@ class TestResultAsset(models.Model):
 
 
 class TestResultPerfSummary(models.Model):
-
     repo = models.ForeignKey(
         "repository.Repository",
         related_name="testresult_perfsummaries",
@@ -297,6 +296,3 @@ class TestResultPerfSummary(models.Model):
         db_table = "testresult_perfsummary"
         unique_together = ("repo", "branch", "flow", "plan", "method", "day")
         indexes = [models.Index(fields=unique_together, name="lookup")]
-
-    def __str__(self):
-        return self.name
