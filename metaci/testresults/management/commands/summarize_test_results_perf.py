@@ -44,7 +44,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("startdate", type=str)
         parser.add_argument("enddate", type=str)
-        parser.add_argument("restart", choices=["restart", "continue"])
+        parser.add_argument("replace", choices=["replace", "continue"])
 
     def handle_date(self, date):
         metrics = self.metrics
@@ -74,28 +74,25 @@ class Command(BaseCommand):
         )
 
         print(method_contexts.query)
+        obsolete_objects = TestResultPerfSummary.objects.filter(day=date)
+        print("To delete", len(obsolete_objects))
+        obsolete_objects.delete()
 
-        total = 0
-        for idx, m in enumerate(method_contexts):
-            obj, created = TestResultPerfSummary.objects.update_or_create(
-                repo_id=m["repo_id"],
-                branch_id=m["branch_id"],
-                plan_id=m["plan_id"],
-                flow=m["flow"],
-                day=m["day"],
-                method_id=m["method_id"],
-                defaults={field: m[field] for field in self.annotations},
-            )
-            total += m["count"]
-            print(date, idx, "/", len(method_contexts), created, total)
+        new_objects = [TestResultPerfSummary(**values) for values in method_contexts]
+        print(len(new_objects))
 
-    def handle(self, startdate, enddate, restart, **options):
-        should_restart = restart == "restart"
-        if not should_restart:
+        print(len(TestResultPerfSummary.objects.bulk_create(new_objects)))
+
+    def handle(self, startdate, enddate, replace, **options):
+        should_replace = replace == "replace"
+        if not should_replace:
             try:
                 last_day_processed = TestResultPerfSummary.objects.order_by("-day")[
                     0
                 ].day
+                # replace last day processed even if mode is not "replace".
+                # often we won't have a way of knowing if the last day is
+                # complete
                 startdate = max(startdate, last_day_processed.strftime(DATE_FORMAT))
             except IndexError:
                 pass
