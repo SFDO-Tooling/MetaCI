@@ -18,8 +18,6 @@ import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
-import BrandBand from '@salesforce/design-system-react/components/brand-band';
-import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 // flowlint  untyped-import:error
 
 import PerfDataTableOptionsUI from './perfTableOptionsUI';
@@ -27,79 +25,26 @@ import PerfDataTableOptionsUI from './perfTableOptionsUI';
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfState,
-         selectPerfUIStatus,
-         selectTestmethodPerfUI,
        } from 'store/perfdata/selectors';
 
-import { QueryParamHelpers, addIds } from './perfTableUtils';
-
-type SpinnerProps = {
-  status: LoadingStatus;
-}
-
-const PerfDataTableSpinner = ({status}) => {
-  console.log("STATUS", status);
-  if(status === "LOADING"){
-    return <Spinner
-      size="small"
-      variant="base"
-      assistiveText={{ label: 'Small spinner' }}
-    />
-  }
-  return null;
-}
+import { QueryParamHelpers } from './perfTableUtils';
+import type { ServerDataFetcher } from './perfPage';
 
 // TODO: Stronger typing in these
-type ReduxProps = {|
-    perfState: PerfDataState,
-    perfUIStatus: LoadingStatus ,
-    testmethodPerfUI: {}
-  |} & typeof actions;
+type Props = {|
+  fetchServerData: ServerDataFetcher,
+  queryparams: QueryParamHelpers,
+  perfState: PerfDataState,
+  items: {}[],
+  |};
 
-
-type SelfProps = {default_columns: string[]};
-
-export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
-                          perfState, testmethodPerfUI,
-                           perfUIStatus,
-                          match, location, history }:
-                              ReduxProps & InitialProps & SelfProps) => {
-    let uiAvailable = perfUIStatus=== "AVAILABLE";
-    let queryparams = new QueryParamHelpers(get(testmethodPerfUI, "defaults", {}));
-    if ((perfUIStatus === "ERROR") ||
-            (perfState && perfState.status === "ERROR")){
-      return <AuthError
-        message="Top Secret! Please ensure you are on the VPN and logged in to MetaCI." />
-    }
-
-    let queryParts = queryparams.get;
+export const PerfDataTable = ({ fetchServerData,
+                              defaults,
+                              items,
+                              perfState,
+                              queryparams} :
+                  Props) => {
     let changeUrl = queryparams.set;
-
-    useEffect(() => {
-      doPerfRESTFetch(null, queryParts());
-      doPerfREST_UI_Fetch();
-      let pathParts = window.location.pathname.split("/");
-
-      /* Special case for getting repo name from URL
-        * path into query params with other filters
-        */
-      changeUrl({repo: pathParts[pathParts.length-2]})
-    }, []);
-
-    var items;
-    if(perfState && perfState.perfdata
-        && Array.isArray(perfState.perfdata.results)){
-      items = addIds(perfState.perfdata.results);
-    }else{
-      items = [];
-    }
-
-    // its okay to pass null or undefined because query-string has reasonable
-    // and useful interpretations of both of them.
-    const fetchServerData = (params?: {[string]: string | string[] | null | typeof undefined}) => {
-      changeUrl({...queryParts(), ...params});
-      doPerfRESTFetch(null, queryParts());
-    }
 
 
     /*
@@ -119,8 +64,8 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       }
     };
 
-    var page = parseInt(queryParts()["page"]||"1") - 1;
-    var custom_page_size = queryParts("page_size");
+    var page = parseInt(queryparams.get("page")||"1") - 1;
+    var custom_page_size = queryparams.get("page_size");
     var page_size = custom_page_size ? parseInt(custom_page_size) :
                         get(perfState, "perfdata.results.length") || -1;
     var previousPage:string = get(perfState, "perfdata.previous") || "";
@@ -162,7 +107,7 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       }else{
         // these are really just for looks. If there are no items, they
         // don't matter. TODO: use included_columns for this instead.
-        let default_columns = queryParts("include_fields") ||
+        let default_columns = queryparams.getList("include_fields") ||
                               ["Method Name", "Duration"];
         return zip(default_columns, default_columns)
       }
@@ -174,13 +119,14 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
           {
             let isSorted:bool = false, sortDirection:string|null = null;
 
-            if(queryParts()["o"]===name){
+            if (queryparams.get("o")===name){
               isSorted = true;
               sortDirection = "asc";
-            }else if(queryParts()["o"]==="-"+name){
+            } else if (queryparams.get("o")==="-"+name){
               isSorted = true;
               sortDirection = "desc";
             }
+            console.log("Name", name, columns());
 
             return  <DataTableColumn
                           key={name}
@@ -217,39 +163,20 @@ export const UnwrappedPerfDataTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     </div>
   };
 
-const AuthError = ({message}:{message:string}) => {
-  return <BrandBand
-      id="brand-band-lightning-blue"
-      className="slds-p-around_small"
-      theme="lightning-blue"
-      style={{textAlign:"center",
-        backgroundImage: "url(" + BrandBannerBackground + "), linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)"}}
-    >
-      <div className="slds-box slds-theme_default"
-        style={{marginLeft:"auto", marginRight:"auto"}}>
-        <h3 className="slds-text-heading_label slds-truncate">{message}</h3>
-      </div>
-      <div>
-        <img src="https://i.gifer.com/G36W.gif" />
-      </div>
-  </BrandBand>
+type SpinnerProps = {
+  status: LoadingStatus;
 }
 
-const select = (appState: AppState) => {
-  return {
-    perfState: selectPerfState(appState),
-    testmethodPerfUI: selectTestmethodPerfUI(appState),
-    perfUIStatus: selectPerfUIStatus(appState)
-  }};
+const PerfDataTableSpinner = ({ status }) => {
+  console.log("STATUS", status);
+  if (status === "LOADING") {
+    return <Spinner
+      size="small"
+      variant="base"
+      assistiveText={{ label: 'Small spinner' }}
+    />
+  }
+  return null;
+}
 
-
-const actions = {
-  doPerfRESTFetch: (url, queryparts) => perfRESTFetch(url || "/api/testmethod_perf?", queryparts),
-  doPerfREST_UI_Fetch: perfREST_UI_Fetch,
-};
-
-const WrappedPerfDataTable: React.ComponentType<{}> = withRouter(connect(select, actions)(
-  UnwrappedPerfDataTable,
-));
-
-export default WrappedPerfDataTable;
+export default PerfDataTable;
