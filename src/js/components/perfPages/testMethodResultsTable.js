@@ -1,3 +1,5 @@
+// This file is not finished and is currently unused.
+
 import * as React from 'react';
 
 import { connect } from 'react-redux';
@@ -9,14 +11,14 @@ import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfState,
     selectPerfUIStatus,
-    selectTestmethodResultUI,
+    selectTestmethodResultsUI,
   } from 'store/perfdata/selectors';
 
 import { UnwrappedPerfPage as PerfPage } from "./perfPage";
 
 const DEFAULT_COLUMNS = ["Date", "Method Name", "Duration"];
 
-export const TestMethodResultsTable = (
+export const TestMethodResultsTable: typeof PerfPage = (
     {doPerfRESTFetch, doPerfREST_UI_Fetch,
     perfdatastate, perfdataUIstate,
     match, location, history }) => {
