@@ -21,7 +21,7 @@ import type { UIData } from '../../api/testmethod_perf_UI';
 import { assertUIData } from '../../api/testmethod_perf_UI';
 
 
-export const perfRESTFetch = (url : string, params?: {}):
+export const perfRESTFetch = (url: string, params?: {}):
         ThunkAction => (dispatch, getState, { apiFetch }) => {
   dispatch({ type: 'PERF_DATA_LOADING', payload: url });
   if(params){
