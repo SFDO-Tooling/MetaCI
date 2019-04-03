@@ -11,7 +11,6 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import type { AppState } from 'store';
 import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
-import type { InitialProps } from 'components/utils';
 import { t } from 'i18next';
 // flowlint  untyped-import:off
 import Spinner from '@salesforce/design-system-react/components/spinner';
@@ -28,9 +27,8 @@ import { selectPerfState,
        } from 'store/perfdata/selectors';
 
 import { QueryParamHelpers } from './perfTableUtils';
+import { Trans } from 'react-i18next';
 import type { ServerDataFetcher } from './perfPage';
-
-// TODO: Stronger typing in these
 type Props = {|
   fetchServerData: ServerDataFetcher,
   queryparams: QueryParamHelpers,
@@ -45,7 +43,6 @@ export const PerfDataTable = ({ fetchServerData,
                               queryparams} :
                   Props) => {
     let changeUrl = queryparams.set;
-
 
     /*
      * Extract the page from the server-generated URL and ensure it is
@@ -66,8 +63,9 @@ export const PerfDataTable = ({ fetchServerData,
 
     var page = parseInt(queryparams.get("page")||"1") - 1;
     var custom_page_size = queryparams.get("page_size");
+  var count = get(perfState, "perfdata.count") || -1;
     var page_size = custom_page_size ? parseInt(custom_page_size) :
-                        get(perfState, "perfdata.results.length") || -1;
+              get(perfState, "perfdata.results.length") || null;
     var previousPage:string = get(perfState, "perfdata.previous") || "";
     var nextPage:string = get(perfState, "perfdata.next") || "";
 
@@ -79,9 +77,9 @@ export const PerfDataTable = ({ fetchServerData,
           <>
             <div className="slds-col slds-size--1-of-2"
                   style={{ textAlign: "left" }}>
-                          Showing {(page * page_size).toString()} to {' '}
-                                {((page + 1) * page_size).toString()} {' '}
-                          of  {get(perfState, "perfdata.count").toString()} records
+                    {t("Showing")} {(page * page_size).toString()}{t(' to ')}
+                                {Math.min((page + 1) * page_size, count)}
+                    {t(' of ')}{count.toString()} {t('records')}
             </div>
             <div className="slds-col slds-size--1-of-2">
                       <button onClick={()=>goPageFromUrl(previousPage)}
@@ -106,7 +104,7 @@ export const PerfDataTable = ({ fetchServerData,
         return columnPairs;
       }else{
         // these are really just for looks. If there are no items, they
-        // don't matter. TODO: use included_columns for this instead.
+        // don't matter.
         let default_columns = queryparams.getList("include_fields") ||
                               ["Method Name", "Duration"];
         return zip(default_columns, default_columns)
@@ -126,7 +124,6 @@ export const PerfDataTable = ({ fetchServerData,
               isSorted = true;
               sortDirection = "desc";
             }
-            console.log("Name", name, columns());
 
             return  <DataTableColumn
                           key={name}
@@ -168,7 +165,6 @@ type SpinnerProps = {
 }
 
 const PerfDataTableSpinner = ({ status }) => {
-  console.log("STATUS", status);
   if (status === "LOADING") {
     return <Spinner
       size="small"

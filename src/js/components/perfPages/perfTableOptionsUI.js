@@ -27,16 +27,16 @@ import TextInput from './formFields/textInput';
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfUIStatus, selectBuildflowFiltersUI } from 'store/perfdata/selectors';
-import type { FilterDefinition } from '../../api/testmethod_perf_UI';
+import type { FilterDefinition, TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 
-
+import { Trans } from 'react-i18next';
 
 type Props = {
     fetchServerData : (params?: {
         [string]: ?(string | Array<string>)
       }) => void,
       queryparams: (name?: string) => string,
-      testmethodPerfUI: {},
+      testMethodPerfUI: TestMethodPerfUI,
 }
 
 type ReduxProps = {
@@ -48,65 +48,45 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
             { fetchServerData, /* A function to trigger fetch */
                 queryparams,    /* A function to get queryparams or defaults */
                 perfUIStatus, /* Has data been loaded yet? */
-                testmethodPerfUI, /* UI Configuration data */
+                testMethodPerfUI, /* UI Configuration data */
                 buildflow_filters, /* List of filters from server */
             } : Props & ReduxProps)  => {
     // is the UI data available? If so, populate the fields. If not,
     // just show the accordion.
     let uiAvailable = perfUIStatus == "AVAILABLE";
+    if (uiAvailable && !testMethodPerfUI) throw new Error("Store error");
+
     // state for managing the accordion. Maybe a single Map would be better.
     const [perfPanelColumnsExpanded, setPerfPanelColumnsExpanded] = useState(false);
     const [perfPanelFiltersExpanded, setPerfPanelFiltersExpanded] = useState(false);
     const [perfPanelOptionsExpanded, setPerfPanelOptionsExpanded] = useState(false);
     const [perfPanelDatesExpanded, setPerfPanelDatesExpanded] = useState(false);
 
-    // Get the initial value for a form field either from the URL OR
-    // from a default value specified on the server (if either is available)
-    //
-    // Possible that this duplicates work already being done in
-    // queryparams.get.
-    const getInitialValue = (param: string) :
-                                            string | null => {
-        var stringOrList: string | string[] = queryparams.get(param);
-        if(Array.isArray(stringOrList)) return stringOrList[0];
-        else return stringOrList;
-
-        // There was more complicated code here for special-casing
-        // method_name. If you need to revive it, its in commit
-        // ca3d2b8a9
-    }
-
-    const getInitialValueList = (param: string):
-        string[] | null => {
-
-        var stringOrList: string | string[] = queryparams.get(param);
-        if (Array.isArray(stringOrList)) return stringOrList;
-        else return [stringOrList];
-    }
-
-    const gatherFilters = (perfdataUIstate): Field[] => {
+    // collect filters to display in filters accordion
+    const gatherFilters = (perfdataUIstate: typeof testMethodPerfUI): Field[] => {
+        console.log(perfdataUIstate);
         let filters: Field[] = [];
         if(!uiAvailable) return filters;
 
-        const testmethod_perf_filters = get(perfdataUIstate,
-                            "filters");
+        const testmethod_perf_filters = perfdataUIstate.filters;
+        console.log(buildflow_filters, testmethod_perf_filters);
         const all_filters = [...buildflow_filters, ...testmethod_perf_filters];
         if(all_filters.length){
             all_filters.map((filterDef)=>{
-                if(get(filterDef, "choices")){
+                if (filterDef.field_type == "ChoiceField"){
                     filters.push(
                         ChoiceField(filterDef,
-                            getInitialValue(filterDef.name),
+                            queryparams.get(filterDef.name),
                             fetchServerData));
                 } else if (filterDef.field_type == "DecimalField") {
                     filters.push(
                         DecimalField(filterDef,
-                            getInitialValue(filterDef.name),
+                            queryparams.get(filterDef.name),
                             fetchServerData));
                 } else if (filterDef.field_type == "CharField") {
                     filters.push(
                         CharField(filterDef,
-                            getInitialValue(filterDef.name),
+                            queryparams.get(filterDef.name),
                             fetchServerData));
                 }
             });
@@ -114,40 +94,46 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
         return filters;
     }
 
-    const filters = uiAvailable ? gatherFilters(testmethodPerfUI) : [];
+    // get the filter configurations from the server if they have
+    // arrived
+    const filters = uiAvailable ? gatherFilters(testMethodPerfUI) : [];
 
     const exclude = ["o", "include_fields", "build_flows_limit"];
     let filterPanelFilters = filters.filter(
         (filter)=>!exclude.includes(filter.name))
     var filterPanelCount = filterPanelFilters.filter((f) =>
         f.currentValue).length;
+    var dateRangeCount:number = [queryparams.get("daterange_after"),
+        queryparams.get("daterange_before")].filter((x)=>x).length;
 
     return (
         <Accordion key="perfUIMainAccordion">
             <AccordionPanel id="perfPanelColumns"
                 key="perfPanelColumns"
-                summary="Columns"
+                summary={t("Columns")}
                 expanded={perfPanelColumnsExpanded}
                 onTogglePanel={() => setPerfPanelColumnsExpanded(!perfPanelColumnsExpanded)}>
                 {uiAvailable &&
                 <FieldPicker key="PerfDataTableFieldPicker"
-                    choices={get(testmethodPerfUI, "includable_fields")}
-                    defaultValue={getInitialValueList("include_fields")}
+                    choices={get(testMethodPerfUI, "includable_fields")}
+                    defaultValue={queryparams.getList("include_fields")}
                     onChange={(data) => fetchServerData({include_fields:data})} />}
             </AccordionPanel>
             <AccordionPanel id="perfPanelFilters"
                 key="perfPanelFilters"
-                summary={"Filters" + (filterPanelCount > 0 ? " (" + filterPanelCount + ")" : "")}
+                summary={t("Filters") + (filterPanelCount > 0 ? " (" + filterPanelCount + ")" : "")}
                 expanded={perfPanelFiltersExpanded}
                 onTogglePanel={() => { setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded) }}>
                 {uiAvailable &&
                     <AllFilters filters={filterPanelFilters} fetchServerData={fetchServerData}/>
                 }
             </AccordionPanel>
-            {/* TODO: highlight whether date has been set or not */ }
             <AccordionPanel id="perfPaneDates"
                 key="perfPaneDates"
-                summary={"Date Range"}
+                summary={t("Date Range") +
+                    (dateRangeCount ?
+                        " (" + dateRangeCount.toString() + ")"
+                        :"")}
                 expanded={perfPanelDatesExpanded}
                 onTogglePanel={() => { setPerfPanelDatesExpanded(!perfPanelDatesExpanded) }}>
                 {uiAvailable &&
@@ -155,24 +141,24 @@ let PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = (
                     onChange={(name, data) => fetchServerData({ [name]: data })}
                     startName="daterange_after"
                     endName="daterange_before"
-                    startValue={getInitialValue("daterange_after")}
-                    endValue={getInitialValue("daterange_before")} />
+                    startValue={queryparams.get("daterange_after")}
+                    endValue={queryparams.get("daterange_before")} />
                 }
             </AccordionPanel>
             <AccordionPanel id="perfPanelOptions"
                 key="perfPanelOptions"
-                summary="Options"
+                summary={t("Options")}
                 expanded={perfPanelOptionsExpanded}
                 onTogglePanel={() => { setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded) }}>
                 {uiAvailable &&
                 <React.Fragment>
-                    <TextInput defaultValue={getInitialValue("page_size")}
-                        label="Page Size"
+                    <TextInput defaultValue={queryparams.get("page_size")}
+                        label={t("Page Size")}
                         tooltip="Number of rows to fetch per page"
                         onValueUpdate={(value: string) => fetchServerData({ page_size: value })} />
                     <TextInput
-                        defaultValue={getInitialValue("build_flows_limit")}
-                        label="Build Flows Limit"
+                        defaultValue={queryparams.get("build_flows_limit")}
+                        label={t("Build Flows Limit")}
                         tooltip="Max number of build_flows to aggregate (performance optimization)"
                         onValueUpdate={(value: string) => fetchServerData({ build_flows_limit: value })} />
                 </React.Fragment>
@@ -192,11 +178,7 @@ const AllFilters = ({ filters, fetchServerData }) => {
         </div>
 }
 
-type FieldOption = {
-    id: string,
-    label: string
-}
-
+// interface representing fields that can be shown on the screen.
 type Field = {
     name: string,
     currentValue?: mixed,

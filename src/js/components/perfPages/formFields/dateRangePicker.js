@@ -1,12 +1,12 @@
 // @flow
- /* flowlint
-  *   untyped-import:off
-  */
 
 import * as React from 'react';
+import { useState } from 'react';
+
+// flowlint  untyped-import:off
 import Datepicker from '@salesforce/design-system-react/components/date-picker';
 import Button from '@salesforce/design-system-react/components/button';
-import { useState } from 'react';
+// flowlint  untyped-import:error
 
 type SLDSDateOption = {
     formattedDate : string,
@@ -38,6 +38,7 @@ const dateRangePicker = ({onChange, startName, endName, startValue, endValue} :
     let endValueOrNull = null;
     if(startValue) startValueOrNull = new Date(startValue);
     if(endValue) startValueOrNull = new Date(endValue);
+    console.log(startDateKey);
     return (
         <React.Fragment>
             <Datepicker

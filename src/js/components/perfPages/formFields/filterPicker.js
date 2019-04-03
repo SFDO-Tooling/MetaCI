@@ -8,8 +8,6 @@ import { connect } from 'react-redux';
 
 import { withRouter } from 'react-router';
 
-import get from 'lodash/get';
-
 import queryString from 'query-string';
 
 // flowlint  untyped-import:off

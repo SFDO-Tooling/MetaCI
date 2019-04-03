@@ -11,7 +11,6 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import type { AppState } from 'store';
 import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
-import type { InitialProps } from 'components/utils';
 import { t } from 'i18next';
 
 // flowlint  untyped-import:off
@@ -29,8 +28,10 @@ import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfState,
          selectPerfUIStatus,
-         selectTestmethodPerfUI,
+         selectTestMethodPerfUI,
        } from 'store/perfdata/selectors';
+
+import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 
 import { QueryParamHelpers, addIds } from './perfTableUtils';
 
@@ -38,6 +39,7 @@ import PerfDataTable from './perfDataTable';
 
 const DEFAULT_COLUMNS = ["Method Name", "Duration"];
 
+import type { Match, RouterHistory } from 'react-router-dom';
 export type ServerDataFetcher =
       (params?: { [string]: string | string[] | null | typeof undefined })
         => void
@@ -46,66 +48,68 @@ export type ServerDataFetcher =
 type ReduxProps = {|
     perfState: PerfDataState,
     perfUIStatus: LoadingStatus,
-    testmethodPerfUI: {},
+    testMethodPerfUI: TestMethodPerfUI,
     doPerfRESTFetch: ({})=>null,
     doPerfREST_UI_Fetch: typeof perfREST_UI_Fetch,
 
 
   |} & typeof actions;
 
+export type RouterProps = {| match: Match, history: RouterHistory |};
 
 type SelfProps = {default_columns: string[]};
 
 export const UnwrappedPerfPage = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
-                          perfState, testmethodPerfUI,
+                          perfState, testMethodPerfUI,
                            perfUIStatus,
                           match, location, history }:
-                              ReduxProps & InitialProps & SelfProps) => {
+              ReduxProps & RouterProps & SelfProps) => {
     let uiAvailable = perfUIStatus=== "AVAILABLE";
-    let queryparams = new QueryParamHelpers(get(testmethodPerfUI, "defaults", {}));
+    let queryparams = new QueryParamHelpers(get(testMethodPerfUI, "defaults", {}));
+  if (uiAvailable && !testMethodPerfUI) throw new Error("Store error");
 
-    // These shortcuts are not very helpful. Replace them.
-    let queryParts = queryparams.getAll;
-    let changeUrl = queryparams.set;
-
+    // If there was an error loading at this point, it is very likely to
+    // be an authentication error.
+    // TODO: Parse exception to be sure.
     if ((perfUIStatus === "ERROR") ||
         (perfState && perfState.status === "ERROR")) {
         return <AuthError
-          message="Top Secret! Please ensure you are on the VPN and logged in to MetaCI."
+          message={t("Top Secret! Please ensure you are on the VPN and logged in to MetaCI.")}
           />
     }
 
+    // Fetch the data: both UI configuration and also actual data results
     useEffect(() => {
-      doPerfRESTFetch(queryParts());
+      doPerfRESTFetch(queryparams.getAll());
       doPerfREST_UI_Fetch();
       let pathParts = window.location.pathname.split("/");
 
       /* Special case for getting repo name from URL
         * path into query params with other filters
         */
-      changeUrl({repo: pathParts[pathParts.length-2]})
+      queryparams.set({repo: pathParts[pathParts.length-2]})
     }, []);
 
-    var items;
+    var results;
     if(perfState && perfState.perfdata
         && Array.isArray(perfState.perfdata.results)){
-      items = addIds(perfState.perfdata.results);
+      results = addIds(perfState.perfdata.results);
     }else{
-      items = [];
+      results = [];
     }
 
-    // its okay to pass null or undefined because query-string has reasonable
-    // and useful interpretations of both of them.
     const fetchServerData: ServerDataFetcher = (params) => {
-      changeUrl({...queryParts(), ...params});
-      doPerfRESTFetch(queryParts());
+      // its okay to pass null or undefined because query-string has reasonable
+      // and useful interpretations of both of them.
+        queryparams.set({ ...queryparams.getAll(), ...params});
+      doPerfRESTFetch(queryparams.getAll());
     }
 
     return <div key="perfContainerDiv">
       <PerfTableOptionsUI
           fetchServerData={fetchServerData}
           uiAvailable={uiAvailable}
-          testmethodPerfUI={testmethodPerfUI}
+          testMethodPerfUI={testMethodPerfUI}
           queryparams={queryparams}
           key="thePerfAccordian"/>
 			<div style={{ position: 'relative'}}>
@@ -113,7 +117,7 @@ export const UnwrappedPerfPage = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
           fetchServerData={fetchServerData}
           perfState={perfState}
           queryparams={queryparams}
-          items={items}/>
+          items={results}/>
       </div>
     </div>
 };
@@ -141,7 +145,7 @@ const AuthError = ({ message }: { message: string }) => {
 const select = (appState: AppState) => {
   return {
     perfState: selectPerfState(appState),
-    testmethodPerfUI: selectTestmethodPerfUI(appState),
+    testMethodPerfUI: selectTestMethodPerfUI(appState),
     perfUIStatus: selectPerfUIStatus(appState)
   }};
 

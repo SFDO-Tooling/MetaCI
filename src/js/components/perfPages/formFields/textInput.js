@@ -1,9 +1,9 @@
 // @flow
 
 import * as React from 'react';
+import { useState } from 'react';
 
 import debounce from 'lodash/debounce';
-import { useState } from 'react';
 // flowlint  untyped-import:off
 import Input from '@salesforce/design-system-react/components/input';
 import Tooltip from '@salesforce/design-system-react/components/tooltip';

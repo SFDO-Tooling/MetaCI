@@ -21,11 +21,7 @@ import utilitySprite from '@salesforce-ux/design-system/assets/icons/utility-spr
 
 import init_i18n from './i18n';
 
-import AuthError from 'components/authError';
 import ErrorBoundary from 'components/error';
-import Footer from 'components/footer';
-import FourOhFour from 'components/404';
-import Header from 'components/header';
 import PerfPage from 'components/perfPages/perfPage';
 import TestMethodsResultsTable from 'components/perfPages/testMethodResultsTable';
 import getApiFetch from 'utils/api';

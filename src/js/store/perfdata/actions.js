@@ -17,8 +17,8 @@ type UIDataError = { type: 'UI_DATA_ERROR', payload: string };
 export type PerfDataAction = PerfDataAvailableAction | PerfDataLoadingAction | PerfDataError;
 export type UIDataAction = UIDataAvailableAction | UIDataLoadingAction | UIDataError;
 
-import type { UIData } from '../../api/testmethod_perf_UI';
-import { assertUIData } from '../../api/testmethod_perf_UI';
+import type { UIData } from '../../api/testmethod_perf_UI_JSON_schema';
+import { assertUIData } from '../../api/testmethod_perf_UI_JSON_schema';
 
 
 export const perfRESTFetch = (url: string, params?: {}):

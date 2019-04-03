@@ -8,8 +8,6 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import type { RouterHistory } from 'react-router';
 
-import get from 'lodash/get';
-
 import queryString from 'query-string';
 
 // flowlint  untyped-import:off
@@ -21,7 +19,6 @@ import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfState, selectPerfUIStatus } from 'store/perfdata/selectors';
 import type { AppState } from 'store';
-import type { InitialProps } from 'components/utils';
 
 type Props = {
   onChange: (string[]) => void,

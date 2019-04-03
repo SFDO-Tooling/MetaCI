@@ -11,7 +11,7 @@ import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 
 import { selectPerfState,
     selectPerfUIStatus,
-    selectTestmethodResultsUI,
+    selectTestMethodResultsUI,
   } from 'store/perfdata/selectors';
 
 import { UnwrappedPerfPage as PerfPage } from "./perfPage";
