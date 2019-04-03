@@ -29,6 +29,7 @@ const dateRangePicker = ({onChange, startName, endName, startValue, endValue} :
 
     // changing the key reliably clears the input,
     // so these variables are part of an input clearing hack
+    // https://github.com/salesforce/design-system-react/issues/1868#issue-425218055
     let [startDateKey, setStartDateKey] = useState(1);
     let [endDateKey, setEndDateKey] = useState(-1);
 
