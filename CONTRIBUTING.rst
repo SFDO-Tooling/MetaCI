@@ -109,6 +109,10 @@ To use the Django admin UI, you'll need to create a superuser::
 
     ./manage.py createsuperuser
 
+You'll want to login to your user through the Admin URL rather
+than through the visible login button.
+
+    http://localhost:8000/admin/login
 
 Running the server
 ------------------
