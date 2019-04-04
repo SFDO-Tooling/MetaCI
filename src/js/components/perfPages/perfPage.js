@@ -137,7 +137,10 @@ const AuthError = ({ message }: { message: string }) => {
       <h3 className="slds-text-heading_label slds-truncate">{message}</h3>
     </div>
     <div>
-      <img src="https://i.gifer.com/G36W.gif" />
+      <video onEnded={(evt) => { evt.target.load(); evt.target.play()}}
+                          loop autoPlay muted playsInline>
+        <source src="/static/images/NoNoNo.mp4" itemProp="contentUrl" type="video/mp4"/>
+      </video>
     </div>
   </BrandBand>
 }
