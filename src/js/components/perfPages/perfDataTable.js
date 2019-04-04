@@ -63,7 +63,7 @@ export const PerfDataTable = ({ fetchServerData,
 
     var page = parseInt(queryparams.get("page")||"1") - 1;
     var custom_page_size = queryparams.get("page_size");
-  var count = get(perfState, "perfdata.count") || -1;
+    var count = get(perfState, "perfdata.count") || -1;
     var page_size = custom_page_size ? parseInt(custom_page_size) :
               get(perfState, "perfdata.results.length") || null;
     var previousPage:string = get(perfState, "perfdata.previous") || "";
