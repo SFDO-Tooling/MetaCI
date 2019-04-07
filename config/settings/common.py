@@ -245,7 +245,7 @@ ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
 ADMIN_AREA_PREFIX = ADMIN_URL
 
 # URLs other than ADMIN_AREA which should be secure
-RESTRICTED_PREFIXES = env("RESTRICTED_PREFIXES", default=["api/"], cast=url_prefix_list)
+RESTRICTED_PREFIXES = env("RESTRICTED_PREFIXES", default=[], cast=url_prefix_list)
 
 ADMIN_API_ALLOWED_SUBNETS = env(
     "ADMIN_API_ALLOWED_SUBNETS",
@@ -346,7 +346,10 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 100,
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAdminUser",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "metaci.permissions.IsOnSecureNetwork",
+        "rest_framework.permissions.IsAdminUser",
+    ),
 }
 
 # log_request_id settings
