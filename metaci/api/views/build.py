@@ -19,7 +19,7 @@ class BuildViewSet(viewsets.ModelViewSet):
 
     serializer_class = BuildSerializer
     queryset = Build.objects.all()
-    filter_class = BuildFilter
+    filterset_class = BuildFilter
     pagination_class = RestrictedPagination
 
 
@@ -30,7 +30,7 @@ class BuildFlowViewSet(viewsets.ModelViewSet):
 
     serializer_class = BuildFlowSerializer
     queryset = BuildFlow.objects.all()
-    filter_class = BuildFlowFilter
+    filterset_class = BuildFlowFilter
 
 
 class RebuildViewSet(viewsets.ModelViewSet):
@@ -40,4 +40,4 @@ class RebuildViewSet(viewsets.ModelViewSet):
 
     serializer_class = RebuildSerializer
     queryset = Rebuild.objects.all()
-    filter_class = RebuildFilter
+    filterset_class = RebuildFilter

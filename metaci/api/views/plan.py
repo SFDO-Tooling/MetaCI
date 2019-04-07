@@ -15,7 +15,7 @@ class PlanViewSet(viewsets.ModelViewSet):
 
     serializer_class = PlanSerializer
     queryset = Plan.objects.all()
-    filter_class = PlanFilter
+    filterset_class = PlanFilter
 
 
 class PlanRepositoryViewSet(viewsets.ModelViewSet):
@@ -25,4 +25,4 @@ class PlanRepositoryViewSet(viewsets.ModelViewSet):
 
     serializer_class = PlanRepositorySerializer
     queryset = PlanRepository.objects.all()
-    filter_class = PlanRepositoryFilter
+    filterset_class = PlanRepositoryFilter

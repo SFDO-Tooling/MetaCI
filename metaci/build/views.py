@@ -22,7 +22,7 @@ def build_list(request):
     repo = request.GET.get('repo')
     if repo:
         query['repo__name'] = repo
-    build_filter, builds = view_queryset(request, query, request.GET.get('status'), filter_class=BuildFilter)
+    build_filter, builds = view_queryset(request, query, request.GET.get('status'), filterset_class=BuildFilter)
     context = {
         'filter': build_filter,
         'builds': builds,
