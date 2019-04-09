@@ -1,13 +1,22 @@
+import json
+
+from guardian.shortcuts import assign_perm
+
 from metaci.conftest import (
     StaffSuperuserFactory,
     UserFactory,
     RepositoryFactory,
     BranchFactory,
     PlanFactory,
+    BuildFactory,
     BuildFlowFactory,
+    PlanRepositoryFactory,
+    TestResultFactory,
 )
 
 from metaci.api import urls
+
+from metaci.plan.models import PlanRepository
 
 from rest_framework.test import APIClient, APITestCase
 
@@ -22,13 +31,21 @@ class TestAPISecurity(APITestCase):
         super().setUpClass()
         p1 = PlanFactory(name="Plan1")
         p2 = PlanFactory(name="Plan2")
-        r1 = RepositoryFactory(name="Repo1")
-        r2 = RepositoryFactory(name="Repo2")
-        b1 = BranchFactory(name="Branch1", repo=r1)
-        b2 = BranchFactory(name="Branch2", repo=r2)
-        bf1 = BuildFlowFactory(flow="Flow1")
-        bf2 = BuildFlowFactory(flow="Flow2")
-        (p1, p2, r1, r2, b1, b2, bf1, bf2)  # shut up linter
+        r1 = RepositoryFactory(name="PublicRepo")
+        r2 = RepositoryFactory(name="PrivateRepo")
+        PlanRepositoryFactory(plan=p1, repo=r1)
+        pr2 = PlanRepositoryFactory(plan=p2, repo=r2)
+        BranchFactory(name="Branch1", repo=r1)
+        BranchFactory(name="Branch2", repo=r2)
+        private_build = BuildFactory(repo=r2, plan=p2, planrepo=pr2)
+        private_bff = BuildFlowFactory(build=private_build)
+        public_build = BuildFactory(repo=r2, plan=p2, planrepo=pr2)
+        public_bff = BuildFlowFactory(build=public_build)
+        BuildFlowFactory(flow="Flow2")
+        TestResultFactory(build_flow=private_bff)
+        TestResultFactory(build_flow=private_bff)
+        TestResultFactory(build_flow=public_bff)
+        TestResultFactory(build_flow=public_bff)
 
     @classmethod
     def make_user_and_client(cls, user=None):
@@ -45,7 +62,6 @@ class TestAPISecurity(APITestCase):
 
     def test_api_schema_protection_normal_user(self):
         client, user = self.make_user_and_client(UserFactory())
-        client.force_authenticate(user)
         response = client.get("/api/")
         self.debugmsg(response)
         self.assertEqual(response.status_code, 403)
@@ -54,14 +70,12 @@ class TestAPISecurity(APITestCase):
         superuser = StaffSuperuserFactory()
         client, u = self.make_user_and_client(superuser)
         assert superuser == u
-        client.force_authenticate(user=superuser)
         assert client.login(username=u.username, password="foobar")
         assert client.get("/api/").status_code == 200
         assert client.get("/api/branches/").status_code == 200
 
     def test_public_access(self):
         client, user = self.make_user_and_client(UserFactory())
-        client.force_authenticate(user)
         response = client.get("/api/testmethod_perf_UI/")
         self.debugmsg(response)
         self.assertEqual(response.status_code, 200)
@@ -69,7 +83,6 @@ class TestAPISecurity(APITestCase):
     def test_api_methods_IP_view_protection_normal_user(self):
         client, user = self.make_user_and_client()
         superclient, superduper = self.make_user_and_client(StaffSuperuserFactory())
-        superclient.force_authenticate(user=superduper)
 
         ip = common.ipv4_networks
         BAD_ADDR = "192.250.0.8"
@@ -89,7 +102,11 @@ class TestAPISecurity(APITestCase):
                         "/api/" + callable_url, REMOTE_ADDR=addr
                     ).status_code
 
-                is_public = callable_url == "testmethod_perf_UI/"
+                is_public = callable_url in [
+                    "testmethod_perf_UI/",
+                    "testmethod_perf/",
+                    "testmethod_results/",
+                ]
                 if is_public:
                     # IP address and user role don't matter for public URL
                     self.assertEqual(get(client, BAD_ADDR), 200)
@@ -113,3 +130,37 @@ class TestAPISecurity(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("application/json", response["content-type"])
         self.assertIn(bytes("/api/", "ascii"), response.content)
+
+    def test_object_level_permissions_public_repo(self):
+        client, user = self.make_user_and_client()
+        response = client.get("/api/testmethod_perf/")
+        js = json.loads(response.content)
+        assert "count" in js, js
+        self.assertEquals(js["count"], 0)
+
+    # todo: combine this test with the one below somehow
+    def test_object_level_permission_denial_private_repo(self):
+        client, user = self.make_user_and_client()
+        r1 = PlanRepository.objects.filter(repo__name="PrivateRepo")
+        assert len(r1) == 1
+        # print(assign_perm("plan.view_stats", user, r1[0]))
+        response = client.get("/api/testmethod_perf/")
+        js = json.loads(response.content)
+        assert "count" in js, js
+        self.assertEqual(js["count"], 0)
+
+    def test_object_level_permission_success_private_repo(self):
+        client, user = self.make_user_and_client()
+        r1 = PlanRepository.objects.filter(repo__name="PrivateRepo")
+        assert len(r1) == 1
+        print(assign_perm("plan.view_stats", user, r1[0]))
+        response = client.get("/api/testmethod_perf/")
+        js = json.loads(response.content)
+        self.assertGreater(js["count"], 0)
+
+    def test_superuser_success_private_repo(self):
+        client, superuser = self.make_user_and_client(StaffSuperuserFactory())
+        response = client.get("/api/testmethod_perf/")
+        js = json.loads(response.content)
+        assert "count" in js, js
+        self.assertGreater(js["count"], 2)

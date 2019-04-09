@@ -11,10 +11,10 @@ from django_filters.widgets import DateRangeWidget
 
 from postgres_stats.aggregates import Percentile
 
-from rest_framework import generics, exceptions, viewsets, pagination
+from rest_framework import generics, exceptions, viewsets, pagination, permissions
 
 from metaci.testresults.models import TestResult
-from metaci.build.models import BuildFlow
+from metaci.build.models import BuildFlow, Build
 from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
 from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
@@ -265,6 +265,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     filterset_class = TestMethodPerfFilterSet
     pagination_class = StandardResultsSetPagination
     ordering_param_name = filterset_class.ordering_param_name
+    permission_classes = (permissions.AllowAny,)
 
     # example URLs:
     # http://localhost:8000/api/testmethod_perf/?repo=gem&plan=Release%20Test&method_name=testCreateNegative
@@ -289,6 +290,10 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         build_flows = BuildFlowFilterSet(
             self.request.GET, build_flows, really_filter=True
         ).qs
+
+        build_flows = build_flows.filter(
+            build__in=Build.objects.for_user(self.request.user, "plan.view_stats")
+        )
 
         return build_flows.order_by("-time_end")[0:build_flows_limit]
 
