@@ -292,7 +292,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         ).qs
 
         build_flows = build_flows.filter(
-            build__in=Build.objects.for_user(self.request.user, "plan.view_stats")
+            build__in=Build.objects.for_user(self.request.user)
         )
 
         return build_flows.order_by("-time_end")[0:build_flows_limit]

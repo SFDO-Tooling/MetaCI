@@ -136,14 +136,12 @@ class TestAPISecurity(APITestCase):
         response = client.get("/api/testmethod_perf/")
         js = json.loads(response.content)
         assert "count" in js, js
-        self.assertEquals(js["count"], 0)
+        self.assertEqual(js["count"], 0)
 
-    # todo: combine this test with the one below somehow
     def test_object_level_permission_denial_private_repo(self):
         client, user = self.make_user_and_client()
         r1 = PlanRepository.objects.filter(repo__name="PrivateRepo")
         assert len(r1) == 1
-        # print(assign_perm("plan.view_stats", user, r1[0]))
         response = client.get("/api/testmethod_perf/")
         js = json.loads(response.content)
         assert "count" in js, js
@@ -153,7 +151,7 @@ class TestAPISecurity(APITestCase):
         client, user = self.make_user_and_client()
         r1 = PlanRepository.objects.filter(repo__name="PrivateRepo")
         assert len(r1) == 1
-        print(assign_perm("plan.view_stats", user, r1[0]))
+        assign_perm("plan.view_builds", user, r1[0])
         response = client.get("/api/testmethod_perf/")
         js = json.loads(response.content)
         self.assertGreater(js["count"], 0)
