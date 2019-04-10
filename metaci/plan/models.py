@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import re
 import yaml
 
+from django.apps import apps
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
@@ -187,7 +188,6 @@ class PlanRepository(models.Model):
             ("rebuild_builds", "Rebuild Builds"),
             ("qa_builds", "QA Builds"),
             ("org_login", "Login to Org"),
-            ("view_stats", "View aggregate and individual method metrics"),
         )
 
     def __str__(self):
