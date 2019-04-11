@@ -39,6 +39,9 @@ class BranchFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Branch
 
+    name = factory.fuzzy.FuzzyChoice(["master", "branch1", "branch2"])
+    repo = factory.SubFactory(RepositoryFactory)
+
 
 class BuildFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -46,6 +49,7 @@ class BuildFactory(factory.django.DjangoModelFactory):
 
     plan = factory.SubFactory(PlanFactory)
     repo = factory.SubFactory(RepositoryFactory)
+    branch = factory.LazyAttribute(lambda build: BranchFactory(repo=build.repo))
 
 
 class BuildFlowFactory(factory.django.DjangoModelFactory):
