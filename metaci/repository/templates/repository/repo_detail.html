@@ -61,7 +61,7 @@
             <div class="slds-truncate" title="{{ build.id }}"><a href="/builds/{{ build.id }}">{{ build.id }}</a></div>
           </th>
           <td data-label="Status">
-            <div class="slds-truncate slds-badge {% if build.get_status == 'fail' %} slds-theme--error {% elif build.get_status == 'error' %} slds-theme--warning {% elif build.get_status == 'success' %}slds-theme--success{% endif %}" title="{{ build.get_status }}">{{ build.get_status }}</div>
+            <div class="slds-truncate slds-badge {% if build.get_status == 'fail' %} slds-theme--error {% elif build.get_status == 'error' %} slds-theme--offline {% elif build.get_status == 'success' %}slds-theme--success{% endif %}" title="{{ build.get_status }}">{{ build.get_status }}</div>
           </td>
           <td data-label="Plan">
             <div class="slds-truncate" title="{{ build.plan }}">{{ build.plan }}</div>
