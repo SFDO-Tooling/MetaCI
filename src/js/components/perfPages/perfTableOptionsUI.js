@@ -1,37 +1,32 @@
+/* eslint-disable react/display-name */
+/* eslint-disable no-use-before-define */
 // @flow
-
-import * as React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import type { ComponentType, Node } from 'react';
 import get from 'lodash/get';
-import zip from 'lodash/zip';
-import partition from 'lodash/partition';
-import chunk from 'lodash/chunk';
-import queryString from 'query-string';
 import { connect } from 'react-redux';
-import type { AppState } from 'store';
-import is, { type AssertionType } from 'sarcastic';
-
+import is from 'sarcastic';
 // flowlint  untyped-import:off
 import { t } from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
 // flowlint untyped-type-import:error
 
-import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
-import {
-  selectPerfUIStatus,
-  selectBuildflowFiltersUI,
-} from 'store/perfdata/selectors';
-import type {
-  FilterDefinition,
-  TestMethodPerfUI,
-} from 'api/testmethod_perf_UI_JSON_schema';
-import { Trans } from 'react-i18next';
-
 import FieldPicker from './formFields/fieldPicker';
 import FilterPicker from './formFields/filterPicker';
 import DateRangePicker from './formFields/dateRangePicker';
 import TextInput from './formFields/textInput';
+
+import type {
+  FilterDefinition,
+  TestMethodPerfUI,
+} from 'api/testmethod_perf_UI_JSON_schema';
+import {
+  selectPerfUIStatus,
+  selectBuildflowFiltersUI,
+} from 'store/perfdata/selectors';
+import { perfREST_UI_Fetch } from 'store/perfdata/actions';
+import type { AppState } from 'store';
 
 type Props = {
   fetchServerData: (params?: {
@@ -46,7 +41,7 @@ type ReduxProps = {
   buildflow_filters: FilterDefinition[],
 };
 
-const PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = ({
+const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
   fetchServerData /* A function to trigger fetch */,
   queryparams /* A function to get queryparams or defaults */,
   perfUIStatus /* Has data been loaded yet? */,
@@ -55,7 +50,7 @@ const PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = ({
 }: Props & ReduxProps) => {
   // is the UI data available? If so, populate the fields. If not,
   // just show the accordion.
-  const uiAvailable = perfUIStatus == 'AVAILABLE';
+  const uiAvailable = perfUIStatus === 'AVAILABLE';
   if (uiAvailable && !testMethodPerfUI) {
     throw new Error('Store error');
   }
@@ -74,40 +69,45 @@ const PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = ({
 
   // collect filters to display in filters accordion
   const gatherFilters = (perfdataUIstate: typeof testMethodPerfUI): Field[] => {
-    console.log(perfdataUIstate);
     const filters: Field[] = [];
     if (!uiAvailable) {
       return filters;
     }
 
     const testmethod_perf_filters = perfdataUIstate.filters;
-    console.log(buildflow_filters, testmethod_perf_filters);
     const all_filters = [...buildflow_filters, ...testmethod_perf_filters];
     if (all_filters.length) {
-      all_filters.map(filterDef => {
-        if (filterDef.field_type == 'ChoiceField') {
+      all_filters.forEach(filterDef => {
+        if (filterDef.field_type === 'ChoiceField') {
           filters.push(
-            ChoiceField(
+            choiceField(
               filterDef,
               queryparams.get(filterDef.name),
               fetchServerData,
             ),
           );
-        } else if (filterDef.field_type == 'DecimalField') {
+        } else if (filterDef.field_type === 'DecimalField') {
           filters.push(
-            DecimalField(
+            decimalField(
               filterDef,
               queryparams.get(filterDef.name),
               fetchServerData,
             ),
           );
-        } else if (filterDef.field_type == 'CharField') {
+        } else if (filterDef.field_type === 'CharField') {
           filters.push(
-            CharField(
+            charField(
               filterDef,
               queryparams.get(filterDef.name),
               fetchServerData,
             ),
+          );
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(
+            'Unknown filterDef type',
+            filterDef.field_type,
+            filterDef,
           );
         }
       });
@@ -224,7 +224,7 @@ const PerfTableOptionsUI: React.ComponentType<Props & ReduxProps> = ({
   );
 };
 
-const AllFilters = ({ filters, fetchServerData }) => (
+const AllFilters = ({ filters }: { filters: Field[] }) => (
   <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
     {filters.map(filter => (
       <div key={filter.name} className="slds-col slds-size_3-of-12">
@@ -238,10 +238,10 @@ const AllFilters = ({ filters, fetchServerData }) => (
 type Field = {
   name: string,
   currentValue?: mixed,
-  render: () => React.Node,
+  render: () => Node,
 };
 
-const ChoiceField = (
+const choiceField = (
   filter: FilterDefinition,
   currentValue?: string | null,
   fetchServerData,
@@ -272,7 +272,7 @@ const ChoiceField = (
   };
 };
 
-const CharField = (
+const charField = (
   filter: FilterDefinition,
   currentValue?: string | null,
   fetchServerData,
@@ -289,7 +289,7 @@ const CharField = (
   ),
 });
 
-const DecimalField = CharField;
+const decimalField = charField;
 
 const select = (appState: AppState) => ({
   perfUIStatus: selectPerfUIStatus(appState),
@@ -300,7 +300,7 @@ const actions = {
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 
-const PerfTableOptionsUIConnected: React.ComponentType<{}> = connect(
+const PerfTableOptionsUIConnected: ComponentType<{}> = connect(
   select,
   actions,
 )(PerfTableOptionsUI);

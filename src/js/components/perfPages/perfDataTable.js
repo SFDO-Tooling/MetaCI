@@ -1,29 +1,20 @@
 // @flow
-
 import * as React from 'react';
-import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import zip from 'lodash/zip';
 import queryString from 'query-string';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import type { AppState } from 'store';
-import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 import { t } from 'i18next';
 // flowlint  untyped-import:off
 import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
-import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
 // flowlint  untyped-import:error
 
-import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
-import { selectPerfState } from 'store/perfdata/selectors';
-import { Trans } from 'react-i18next';
-
 import { QueryParamHelpers } from './perfTableUtils';
-import PerfDataTableOptionsUI from './perfTableOptionsUI';
 import type { ServerDataFetcher } from './perfPage';
+
+import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
+
 type Props = {|
   fetchServerData: ServerDataFetcher,
   queryparams: QueryParamHelpers,
@@ -31,15 +22,12 @@ type Props = {|
   items: {}[],
 |};
 
-export const PerfDataTable = ({
+const PerfDataTable = ({
   fetchServerData,
-  defaults,
   items,
   perfState,
   queryparams,
 }: Props) => {
-  const changeUrl = queryparams.set;
-
   /*
    * Extract the page from the server-generated URL and ensure it is
    * browser URL before fetching it.
@@ -57,11 +45,11 @@ export const PerfDataTable = ({
     }
   };
 
-  const page = parseInt(queryparams.get('page') || '1') - 1;
+  const page = parseInt(queryparams.get('page') || '1', 10) - 1;
   const custom_page_size = queryparams.get('page_size');
   const count = get(perfState, 'perfdata.count') || -1;
   const page_size = custom_page_size
-    ? parseInt(custom_page_size)
+    ? parseInt(custom_page_size, 10)
     : get(perfState, 'perfdata.results.length') || null;
   const previousPage: string = get(perfState, 'perfdata.previous') || '';
   const nextPage: string = get(perfState, 'perfdata.next') || '';
@@ -103,9 +91,8 @@ export const PerfDataTable = ({
   );
 
   const columns = () => {
-    let columns;
     if (items.length > 0) {
-      const columnIds = Object.keys(items[0]).filter(item => item != 'id');
+      const columnIds = Object.keys(items[0]).filter(item => item !== 'id');
       const columnPairs = columnIds.map(id => [id, id]);
       return columnPairs;
     }
@@ -118,7 +105,7 @@ export const PerfDataTable = ({
     return zip(default_columns, default_columns);
   };
 
-  const PerfDataColumns = () =>
+  const perfDataColumns = () =>
     columns().map(([name, label]) => {
       let isSorted: boolean = false;
       let sortDirection: string | null = null;
@@ -143,7 +130,7 @@ export const PerfDataTable = ({
       );
     });
 
-  const doSort = (sortColumn, ...rest) => {
+  const doSort = (sortColumn, ..._rest) => {
     let sortProperty = sortColumn.property;
     const sortDirection = sortColumn.sortDirection;
 
@@ -162,7 +149,7 @@ export const PerfDataTable = ({
           onSort={doSort}
           id="perfDataTable"
         >
-          {PerfDataColumns()}
+          {perfDataColumns()}
         </DataTable>
         <PerfDataTableFooter />
       </div>
@@ -174,7 +161,7 @@ type SpinnerProps = {
   status: LoadingStatus,
 };
 
-const PerfDataTableSpinner = ({ status }) => {
+const PerfDataTableSpinner = ({ status }: SpinnerProps) => {
   if (status === 'LOADING') {
     return (
       <Spinner

@@ -2,7 +2,10 @@
 
 import queryString from 'query-string';
 import type { ThunkAction } from 'redux-thunk';
+
 import type { PerfData } from 'store/perfdata/reducer';
+import type { UIData } from 'api/testmethod_perf_UI_JSON_schema';
+import { assertUIData } from 'api/testmethod_perf_UI_JSON_schema';
 
 type PerfDataAvailableAction = {
   type: 'PERF_DATA_AVAILABLE',
@@ -24,12 +27,9 @@ export type UIDataAction =
   | UIDataLoadingAction
   | UIDataError;
 
-import type { UIData } from '../../api/testmethod_perf_UI_JSON_schema';
-import { assertUIData } from '../../api/testmethod_perf_UI_JSON_schema';
-
 export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (
   dispatch,
-  getState,
+  _getState,
   { apiFetch },
 ) => {
   dispatch({ type: 'PERF_DATA_LOADING', payload: url });
@@ -43,19 +43,17 @@ export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (
       if (!payload.error) {
         return dispatch({ type: 'PERF_DATA_AVAILABLE', payload });
       }
-      // TODO: PERF_DATA_ERROR is not handled yet
       return dispatch({ type: 'PERF_DATA_ERROR', payload });
     }
-    alert('Missing payload from server');
+    return undefined;
   });
 };
 
 export const perfREST_UI_Fetch = (): ThunkAction => (
   dispatch,
-  getState,
+  _getState,
   { apiFetch },
 ) => {
-  // todo use reverse
   const url = '/api/testmethod_perf_UI';
   dispatch({ type: 'UI_DATA_LOADING', payload: url });
   apiFetch(url, {
@@ -64,10 +62,12 @@ export const perfREST_UI_Fetch = (): ThunkAction => (
     if (payload) {
       if (!payload.error) {
         const typedPayload: UIData = assertUIData(payload);
-        return dispatch({ type: 'UI_DATA_AVAILABLE', payload });
+        return dispatch({ type: 'UI_DATA_AVAILABLE', payload: typedPayload });
       }
       return dispatch({ type: 'UI_DATA_ERROR', payload });
     }
-    alert('Missing payload from server');
+    // eslint-disable-next-line no-console
+    console.log('Missing payload from server');
+    return undefined;
   });
 };

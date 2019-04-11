@@ -1,25 +1,21 @@
 // @flow
 
-import * as React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import type { ComponentType } from 'react';
 import get from 'lodash/get';
-import zip from 'lodash/zip';
-import queryString from 'query-string';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import type { AppState } from 'store';
-import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 import { t } from 'i18next';
-
-// flowlint  untyped-import:off
-import Spinner from '@salesforce/design-system-react/components/spinner';
-import DataTable from '@salesforce/design-system-react/components/data-table';
-import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
-import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
 import BrandBand from '@salesforce/design-system-react/components/brand-band';
 import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
-// flowlint  untyped-import:error
+import type { Match, RouterHistory } from 'react-router-dom';
 
+import { QueryParamHelpers, addIds } from './perfTableUtils';
+import PerfDataTable from './perfDataTable';
+import PerfTableOptionsUI from './perfTableOptionsUI';
+
+import type { AppState } from 'store';
+import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 import {
   selectPerfState,
@@ -28,17 +24,11 @@ import {
 } from 'store/perfdata/selectors';
 import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 
-import { QueryParamHelpers, addIds } from './perfTableUtils';
-import PerfDataTable from './perfDataTable';
-
-const DEFAULT_COLUMNS = ['Method Name', 'Duration'];
-
-import type { Match, RouterHistory } from 'react-router-dom';
-
-import PerfTableOptionsUI from './perfTableOptionsUI';
 export type ServerDataFetcher = (params?: {
   [string]: string | string[] | null | typeof undefined,
 }) => void;
+
+const gradient = 'linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)';
 
 // TODO: Stronger typing in these
 type ReduxProps = {|
@@ -47,6 +37,7 @@ type ReduxProps = {|
   testMethodPerfUI: TestMethodPerfUI,
   doPerfRESTFetch: ({}) => null,
   doPerfREST_UI_Fetch: typeof perfREST_UI_Fetch,
+  // eslint-disable-next-line no-use-before-define
 |} & typeof actions;
 
 export type RouterProps = {| match: Match, history: RouterHistory |};
@@ -59,9 +50,6 @@ export const UnwrappedPerfPage = ({
   perfState,
   testMethodPerfUI,
   perfUIStatus,
-  match,
-  location,
-  history,
 }: ReduxProps & RouterProps & SelfProps) => {
   const uiAvailable = perfUIStatus === 'AVAILABLE';
   const queryparams = new QueryParamHelpers(
@@ -142,7 +130,7 @@ const AuthError = ({ message }: { message: string }) => (
     theme="lightning-blue"
     style={{
       textAlign: 'center',
-      backgroundImage: `url(${BrandBannerBackground}), linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)`,
+      backgroundImage: `url(${BrandBannerBackground}), ${gradient}`,
     }}
   >
     <div
@@ -184,7 +172,7 @@ const actions = {
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 
-const WrappedPerfPage: React.ComponentType<{}> = withRouter(
+const WrappedPerfPage: ComponentType<{}> = withRouter(
   connect(
     select,
     actions,

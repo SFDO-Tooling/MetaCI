@@ -1,20 +1,6 @@
 // @flow
-
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
-import type { RouterHistory } from 'react-router';
-import queryString from 'query-string';
-
-// flowlint  untyped-import:off
 import Combobox from '@salesforce/design-system-react/components/combobox';
-import Icon from '@salesforce/design-system-react/components/icon';
-// flowlint  untyped-import:error
-
-import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
-import { selectPerfState, selectPerfUIStatus } from 'store/perfdata/selectors';
-import type { AppState } from 'store';
 
 type Props = {
   onChange: (string[]) => void,
@@ -30,7 +16,7 @@ type SLDSChoiceOption = {
 type Options = SLDSChoiceOption[];
 
 const FieldPicker = ({ onChange, choices, defaultValue }: Props) => {
-  console.assert(choices && choices.length, 'Choices is empty', choices);
+  console.assert(choices && choices.length, 'Choices is empty', choices); // eslint-disable-line no-console
   const options = choices.map(pair => ({ id: pair[0], label: pair[1] }));
 
   const onUpdate = (selections: Options) => {
@@ -43,10 +29,10 @@ const FieldPicker = ({ onChange, choices, defaultValue }: Props) => {
       id="combobox-readonly-multiple"
       events={{
         onRequestRemoveSelectedOption: (
-          event: mixed,
+          _event: mixed,
           data: { selection: Options },
         ) => onUpdate(data.selection),
-        onSelect: (event: mixed, data: { selection: Options }) =>
+        onSelect: (_event: mixed, data: { selection: Options }) =>
           onUpdate(data.selection),
       }}
       labels={{
@@ -54,7 +40,7 @@ const FieldPicker = ({ onChange, choices, defaultValue }: Props) => {
       }}
       multiple
       options={options}
-      selection={getSelectionListFromDefaultValue(options, defaultValue)}
+      selection={getSelectionListFromDefaultValue(options, defaultValue)} // eslint-disable-line no-use-before-define
       value=""
       variant="readonly"
     />
@@ -62,13 +48,14 @@ const FieldPicker = ({ onChange, choices, defaultValue }: Props) => {
 };
 
 const getSelectionListFromDefaultValue = (options, defaultValue) => {
-  if (defaultValue != null) {
+  if (defaultValue !== null && defaultValue !== undefined) {
     // this is for flow's benefit
     const indexOf = defaultValue.indexOf.bind(defaultValue);
 
     const included_options = options.filter(option => indexOf(option.id) >= 0);
     return included_options;
   }
+  return undefined;
 };
 
 export default FieldPicker;
