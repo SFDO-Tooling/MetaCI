@@ -2,12 +2,9 @@
 
 import * as React from 'react';
 import { Trans } from 'react-i18next';
-
 import routes from 'utils/routes';
 import { logError } from 'utils/logging';
-
 import Illustration from '@salesforce/design-system-react/components/illustration';
-
 import svgPath from 'images/desert.svg';
 
 type Props = { children: React.Node };

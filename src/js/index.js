@@ -7,7 +7,6 @@ import IconSettings from '@salesforce/design-system-react/components/icon-settin
 import logger from 'redux-logger';
 import settings from '@salesforce/design-system-react/components/settings';
 import thunk from 'redux-thunk';
-import { withRouter } from 'react-router';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
@@ -28,10 +27,7 @@ import getApiFetch from 'utils/api';
 import reducer from 'store';
 import { logError } from 'utils/logging';
 import { login } from 'store/user/actions';
-import { routePatterns } from 'utils/routes';
 
-
-const SF_logo = require('images/salesforce-logo.png');
 
 const App = () => (
   <DocumentTitle title={t('Meta CI')}>
@@ -103,12 +99,6 @@ init_i18n(() => {
 
     // Set App element (used for react-SLDS modals)
     settings.setAppElement(el);
-
-    // TODO: Delete this in April, 2019.
-    // if( window.location.pathname.match(/\/repos\/.*\/perf/)>=0){
-    //   let pathParts = window.location.pathname.split("/");
-    //   changeUrl({repo: pathParts[pathParts.length-2]})
-    // }
 
     ReactDOM.render(
       <Provider store={appStore}>

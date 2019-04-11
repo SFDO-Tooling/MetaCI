@@ -1,7 +1,6 @@
 // @flow
 
 import type { ThunkAction } from 'redux-thunk';
-
 import type { User } from 'store/user/reducer';
 
 type LoginAction = { type: 'USER_LOGGED_IN', payload: User };
