@@ -1,20 +1,22 @@
 // This file is not finished and is currently unused.
+/*
+import * as React from "react";
+import { connect } from "react-redux";
 
-import * as React from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import type { AppState } from 'store';
-import type { InitialProps } from 'components/utils';
-import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
+import { withRouter } from "react-router-dom";
+
+import type { AppState } from "store";
+import type { InitialProps } from "components/utils";
+import { perfRESTFetch, perfREST_UI_Fetch } from "store/perfdata/actions";
 import {
   selectPerfState,
   selectPerfUIStatus,
-  selectTestMethodResultsUI,
-} from 'store/perfdata/selectors';
+  selectTestMethodResultsUI
+} from "store/perfdata/selectors";
 
-import { UnwrappedPerfPage as PerfPage } from './perfPage';
+import { UnwrappedPerfPage as PerfPage } from "./perfPage";
 
-const DEFAULT_COLUMNS = ['Date', 'Method Name', 'Duration'];
+const DEFAULT_COLUMNS = ["Date", "Method Name", "Duration"];
 
 export const TestMethodResultsTable: typeof PerfPage = ({
   doPerfRESTFetch,
@@ -23,7 +25,7 @@ export const TestMethodResultsTable: typeof PerfPage = ({
   perfdataUIstate,
   match,
   location,
-  history,
+  history
 }) =>
   PerfPage({
     doPerfRESTFetch,
@@ -33,25 +35,26 @@ export const TestMethodResultsTable: typeof PerfPage = ({
     match,
     location,
     history,
-    default_columns: DEFAULT_COLUMNS,
+    default_columns: DEFAULT_COLUMNS
   });
 
 const select = (appState: AppState) => ({
   perfdatastate: selectPerfState(appState),
-  perfdataUIstate: selectPerf_UI_State(appState),
+  perfdataUIstate: selectPerf_UI_State(appState)
 });
 
 const actions = {
   doPerfRESTFetch: (url, queryparts) =>
-    perfRESTFetch(url || '/api/testmethod_results?', queryparts),
-  doPerfREST_UI_Fetch: perfREST_UI_Fetch,
+    perfRESTFetch(url || "/api/testmethod_results?", queryparts),
+  doPerfREST_UI_Fetch: perfREST_UI_Fetch
 };
 
 const WrappedTestMethodResultsTable: React.ComponentType<{}> = withRouter(
   connect(
     select,
-    actions,
-  )(TestMethodResultsTable),
+    actions
+  )(TestMethodResultsTable)
 );
 
 export default WrappedTestMethodResultsTable;
+*/

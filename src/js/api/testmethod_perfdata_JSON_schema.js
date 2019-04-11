@@ -11,6 +11,5 @@ const PerfDataShape = is.shape({
 
 export type PerfData = AssertionType<typeof PerfDataShape>;
 
-export function assertPerfData(data: mixed): PerfData {
-  return is(data, PerfDataShape, 'UIData from server: ');
-}
+export const assertPerfData = (data: mixed): PerfData =>
+  is(data, PerfDataShape, 'UIData from server: ');

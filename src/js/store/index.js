@@ -2,6 +2,7 @@
 
 import { combineReducers } from 'redux';
 import type { CombinedReducer } from 'redux';
+
 import userReducer from 'store/user/reducer';
 import { perfDataReducer, perfDataUIReducer } from 'store/perfdata/reducer';
 import type { User } from 'store/user/reducer';

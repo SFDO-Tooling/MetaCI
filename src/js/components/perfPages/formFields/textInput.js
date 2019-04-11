@@ -1,7 +1,5 @@
 // @flow
-
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import debounce from 'lodash/debounce';
 // flowlint  untyped-import:off
 import Input from '@salesforce/design-system-react/components/input';
@@ -23,7 +21,7 @@ const TextInput = ({ label, defaultValue, onValueUpdate, tooltip }: Props) => {
   );
 
   // store in state so debouncer can have internal history
-  const [debouncedChangeUrl, setDebouncer] = useState(
+  const [debouncedChangeUrl, _] = useState(
     // wrap in obj to prevent magic useState behaviour
     { debouncedCallback },
   );
@@ -37,7 +35,7 @@ const TextInput = ({ label, defaultValue, onValueUpdate, tooltip }: Props) => {
         tooltip && <Tooltip align="top left" content={tooltip} />
       }
       defaultValue={defaultValue}
-      onChange={(event: null, { value }: { value: string }) =>
+      onChange={(_event: null, { value }: { value: string }) =>
         debouncedCallback(value)
       }
     />

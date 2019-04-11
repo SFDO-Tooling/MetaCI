@@ -1,7 +1,7 @@
 // @flow
 
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import type { Node } from 'react';
 // flowlint  untyped-import:off
 import Combobox from '@salesforce/design-system-react/components/combobox';
 import Icon from '@salesforce/design-system-react/components/icon';
@@ -20,7 +20,7 @@ const FilterPicker = ({
   field_name,
   value,
   onSelect,
-}: Props): React.Node => {
+}: Props): Node => {
   const selected = value ? choices.filter(choice => choice.id === value) : [];
   const [inputValue, setInputValue] = useState('');
   const [selection, setSelection] = useState(selected);
@@ -29,15 +29,15 @@ const FilterPicker = ({
       id="combobox-inline-single"
       placeholder={field_name}
       events={{
-        onChange: (event, { newValue }) => {
+        onChange: (_event, { newValue }) => {
           setInputValue(newValue);
         },
-        onRequestRemoveSelectedOption: (event, data) => {
+        onRequestRemoveSelectedOption: (_event, data) => {
           setInputValue('');
           setSelection(data.selection);
           onSelect();
         },
-        onSubmit: (event, { newValue }) => {
+        onSubmit: (_event, { newValue }) => {
           setInputValue('');
           setSelection([
             ...selection,
@@ -53,7 +53,7 @@ const FilterPicker = ({
             },
           ]);
         },
-        onSelect: (event, data) => {
+        onSelect: (_event, data) => {
           if (onSelect && data) {
             onSelect(data.selection[0].id);
           }

@@ -1,8 +1,5 @@
 // @flow
-
-import * as React from 'react';
-import { useState } from 'react';
-
+import React, { useState } from 'react';
 // flowlint  untyped-import:off
 import Datepicker from '@salesforce/design-system-react/components/date-picker';
 import Button from '@salesforce/design-system-react/components/button';
@@ -54,13 +51,12 @@ const dateRangePicker = ({
   if (endValue) {
     startValueOrNull = new Date(endValue);
   }
-  console.log(startDateKey);
   return (
     <React.Fragment>
       <Datepicker
         key={startDateKey}
         value={startValueOrNull}
-        onChange={(event: mixed, data) => {
+        onChange={(_event: mixed, data) => {
           localOnChange(startName, data);
         }}
       />
@@ -77,7 +73,7 @@ const dateRangePicker = ({
       <Datepicker
         key={endDateKey}
         value={endValueOrNull}
-        onChange={(event: mixed, data) => {
+        onChange={(_event: mixed, data) => {
           localOnChange(endName, data);
         }}
       />

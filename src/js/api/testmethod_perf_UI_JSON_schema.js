@@ -29,6 +29,5 @@ export type UIData = AssertionType<typeof UIDataShape>;
 export type FilterDefinition = AssertionType<typeof FilterDefinitionShape>;
 export type TestMethodPerfUI = AssertionType<typeof TestMethodPerfUIShape>;
 
-export function assertUIData(data: mixed): UIData {
-  return is(data, UIDataShape, 'UIData from server: ');
-}
+export const assertUIData = (data: mixed): UIData =>
+  is(data, UIDataShape, 'UIData from server: ');

@@ -22,12 +22,11 @@ import init_i18n from './i18n';
 
 import ErrorBoundary from 'components/error';
 import PerfPage from 'components/perfPages/perfPage';
-import TestMethodsResultsTable from 'components/perfPages/testMethodResultsTable';
+// import TestMethodsResultsTable from 'components/perfPages/testMethodResultsTable';
 import getApiFetch from 'utils/api';
 import reducer from 'store';
 import { logError } from 'utils/logging';
 import { login } from 'store/user/actions';
-
 
 const App = () => (
   <DocumentTitle title={t('Meta CI')}>
@@ -42,8 +41,11 @@ const App = () => (
         >
           <ErrorBoundary>
             <Switch>
-             <Route path="/repos/:owner/:repo/perf" component={PerfPage} />
-             <Route path="/repos/:owner/:repo/tests" component={TestMethodsResultsTable} />
+              <Route path="/repos/:owner/:repo/perf" component={PerfPage} />
+              {/* <Route
+                path="/repos/:owner/:repo/tests"
+                component={TestMethodsResultsTable}
+              /> */}
             </Switch>
           </ErrorBoundary>
         </div>
