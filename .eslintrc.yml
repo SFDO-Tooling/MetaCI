@@ -3,12 +3,17 @@
 root: true
 parser: babel-eslint
 parserOptions:
-  sourceType: script
+  sourceType: module
   ecmaVersion: 2015
   allowImportExportEverywhere: true
+  ecmaFeatures:
+    impliedStrict: true
+    jsx: true
 env:
   es6: true
-  node: true
+  browser: true
+  commonjs: true
+  node: false
 settings:
   import/resolver:
     webpack:
@@ -22,8 +27,8 @@ settings:
             - static
             - node_modules
   react:
-    version: 'detect'
-    flowVersion: '0.94.0'
+    version: "detect"
+    flowVersion: "0.94.0"
 plugins:
   - react
   - prettier
@@ -100,7 +105,7 @@ rules:
     - terms:
         - todo
         - fixme
-        - '@@@'
+        - "@@@"
   no-with: 2
   prefer-promise-reject-errors:
     - 2
@@ -144,7 +149,7 @@ rules:
     - 2
     - ignoreComments: true
       ignoreStrings: true
-      ignorePattern: '^import .*'
+      ignorePattern: "^import .*"
   new-cap:
     - 2
     - capIsNewExceptions:
