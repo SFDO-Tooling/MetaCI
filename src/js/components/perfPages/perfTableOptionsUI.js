@@ -263,7 +263,7 @@ const choiceField = (
         key={filter.name}
         field_name={filter.name}
         choices={choices_as_objs}
-        value={currentValue}
+        currentValue={currentValue}
         onSelect={value => {
           fetchServerData({ [filter.name]: value });
         }}

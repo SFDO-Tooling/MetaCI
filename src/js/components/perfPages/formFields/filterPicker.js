@@ -11,17 +11,19 @@ import comboboxFilterAndLimit from '@salesforce/design-system-react/components/c
 type Props = {
   choices: { id: string }[],
   field_name: string,
-  value?: string | null,
+  currentValue?: string | null,
   onSelect: mixed => void,
 };
 
 const FilterPicker = ({
   choices,
   field_name,
-  value,
+  currentValue,
   onSelect,
 }: Props): Node => {
-  const selected = value ? choices.filter(choice => choice.id === value) : [];
+  const selected = currentValue
+    ? choices.filter(choice => choice.id === currentValue)
+    : [];
   const [inputValue, setInputValue] = useState('');
   const [selection, setSelection] = useState(selected);
   return (
@@ -29,20 +31,20 @@ const FilterPicker = ({
       id="combobox-inline-single"
       placeholder={field_name}
       events={{
-        onChange: (_event, { newValue }) => {
-          setInputValue(newValue);
+        onChange: (_event, { value }) => {
+          setInputValue(value);
         },
         onRequestRemoveSelectedOption: (_event, data) => {
           setInputValue('');
           setSelection(data.selection);
           onSelect();
         },
-        onSubmit: (_event, { newValue }) => {
+        onSubmit: (_event, { value }) => {
           setInputValue('');
           setSelection([
             ...selection,
             {
-              label: newValue,
+              label: value,
               icon: (
                 <Icon
                   assistiveText={{ label: 'Account' }}
