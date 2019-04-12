@@ -80,6 +80,7 @@ LOCAL_APPS = (
     "metaci.repository.apps.RepositoryConfig",
     "metaci.testresults.apps.TestResultsConfig",
     "metaci.release.apps.ReleaseConfig",
+    "metaci.db.apps.DBUtils",
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
