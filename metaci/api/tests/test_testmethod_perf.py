@@ -1,4 +1,4 @@
-from metaci.conftest import StaffSuperuserFactory, TestResultFactory
+from metaci.conftest import StaffSuperuserFactory, TestResultFactory, PlanFactory
 import pytest
 
 from urllib.parse import urlencode
@@ -28,7 +28,8 @@ class _TestingHelpers:
         self.debugmsg("QueryParams", params)
         return reverse("testmethod_perf-list") + "?" + params
 
-    def find_by(self, fieldname, objs, value):
+    def find_first(self, fieldname, objs, value):
+        """ Find objects in JSON result sets that match a value """
         if type(objs) == dict:
             objs = objs.get("results", objs)
         return next((x for x in objs if x[fieldname] == value), None)
@@ -72,18 +73,18 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
     def test_counting(self):
         """Test counting of method invocations"""
         objs = self.get_api_results(include_fields="count")
-        self.assertEqual(self.find_by("method_name", objs, "Foo")["count"], 2)
-        self.assertEqual(self.find_by("method_name", objs, "Bar")["count"], 2)
+        self.assertEqual(self.find_first("method_name", objs, "Foo")["count"], 2)
+        self.assertEqual(self.find_first("method_name", objs, "Bar")["count"], 2)
 
     def test_averaging(self):
         """Test averaging of methods"""
         objs = self.get_api_results(include_fields="duration_average")
 
         self.assertEqual(
-            self.find_by("method_name", objs, "Foo")["duration_average"], 6
+            self.find_first("method_name", objs, "Foo")["duration_average"], 6
         )
         self.assertEqual(
-            self.find_by("method_name", objs, "Bar")["duration_average"], 4
+            self.find_first("method_name", objs, "Bar")["duration_average"], 4
         )
 
     def test_all_included_fields(self):
@@ -133,7 +134,9 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         _outlier = TestResultFactory(method__name="Foo", duration=11)  # noqa
         rows = self.get_api_results(include_fields=["duration_slow", "count"])
 
-        self.assertEqual(self.find_by("method_name", rows, "Foo")["duration_slow"], 10)
+        self.assertEqual(
+            self.find_first("method_name", rows, "Foo")["duration_slow"], 10
+        )
 
     def test_duration_fast(self):
         """Test counting high durations"""
@@ -142,7 +145,9 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         _outlier = TestResultFactory(method__name="Foo", duration=1)  # noqa
         rows = self.get_api_results(include_fields=["duration_slow", "count"])
 
-        self.assertEqual(self.find_by("method_name", rows, "Foo")["duration_slow"], 2)
+        self.assertEqual(
+            self.find_first("method_name", rows, "Foo")["duration_slow"], 2
+        )
 
     def test_count_failures(self):
         """Test counting failed tests"""
@@ -151,28 +156,34 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         rows = self.get_api_results(include_fields=["failures", "success_percentage"])
 
         self.assertEqual(
-            self.find_by("method_name", rows, "FailingTest")["failures"], 15
+            self.find_first("method_name", rows, "FailingTest")["failures"], 15
         )
         self.assertEqual(
-            self.find_by("method_name", rows, "FailingTest")["success_percentage"],
+            self.find_first("method_name", rows, "FailingTest")["success_percentage"],
             (10 / 25) * 100,
         )
 
     def test_split_by_repo(self):
         """Test Splitting on repo"""
         self.insert_identical_tests(
-            method_name="HedaTest", count=15, build_flow__build__repo__name="HEDA"
+            method_name="HedaTest",
+            count=15,
+            build_flow__build__planrepo__repo__name="HEDA",
         )
         self.insert_identical_tests(
-            method_name="NPSPTest", count=20, build_flow__build__repo__name="Cumulus"
+            method_name="NPSPTest",
+            count=20,
+            build_flow__build__planrepo__repo__name="Cumulus",
         )
         rows = self.get_api_results(include_fields=["count", "repo"])
 
-        self.assertEqual(self.find_by("method_name", rows, "HedaTest")["count"], 15)
-        self.assertEqual(self.find_by("method_name", rows, "HedaTest")["repo"], "HEDA")
-        self.assertEqual(self.find_by("method_name", rows, "NPSPTest")["count"], 20)
+        self.assertEqual(self.find_first("method_name", rows, "HedaTest")["count"], 15)
         self.assertEqual(
-            self.find_by("method_name", rows, "NPSPTest")["repo"], "Cumulus"
+            self.find_first("method_name", rows, "HedaTest")["repo"], "HEDA"
+        )
+        self.assertEqual(self.find_first("method_name", rows, "NPSPTest")["count"], 20)
+        self.assertEqual(
+            self.find_first("method_name", rows, "NPSPTest")["repo"], "Cumulus"
         )
 
     def test_split_by_flow(self):
@@ -183,13 +194,15 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.insert_identical_tests(
             method_name="HedaTest", count=20, build_flow__flow="ci_beta"
         )
-        rows = self.get_api_results(include_fields=["count", "flow"])
+        rows = self.get_api_results(
+            include_fields=["count", "flow"], method_name="HedaTest"
+        )
 
         for row in rows:
             self.assertIn(row["flow"], ["ci_feature", "ci_beta", "rida"])
 
-        self.assertEqual(self.find_by("flow", rows, "ci_feature")["count"], 15)
-        self.assertEqual(self.find_by("flow", rows, "ci_beta")["count"], 20)
+        self.assertEqual(self.find_first("flow", rows, "ci_feature")["count"], 15)
+        self.assertEqual(self.find_first("flow", rows, "ci_beta")["count"], 20)
 
     def test_split_by_flow_ignoring_repo(self):
         """Test splitting on flow regardless of repro"""
@@ -207,35 +220,38 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         )
         rows = self.get_api_results(include_fields=["count", "flow"])
 
-        self.assertEqual(self.find_by("flow", rows, "Flow1")["count"], 10)
-        self.assertEqual(self.find_by("flow", rows, "Flow2")["count"], 14)
+        self.assertEqual(self.find_first("flow", rows, "Flow1")["count"], 10)
+        self.assertEqual(self.find_first("flow", rows, "Flow2")["count"], 14)
 
     def test_split_by_plan(self):
         """Test splitting on plan regardless of the rest"""
+        plan1 = PlanFactory(name="plan1")
+        plan2 = PlanFactory(name="plan2")
+
         self.insert_identical_tests(
             count=3,
-            build_flow__build__repo__name="HEDA",
-            build_flow__build__plan__name="plan1",
+            build_flow__build__planrepo__repo__name="HEDA",
+            build_flow__build__planrepo__plan=plan1,
         )
         self.insert_identical_tests(
             count=5,
-            build_flow__build__repo__name="HEDA",
-            build_flow__build__plan__name="plan2",
+            build_flow__build__planrepo__repo__name="HEDA",
+            build_flow__build__planrepo__plan=plan2,
         )
         self.insert_identical_tests(
             count=7,
-            build_flow__build__repo__name="Cumulus",
-            build_flow__build__plan__name="plan1",
+            build_flow__build__planrepo__repo__name="Cumulus",
+            build_flow__build__planrepo__plan=plan1,
         )
         self.insert_identical_tests(
             count=9,
-            build_flow__build__repo__name="Cumulus",
-            build_flow__build__plan__name="plan2",
+            build_flow__build__planrepo__repo__name="Cumulus",
+            build_flow__build__planrepo__plan=plan2,
         )
         rows = self.get_api_results(include_fields=["count", "plan"])
 
-        self.assertEqual(self.find_by("plan", rows, "plan1")["count"], 10)
-        self.assertEqual(self.find_by("plan", rows, "plan2")["count"], 14)
+        self.assertEqual(self.find_first("plan", rows, "plan1")["count"], 10)
+        self.assertEqual(self.find_first("plan", rows, "plan2")["count"], 14)
 
     def test_order_by_count_desc(self):
         """Test ordering by count"""

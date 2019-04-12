@@ -11,7 +11,9 @@ from metaci.users.models import User
 from metaci.testresults.models import TestResult
 from django.contrib.auth.models import Group
 
-from metaci.build.models import BuildFlow, Build
+from metaci.build.models import BuildFlow
+
+import random
 
 
 class Command(BaseCommand):
@@ -43,21 +45,35 @@ class Command(BaseCommand):
     def create_objs(self):
         with transaction.atomic():
             factory.random.reseed_random("TOtaLLY RaNdOM")
+            random.seed("RaNDOM!! TOtaLLY")
             fact.UserFactory()
             fact.UserFactory()
-            PublicPlanRepository = fact.PlanRepositoryFactory()
-            PrivatePlanRepository = fact.PlanRepositoryFactory()
-            assign_perm(
-                "plan.view_builds",
-                Group.objects.get(name="Public"),
-                PublicPlanRepository,
-            )
+            PublicPlanRepositories = [fact.PlanRepositoryFactory() for i in range(6)]
+            PrivatePlanRepositories = [fact.PlanRepositoryFactory() for i in range(6)]
+            for repo in PublicPlanRepositories:
+                assign_perm("plan.view_builds", Group.objects.get(name="Public"), repo)
 
-            fact.TestResultFactory(build_flow__build__planrepo=PublicPlanRepository)
-            fact.TestResultFactory(build_flow__build__planrepo=PrivatePlanRepository)
-            fact.TestResultFactory(build_flow__build__planrepo=PublicPlanRepository)
-            fact.TestResultFactory(build_flow__build__planrepo=PrivatePlanRepository)
+            builds = [
+                fact.BuildFactory(planrepo=planrepo)
+                for planrepo in random.choices(
+                    PublicPlanRepositories + PrivatePlanRepositories, k=50
+                )
+            ]
 
+            build_flows = [
+                fact.BuildFlowFactory(build=build)
+                for build in random.choices(builds, k=100)
+            ]
+
+            methods = [fact.TestMethodFactory() for _ in range(20)]
+
+            test_results = [
+                fact.TestResultFactory(build_flow=build_flow, method=method)
+                for build_flow, method in zip(
+                    random.choices(build_flows, k=200), random.choices(methods, k=200)
+                )
+            ]
+            print(test_results)
             self.make_consistent()
 
     def make_consistent(self):
