@@ -16,6 +16,8 @@ BUILD_FLOW_STATUS_NAMES = (name for (name, label) in BUILD_FLOW_STATUSES)
 
 
 def do_logs():
+    """Call this function at the module level to get more insight
+    into what FactoryBoy is doing under the covers."""
     import logging
 
     logger = logging.getLogger("factory")
@@ -28,26 +30,6 @@ def fake_name(prefix=None):
         lambda a: (getattr(a, "_name_prefix", None) or prefix or "")
         + factory.Faker("word").generate({})
     )
-
-
-class RelatedFactoryList(factory.RelatedFactory):
-    """Calls a factory 'size' times once the object has been generated.
-        Simplified from
-        https://github.com/FactoryBoy/factory_boy/blob/2481d411cde311bb7edd51b6dff3b345c2c14bc6/factory/declarations.py#L675
-        While awaiting release
-    """
-
-    def __init__(self, factory, factory_related_name="", size=2, **defaults):
-        self.size = size
-        super(RelatedFactoryList, self).__init__(
-            factory, factory_related_name, **defaults
-        )
-
-    def call(self, instance, step, context):
-        return [
-            super(RelatedFactoryList, self).call(instance, step, context)
-            for i in range(self.size if isinstance(self.size, int) else self.size())
-        ]
 
 
 class PlanFactory(factory.django.DjangoModelFactory):
