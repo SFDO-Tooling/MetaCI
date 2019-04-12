@@ -11,7 +11,9 @@ from metaci.repository.models import Branch, Repository
 
 from metaci.users.models import User
 
-BUILD_STATUS_NAMES = (name for (name, label) in BUILD_STATUSES)
+BUILD_STATUS_NAMES = (
+    tuple(name for (name, label) in BUILD_STATUSES) + ("success",) * 7
+)  # weighted towards success!
 BUILD_FLOW_STATUS_NAMES = (name for (name, label) in BUILD_FLOW_STATUSES)
 
 
