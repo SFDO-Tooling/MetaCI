@@ -1,9 +1,1 @@
-{
-  "404": "404",
-  "Authentication Error": "Authentication Error",
-  "Copyright 2019 Salesforce.org. All rights reserved.": "Copyright 2019 Salesforce.org. All rights reserved.",
-  "Meta CI": "Meta CI",
-  "anErrorOccurred": "An error occurred. Try the <1>home page</1>?",
-  "errorWithAccount": "An error occurred with your account. Try the <2>home page</2>?",
-  "pageCannotBeFound": "That page cannot be found. Try the <2>home page</2>?"
-}
+{}
