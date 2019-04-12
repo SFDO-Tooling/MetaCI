@@ -40,6 +40,7 @@ def fake_name(prefix=None):
 class PlanFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Plan
+        exclude = ("name_prefix",)
 
     name_prefix = "Plan"
     name = fake_name()
