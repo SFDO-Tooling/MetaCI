@@ -48,8 +48,14 @@ class Command(BaseCommand):
             random.seed("RaNDOM!! TOtaLLY")
             fact.UserFactory()
             fact.UserFactory()
-            PublicPlanRepositories = [fact.PlanRepositoryFactory() for i in range(6)]
-            PrivatePlanRepositories = [fact.PlanRepositoryFactory() for i in range(6)]
+            PublicPlanRepositories = [
+                fact.PlanRepositoryFactory(repo__name_prefix="PublicRepo_")
+                for i in range(6)
+            ]
+            PrivatePlanRepositories = [
+                fact.PlanRepositoryFactory(repo__name_prefix="PrivateRepo_")
+                for i in range(6)
+            ]
             for repo in PublicPlanRepositories:
                 assign_perm("plan.view_builds", Group.objects.get(name="Public"), repo)
 
@@ -73,6 +79,7 @@ class Command(BaseCommand):
                     random.choices(build_flows, k=200), random.choices(methods, k=200)
                 )
             ]
+            test_results  # For linter
             self.make_consistent()
 
     def make_consistent(self):

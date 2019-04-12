@@ -28,8 +28,11 @@ def do_logs():
 
 
 def fake_name(prefix=None):
+    """Generate a fake name with a certain prefix. You can push the name_prefix
+       from outside of the factory if you have a preference when you instantiate
+       the class."""
     return factory.LazyAttribute(
-        lambda a: (getattr(a, "_name_prefix", None) or prefix or "")
+        lambda a: (getattr(a, "name_prefix", None) or prefix or "")
         + factory.Faker("word").generate({})
     )
 
@@ -38,19 +41,19 @@ class PlanFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Plan
 
-    _name_prefix = "Plan"
+    name_prefix = "Plan"
     name = fake_name()
 
 
 class RepositoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Repository
-        exclude = ("_name_prefix",)
+        exclude = ("name_prefix",)
 
     name = fake_name()
 
     github_id = 1234
-    _name_prefix = "Repo_"
+    name_prefix = "Repo_"
     owner = factory.fuzzy.FuzzyChoice(["SFDO", "SFDC", "Partner1", "Partner2"])
 
 
@@ -104,9 +107,9 @@ class TestClassFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = TestClass
-        exclude = ("_name_prefix",)
+        exclude = ("name_prefix",)
 
-    _name_prefix = "Test_"
+    name_prefix = "Test_"
     repo = factory.LazyAttribute(lambda x: random.choice(Repository.objects.all()))
     name = fake_name()
 
@@ -116,9 +119,9 @@ class TestMethodFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = TestMethod
-        exclude = ("_name_prefix",)
+        exclude = ("name_prefix",)
 
-    _name_prefix = "Test_"
+    name_prefix = "Test_"
     testclass = factory.SubFactory(TestClassFactory)
     name = fake_name()
 
