@@ -69,15 +69,6 @@ class RepositoryFactory(factory.django.DjangoModelFactory):
     _name_prefix = "Repo_"
     owner = factory.fuzzy.FuzzyChoice(["SFDO", "SFDC", "Partner1", "Partner2"])
 
-    # @factory.post_generation
-    # def postgen(obj, create, extracted, **kwargs):
-    #     if not obj.repo:
-    #         obj.repo = factory.fuzzy.FuzzyChoice(Repository.objects.all())
-
-    #     if not len(obj.builds) > 0:
-    #         for i in range(0, 7):
-    #             BuildFactory(repo=obj)
-
 
 class PlanRepositoryFactory(factory.django.DjangoModelFactory):
     class Meta:
