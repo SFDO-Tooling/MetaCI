@@ -73,7 +73,6 @@ class Command(BaseCommand):
                     random.choices(build_flows, k=200), random.choices(methods, k=200)
                 )
             ]
-            print(test_results)
             self.make_consistent()
 
     def make_consistent(self):
