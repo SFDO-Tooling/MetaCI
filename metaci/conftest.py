@@ -18,7 +18,13 @@ class RepositoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Repository
 
+    name = factory.LazyAttribute(
+        lambda a: "Repo_"
+        + factory.Faker("paragraph").generate({}).replace(" ", "_")[0:20].lower()
+    )
+
     github_id = 1234
+    owner = factory.fuzzy.FuzzyChoice(["SFDO", "SFDC", "Partner1", "Partner2"])
 
 
 class PlanRepositoryFactory(factory.django.DjangoModelFactory):
@@ -46,7 +52,7 @@ class BuildFlowFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BuildFlow
 
-    tests_total = 5
+    tests_total = 1
     build = factory.SubFactory(BuildFactory)
     flow = "rida"
 
