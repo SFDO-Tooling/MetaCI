@@ -4,21 +4,23 @@ import * as React from 'react';
 import { Trans } from 'react-i18next';
 import Illustration from '@salesforce/design-system-react/components/illustration';
 
-import routes from 'utils/routes';
+import svgPath from 'images/broken.svg';
 import { logError } from 'utils/logging';
-import svgPath from 'images/desert.svg';
 
 type Props = { children: React.Node };
 
-class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
+class ErrorBoundary extends React.Component<
+  Props,
+  { hasError: boolean, info: {} },
+> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, info: {} };
   }
 
   /* istanbul ignore next */
   componentDidCatch(error: Error, info: {}) {
-    this.setState({ hasError: true });
+    this.setState({ hasError: true, info });
     logError(error, info);
   }
 
@@ -27,9 +29,18 @@ class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
       return (
         <EmptyIllustration
           message={
-            <Trans i18nKey="anErrorOccurred">
-              An error occurred. Try the <a href={routes.home()}>home page</a>?
-            </Trans>
+            <>
+              <Trans i18nKey="anErrorOccurred">
+                Unless you pasted a URL incorrectly, it is probably a bug in the
+                code or a networking problem.
+                <br />
+                Our top minds have been alerted.
+                <br />
+                You may need to <a href="./perf">rebuild your query</a> from
+                scratch. Sorry about that.
+                <br />
+              </Trans>
+            </>
           }
         />
       );
@@ -40,10 +51,10 @@ class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
 
 export const EmptyIllustration = ({ message }: { message: React.Node }) => (
   <Illustration
-    heading="¯\_(ツ)_/¯"
+    heading="Yikes! An error occurred!  :("
     messageBody={message}
-    name="Desert"
-    path={`${svgPath}#desert`}
+    name="Broken"
+    path={`${svgPath}#broken`}
     size="large"
   />
 );
