@@ -33,3 +33,8 @@ export const selectBuildflowFiltersUI = (
   appState.perfDataUI.status === 'AVAILABLE'
     ? appState.perfDataUI.uidata.buildflow_filters
     : null;
+
+export const selectDebugStatus = (appState: AppState): boolean =>
+  appState.perfDataUI.status === 'AVAILABLE'
+    ? appState.perfDataUI.uidata.debug
+    : false;

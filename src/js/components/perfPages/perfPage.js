@@ -13,16 +13,17 @@ import type { Match, RouterHistory } from 'react-router-dom';
 import { QueryParamHelpers, addIds } from './perfTableUtils';
 import PerfDataTable from './perfDataTable';
 import PerfTableOptionsUI from './perfTableOptionsUI';
+import DebugIcon from './debugIcon';
 
 import type { AppState } from 'store';
 import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
+import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 import {
   selectPerfState,
   selectPerfUIStatus,
   selectTestMethodPerfUI,
 } from 'store/perfdata/selectors';
-import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 
 export type ServerDataFetcher = (params?: {
   [string]: string | string[] | null | typeof undefined,
@@ -104,6 +105,7 @@ export const UnwrappedPerfPage = ({
 
   return (
     <div key="perfContainerDiv">
+      <DebugIcon />
       <PerfTableOptionsUI
         fetchServerData={fetchServerData}
         uiAvailable={uiAvailable}
