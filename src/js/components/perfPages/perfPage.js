@@ -10,10 +10,10 @@ import BrandBand from '@salesforce/design-system-react/components/brand-band';
 import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 import type { Match, RouterHistory } from 'react-router-dom';
 
-import { QueryParamHelpers, addIds } from './perfTableUtils';
-import PerfDataTable from './perfDataTable';
-import PerfTableOptionsUI from './perfTableOptionsUI';
 import DebugIcon from './debugIcon';
+import PerfTableOptionsUI from './perfTableOptionsUI';
+import PerfDataTable from './perfDataTable';
+import { QueryParamHelpers, addIds } from './perfTableUtils';
 
 import type { AppState } from 'store';
 import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
@@ -105,7 +105,6 @@ export const UnwrappedPerfPage = ({
 
   return (
     <div key="perfContainerDiv">
-      <DebugIcon />
       <PerfTableOptionsUI
         fetchServerData={fetchServerData}
         uiAvailable={uiAvailable}
@@ -120,7 +119,8 @@ export const UnwrappedPerfPage = ({
           queryparams={queryparams}
           items={results}
         />
-      </div>
+      </div>{' '}
+      <DebugIcon />
     </div>
   );
 };
