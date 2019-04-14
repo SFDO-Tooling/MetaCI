@@ -15,7 +15,7 @@ class BranchViewSet(viewsets.ModelViewSet):
 
     serializer_class = BranchSerializer
     queryset = Branch.objects.all()
-    filter_class = BranchFilter
+    filterset_class = BranchFilter
 
 
 class RepositoryViewSet(PkOrSlugMixin, viewsets.ModelViewSet):
@@ -25,5 +25,5 @@ class RepositoryViewSet(PkOrSlugMixin, viewsets.ModelViewSet):
 
     serializer_class = RepositorySerializer
     queryset = Repository.objects.all()
-    filter_class = RepositoryFilter
+    filterset_class = RepositoryFilter
     lookup_slug_field = "name"
