@@ -67,7 +67,7 @@ class PlanRepositoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = PlanRepository
 
-    plan = factory.fuzzy.FuzzyChoice(Plan.objects.all())
+    plan = factory.LazyAttribute(lambda x: rand.choice(Plan.objects.all()))
     repo = factory.SubFactory(RepositoryFactory)
 
 
