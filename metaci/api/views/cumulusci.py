@@ -17,7 +17,7 @@ class OrgViewSet(viewsets.ModelViewSet):
 
     serializer_class = OrgSerializer
     queryset = Org.objects.all()
-    filter_class = OrgFilter
+    filterset_class = OrgFilter
 
 
 class ScratchOrgInstanceViewSet(viewsets.ModelViewSet):
@@ -27,7 +27,7 @@ class ScratchOrgInstanceViewSet(viewsets.ModelViewSet):
 
     serializer_class = ScratchOrgInstanceSerializer
     queryset = ScratchOrgInstance.objects.all()
-    filter_class = ScratchOrgInstanceFilter
+    filterset_class = ScratchOrgInstanceFilter
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
