@@ -42,10 +42,10 @@ class TestAPISecurity(APITestCase):
         public_build = BuildFactory(repo=r2, plan=p2, planrepo=pr2)
         public_bff = BuildFlowFactory(build=public_build)
         BuildFlowFactory(flow="Flow2")
-        TestResultFactory(build_flow=private_bff)
-        TestResultFactory(build_flow=private_bff)
-        TestResultFactory(build_flow=public_bff)
-        TestResultFactory(build_flow=public_bff)
+        TestResultFactory(build_flow=private_bff, method__name="Private1")
+        TestResultFactory(build_flow=private_bff, method__name="Private2")
+        TestResultFactory(build_flow=public_bff, method__name="Public1")
+        TestResultFactory(build_flow=public_bff, method__name="Public2")
 
     @classmethod
     def make_user_and_client(cls, user=None):
@@ -160,5 +160,6 @@ class TestAPISecurity(APITestCase):
         client, superuser = self.make_user_and_client(StaffSuperuserFactory())
         response = client.get("/api/testmethod_perf/")
         js = json.loads(response.content)
+        print(response.content)
         assert "count" in js, js
         self.assertGreater(js["count"], 2)
