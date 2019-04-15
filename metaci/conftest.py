@@ -16,6 +16,11 @@ BUILD_STATUS_NAMES = (
 )  # weighted towards success!
 BUILD_FLOW_STATUS_NAMES = (name for (name, label) in BUILD_FLOW_STATUSES)
 
+rand = random.Random()
+rand.seed("limeandromeda")
+
+factory.random.reseed_random("TOtaLLY RaNdOM")
+
 
 def do_logs():
     """Call this function at the module level to get more insight
@@ -75,7 +80,7 @@ class BranchFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def postgen(obj, create, extracted, **kwargs):
         if not obj.repo:
-            obj.repo = random.choice(Repository.objects.all())
+            obj.repo = rand.choice(Repository.objects.all())
             obj.save()
 
 
@@ -111,7 +116,7 @@ class TestClassFactory(factory.django.DjangoModelFactory):
         exclude = ("name_prefix",)
 
     name_prefix = "Test_"
-    repo = factory.LazyAttribute(lambda x: random.choice(Repository.objects.all()))
+    repo = factory.LazyAttribute(lambda x: rand.choice(Repository.objects.all()))
     name = fake_name()
 
 
@@ -131,7 +136,7 @@ class TestMethodFactory(factory.django.DjangoModelFactory):
         if isinstance(extracted, numbers.Number):
             obj._target_success_pct = extracted
         else:
-            obj._target_success_pct = random.random() * 100
+            obj._target_success_pct = rand.random() * 100
         obj.save()
 
 
@@ -148,11 +153,11 @@ class TestResultFactory(factory.django.DjangoModelFactory):
 
     @factory.LazyAttribute
     def outcome(result):
-        success = random.random() * 100 < result.method._target_success_pct
+        success = rand.random() * 100 < result.method._target_success_pct
         if success:
             return "success"
         else:
-            return random.choice(["CompileFail", "Fail", "Skip"])
+            return rand.choice(["CompileFail", "Fail", "Skip"])
 
 
 class UserFactory(factory.django.DjangoModelFactory):

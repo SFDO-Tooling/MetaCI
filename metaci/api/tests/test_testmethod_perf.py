@@ -9,6 +9,9 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient, APITestCase
 
+rand = random.Random()
+rand.seed("xyzzy")
+
 
 class _TestingHelpers:
     def debugmsg(self, *args):
@@ -112,17 +115,16 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             for row in rows:
                 self.assertSetEqual(set(fields + ["method_name"]), set(row))
 
-        random.seed("xyzzy")
         for i in range(10):
-            field = random.sample(includable_fields, 1)
+            field = rand.sample(includable_fields, 1)
             _test_fields(field)
 
         for i in range(10):
-            field1, field2 = random.sample(includable_fields, 2)
+            field1, field2 = rand.sample(includable_fields, 2)
             _test_fields([field1, field2])
 
         for i in range(10):
-            field1, field2, field3 = random.sample(includable_fields, 3)
+            field1, field2, field3 = rand.sample(includable_fields, 3)
             _test_fields([field1, field2, field3])
 
         _test_fields(includable_fields)
