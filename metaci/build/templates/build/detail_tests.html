@@ -1,7 +1,7 @@
 {% extends "build/detail_layout.html" %}
 
 {% block tab_content %}
-<div class="slds-box slds-m-bottom--large {% if tests.fail %}slds-theme--warning{% else %}slds-theme--success{% endif %}">
+<div class="slds-box slds-m-bottom--large {% if tests.fail %}slds-theme--error{% else %}slds-theme--success{% endif %}">
   <h3 class="slds-text-heading--large">{{ tests.pass }} of {{ tests.total }} tests passed</h3>
 </div>
 {% if tests.fail %}

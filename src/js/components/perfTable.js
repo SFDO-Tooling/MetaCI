@@ -20,6 +20,8 @@ import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import DataTableCell from '@salesforce/design-system-react/components/data-table/cell';
+import BrandBand from '@salesforce/design-system-react/components/brand-band';
+import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 
 import FieldPicker from './fieldPicker';
 import FilterPicker from './filterPicker';
@@ -94,7 +96,11 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
                           match, location, history, default_columns }:
                               ReduxProps & InitialProps & SelfProps) => {
     default_columns = default_columns || DEFAULT_COLUMNS;
-
+  if ((perfdataUIstate && perfdataUIstate.status === "UI_DATA_ERROR") ||
+    (perfdatastate && perfdatastate.status === "PERF_DATA_ERROR")){
+    return <AuthError
+        message= "Top Secret! Please ensure you are on the VPN and logged in to MetaCI."/>
+    }
 
     let queryParts = queryparams.get;
     let changeUrl = queryparams.set;
@@ -160,14 +166,14 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
             <div className="slds-col slds-size--1-of-2"
                   style={{ textAlign: "left" }}>
                           Showing {(page * page_size).toString()} to {' '}
-                                {Math.min((page + 1) * page_size, 1).toString()} {' '}
+                                {((page + 1) * page_size).toString()} {' '}
                           of  {get(perfdatastate, "perfdata.count").toString()} records
             </div>
             <div className="slds-col slds-size--1-of-2">
-                      <button onClick={()=>doPerfRESTFetch(previousPage)}
+                      <button onClick={()=>goPageFromUrl(previousPage)}
                         className="slds-button slds-button--brand"
                         disabled={!previousPage}>Previous</button>
-                      <button onClick={()=>doPerfRESTFetch(nextPage)}
+                      <button onClick={()=>goPageFromUrl(nextPage)}
                         className="slds-button slds-button--brand"
                         disabled={!nextPage}>Next</button>
             </div>
@@ -242,6 +248,24 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
         </div>
     </div>
   };
+
+const AuthError = ({message}:{message:string}) => {
+  return <BrandBand
+      id="brand-band-lightning-blue"
+      className="slds-p-around_small"
+      theme="lightning-blue"
+      style={{textAlign:"center",
+        backgroundImage: "url(" + BrandBannerBackground + "), linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)"}}
+    >
+      <div className="slds-box slds-theme_default"
+        style={{marginLeft:"auto", marginRight:"auto"}}>
+        <h3 className="slds-text-heading_label slds-truncate">{message}</h3>
+      </div>
+      <div>
+        <img src="https://i.gifer.com/G36W.gif" />
+      </div>
+  </BrandBand>
+}
 
 const select = (appState: AppState) => {
   return {
