@@ -1,4 +1,3 @@
-from ansi2html import Ansi2HTMLConverter
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -8,12 +7,10 @@ from django.shortcuts import render
 from django.utils import timezone
 from watson import search as watson
 
-from metaci.build.exceptions import BuildError
 from metaci.build.filters import BuildFilter
 from metaci.build.forms import QATestingForm
 from metaci.build.models import Build
 from metaci.build.models import Rebuild
-from metaci.build.tasks import run_build
 from metaci.build.utils import view_queryset
 
 
@@ -22,6 +19,7 @@ def build_list(request):
     repo = request.GET.get("repo")
     if repo:
         query["repo__name"] = repo
+
     build_filter, builds = view_queryset(
         request, query, request.GET.get("status"), filterset_class=BuildFilter
     )

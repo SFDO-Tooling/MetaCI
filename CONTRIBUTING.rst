@@ -83,9 +83,15 @@ Then run the initial migrations::
 
     python manage.py migrate
 
+Run this command if you would like to populate the database with fake testing
+data:
+
+    python manage.py populate_db
+
 Run this command to create a necessary repeatable django-rq job in the database::
 
     ./manage.py metaci_scheduled_jobs
+
 
 Copying the production database
 -------------------------------
