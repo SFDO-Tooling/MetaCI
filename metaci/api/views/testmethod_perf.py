@@ -313,7 +313,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
         # every field we want to filter on should be in the annotation list
         for param, value in params.items():
-            if value and filters.get(param) and fields.get(param):
+            if value and filters.get(param) and filters[param].field_name:
                 fields_to_include.append(filters[param].field_name)
 
         # the field we want to order on should be in the annotation list

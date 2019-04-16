@@ -361,4 +361,4 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         rows = self.get_api_results(count_gt=3, count_lt=5)
         self.assertEqual(len(rows), 1)
         for row in rows:
-            self.equals(row["method_name"], "Bar1")
+            self.assertEqual(row["method_name"], "Bar1")
