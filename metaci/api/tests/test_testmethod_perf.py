@@ -352,3 +352,13 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.debugmsg(response)
         self.assertEqual(response.status_code, 200)
         self.assertIn("text/html", response["content-type"])
+
+    def test_filter_by_count(self):
+        TestResultFactory(method__name="Bar1")
+        TestResultFactory(method__name="Bar1")
+        TestResultFactory(method__name="Bar1")
+        TestResultFactory(method__name="Bar1")
+        rows = self.get_api_results(count_gt=3, count_lt=5)
+        self.assertEqual(len(rows), 1)
+        for row in rows:
+            self.equals(row["method_name"], "Bar1")
