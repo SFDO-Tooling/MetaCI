@@ -115,8 +115,6 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
       changeUrl({ repo });
       doPerfRESTFetch(null, { ...queryParts(), repo });
       doPerfREST_UI_Fetch();
-
-      changeUrl({ repo: pathParts[pathParts.length - 2] });
     }, []);
 
     var items;
