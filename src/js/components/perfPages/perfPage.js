@@ -74,14 +74,14 @@ export const UnwrappedPerfPage = ({
 
   // Fetch the data: both UI configuration and also actual data results
   useEffect(() => {
-    doPerfRESTFetch(queryparams.getAll());
-    doPerfREST_UI_Fetch();
-    const pathParts = window.location.pathname.split('/');
-
     /* Special case for getting repo name from URL
      * path into query params with other filters
      */
-    queryparams.set({ repo: pathParts[pathParts.length - 2] });
+    const pathParts = window.location.pathname.split('/');
+    const repo = pathParts[pathParts.length - 2];
+    queryparams.set({ repo });
+    doPerfRESTFetch({ ...queryparams.getAll(), repo });
+    doPerfREST_UI_Fetch();
   }, []);
 
   let results;
