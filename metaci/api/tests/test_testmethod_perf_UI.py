@@ -1,8 +1,6 @@
 import pytest
 
 from metaci.conftest import (
-    StaffSuperuserFactory,
-    #  BuildFactory,
     RepositoryFactory,
     BranchFactory,
     PlanFactory,
@@ -11,7 +9,7 @@ from metaci.conftest import (
 
 from django.urls import reverse
 
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APITestCase
 
 from .test_testmethod_perf import _TestingHelpers
 
@@ -34,31 +32,8 @@ class TestTestMethodPerfUI_RESTAPI(APITestCase, _TestingHelpers):
     def setUp(self):
         self.client.force_authenticate(self.user)
 
-    def debugmsg(self, *args):
-        print(*args)  # Pytest does useful stuff with stdout, better than logger data
-
-    @classmethod
-    def make_user_and_client(cls):
-        user = StaffSuperuserFactory()
-        client = APIClient()
-        client.force_authenticate(user)
-        response = client.get("/api/")
-        assert response.status_code == 200, response.content
-        return client, user
-
     def api_url(self):
         return reverse("testmethod_perf_UI-list")
-
-    def find_by(self, fieldname, objs, value):
-        if type(objs) == dict:
-            objs = objs.get("results", objs)
-        return next((x for x in objs if x[fieldname] == value), None)
-
-    def get_api_results(self):
-        response = self.client.get(self.api_url())
-        self.assertEqual(response.status_code, 200)
-        obj = response.json()
-        return obj
 
     def test_api_schema_view(self):
         response = self.client.get("/api/")
