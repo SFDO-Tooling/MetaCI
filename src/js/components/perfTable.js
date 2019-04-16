@@ -106,14 +106,17 @@ export const UnwrappedPerfTable = ({doPerfRESTFetch, doPerfREST_UI_Fetch,
     let changeUrl = queryparams.set;
 
     useEffect(() => {
-      doPerfRESTFetch(null, queryParts());
-      doPerfREST_UI_Fetch();
-      let pathParts = window.location.pathname.split("/");
-
       /* Special case for getting repo name from URL
-        * path into query params with other filters
-        */
-      changeUrl({repo: pathParts[pathParts.length-2]})
+       * path into query params with other filters
+       */
+
+      let pathParts = window.location.pathname.split('/');
+      let repo = pathParts[pathParts.length - 2];
+      changeUrl({ repo });
+      doPerfRESTFetch(null, { ...queryParts(), repo });
+      doPerfREST_UI_Fetch();
+
+      changeUrl({ repo: pathParts[pathParts.length - 2] });
     }, []);
 
     var items;
