@@ -9,18 +9,15 @@ import { logError } from 'utils/logging';
 
 type Props = { children: React.Node };
 
-class ErrorBoundary extends React.Component<
-  Props,
-  { hasError: boolean, info: {} },
-> {
+class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, info: {} };
+    this.state = { hasError: false };
   }
 
   /* istanbul ignore next */
   componentDidCatch(error: Error, info: {}) {
-    this.setState({ hasError: true, info });
+    this.setState({ hasError: true });
     logError(error, info);
   }
 
