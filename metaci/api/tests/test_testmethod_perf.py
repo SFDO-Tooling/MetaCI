@@ -352,3 +352,28 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.debugmsg(response)
         self.assertEqual(response.status_code, 200)
         self.assertIn("text/html", response["content-type"])
+
+    def test_filter_by_count(self):
+        TestResultFactory(method__name="Bar1")
+        TestResultFactory(method__name="Bar1")
+        TestResultFactory(method__name="Bar1")
+        TestResultFactory(method__name="Bar1")
+        rows = self.get_api_results(count_gt=3, count_lt=5)
+        self.assertEqual(len(rows), 1)
+        for row in rows:
+            self.assertEqual(row["method_name"], "Bar1")
+
+    def test_default_fields(self):
+        rows = self.get_api_results()
+
+        self.assertIn("duration_average", rows[0].keys())
+        self.assertIn("method_name", rows[0].keys())
+
+    def test_default_fields_repo_only(self):
+        TestResultFactory(
+            method__name="Bar1", build_flow__build__planrepo__repo__name="myrepo"
+        )
+        rows = self.get_api_results(repo="myrepo")
+
+        self.assertIn("duration_average", rows[0].keys())
+        self.assertIn("method_name", rows[0].keys())
