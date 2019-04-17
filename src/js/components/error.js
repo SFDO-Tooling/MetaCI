@@ -2,10 +2,11 @@
 
 import * as React from 'react';
 import { Trans } from 'react-i18next';
+import Illustration from '@salesforce/design-system-react/components/illustration';
 
 import routes from 'utils/routes';
 import { logError } from 'utils/logging';
-import { EmptyIllustration } from 'components/404';
+import svgPath from 'images/desert.svg';
 
 type Props = { children: React.Node };
 
@@ -36,5 +37,15 @@ class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
     return this.props.children;
   }
 }
+
+export const EmptyIllustration = ({ message }: { message: React.Node }) => (
+  <Illustration
+    heading="¯\_(ツ)_/¯"
+    messageBody={message}
+    name="Desert"
+    path={`${svgPath}#desert`}
+    size="large"
+  />
+);
 
 export default ErrorBoundary;

@@ -18,8 +18,8 @@ const getResponse = (resp, errorStatus) =>
       } catch (err) {
         // swallow error
       }
-      if(errorStatus){
-        return {error: errorStatus, reason: text};
+      if (errorStatus) {
+        return { error: errorStatus, reason: text };
       }
       return text;
     })

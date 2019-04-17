@@ -1,5 +1,4 @@
 // @flow
-
 import type { ThunkAction } from 'redux-thunk';
 
 import type { User } from 'store/user/reducer';
@@ -25,7 +24,7 @@ export const login = (payload: User): LoginAction => {
   };
 };
 
-export const logout = (): ThunkAction => (dispatch, getState, { apiFetch }) =>
+export const logout = (): ThunkAction => (dispatch, _getState, { apiFetch }) =>
   apiFetch(window.api_urls.account_logout(), {
     method: 'POST',
   }).then(() => {

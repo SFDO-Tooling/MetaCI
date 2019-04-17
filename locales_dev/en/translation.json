@@ -1,9 +1,15 @@
 {
-  "404": "404",
-  "Authentication Error": "Authentication Error",
-  "Copyright 2019 Salesforce.org. All rights reserved.": "Copyright 2019 Salesforce.org. All rights reserved.",
+  " of ": " of ",
+  " to ": " to ",
+  "Build Flows Limit": "Build Flows Limit",
+  "Columns": "Columns",
+  "Date Range": "Date Range",
+  "Filters": "Filters",
   "Meta CI": "Meta CI",
+  "Options": "Options",
+  "Page Size": "Page Size",
+  "Showing": "Showing",
+  "Top Secret! Please ensure you are on the VPN and logged in to MetaCI.": "Top Secret! Please ensure you are on the VPN and logged in to MetaCI.",
   "anErrorOccurred": "An error occurred. Try the <1>home page</1>?",
-  "errorWithAccount": "An error occurred with your account. Try the <2>home page</2>?",
-  "pageCannotBeFound": "That page cannot be found. Try the <2>home page</2>?"
+  "records": "records"
 }
