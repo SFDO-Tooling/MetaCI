@@ -198,6 +198,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             self.find_first("method_name", rows, "NPSPTest")["repo"], "Cumulus"
         )
 
+    @pytest.mark.skip(reason="removing the ability to search by flow")
     def test_split_by_flow(self):
         """Test splitting on flow"""
         self.insert_identical_tests(
@@ -216,6 +217,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.assertEqual(self.find_first("flow", rows, "ci_feature")["count"], 15)
         self.assertEqual(self.find_first("flow", rows, "ci_beta")["count"], 20)
 
+    @pytest.mark.skip(reason="removing the ability to search by flow")
     def test_split_by_flow_ignoring_repo(self):
         """Test splitting on flow regardless of repro"""
         self.insert_identical_tests(
@@ -292,11 +294,22 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.assertTrue(rows[0]["method_name"] > rows[-1]["method_name"])
 
     def test_order_by_success_percentage(self):
-        TestResultFactory(method__name="Bar", outcome="Pass", build_flow__tests_total=1)
+        TestResultFactory(
+            method__name="Foo2", outcome="Fail", build_flow__tests_total=1
+        )
+        TestResultFactory(
+            method__name="Bar2", outcome="Pass", build_flow__tests_total=1
+        )
         rows = self.get_api_results(o="success_percentage")
+        print(
+            TestResultPerfSummary.objects.all().values(
+                "day", "method__name", "agg_failures", "agg_count"
+            )
+        )
         self.assertTrue(rows[0]["success_percentage"] < rows[-1]["success_percentage"])
 
     def test_order_by_success_percentage_desc(self):
+        TestResultFactory(method__name="Foo", outcome="Fail", build_flow__tests_total=1)
         TestResultFactory(method__name="Bar", outcome="Pass", build_flow__tests_total=1)
         rows = self.get_api_results(o="-success_percentage")
         self.assertTrue(rows[0]["success_percentage"] > rows[-1]["success_percentage"])

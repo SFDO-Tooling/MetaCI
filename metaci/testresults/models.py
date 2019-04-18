@@ -258,24 +258,27 @@ class TestResultPerfSummary(models.Model):
         unique_together = ("repo", "branch", "plan", "method", "day")
         indexes = [models.Index(fields=unique_together, name="lookup")]
 
-    repo = models.ForeignKey(
+    rel_repo = models.ForeignKey(
         "repository.Repository",
         related_name="testresult_perfsummaries",
+        db_column="repo_id",
         on_delete=models.PROTECT,
     )
-    branch = models.ForeignKey(
+    rel_branch = models.ForeignKey(
         "repository.Branch",
         related_name="testresult_perfsummaries",
         null=False,
         blank=False,
+        db_column="branch_id",
         on_delete=models.PROTECT,
     )
 
-    plan = models.ForeignKey(
+    rel_plan = models.ForeignKey(
         "plan.Plan",
         related_name="testresult_perfsummaries",
         null=False,
         blank=False,
+        db_column="plan_id",
         on_delete=models.PROTECT,
     )
 
@@ -319,22 +322,13 @@ class TestResultPerfSummary(models.Model):
             time_end__date=date_with_timezone
         )
 
-        def timer():
-            starttime = time.time()
-            while True:
-                endtime = time.time()
-                yield round(endtime - starttime)
-                starttime = endtime
-
-        t = timer()
-
         method_contexts = (
             TestResult.objects.filter(build_flow_id__in=buildflows)
             .values(
                 "method_id",
-                repo_id=F("build_flow__build__repo"),
-                branch_id=F("build_flow__build__branch"),
-                plan_id=F("build_flow__build__plan"),
+                rel_repo_id=F("build_flow__build__repo"),
+                rel_branch_id=F("build_flow__build__branch"),
+                rel_plan_id=F("build_flow__build__plan"),
                 day=Value(date, output_field=models.DateField()),
             )
             .annotate(
@@ -353,11 +347,7 @@ class TestResultPerfSummary(models.Model):
         )
 
         obsolete_objects = TestResultPerfSummary.objects.filter(day=date)
-        print("To delete", next(t), len(obsolete_objects))
         obsolete_objects.delete()
-        print("Deleted", next(t))
 
         new_objects = [TestResultPerfSummary(**values) for values in method_contexts]
-        print("New Objects to be created", next(t), len(new_objects))
         created = len(TestResultPerfSummary.objects.bulk_create(new_objects))
-        print("New objects created", next(t), created)

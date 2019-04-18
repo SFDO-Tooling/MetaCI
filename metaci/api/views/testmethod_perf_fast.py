@@ -56,7 +56,7 @@ class StandardResultsSetPagination(pagination.PageNumberPagination):
     max_page_size = DEFAULTS.max_page_size
 
 
-class BuildFlowFilterSet:
+class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
     """A "conditional" filterset for generating the BuildFlow sub-select.
 
     The tricky bit is that this filter serves three different jobs.
@@ -81,19 +81,19 @@ class BuildFlowFilterSet:
         Repository.objects.values_list("name", "name").order_by("name").distinct()
     )
     repo = django_filters.rest_framework.ChoiceFilter(
-        field_name="build__repo__name", label="Repo Name", choices=repo_choices
+        field_name="rel_repo__name", label="Repo Name", choices=repo_choices
     )
 
     branch_choices = (
         Branch.objects.values_list("name", "name").order_by("name").distinct()
     )
     branch = django_filters.rest_framework.ChoiceFilter(
-        field_name="build__branch__name", label="Branch Name", choices=branch_choices
+        field_name="rel_branch__name", label="Branch Name", choices=branch_choices
     )
 
     plan_choices = Plan.objects.values_list("name", "name").order_by("name").distinct()
     plan = django_filters.rest_framework.ChoiceFilter(
-        field_name="build__plan__name", label="Plan Name", choices=plan_choices
+        field_name="rel_plan__name", label="Plan Name", choices=plan_choices
     )
 
     # Django-filter's DateRangeFilter is kind of ... special
@@ -263,7 +263,11 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
                 and fields.get(filters[param].field_name)  # param has associated field
             ):
                 fields_to_include.append(filters[param].field_name)
+                print("INCLUDING", filters[param].field_name)
+            else:
+                print("SKIPPING", value)
 
+        # no fields? Use defaults
         if fields_to_include == []:
             filters = self.filterset_class.get_filters()
             assert filters
@@ -278,11 +282,9 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         if self.orderby_field and self.orderby_field.strip("-") != "method_name":
             fields_to_include.append(self.orderby_field.strip("-"))
 
-        fields = self.filterset_class.metrics
-
-        # every field explicitly asked for
+        # build a dictionary in the form DRF likes
         for fieldname in fields_to_include:
-            if fields.get(fieldname) and fieldname != "method_name":
+            if fields.get(fieldname):
                 aggregations[fieldname] = fields[fieldname].aggregation
 
         return aggregations
@@ -291,11 +293,28 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         """Which fields to split on (or group by, depending on how you think about it)"""
         params = self.request.query_params
         output_fields = {}
+        build_fields = BuildFlowFilterSet.build_fields
+        group_by_fields = []
+        order_by_field = self.orderby_field
 
         # if the order_by field is a build field
         # then we need to group by it.
         if order_by_field and order_by_field in build_fields:
-            output_fields[param] = F(build_fields[param])
+            group_by_fields.append(order_by_field)
+
+        # if it is in the include_fields list, lets add
+        # it too, with group-by behaviour.
+        # TODO: Test this logic
+        fields_to_include = params.getlist("include_fields")
+        build_fields_in_include_fields = set(fields_to_include).intersection(
+            set(build_fields.keys())
+        )
+        for fieldname in build_fields_in_include_fields:
+            group_by_fields.append(fieldname)
+
+        if group_by_fields:
+            for param in group_by_fields:
+                output_fields[param] = F(build_fields[param])
 
         return output_fields
 
@@ -314,12 +333,15 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         set_timeout(10)
         self._check_params()
 
-        # splitter_fields = self._get_splitter_fields()
+        splitter_fields = self._get_splitter_fields()
         aggregations = self._get_aggregation_fields()
+
+        print("Splitter fields", splitter_fields)
+        print("aggregations", aggregations)
 
         queryset = (
             TestResultPerfSummary.objects.filter()
-            .values(method_name=F("method__name"))
+            .values(method_name=F("method__name"), **splitter_fields)
             .annotate(**aggregations)
         )
 
