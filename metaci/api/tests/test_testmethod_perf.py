@@ -401,6 +401,14 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.assertIn("duration_average", rows[0].keys())
         self.assertIn("method_name", rows[0].keys())
 
+    def test_filter_by_methodname(self):
+        rows = self.get_api_results(method_name="Foo")
+        self.assertTrue(rows)
+
+    def test_filter_by_methodname_subset(self):
+        rows = self.get_api_results(method_name="Fo")
+        self.assertTrue(rows)
+
 
 class TestFastTestMethodPerfRESTAPI(TestTestMethodPerfRESTAPI):
     route = reverse("fast_testmethod_perf-list")

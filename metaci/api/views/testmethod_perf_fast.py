@@ -114,6 +114,9 @@ class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
         method="dummy_filter", label="Build Flows Limit (default: 100)"
     )
 
+    def dummy_filter(self, queryset, name, value):
+        return queryset
+
     fields_and_stuff = locals()
 
     build_fields = {}
@@ -260,6 +263,7 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             if value and (
                 filters.get(param)  # param is a filter, not a random config
                 and filters[param].field_name  # safety check
+                and param != "method_name"  # automatically included already
                 and fields.get(filters[param].field_name)  # param has associated field
             ):
                 fields_to_include.append(filters[param].field_name)
