@@ -9,19 +9,21 @@ import { t } from 'i18next';
 import BrandBand from '@salesforce/design-system-react/components/brand-band';
 import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 import type { Match, RouterHistory } from 'react-router-dom';
+
+import DebugIcon from './debugIcon';
+import PerfTableOptionsUI from './perfTableOptionsUI';
+import PerfDataTable from './perfDataTable';
+import { QueryParamHelpers, addIds } from './perfTableUtils';
+
 import type { AppState } from 'store';
 import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
+import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 import {
   selectPerfState,
   selectPerfUIStatus,
   selectTestMethodPerfUI,
 } from 'store/perfdata/selectors';
-import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
-
-import PerfTableOptionsUI from './perfTableOptionsUI';
-import PerfDataTable from './perfDataTable';
-import { QueryParamHelpers, addIds } from './perfTableUtils';
 
 export type ServerDataFetcher = (params?: {
   [string]: string | string[] | null | typeof undefined,
@@ -110,7 +112,8 @@ export const UnwrappedPerfPage = ({
           queryparams={queryparams}
           items={results}
         />
-      </div>
+      </div>{' '}
+      <DebugIcon />
     </div>
   );
 };

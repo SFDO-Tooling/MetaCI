@@ -23,6 +23,7 @@ const UIDataShape = is.shape({
   buildflow_filters: is.arrayOf(FilterDefinitionShape),
   testmethod_perf: TestMethodPerfUIShape,
   testmethod_results: TestMethodPerfUIShape,
+  debug: is.boolean,
 });
 
 export type UIData = AssertionType<typeof UIDataShape>;

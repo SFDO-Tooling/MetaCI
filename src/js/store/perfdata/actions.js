@@ -2,7 +2,6 @@
 
 import queryString from 'query-string';
 import type { ThunkAction } from 'redux-thunk';
-
 import type { PerfData } from 'store/perfdata/reducer';
 import type { UIData } from 'api/testmethod_perf_UI_JSON_schema';
 import { assertUIData } from 'api/testmethod_perf_UI_JSON_schema';
@@ -11,7 +10,10 @@ type PerfDataAvailableAction = {
   type: 'PERF_DATA_AVAILABLE',
   payload: PerfData,
 };
-type PerfDataLoadingAction = { type: 'PERF_DATA_LOADING', payload: PerfData };
+type PerfDataLoadingAction = {
+  type: 'PERF_DATA_LOADING',
+  payload: { url: string },
+};
 type PerfDataError = { type: 'PERF_DATA_ERROR', payload: string };
 
 type UIDataAvailableAction = { type: 'UI_DATA_AVAILABLE', payload: UIData };
@@ -32,10 +34,10 @@ export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (
   _getState,
   { apiFetch },
 ) => {
-  dispatch({ type: 'PERF_DATA_LOADING', payload: url });
   if (params) {
     url = `${url}&${queryString.stringify(params)}`;
   }
+  dispatch({ type: 'PERF_DATA_LOADING', payload: { url } });
   apiFetch(url, {
     method: 'GET',
   }).then(payload => {

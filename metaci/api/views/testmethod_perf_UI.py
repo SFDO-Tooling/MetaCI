@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from rest_framework import viewsets, response, permissions
 
 from metaci.api.views.testmethod_perf import (
@@ -42,6 +44,7 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
                 "filters": testmethodresult_filters.values(),
                 "defaults": {**dict(self.defaults)},
             },
+            "debug": settings.DEBUG,
         }
 
         return response.Response(json)
