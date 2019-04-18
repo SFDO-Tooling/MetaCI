@@ -13,6 +13,7 @@ from metaci.api.views.testmethod_perf import (
     TestMethodPerfListView,
     TestMethodResultListView,
 )
+from metaci.api.views.testmethod_perf_fast import FastTestMethodPerfListView
 from metaci.api.views.testmethod_perf_UI import TestMethodPerfUIApiView
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
@@ -29,6 +30,9 @@ router.register(r"repos", RepositoryViewSet, basename="repo")
 router.register(r"scratch_orgs", ScratchOrgInstanceViewSet, basename="scratch_org")
 router.register(r"services", ServiceViewSet, basename="service")
 router.register(r"testmethod_perf", TestMethodPerfListView, basename="testmethod_perf")
+router.register(
+    r"fast_testmethod_perf", FastTestMethodPerfListView, basename="fast_testmethod_perf"
+)
 router.register(
     r"testmethod_results", TestMethodResultListView, basename="testmethod_result"
 )

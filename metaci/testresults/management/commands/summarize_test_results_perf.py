@@ -1,13 +1,7 @@
 import datetime
 
 from django.core.management.base import BaseCommand
-from django.utils import timezone
-from django.db.models import F, Count, Value
-from django.db import models
-
-from metaci.build.models import BuildFlow
-from metaci.testresults.models import TestResultPerfSummary, TestResult
-
+from metaci.testresults.models import TestResultPerfSummary
 from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
 
 DATE_FORMAT = "%Y-%m-%d"
@@ -39,49 +33,16 @@ class Command(BaseCommand):
         "cpu_usage_low",
         "cpu_usage_high",
         "failures",
+        "assertion_failures",
+        "DML_failures",
+        "Other_failures",
+        "success_percentage",
     ]
 
     def add_arguments(self, parser):
         parser.add_argument("startdate", type=str)
         parser.add_argument("enddate", type=str)
         parser.add_argument("replace", choices=["replace", "continue"])
-
-    def handle_date(self, date):
-        metrics = self.metrics
-        date_with_timezone = timezone.template_localtime(date, use_tz=True)
-        buildflows = BuildFlow.objects.filter(time_end__date=date_with_timezone)
-
-        method_contexts = (
-            TestResult.objects.filter(build_flow_id__in=buildflows)
-            .values(
-                "method_id",
-                repo_id=F("build_flow__build__repo"),
-                branch_id=F("build_flow__build__branch"),
-                plan_id=F("build_flow__build__plan"),
-                flow=F("build_flow__flow"),
-                day=Value(date, output_field=models.DateField()),
-            )
-            .annotate(
-                count=Count("method__name"),
-                duration_average=metrics["duration_average"],
-                duration_slow=metrics["duration_slow"],
-                duration_fast=metrics["duration_fast"],
-                cpu_usage_average=metrics["cpu_usage_average"],
-                cpu_usage_low=metrics["cpu_usage_low"],
-                cpu_usage_high=metrics["cpu_usage_high"],
-                failures=metrics["failures"],
-            )
-        )
-
-        print(method_contexts.query)
-        obsolete_objects = TestResultPerfSummary.objects.filter(day=date)
-        print("To delete", len(obsolete_objects))
-        obsolete_objects.delete()
-
-        new_objects = [TestResultPerfSummary(**values) for values in method_contexts]
-        print(len(new_objects))
-
-        print(len(TestResultPerfSummary.objects.bulk_create(new_objects)))
 
     def handle(self, startdate, enddate, replace, **options):
         should_replace = replace == "replace"
@@ -98,4 +59,4 @@ class Command(BaseCommand):
                 pass
         dates = date_range(startdate, enddate)
         for date in dates:
-            self.handle_date(date)
+            TestResultPerfSummary.summarize_day(date)

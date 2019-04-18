@@ -1,10 +1,10 @@
 import copy
 from collections import namedtuple
 
-from django.db.models import FloatField
-from django.db.models.functions import Cast, Lower
+from django.db.models import FloatField, BigIntegerField
+from django.db.models.functions import Cast
 
-from django.db.models import F, Avg, Count, Q, StdDev
+from django.db.models import F, Avg, Count, Q, StdDev, Sum
 
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
@@ -13,8 +13,7 @@ from postgres_stats.aggregates import Percentile
 
 from rest_framework import generics, exceptions, viewsets, pagination, permissions
 
-from metaci.testresults.models import TestResult
-from metaci.build.models import BuildFlow, Build
+from metaci.testresults.models import TestResultPerfSummary
 from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
 from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
@@ -51,35 +50,13 @@ def set_timeout(timeout):
         cursor.execute("SET LOCAL statement_timeout=%s", [timeout * 1000])
 
 
-class TurnFilterSetOffByDefaultBase(django_filters.rest_framework.FilterSet):
-    """A bit of a hack class. Use carefully!
-
-    This is a bit of a hack to allow two filtersets to work together in
-    generating the djago-filter config form but to have only one of them
-    actually filter the output queryset. The other filters a queryset of
-    a sub-select.
-    """
-
-    def __init__(self, *args, really_filter=False, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if not really_filter:
-            for filtername in self.filters.keys():
-                if filtername in self.disable_by_default:
-                    self.filters[filtername] = copy.copy(self.filters[filtername])
-                    self.filters[filtername].method = self.dummy_filter
-
-    def dummy_filter(self, queryset, name, value):
-        return queryset
-
-
 class StandardResultsSetPagination(pagination.PageNumberPagination):
     page_size = DEFAULTS.page_size
     page_size_query_param = "page_size"
     max_page_size = DEFAULTS.max_page_size
 
 
-class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
+class BuildFlowFilterSet:
     """A "conditional" filterset for generating the BuildFlow sub-select.
 
     The tricky bit is that this filter serves three different jobs.
@@ -100,15 +77,12 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     and turned on explicitly ("really_filter") when it is created by get_queryset
     """
 
-    disable_by_default = []
-
     repo_choices = (
         Repository.objects.values_list("name", "name").order_by("name").distinct()
     )
     repo = django_filters.rest_framework.ChoiceFilter(
         field_name="build__repo__name", label="Repo Name", choices=repo_choices
     )
-    disable_by_default.append("repo")
 
     branch_choices = (
         Branch.objects.values_list("name", "name").order_by("name").distinct()
@@ -116,21 +90,11 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     branch = django_filters.rest_framework.ChoiceFilter(
         field_name="build__branch__name", label="Branch Name", choices=branch_choices
     )
-    disable_by_default.append("branch")
 
     plan_choices = Plan.objects.values_list("name", "name").order_by("name").distinct()
     plan = django_filters.rest_framework.ChoiceFilter(
         field_name="build__plan__name", label="Plan Name", choices=plan_choices
     )
-    disable_by_default.append("plan")
-
-    flow_choices = (
-        BuildFlow.objects.values_list("flow", "flow").order_by("flow").distinct()
-    )
-    flow = django_filters.rest_framework.ChoiceFilter(
-        field_name="flow", label="Flow Name", choices=flow_choices
-    )
-    disable_by_default.append("flow")
 
     # Django-filter's DateRangeFilter is kind of ... special
     # disable until we can fix it.
@@ -139,27 +103,36 @@ class BuildFlowFilterSet(TurnFilterSetOffByDefaultBase):
     # disable_by_default.append("recentdate")
 
     daterange = django_filters.rest_framework.DateFromToRangeFilter(
-        field_name="time_end",
+        field_name="day",
         label="Date range",
         widget=DateRangeWidget(attrs={"type": "date"}),
     )
-    disable_by_default.append("daterange")
 
     # This is not really a filter. It's actually just a query input but putting it
     # here lets me get it in the django-filters form.
     build_flows_limit = django_filters.rest_framework.NumberFilter(
-        method="dummy_filter",
-        label="Build Flows Limit (default: 100)",
-        initial=DEFAULTS.build_flows_limit,
+        method="dummy_filter", label="Build Flows Limit (default: 100)"
     )
 
     fields_and_stuff = locals()
 
     build_fields = {}
 
-    for name in ("repo", "plan", "branch", "flow"):
+    for name in ("repo", "plan", "branch"):
         # make a list of db field_names for use in grouping
         build_fields[name] = fields_and_stuff[name].field_name
+
+
+def AsInt(expr):
+    return Cast(expr, BigIntegerField())
+
+
+def AsFloat(expr):
+    return Cast(expr, FloatField())
+
+
+def AvgofAvgs(fieldname):
+    return AsFloat(Sum(AsInt(F(fieldname) * F("agg_count"))) / Sum("agg_count"))
 
 
 class TestMethodPerfFilterSet(
@@ -194,42 +167,33 @@ class TestMethodPerfFilterSet(
     def dummy(queryset, name, value):
         return queryset
 
-    # don't include method_name in this list. Its already passed by default
     metrics = {
-        "duration_average": FieldType("Duration: Average", Avg("duration")),
-        "duration_slow": FieldType("Duration: Slow", NearMax("duration")),
-        "duration_fast": FieldType("Duration: Fast", NearMin("duration")),
-        "duration_stddev": FieldType("Duration: Stddev", StdDev("duration")),
-        "duration_coefficient_var": FieldType(
-            "Duration: VarCoef", StdDev("duration") / Avg("duration")
+        "method_name": FieldType("Method Name", F("method__name")),
+        "duration_average": FieldType(
+            "Duration: Average", AvgofAvgs("agg_duration_average")
         ),
-        "cpu_usage_average": FieldType("CPU Usage: Average", Avg("test_cpu_time_used")),
-        "cpu_usage_low": FieldType("CPU Usage: Low", NearMin("test_cpu_time_used")),
-        "cpu_usage_high": FieldType("CPU Usage: High", NearMax("test_cpu_time_used")),
-        "count": FieldType("Count", Count("id")),
-        "failures": FieldType("Failures", Count("id", filter=Q(outcome="Fail"))),
+        "duration_slow": FieldType("Duration: Slow", AvgofAvgs("agg_duration_slow")),
+        "duration_fast": FieldType("Duration: Fast", AvgofAvgs("agg_duration_fast")),
+        "cpu_usage_average": FieldType(
+            "CPU Usage: Average", AvgofAvgs("agg_cpu_usage_average")
+        ),
+        "cpu_usage_low": FieldType("CPU Usage: Low", AvgofAvgs("agg_cpu_usage_low")),
+        "cpu_usage_high": FieldType("CPU Usage: High", AvgofAvgs("agg_cpu_usage_high")),
+        "count": FieldType("Count", Sum(F("agg_count"))),
+        "failures": FieldType("Failures", Sum("agg_failures")),
         "assertion_failures": FieldType(
-            "Assertion Failures",
-            Count("id", filter=Q(message__startswith="System.AssertException")),
-        ),
-        "DML_failures": FieldType(
-            "DML Failures",
-            Count("id", filter=Q(message__startswith="System.DmlException")),
-        ),
-        "Other_failures": FieldType(
-            "Other Failures",
-            Count(
-                "id",
-                filter=~Q(message__startswith="System.DmlException")
-                & ~Q(message__startswith="System.AssertException"),
-            ),
+            "Assertion Failures", Sum("agg_assertion_failures")
         ),
         "success_percentage": FieldType(
             "Success Percentage",
-            Cast(Count("id", filter=Q(outcome="Pass")), FloatField())
-            / Cast(Count("id"), FloatField())
-            * 100,
+            AsInt(
+                (AsFloat(Sum(F("agg_count"))) - Sum(F("agg_failures")))
+                / AsFloat(Sum(F("agg_count")))
+                * 100
+            ),
         ),
+        "DML_failures": FieldType("DML Failures", Sum("agg_DML_failures")),
+        "Other_failures": FieldType("Other Failures", Sum("agg_other_failures")),
     }
 
     metric_choices = tuple((key, field.label) for key, field in metrics.items())
@@ -258,7 +222,7 @@ class MetaCIApiException(exceptions.APIException):
     default_code = 400
 
 
-class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
+class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     """A view for lists of aggregated test metrics.
 
     Note that the number of build flows covered is limited to **DEFAULTS.build_flows_limit** for performance reasons. You can
@@ -271,6 +235,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     pagination_class = StandardResultsSetPagination
     ordering_param_name = filterset_class.ordering_param_name
     permission_classes = (permissions.AllowAny,)
+    model_fields = set(field.name for field in TestResultPerfSummary._meta.get_fields())
 
     # example URLs:
     # http://localhost:8000/api/testmethod_perf/?repo=gem&plan=Release%20Test&method_name=testCreateNegative
@@ -280,27 +245,6 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     @property
     def orderby_field(self):
         return self.request.query_params.get(self.ordering_param_name)
-
-    def _get_build_flows(self):
-        """Which build_flows do we need to look at? Limit by time, repo, etc.
-
-        Also limits # of returned build_flows for performance reasons
-        """
-        params = self.request.query_params
-        build_flows_limit = int(
-            params.get("build_flows_limit") or DEFAULTS.build_flows_limit
-        )
-
-        build_flows = BuildFlow.objects.filter(tests_total__gte=1)
-        build_flows = BuildFlowFilterSet(
-            self.request.GET, build_flows, really_filter=True
-        ).qs
-
-        build_flows = build_flows.filter(
-            build__in=Build.objects.for_user(self.request.user)
-        )
-
-        return build_flows.order_by("-time_end")[0:build_flows_limit]
 
     def _get_aggregation_fields(self):
         """What fields should appear in the output?"""
@@ -320,17 +264,6 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             ):
                 fields_to_include.append(filters[param].field_name)
 
-        # the field we want to order on should be in the annotation list
-        if self.orderby_field:
-            fields_to_include.append(self.orderby_field.strip("-"))
-
-        # method_name is removed because
-        # Django doesn't like it if we add it to the annotation list
-        # when it is already a field_name
-        if "method_name" in fields_to_include:
-            fields_to_include.remove("method_name")
-
-        # no fields? Use defaults
         if fields_to_include == []:
             filters = self.filterset_class.get_filters()
             assert filters
@@ -341,9 +274,15 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
             fields_to_include.extend(default_include_fields)
 
-        # build a dictionary in the form DRF likes
+        # the field we want to order on should be in the annotation list
+        if self.orderby_field and self.orderby_field.strip("-") != "method_name":
+            fields_to_include.append(self.orderby_field.strip("-"))
+
+        fields = self.filterset_class.metrics
+
+        # every field explicitly asked for
         for fieldname in fields_to_include:
-            if fields.get(fieldname):
+            if fields.get(fieldname) and fieldname != "method_name":
                 aggregations[fieldname] = fields[fieldname].aggregation
 
         return aggregations
@@ -352,28 +291,11 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         """Which fields to split on (or group by, depending on how you think about it)"""
         params = self.request.query_params
         output_fields = {}
-        build_fields = BuildFlowFilterSet.build_fields
-        group_by_fields = []
-        order_by_field = self.orderby_field
 
         # if the order_by field is a build field
         # then we need to group by it.
         if order_by_field and order_by_field in build_fields:
-            group_by_fields.append(order_by_field)
-
-        # if it is in the include_fields list, lets add
-        # it too, with group-by behaviour.
-        # TODO: Test this logic
-        fields_to_include = params.getlist("include_fields")
-        build_fields_in_include_fields = set(fields_to_include).intersection(
-            set(build_fields.keys())
-        )
-        for fieldname in build_fields_in_include_fields:
-            group_by_fields.append(fieldname)
-
-        if group_by_fields:
-            for param in group_by_fields:
-                output_fields[param] = F("build_flow__" + build_fields[param])
+            output_fields[param] = F(build_fields[param])
 
         return output_fields
 
@@ -389,76 +311,26 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
     def get_queryset(self):
         """The main method that the Django infrastructure invokes."""
-        set_timeout(5)
+        set_timeout(10)
         self._check_params()
 
-        build_flows = self._get_build_flows()
-        splitter_fields = self._get_splitter_fields()
+        # splitter_fields = self._get_splitter_fields()
         aggregations = self._get_aggregation_fields()
 
         queryset = (
-            TestResult.objects.filter(
-                build_flow_id__in=build_flows, duration__isnull=False
-            )
-            .values(method_name=F("method__name"), **splitter_fields)
+            TestResultPerfSummary.objects.filter()
+            .values(method_name=F("method__name"))
             .annotate(**aggregations)
         )
 
         if not self.orderby_field:
-            queryset = queryset.order_by(Lower("method_name"))
+            queryset = queryset.order_by("method_name")
 
         return queryset
 
 
-class TestMethodResultFilterSet(
-    BuildFlowFilterSet, django_filters.rest_framework.FilterSet
-):
-    method_name = TestMethodPerfFilterSet.get_filters()["method_name"]
-
-    dummy = TestMethodPerfFilterSet.dummy
-
-    # this field should be renamed. These aren't really metrics.
-    metrics = {
-        "method_name": FieldType("Method Name", F("method_name")),
-        "duration": FieldType("Duration", F("duration")),
-        "cpu_usage": FieldType("CPU Usage", F("test_cpu_time_used")),
-        "outcome": FieldType("Failures", F("outcome")),
-        "id": FieldType("Id", F("id")),
-        "date": FieldType("Date", F("build_flow__time_end")),
-        "type": FieldType("Type", F("method__testclass__test_type")),
-    }
-
-    metric_choices = tuple((key, field.label) for key, field in metrics.items())
-    includable_fields = metric_choices + tuple(
-        zip(
-            BuildFlowFilterSet.build_fields.keys(),
-            BuildFlowFilterSet.build_fields.keys(),
-        )
-    )
-
-    include_fields = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Include (multi-select okay)",
-        choices=includable_fields,
-        method=dummy,
-        initial=["repo", "duration_average"],
-    )
-
-    ordering_fields = [(key, key) for (key, field) in includable_fields]
-
-    o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
-    ordering_param_name = "o"
-
-
-class TestMethodResultListView(TestMethodPerfListView):
-    serializer_class = SimpleDictSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filterset_class = TestMethodResultFilterSet
-    pagination_class = StandardResultsSetPagination
-    ordering_param_name = filterset_class.ordering_param_name
-
-
 # A bit of hackery to make a dynamic docstring, because the docstring
 # appears in the UI.
-TestMethodPerfListView.__doc__ = TestMethodPerfListView.__doc__.replace(
+FastTestMethodPerfListView.__doc__ = FastTestMethodPerfListView.__doc__.replace(
     "DEFAULTS.build_flows_limit", str(DEFAULTS.build_flows_limit)
 )

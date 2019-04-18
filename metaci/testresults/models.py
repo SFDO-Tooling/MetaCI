@@ -1,13 +1,18 @@
 from __future__ import unicode_literals
 
 import os
-import dateutil.parser
 from collections import OrderedDict
 from django.db import models
-from django import forms
 from django.urls import reverse
 from metaci.testresults.choices import OUTCOME_CHOICES
 from metaci.testresults.choices import TEST_TYPE_CHOICES
+
+from django.utils import timezone
+
+from metaci.build import models as build_models
+import time
+
+from django.db.models import F, Count, Value
 
 
 class TestClass(models.Model):
@@ -246,6 +251,13 @@ class TestResultAsset(models.Model):
 
 
 class TestResultPerfSummary(models.Model):
+    class Meta:
+        verbose_name = "Test Results Performance Summary"
+        verbose_name_plural = "Test Results Performance Summaries"
+        db_table = "testresult_perfsummary"
+        unique_together = ("repo", "branch", "plan", "method", "day")
+        indexes = [models.Index(fields=unique_together, name="lookup")]
+
     repo = models.ForeignKey(
         "repository.Repository",
         related_name="testresult_perfsummaries",
@@ -258,8 +270,6 @@ class TestResultPerfSummary(models.Model):
         blank=False,
         on_delete=models.PROTECT,
     )
-
-    flow = models.CharField(max_length=255, null=False, blank=False)
 
     plan = models.ForeignKey(
         "plan.Plan",
@@ -279,20 +289,75 @@ class TestResultPerfSummary(models.Model):
 
     day = models.DateField(null=False, blank=False)
 
-    duration_average = models.FloatField(null=True, blank=False)
-    duration_slow = models.FloatField(null=True, blank=False)
-    duration_fast = models.FloatField(null=True, blank=False)
-    cpu_usage_average = models.FloatField(null=True, blank=False)
-    cpu_usage_low = models.FloatField(null=True, blank=False)
-    cpu_usage_high = models.FloatField(null=True, blank=False)
+    agg_duration_average = models.FloatField(null=True, blank=False)
+    agg_duration_slow = models.FloatField(null=True, blank=False)
+    agg_duration_fast = models.FloatField(null=True, blank=False)
+    agg_cpu_usage_average = models.FloatField(null=True, blank=False)
+    agg_cpu_usage_low = models.FloatField(null=True, blank=False)
+    agg_cpu_usage_high = models.FloatField(null=True, blank=False)
 
-    count = models.IntegerField(null=False, blank=False)
+    agg_count = models.IntegerField(null=False, blank=False)
 
-    failures = models.IntegerField(null=False, blank=False)
+    agg_failures = models.IntegerField(null=False, blank=False)
 
-    class Meta:
-        verbose_name = "Test Results Performance Summary"
-        verbose_name_plural = "Test Results Performance Summaries"
-        db_table = "testresult_perfsummary"
-        unique_together = ("repo", "branch", "flow", "plan", "method", "day")
-        indexes = [models.Index(fields=unique_together, name="lookup")]
+    agg_assertion_failures = models.IntegerField(null=False, blank=False)
+
+    agg_DML_failures = models.IntegerField(null=False, blank=False)
+    agg_other_failures = models.IntegerField(null=False, blank=False)
+
+    @classmethod
+    def summarize_day(cls, date):
+        assert date
+        # TODO: This is gross but its temporary.
+        from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
+
+        metrics = {
+            name: f.aggregation for (name, f) in TestMethodPerfFilterSet.metrics.items()
+        }
+        date_with_timezone = timezone.template_localtime(date, use_tz=True)
+        buildflows = build_models.BuildFlow.objects.filter(
+            time_end__date=date_with_timezone
+        )
+
+        def timer():
+            starttime = time.time()
+            while True:
+                endtime = time.time()
+                yield round(endtime - starttime)
+                starttime = endtime
+
+        t = timer()
+
+        method_contexts = (
+            TestResult.objects.filter(build_flow_id__in=buildflows)
+            .values(
+                "method_id",
+                repo_id=F("build_flow__build__repo"),
+                branch_id=F("build_flow__build__branch"),
+                plan_id=F("build_flow__build__plan"),
+                day=Value(date, output_field=models.DateField()),
+            )
+            .annotate(
+                agg_count=Count("method__name"),
+                agg_duration_average=metrics["duration_average"],
+                agg_duration_slow=metrics["duration_slow"],
+                agg_duration_fast=metrics["duration_fast"],
+                agg_cpu_usage_average=metrics["cpu_usage_average"],
+                agg_cpu_usage_low=metrics["cpu_usage_low"],
+                agg_cpu_usage_high=metrics["cpu_usage_high"],
+                agg_failures=metrics["failures"],
+                agg_assertion_failures=metrics["assertion_failures"],
+                agg_DML_failures=metrics["DML_failures"],
+                agg_other_failures=metrics["Other_failures"],
+            )
+        )
+
+        obsolete_objects = TestResultPerfSummary.objects.filter(day=date)
+        print("To delete", next(t), len(obsolete_objects))
+        obsolete_objects.delete()
+        print("Deleted", next(t))
+
+        new_objects = [TestResultPerfSummary(**values) for values in method_contexts]
+        print("New Objects to be created", next(t), len(new_objects))
+        created = len(TestResultPerfSummary.objects.bulk_create(new_objects))
+        print("New objects created", next(t), created)

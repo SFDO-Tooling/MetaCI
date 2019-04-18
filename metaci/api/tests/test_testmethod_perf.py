@@ -9,11 +9,15 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient, APITestCase
 
+from metaci.testresults.models import TestResultPerfSummary
+
 rand = random.Random()
 rand.seed("xyzzy")
 
 
 class _TestingHelpers:
+    route = reverse("testmethod_perf-list")
+
     def debugmsg(self, *args):
         print(*args)  # Pytest does useful stuff with stdout, better than logger data
 
@@ -29,7 +33,7 @@ class _TestingHelpers:
     def api_url(self, **kwargs):
         params = urlencode(kwargs, True)
         self.debugmsg("QueryParams", params)
-        return reverse("testmethod_perf-list") + "?" + params
+        return self.route + "?" + params
 
     def find_first(self, fieldname, objs, value):
         """ Find objects in JSON result sets that match a value """
@@ -82,6 +86,12 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
     def test_averaging(self):
         """Test averaging of methods"""
         objs = self.get_api_results(include_fields="duration_average")
+        print(
+            "Summaries",
+            TestResultPerfSummary.objects.all().values(
+                "day", "method__name", "agg_duration_average"
+            ),
+        )
 
         self.assertEqual(
             self.find_first("method_name", objs, "Foo")["duration_average"], 6
@@ -90,24 +100,24 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             self.find_first("method_name", objs, "Bar")["duration_average"], 4
         )
 
-    def test_all_included_fields(self):
-        includable_fields = [
-            "duration_average",
-            "duration_slow",
-            "duration_fast",
-            "duration_stddev",
-            "duration_coefficient_var",
-            "cpu_usage_average",
-            "cpu_usage_low",
-            "cpu_usage_high",
-            "count",
-            "failures",
-            "assertion_failures",
-            "DML_failures",
-            "Other_failures",
-            "success_percentage",
-        ]
+    includable_fields = [
+        "duration_average",
+        "duration_slow",
+        "duration_fast",
+        "duration_stddev",
+        "duration_coefficient_var",
+        "cpu_usage_average",
+        "cpu_usage_low",
+        "cpu_usage_high",
+        "count",
+        "failures",
+        "assertion_failures",
+        "DML_failures",
+        "Other_failures",
+        "success_percentage",
+    ]
 
+    def test_all_included_fields(self):
         def _test_fields(fields):
             response = self.client.get(self.api_url(include_fields=fields))
             self.assertEqual(response.status_code, 200)
@@ -116,18 +126,18 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
                 self.assertSetEqual(set(fields + ["method_name"]), set(row))
 
         for i in range(10):
-            field = rand.sample(includable_fields, 1)
+            field = rand.sample(self.includable_fields, 1)
             _test_fields(field)
 
         for i in range(10):
-            field1, field2 = rand.sample(includable_fields, 2)
+            field1, field2 = rand.sample(self.includable_fields, 2)
             _test_fields([field1, field2])
 
         for i in range(10):
-            field1, field2, field3 = rand.sample(includable_fields, 3)
+            field1, field2, field3 = rand.sample(self.includable_fields, 3)
             _test_fields([field1, field2, field3])
 
-        _test_fields(includable_fields)
+        _test_fields(self.includable_fields)
 
     def test_duration_slow(self):
         """Test counting high durations"""
@@ -137,18 +147,18 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         rows = self.get_api_results(include_fields=["duration_slow", "count"])
 
         self.assertEqual(
-            self.find_first("method_name", rows, "Foo")["duration_slow"], 10
+            round(self.find_first("method_name", rows, "Foo")["duration_slow"]), 10
         )
 
     def test_duration_fast(self):
         """Test counting high durations"""
 
-        self.insert_identical_tests(method_name="Foo", count=20, duration=2)
-        _outlier = TestResultFactory(method__name="Foo", duration=1)  # noqa
+        self.insert_identical_tests(method_name="FooBar", count=20, duration=2)
+        _outlier = TestResultFactory(method__name="FooBar", duration=1)  # noqa
         rows = self.get_api_results(include_fields=["duration_slow", "count"])
 
         self.assertEqual(
-            self.find_first("method_name", rows, "Foo")["duration_slow"], 2
+            round(self.find_first("method_name", rows, "FooBar")["duration_slow"]), 2
         )
 
     def test_count_failures(self):
@@ -377,3 +387,22 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
 
         self.assertIn("duration_average", rows[0].keys())
         self.assertIn("method_name", rows[0].keys())
+
+
+class TestFastTestMethodPerfRESTAPI(TestTestMethodPerfRESTAPI):
+    route = reverse("fast_testmethod_perf-list")
+
+    includable_fields = [
+        "duration_average",
+        "duration_slow",
+        "duration_fast",
+        "cpu_usage_average",
+        "cpu_usage_low",
+        "cpu_usage_high",
+        "count",
+        "failures",
+        "assertion_failures",
+        "DML_failures",
+        "Other_failures",
+        "success_percentage",
+    ]
