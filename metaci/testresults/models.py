@@ -255,7 +255,7 @@ class TestResultPerfSummary(models.Model):
         verbose_name = "Test Results Performance Summary"
         verbose_name_plural = "Test Results Performance Summaries"
         db_table = "testresult_perfsummary"
-        unique_together = ("repo", "branch", "plan", "method", "day")
+        unique_together = ("rel_repo", "rel_branch", "rel_plan", "method", "day")
         indexes = [models.Index(fields=unique_together, name="lookup")]
 
     rel_repo = models.ForeignKey(
