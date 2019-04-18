@@ -105,6 +105,8 @@ class TestAPISecurity(APITestCase):
                 is_public = callable_url in [
                     "testmethod_perf_UI/",
                     "testmethod_perf/",
+                    "fast_testmethod_perf/",
+                    "testmethod_perf/",
                     "testmethod_results/",
                 ]
                 if is_public:
