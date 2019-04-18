@@ -1,7 +1,6 @@
 // @flow
 
 import cookies from 'js-cookie';
-
 import { logError } from 'utils/logging';
 
 export type UrlParams = { [string]: string | number | boolean };
@@ -44,7 +43,8 @@ const getApiFetch = () => (url: string, opts: { [string]: mixed } = {}) => {
         if (response.ok) {
           return getResponse(response);
         }
-        if (response.status >= 400 && response.status < 500) {
+        if (response.status >= 400 && response.status) {
+          logError(response);
           return getResponse(response, response.status);
         }
         const error = (new Error(response.statusText): { [string]: mixed });
