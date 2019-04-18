@@ -31,11 +31,13 @@ Install Python requirements::
 
     pip install -r requirements/local.txt
 
-Copy the ``.env`` file somewhere that will be sourced when you need it::
+Copy the ``.env`` file to config/settings/.env::
 
-    cp env.example $VIRTUAL_ENV/bin/postactivate
+    cp env.example config/settings/.env
 
-Edit this file to fill in values for the missing settings.
+Edit this file to fill in values for the missing settings, especially
+GITHUB_USERNAME and GITHUB_PASSWORD. You will need to use a
+`Personal Access Token` instead of a password if you have 2-factor auth setup.
 
 Now run ``workon metaci`` to set those environment variables.
 
@@ -48,6 +50,8 @@ instead of any system-wide Node you may have.
 (``workon metaci}}``).**
 
 .. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
+
+.. _Personal Access Token: https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
 Installing JavaScript requirements
 ----------------------------------
@@ -81,20 +85,22 @@ and running locally::
 
 Then run the initial migrations::
 
-    python manage.py migrate
+    ./manage.py migrate
 
 Run this command if you would like to populate the database with fake testing
 data:
 
-    python manage.py populate_db
+    ./manage.py populate_db
 
 Run this command to create a necessary repeatable django-rq job in the database::
 
     ./manage.py metaci_scheduled_jobs
 
 
-Copying the production database
--------------------------------
+Alternative: Copying the production database
+---------------------------------------------
+
+** PLEASE CONTACT THE METACI TEAM BEFORE DOING THIS TO DISCUSS THE SECURITY IMPLICATAIONS **
 
 Alternatively, if you'd like to fetch a copy of production data from Heroku,
 skip creating the database, and then do this::
