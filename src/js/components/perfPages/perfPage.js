@@ -60,29 +60,22 @@ export const UnwrappedPerfPage = ({
     throw new Error('Store error');
   }
 
-  // If there was an error loading at this point, it is very likely to
-  // be an authentication error.
-  // TODO: Parse exception to be sure.
   if (perfUIStatus === 'ERROR' || (perfState && perfState.status === 'ERROR')) {
-    return (
-      <AuthError
-        message={t(
-          'Top Secret! Please ensure you are on the VPN and logged in to MetaCI.',
-        )}
-      />
-    );
+    const message =
+      get(perfState, 'reason.reason') || get(perfState, 'reason.error') || '';
+    throw new Error(message);
   }
 
   // Fetch the data: both UI configuration and also actual data results
   useEffect(() => {
-    doPerfRESTFetch(queryparams.getAll());
-    doPerfREST_UI_Fetch();
-    const pathParts = window.location.pathname.split('/');
-
     /* Special case for getting repo name from URL
      * path into query params with other filters
      */
-    queryparams.set({ repo: pathParts[pathParts.length - 2] });
+    const pathParts = window.location.pathname.split('/');
+    const repo = pathParts[pathParts.length - 2];
+    queryparams.set({ repo });
+    doPerfRESTFetch({ ...queryparams.getAll(), repo });
+    doPerfREST_UI_Fetch();
   }, []);
 
   let results;
@@ -170,7 +163,7 @@ const select = (appState: AppState) => ({
 
 const actions = {
   doPerfRESTFetch: (queryparts: {}) =>
-    perfRESTFetch('/api/testmethod_perf?', queryparts),
+    perfRESTFetch('/api/fast_testmethod_perf?', queryparts),
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 

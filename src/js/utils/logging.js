@@ -1,7 +1,7 @@
 // @flow
 
 export const logError = (
-  message: string | Error,
+  message: string | Error | Response,
   data: { [string]: mixed } = {},
 ) => {
   if (window.Raven && window.Raven.isSetup()) {

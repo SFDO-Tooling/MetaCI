@@ -11,10 +11,10 @@ from django_filters.widgets import DateRangeWidget
 
 from postgres_stats.aggregates import Percentile
 
-from rest_framework import generics, exceptions, viewsets, pagination
+from rest_framework import generics, exceptions, viewsets, pagination, permissions
 
 from metaci.testresults.models import TestResult
-from metaci.build.models import BuildFlow
+from metaci.build.models import BuildFlow, Build
 from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
 from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
@@ -270,6 +270,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     filterset_class = TestMethodPerfFilterSet
     pagination_class = StandardResultsSetPagination
     ordering_param_name = filterset_class.ordering_param_name
+    permission_classes = (permissions.AllowAny,)
 
     # example URLs:
     # http://localhost:8000/api/testmethod_perf/?repo=gem&plan=Release%20Test&method_name=testCreateNegative
@@ -295,6 +296,10 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             self.request.GET, build_flows, really_filter=True
         ).qs
 
+        build_flows = build_flows.filter(
+            build__in=Build.objects.for_user(self.request.user)
+        )
+
         return build_flows.order_by("-time_end")[0:build_flows_limit]
 
     def _get_aggregation_fields(self):
@@ -308,7 +313,11 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
         # every field we want to filter on should be in the annotation list
         for param, value in params.items():
-            if value and filters.get(param) and fields.get(param):
+            if value and (
+                filters.get(param)  # param is a filter, not a random config
+                and filters[param].field_name  # safety check
+                and fields.get(filters[param].field_name)  # param has associated field
+            ):
                 fields_to_include.append(filters[param].field_name)
 
         # the field we want to order on should be in the annotation list

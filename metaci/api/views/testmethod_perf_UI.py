@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from rest_framework import viewsets, response
+from rest_framework import viewsets, response, permissions
 
 from metaci.api.views.testmethod_perf import (
     BuildFlowFilterSet,
@@ -11,6 +11,8 @@ from metaci.api.views.testmethod_perf import (
 
 
 class TestMethodPerfUIApiView(viewsets.ViewSet):
+    permission_classes = (permissions.AllowAny,)
+
     defaults = [
         (item, value)
         for (item, value) in DEFAULTS.__dict__.items()

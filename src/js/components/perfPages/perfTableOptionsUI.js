@@ -241,6 +241,8 @@ type Field = {
   render: () => Node,
 };
 
+// convert a server-generaeted FilterDef into
+// a field that allows a selection of one option from manu.
 const choiceField = (
   filter: FilterDefinition,
   currentValue?: string | null,
@@ -272,6 +274,8 @@ const choiceField = (
   };
 };
 
+// convert a server-generaeted FilterDef into
+// a single line text field
 const charField = (
   filter: FilterDefinition,
   currentValue?: string | null,
