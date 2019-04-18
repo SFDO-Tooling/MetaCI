@@ -1,7 +1,7 @@
 # Test dependencies go here.
 -r base.txt
 
-pytest==4.3.1
+pytest==4.4.1
 pytest-django==3.4.8
 pytest-tap==2.3
 coverage==4.5.3
