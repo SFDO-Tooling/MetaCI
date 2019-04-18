@@ -201,21 +201,6 @@ const BuildFilterPicker = ({ filter, fetchServerData }) => {
                 onSelect={(value) => { fetchServerData({ [filter.name]: value }) }} />
 }
 
-
-
-const TEMPORARILY_UNUSED_DateRangeRenderer = ({ filter, fetchServerData }) => {
-    let startName = filter.name + "_after";
-    let endName = filter.name + "_before"
-    return <DateRangePicker
-                onChange={(name, data) => fetchServerData({ [name]: data })}
-                startName={startName}
-                endName={endName}
-                startValue={new Date()} // new Date(getDefaultValue(startName))}
-                endValue={new Date()} // new Date (getDefaultValue(endName))}
-                />
-}
-
-
 const AllFilters = ({ filters, fetchServerData }) => {
     return <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
             {filters.map((filter)=>
