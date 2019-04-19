@@ -163,7 +163,7 @@ const select = (appState: AppState) => ({
 
 const actions = {
   doPerfRESTFetch: (queryparts: {}) =>
-    perfRESTFetch('/api/fast_testmethod_perf?', queryparts),
+    perfRESTFetch('/api/testmethod_perf?', queryparts),
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 
