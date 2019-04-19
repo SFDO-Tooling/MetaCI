@@ -37,7 +37,8 @@ Copy the ``.env`` file to config/settings/.env::
 
 Edit this file to fill in values for the missing settings, especially
 GITHUB_USERNAME and GITHUB_PASSWORD. You will need to use a
-`Personal Access Token` instead of a password if you have 2-factor auth setup.
+`Personal Access Token` instead of a password if you have 2-factor
+authentication set up.
 
 Now run ``workon metaci`` to set those environment variables.
 
