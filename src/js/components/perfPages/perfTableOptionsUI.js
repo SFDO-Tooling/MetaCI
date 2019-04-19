@@ -5,11 +5,9 @@ import React, { useState } from 'react';
 import type { ComponentType } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-// flowlint  untyped-import:off
 import { t } from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
-// flowlint untyped-type-import:error
 
 import { createField } from './formFields';
 import type { Field } from './formFields';

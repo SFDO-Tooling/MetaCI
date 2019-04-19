@@ -5,7 +5,6 @@ import type { ComponentType } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { t } from 'i18next';
 import BrandBand from '@salesforce/design-system-react/components/brand-band';
 import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 import type { Match, RouterHistory } from 'react-router-dom';

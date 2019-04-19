@@ -4,11 +4,9 @@ import get from 'lodash/get';
 import zip from 'lodash/zip';
 import queryString from 'query-string';
 import { t } from 'i18next';
-// flowlint  untyped-import:off
 import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
-// flowlint  untyped-import:error
 
 import { QueryParamHelpers } from './perfTableUtils';
 import type { ServerDataFetcher } from './perfPage';
@@ -48,7 +46,7 @@ const PerfDataTable = ({
   const page = parseInt(queryparams.get('page') || '1', 10) - 1;
   const custom_page_size = queryparams.get('page_size');
   const count = get(perfState, 'perfdata.count') || -1;
-  const page_size = custom_page_size
+  const page_size = custom_page_size // flowlint-line sketchy-null-number:off
     ? parseInt(custom_page_size, 10)
     : get(perfState, 'perfdata.results.length') || null;
   const previousPage: string = get(perfState, 'perfdata.previous') || '';

@@ -1,6 +1,7 @@
 // @flow
 
 import cookies from 'js-cookie';
+
 import { logError } from 'utils/logging';
 
 export type UrlParams = { [string]: string | number | boolean };
@@ -17,6 +18,7 @@ const getResponse = (resp, errorStatus) =>
       } catch (err) {
         // swallow error
       }
+      // flowlint-next-line sketchy-null-number:off
       if (errorStatus) {
         return { error: errorStatus, reason: text };
       }

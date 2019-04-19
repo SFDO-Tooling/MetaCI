@@ -1,9 +1,7 @@
 // @flow
 import React, { useState } from 'react';
-// flowlint  untyped-import:off
 import Datepicker from '@salesforce/design-system-react/components/date-picker';
 import Button from '@salesforce/design-system-react/components/button';
-// flowlint  untyped-import:error
 
 type SLDSDateOption = {
   formattedDate: string,

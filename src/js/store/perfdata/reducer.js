@@ -1,9 +1,9 @@
 // @flow
 
-import type { PerfDataAction, UIDataAction } from 'store/perfdata/actions';
-
 import type { UIData } from '../../api/testmethod_perf_UI_JSON_schema';
 import type { PerfData as P } from '../../api/testmethod_perfdata_JSON_schema';
+
+import type { PerfDataAction, UIDataAction } from 'store/perfdata/actions';
 
 export type PerfData = P;
 
@@ -41,7 +41,7 @@ export type UIDataAvailable = {
 export type PerfDataState = PerfDataAvailable | PerfDataLoading | PerfDataError;
 
 export const perfDataReducer = (
-  state: PerfDataState = { status: 'LOADING', perfdata: null },
+  state: PerfDataState = { status: 'LOADING', perfdata: null, url: '' },
   action: PerfDataAction,
 ): PerfDataState => {
   switch (action.type) {

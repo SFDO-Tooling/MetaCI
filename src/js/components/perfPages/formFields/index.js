@@ -9,6 +9,7 @@ import FilterPicker from './filterPicker';
 import TextInput from './textInput';
 
 import type { FilterDefinition } from 'api/testmethod_perf_UI_JSON_schema';
+import { NumberFilterDefinitionShape } from 'api/testmethod_perf_UI_JSON_schema';
 
 // interface representing fields that can be shown on the screen.
 export type Field = {
@@ -68,6 +69,7 @@ const DecimalField = (
   currentValue?: string | null,
   fetchServerData,
 ): Field => {
+  filter = is(filter, NumberFilterDefinitionShape);
   const minValue: number | null | typeof undefined = filter.min;
   const maxValue: number | null | typeof undefined = filter.max;
   let step: number | null | typeof undefined = parseInt(filter.step, 10);

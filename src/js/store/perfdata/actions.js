@@ -2,6 +2,7 @@
 
 import queryString from 'query-string';
 import type { ThunkAction } from 'redux-thunk';
+
 import type { PerfData } from 'store/perfdata/reducer';
 import type { UIData } from 'api/testmethod_perf_UI_JSON_schema';
 import { assertUIData } from 'api/testmethod_perf_UI_JSON_schema';

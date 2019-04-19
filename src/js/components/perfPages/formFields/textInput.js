@@ -1,10 +1,8 @@
 // @flow
 import React, { useState } from 'react';
 import debounce from 'lodash/debounce';
-// flowlint  untyped-import:off
 import Input from '@salesforce/design-system-react/components/input';
 import Tooltip from '@salesforce/design-system-react/components/tooltip';
-// flowlint untyped-type-import:error
 
 type Props = {
   label?: string | null,

@@ -2,11 +2,9 @@
 
 import React, { useState } from 'react';
 import type { Node } from 'react';
-// flowlint  untyped-import:off
 import Combobox from '@salesforce/design-system-react/components/combobox';
 import Icon from '@salesforce/design-system-react/components/icon';
 import comboboxFilterAndLimit from '@salesforce/design-system-react/components/combobox/filter';
-// flowlint  untyped-import:error
 
 type Props = {
   choices: { id: string }[],
