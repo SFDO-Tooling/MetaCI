@@ -7,11 +7,10 @@ import { t } from 'i18next';
 import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
+import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 
 import { QueryParamHelpers } from './perfTableUtils';
 import type { ServerDataFetcher } from './perfPage';
-
-import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 
 type Props = {|
   fetchServerData: ServerDataFetcher,
@@ -61,11 +60,11 @@ const PerfDataTable = ({
             className="slds-col slds-size--1-of-2"
             style={{ textAlign: 'left' }}
           >
-            {t('Showing')} {(page * page_size).toString()}
-            {t(' to ')}
-            {Math.min((page + 1) * page_size, count)}
-            {t(' of ')}
-            {count.toString()} {t('records')}
+            {t('Showing {{fromnum}} to {{tonum}} of {{totalnum}}', {
+              fromnum: (page * page_size).toString(),
+              tonum: Math.min((page + 1) * page_size, count),
+              totalnum: count.toString(),
+            })}
           </div>
           <div className="slds-col slds-size--1-of-2">
             <button
