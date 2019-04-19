@@ -15,7 +15,7 @@ type SLDSChoiceOption = {
 
 type Options = SLDSChoiceOption[];
 
-const FieldPicker = ({ onChange, choices, defaultValue }: Props) => {
+const MultiPicker = ({ onChange, choices, defaultValue }: Props) => {
   console.assert(choices && choices.length, 'Choices is empty', choices); // eslint-disable-line no-console
   const options = choices.map(pair => ({ id: pair[0], label: pair[1] }));
 
@@ -58,4 +58,4 @@ const getSelectionListFromDefaultValue = (options, defaultValue) => {
   return undefined;
 };
 
-export default FieldPicker;
+export default MultiPicker;
