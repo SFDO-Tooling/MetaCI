@@ -98,23 +98,6 @@ Run this command to create a necessary repeatable django-rq job in the database:
     ./manage.py metaci_scheduled_jobs
 
 
-Alternative: Copying the production database
----------------------------------------------
-
-** PLEASE CONTACT THE METACI TEAM BEFORE DOING THIS TO DISCUSS THE SECURITY IMPLICATAIONS **
-
-Alternatively, if you'd like to fetch a copy of production data from Heroku,
-skip creating the database, and then do this::
-
-    heroku pg:pull mrbelvedereci::WHITE metaci
-
-You'll need to create a new superuser to log in. Log in to the admin panel with that user and update your Site record to point to localhost. This will enable you to log in as usual. Next, disable and enable the repeating jobs in django admin. Finally, delete all the persistent orgs as a safety precaution.
-
-You may want to make a local backup of the db since it takes a while to download:
-
-    createdb -T metaci-dev metaci-dev-bak
-
-
 Creating a superuser
 --------------------
 
