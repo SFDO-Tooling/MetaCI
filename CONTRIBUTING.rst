@@ -48,7 +48,7 @@ that whenever you are working on the project, you use the project-specific versi
 instead of any system-wide Node you may have.
 
 **All of the remaining steps assume that you have the virtualenv activated
-(``workon metaci}}``).**
+(``workon metaci``).**
 
 .. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
 
