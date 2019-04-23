@@ -302,6 +302,47 @@ class TestResultPerfSummaryBase(models.Model):
     agg_DML_failures = models.IntegerField(null=False, blank=False)
     agg_other_failures = models.IntegerField(null=False, blank=False)
 
+    @classmethod
+    def metrics(cls):
+        from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
+
+        return {
+            name: f.aggregation for (name, f) in TestMethodPerfFilterSet.metrics.items()
+        }
+
+    @classmethod
+    def _get_queryset_for_dates(cls, start_date, end_date, **values):
+        metrics = cls.metrics()
+
+        buildflows = build_models.BuildFlow.objects.filter(
+            time_end__date__gte=start_date, time_end__date__lte=end_date
+        )
+
+        method_contexts = (
+            TestResult.objects.filter(build_flow_id__in=buildflows)
+            .values(
+                "method_id",
+                rel_repo_id=F("build_flow__build__repo"),
+                rel_branch_id=F("build_flow__build__branch"),
+                rel_plan_id=F("build_flow__build__plan"),
+                **values,
+            )
+            .annotate(
+                agg_count=Count("method__name"),
+                agg_duration_average=metrics["duration_average"],
+                agg_duration_slow=metrics["duration_slow"],
+                agg_duration_fast=metrics["duration_fast"],
+                agg_cpu_usage_average=metrics["cpu_usage_average"],
+                agg_cpu_usage_low=metrics["cpu_usage_low"],
+                agg_cpu_usage_high=metrics["cpu_usage_high"],
+                agg_failures=metrics["failures"],
+                agg_assertion_failures=metrics["assertion_failures"],
+                agg_DML_failures=metrics["DML_failures"],
+                agg_other_failures=metrics["Other_failures"],
+            )
+        )
+        return method_contexts
+
 
 # This class may become obsolete.
 class TestResultPerfSummary(TestResultPerfSummaryBase):
@@ -318,38 +359,12 @@ class TestResultPerfSummary(TestResultPerfSummaryBase):
     def summarize_day(cls, date):
         assert date
         # TODO: This is gross but its temporary.
-        from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
-
-        metrics = {
-            name: f.aggregation for (name, f) in TestMethodPerfFilterSet.metrics.items()
-        }
         date_with_timezone = timezone.template_localtime(date, use_tz=True)
-        buildflows = build_models.BuildFlow.objects.filter(
-            time_end__date=date_with_timezone
-        )
 
-        method_contexts = (
-            TestResult.objects.filter(build_flow_id__in=buildflows)
-            .values(
-                "method_id",
-                rel_repo_id=F("build_flow__build__repo"),
-                rel_branch_id=F("build_flow__build__branch"),
-                rel_plan_id=F("build_flow__build__plan"),
-                day=Value(date, output_field=models.DateField()),
-            )
-            .annotate(
-                agg_count=Count("method__name"),
-                agg_duration_average=metrics["duration_average"],
-                agg_duration_slow=metrics["duration_slow"],
-                agg_duration_fast=metrics["duration_fast"],
-                agg_cpu_usage_average=metrics["cpu_usage_average"],
-                agg_cpu_usage_low=metrics["cpu_usage_low"],
-                agg_cpu_usage_high=metrics["cpu_usage_high"],
-                agg_failures=metrics["failures"],
-                agg_assertion_failures=metrics["assertion_failures"],
-                agg_DML_failures=metrics["DML_failures"],
-                agg_other_failures=metrics["Other_failures"],
-            )
+        method_contexts = cls._get_queryset_for_dates(
+            date_with_timezone,
+            date_with_timezone,
+            day=Value(date, output_field=models.DateField()),
         )
 
         obsolete_objects = cls.objects.filter(day=date)
@@ -377,18 +392,11 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
         sunday_of_week = day - to_subtract
         return sunday_of_week
 
-    from pysnooper import snoop
-
     @classmethod
-    #    @snoop()
     def summarize_week(cls, date):
         assert date
         # TODO: This is gross but its temporary.
-        from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
 
-        metrics = {
-            name: f.aggregation for (name, f) in TestMethodPerfFilterSet.metrics.items()
-        }
         if not hasattr(date, "weekday"):
             date = datetime.datetime.strptime(date, "%Y-%m-%d")
 
@@ -397,33 +405,11 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
         week_end_with_timezone = timezone.template_localtime(
             week_start + timezone.timedelta(days=7), use_tz=True
         )
-        buildflows = build_models.BuildFlow.objects.filter(
-            time_end__date__gte=week_start_with_timezone,
-            time_end__date__lte=week_end_with_timezone,
-        )
 
-        method_contexts = (
-            TestResult.objects.filter(build_flow_id__in=buildflows)
-            .values(
-                "method_id",
-                rel_repo_id=F("build_flow__build__repo"),
-                rel_branch_id=F("build_flow__build__branch"),
-                rel_plan_id=F("build_flow__build__plan"),
-                week_start=Value(date, output_field=models.DateField()),
-            )
-            .annotate(
-                agg_count=Count("method__name"),
-                agg_duration_average=metrics["duration_average"],
-                agg_duration_slow=metrics["duration_slow"],
-                agg_duration_fast=metrics["duration_fast"],
-                agg_cpu_usage_average=metrics["cpu_usage_average"],
-                agg_cpu_usage_low=metrics["cpu_usage_low"],
-                agg_cpu_usage_high=metrics["cpu_usage_high"],
-                agg_failures=metrics["failures"],
-                agg_assertion_failures=metrics["assertion_failures"],
-                agg_DML_failures=metrics["DML_failures"],
-                agg_other_failures=metrics["Other_failures"],
-            )
+        method_contexts = cls._get_queryset_for_dates(
+            week_start_with_timezone,
+            week_end_with_timezone,
+            week_start=Value(date, output_field=models.DateField()),
         )
 
         obsolete_objects = cls.objects.filter(week_start=date)
