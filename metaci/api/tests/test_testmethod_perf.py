@@ -9,8 +9,6 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient, APITestCase
 
-from metaci.testresults.models import TestResultPerfSummary
-
 rand = random.Random()
 rand.seed("xyzzy")
 
@@ -86,12 +84,6 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
     def test_averaging(self):
         """Test averaging of methods"""
         objs = self.get_api_results(include_fields="duration_average")
-        print(
-            "Summaries",
-            TestResultPerfSummary.objects.all().values(
-                "day", "method__name", "agg_duration_average"
-            ),
-        )
 
         self.assertEqual(
             self.find_first("method_name", objs, "Foo")["duration_average"], 6
@@ -301,11 +293,6 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             method__name="Bar2", outcome="Pass", build_flow__tests_total=1
         )
         rows = self.get_api_results(o="success_percentage")
-        print(
-            TestResultPerfSummary.objects.all().values(
-                "day", "method__name", "agg_failures", "agg_count"
-            )
-        )
         self.assertTrue(rows[0]["success_percentage"] < rows[-1]["success_percentage"])
 
     def test_order_by_success_percentage_desc(self):

@@ -10,7 +10,7 @@ from metaci.testresults.choices import TEST_TYPE_CHOICES
 from django.utils import timezone
 
 from metaci.build import models as build_models
-import time
+import datetime
 
 from django.db.models import F, Count, Value
 
@@ -250,23 +250,19 @@ class TestResultAsset(models.Model):
     asset = models.FileField(upload_to=asset_upload_to)
 
 
-class TestResultPerfSummary(models.Model):
+class TestResultPerfSummaryBase(models.Model):
     class Meta:
-        verbose_name = "Test Results Performance Summary"
-        verbose_name_plural = "Test Results Performance Summaries"
-        db_table = "testresult_perfsummary"
-        unique_together = ("rel_repo", "rel_branch", "rel_plan", "method", "day")
-        indexes = [models.Index(fields=unique_together, name="lookup")]
+        abstract = True
 
     rel_repo = models.ForeignKey(
         "repository.Repository",
-        related_name="testresult_perfsummaries",
+        #        related_name="testresult_perfsummaries",
         db_column="repo_id",
         on_delete=models.PROTECT,
     )
     rel_branch = models.ForeignKey(
         "repository.Branch",
-        related_name="testresult_perfsummaries",
+        #        related_name="testresult_perfsummaries",
         null=False,
         blank=False,
         db_column="branch_id",
@@ -275,7 +271,7 @@ class TestResultPerfSummary(models.Model):
 
     rel_plan = models.ForeignKey(
         "plan.Plan",
-        related_name="testresult_perfsummaries",
+        #        related_name="testresult_perfsummaries",
         null=False,
         blank=False,
         db_column="plan_id",
@@ -284,13 +280,11 @@ class TestResultPerfSummary(models.Model):
 
     method = models.ForeignKey(
         TestMethod,
-        related_name="testresult_perfsummaries",
+        #        related_name="testresult_perfsummaries",
         null=False,
         blank=False,
         on_delete=models.PROTECT,
     )
-
-    day = models.DateField(null=False, blank=False)
 
     agg_duration_average = models.FloatField(null=True, blank=False)
     agg_duration_slow = models.FloatField(null=True, blank=False)
@@ -307,6 +301,18 @@ class TestResultPerfSummary(models.Model):
 
     agg_DML_failures = models.IntegerField(null=False, blank=False)
     agg_other_failures = models.IntegerField(null=False, blank=False)
+
+
+# This class may become obsolete.
+class TestResultPerfSummary(TestResultPerfSummaryBase):
+    class Meta:
+        verbose_name = "Test Results Performance Summary"
+        verbose_name_plural = "Test Results Performance Summaries"
+        db_table = "testresult_perfsummary"
+        unique_together = ("rel_repo", "rel_branch", "rel_plan", "method", "day")
+        indexes = [models.Index(fields=unique_together, name="lookup")]
+
+    day = models.DateField(null=False, blank=False)
 
     @classmethod
     def summarize_day(cls, date):
@@ -346,8 +352,83 @@ class TestResultPerfSummary(models.Model):
             )
         )
 
-        obsolete_objects = TestResultPerfSummary.objects.filter(day=date)
+        obsolete_objects = cls.objects.filter(day=date)
         obsolete_objects.delete()
 
-        new_objects = [TestResultPerfSummary(**values) for values in method_contexts]
-        created = len(TestResultPerfSummary.objects.bulk_create(new_objects))
+        new_objects = [cls(**values) for values in method_contexts]
+        created = cls.objects.bulk_create(new_objects)
+        return created
+
+
+class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
+    class Meta:
+        verbose_name = "Test Results Weekly Performance Summary"
+        verbose_name_plural = "Test Results Weekly Performance Summaries"
+        db_table = "testresult_weekly_perfsummary"
+        unique_together = ("rel_repo", "rel_branch", "rel_plan", "method", "week_start")
+        indexes = [models.Index(fields=unique_together, name="weekly_lookup")]
+
+    week_start = models.DateField(null=False, blank=False)
+
+    @classmethod
+    def _get_sunday(cls, day):
+        day_of_week = (day.weekday() + 1) % 7  # Sunday is 0, Monday is 1, etc.
+        to_subtract = datetime.timedelta(days=day_of_week)
+        sunday_of_week = day - to_subtract
+        return sunday_of_week
+
+    from pysnooper import snoop
+
+    @classmethod
+    #    @snoop()
+    def summarize_week(cls, date):
+        assert date
+        # TODO: This is gross but its temporary.
+        from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
+
+        metrics = {
+            name: f.aggregation for (name, f) in TestMethodPerfFilterSet.metrics.items()
+        }
+        if not hasattr(date, "weekday"):
+            date = datetime.datetime.strptime(date, "%Y-%m-%d")
+
+        week_start = cls._get_sunday(date)
+        week_start_with_timezone = timezone.template_localtime(week_start, use_tz=True)
+        week_end_with_timezone = timezone.template_localtime(
+            week_start + timezone.timedelta(days=7), use_tz=True
+        )
+        buildflows = build_models.BuildFlow.objects.filter(
+            time_end__date__gte=week_start_with_timezone,
+            time_end__date__lte=week_end_with_timezone,
+        )
+
+        method_contexts = (
+            TestResult.objects.filter(build_flow_id__in=buildflows)
+            .values(
+                "method_id",
+                rel_repo_id=F("build_flow__build__repo"),
+                rel_branch_id=F("build_flow__build__branch"),
+                rel_plan_id=F("build_flow__build__plan"),
+                week_start=Value(date, output_field=models.DateField()),
+            )
+            .annotate(
+                agg_count=Count("method__name"),
+                agg_duration_average=metrics["duration_average"],
+                agg_duration_slow=metrics["duration_slow"],
+                agg_duration_fast=metrics["duration_fast"],
+                agg_cpu_usage_average=metrics["cpu_usage_average"],
+                agg_cpu_usage_low=metrics["cpu_usage_low"],
+                agg_cpu_usage_high=metrics["cpu_usage_high"],
+                agg_failures=metrics["failures"],
+                agg_assertion_failures=metrics["assertion_failures"],
+                agg_DML_failures=metrics["DML_failures"],
+                agg_other_failures=metrics["Other_failures"],
+            )
+        )
+
+        obsolete_objects = cls.objects.filter(week_start=date)
+        obsolete_objects.delete()
+
+        new_objects = [cls(**values) for values in method_contexts]
+        created = cls.objects.bulk_create(new_objects)
+        return created

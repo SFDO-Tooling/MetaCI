@@ -4,7 +4,7 @@ from collections import namedtuple
 from django.db.models import FloatField, BigIntegerField
 from django.db.models.functions import Cast
 
-from django.db.models import F, Avg, Count, Q, StdDev, Sum
+from django.db.models import F, Avg, Count, Q, StdDev, Sum, Max
 
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
@@ -13,7 +13,7 @@ from postgres_stats.aggregates import Percentile
 
 from rest_framework import generics, exceptions, viewsets, pagination, permissions
 
-from metaci.testresults.models import TestResultPerfSummary
+from metaci.testresults.models import TestResultPerfWeeklySummary
 from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
 from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
@@ -238,7 +238,9 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
     pagination_class = StandardResultsSetPagination
     ordering_param_name = filterset_class.ordering_param_name
     permission_classes = (permissions.AllowAny,)
-    model_fields = set(field.name for field in TestResultPerfSummary._meta.get_fields())
+    model_fields = set(
+        field.name for field in TestResultPerfWeeklySummary._meta.get_fields()
+    )
 
     # example URLs:
     # http://localhost:8000/api/testmethod_perf/?repo=gem&plan=Release%20Test&method_name=testCreateNegative
@@ -267,9 +269,6 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
                 and fields.get(filters[param].field_name)  # param has associated field
             ):
                 fields_to_include.append(filters[param].field_name)
-                print("INCLUDING", filters[param].field_name)
-            else:
-                print("SKIPPING", value)
 
         # no fields? Use defaults
         if fields_to_include == []:
@@ -344,7 +343,7 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         print("aggregations", aggregations)
 
         queryset = (
-            TestResultPerfSummary.objects.filter()
+            TestResultPerfWeeklySummary.objects.filter()
             .values(method_name=F("method__name"), **splitter_fields)
             .annotate(**aggregations)
         )
