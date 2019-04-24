@@ -31,11 +31,14 @@ Install Python requirements::
 
     pip install -r requirements/local.txt
 
-Copy the ``.env`` file somewhere that will be sourced when you need it::
+Copy the ``.env`` file to config/settings/.env::
 
-    cp env.example $VIRTUAL_ENV/bin/postactivate
+    cp env.example config/settings/.env
 
-Edit this file to fill in values for the missing settings.
+Edit this file to fill in values for the missing settings, especially
+GITHUB_USERNAME and GITHUB_PASSWORD. You will need to use a
+`Personal Access Token`_ instead of a password if you have 2-factor
+authentication set up.
 
 Now run ``workon metaci`` to set those environment variables.
 
@@ -45,9 +48,11 @@ that whenever you are working on the project, you use the project-specific versi
 instead of any system-wide Node you may have.
 
 **All of the remaining steps assume that you have the virtualenv activated
-(``workon metaci}}``).**
+("workon metaci").**
 
 .. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
+
+.. _Personal Access Token: https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
 Installing JavaScript requirements
 ----------------------------------
@@ -81,31 +86,16 @@ and running locally::
 
 Then run the initial migrations::
 
-    python manage.py migrate
+    ./manage.py migrate
 
 Run this command if you would like to populate the database with fake testing
 data:
 
-    python manage.py populate_db
+    ./manage.py populate_db
 
 Run this command to create a necessary repeatable django-rq job in the database::
 
     ./manage.py metaci_scheduled_jobs
-
-
-Copying the production database
--------------------------------
-
-Alternatively, if you'd like to fetch a copy of production data from Heroku,
-skip creating the database, and then do this::
-
-    heroku pg:pull mrbelvedereci::WHITE metaci
-
-You'll need to create a new superuser to log in. Log in to the admin panel with that user and update your Site record to point to localhost. This will enable you to log in as usual. Next, disable and enable the repeating jobs in django admin. Finally, delete all the persistent orgs as a safety precaution.
-
-You may want to make a local backup of the db since it takes a while to download:
-
-    createdb -T metaci-dev metaci-dev-bak
 
 
 Creating a superuser
