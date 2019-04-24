@@ -103,7 +103,7 @@ class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
     # disable_by_default.append("recentdate")
 
     daterange = django_filters.rest_framework.DateFromToRangeFilter(
-        field_name="day",
+        field_name="week_start",
         label="Date range",
         widget=DateRangeWidget(attrs={"type": "date"}),
     )
