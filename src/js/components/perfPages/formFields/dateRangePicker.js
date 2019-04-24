@@ -25,12 +25,10 @@ const dateRangePicker = ({
     if (data.formattedDate === '') {
       onChange(name, undefined);
     } else if (data.date.getFullYear() > 2015) {
-      onChange(
-        name,
-        `${data.date.getFullYear().toString()}-${(
-          data.date.getMonth() + 1
-        ).toString()}-${data.date.getDate().toString()}`,
-      );
+      const YYYY = data.date.getFullYear().toString();
+      const MM = (data.date.getMonth() + 1).toString();
+      const DD = data.date.getDate().toString();
+      onChange(name, `${YYYY}-${MM}-${DD}`);
     }
   };
 
@@ -38,21 +36,21 @@ const dateRangePicker = ({
   // so these variables are part of an input clearing hack
   // https://github.com/salesforce/design-system-react/issues/1868#issue-425218055
   const [startDateKey, setStartDateKey] = useState(1);
-  const [endDateKey, setEndDateKey] = useState(-1);
+  const [endDateKey, setEndDateKey] = useState(1);
 
   // check for bad or missing dates
   let startValueOrNull = null;
-  const endValueOrNull = null;
+  let endValueOrNull = null;
   if (startValue) {
     startValueOrNull = new Date(startValue);
   }
   if (endValue) {
-    startValueOrNull = new Date(endValue);
+    endValueOrNull = new Date(endValue);
   }
   return (
     <React.Fragment>
       <Datepicker
-        key={startDateKey}
+        key={`start${startDateKey}`}
         value={startValueOrNull}
         onChange={(_event: mixed, data) => {
           localOnChange(startName, data);
@@ -69,7 +67,7 @@ const dateRangePicker = ({
       />
       &nbsp; - &nbsp;
       <Datepicker
-        key={endDateKey}
+        key={`end${endDateKey}`}
         value={endValueOrNull}
         onChange={(_event: mixed, data) => {
           localOnChange(endName, data);
@@ -81,7 +79,7 @@ const dateRangePicker = ({
         iconName="remove"
         onClick={() => {
           onChange(endName, undefined);
-          setEndDateKey(endDateKey - 1);
+          setEndDateKey(endDateKey + 1);
         }}
       />
     </React.Fragment>
