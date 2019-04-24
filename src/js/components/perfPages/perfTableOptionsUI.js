@@ -188,14 +188,7 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
                 fetchServerData({ page_size: value })
               }
             />
-            <TextInput
-              defaultValue={queryparams.get('build_flows_limit')}
-              label={t('Build Flows Limit')}
-              tooltip="Max number of build_flows to aggregate (performance optimization)"
-              onValueUpdate={(value: string) =>
-                fetchServerData({ build_flows_limit: value })
-              }
-            />
+            {/* Build flow limit input removed in commit 0bd356e22 */}
           </React.Fragment>
         )}
       </AccordionPanel>
