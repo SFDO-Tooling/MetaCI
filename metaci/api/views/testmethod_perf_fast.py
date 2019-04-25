@@ -3,7 +3,7 @@ from collections import namedtuple
 from django.db.models import FloatField, BigIntegerField
 from django.db.models.functions import Cast
 
-from django.db.models import F
+from django.db.models import F, Sum
 
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
