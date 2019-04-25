@@ -3,7 +3,7 @@ from rest_framework import viewsets, response, permissions
 from metaci.api.views.testmethod_perf_fast import BuildFlowFilterSet, DEFAULTS
 
 from metaci.api.views.testmethod_perf_fast import TestMethodPerfFilterSet
-from metaci.api.views.testmethod_perf import TestMethodResultFilterSet
+from metaci.api.views.testresults import TestMethodResultFilterSet
 
 
 class TestMethodPerfUIApiView(viewsets.ViewSet):
@@ -20,6 +20,7 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
         testmethodperf_filters = self.collect_filter_defs(
             TestMethodPerfFilterSet, buildflow_filters.keys()
         )
+        # Future feature
         testmethodresult_filters = self.collect_filter_defs(
             TestMethodResultFilterSet, buildflow_filters.keys()
         )

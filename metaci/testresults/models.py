@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
 import os
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from django.db import models
+
 from django.urls import reverse
 from metaci.testresults.choices import OUTCOME_CHOICES
 from metaci.testresults.choices import TEST_TYPE_CHOICES
@@ -12,7 +13,9 @@ from django.utils import timezone
 from metaci.build import models as build_models
 import datetime
 
-from django.db.models import F, Count, Value
+from django.db.models import F, Value, Avg, Count, Q, StdDev, FloatField
+from django.db.models.functions import Cast
+from postgres_stats.aggregates import Percentile
 
 
 class TestClass(models.Model):
@@ -250,6 +253,19 @@ class TestResultAsset(models.Model):
     asset = models.FileField(upload_to=asset_upload_to)
 
 
+FieldType = namedtuple("FieldType", ["label", "aggregation"])
+
+
+def NearMin(field):
+    "DB Statistical function for almost the minimum but not quite."
+    return Percentile(field, 0.5, output_field=FloatField())
+
+
+def NearMax(field):
+    "DB Statistical function for almost the maximum but not quite."
+    return Percentile(field, 0.95, output_field=FloatField())
+
+
 class TestResultPerfSummaryBase(models.Model):
     class Meta:
         abstract = True
@@ -278,6 +294,14 @@ class TestResultPerfSummaryBase(models.Model):
         on_delete=models.PROTECT,
     )
 
+    rel_planrepo = models.ForeignKey(
+        "plan.PlanRepository",
+        null=False,
+        blank=False,
+        db_column="planrepo_id",
+        on_delete=models.PROTECT,
+    )
+
     method = models.ForeignKey(
         TestMethod,
         #        related_name="testresult_perfsummaries",
@@ -302,13 +326,46 @@ class TestResultPerfSummaryBase(models.Model):
     agg_DML_failures = models.IntegerField(null=False, blank=False)
     agg_other_failures = models.IntegerField(null=False, blank=False)
 
+    metric_definitions = {
+        "duration_average": FieldType("Duration: Average", Avg("duration")),
+        "duration_slow": FieldType("Duration: Slow", NearMax("duration")),
+        "duration_fast": FieldType("Duration: Fast", NearMin("duration")),
+        "duration_stddev": FieldType("Duration: Stddev", StdDev("duration")),
+        "duration_coefficient_var": FieldType(
+            "Duration: VarCoef", StdDev("duration") / Avg("duration")
+        ),
+        "cpu_usage_average": FieldType("CPU Usage: Average", Avg("test_cpu_time_used")),
+        "cpu_usage_low": FieldType("CPU Usage: Low", NearMin("test_cpu_time_used")),
+        "cpu_usage_high": FieldType("CPU Usage: High", NearMax("test_cpu_time_used")),
+        "count": FieldType("Count", Count("id")),
+        "failures": FieldType("Failures", Count("id", filter=Q(outcome="Fail"))),
+        "assertion_failures": FieldType(
+            "Assertion Failures",
+            Count("id", filter=Q(message__startswith="System.AssertException")),
+        ),
+        "DML_failures": FieldType(
+            "DML Failures",
+            Count("id", filter=Q(message__startswith="System.DmlException")),
+        ),
+        "Other_failures": FieldType(
+            "Other Failures",
+            Count(
+                "id",
+                filter=~Q(message__startswith="System.DmlException")
+                & ~Q(message__startswith="System.AssertException"),
+            ),
+        ),
+        "success_percentage": FieldType(
+            "Success Percentage",
+            Cast(Count("id", filter=Q(outcome="Pass")), FloatField())
+            / Cast(Count("id"), FloatField())
+            * 100,
+        ),
+    }
+
     @classmethod
     def metrics(cls):
-        from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
-
-        return {
-            name: f.aggregation for (name, f) in TestMethodPerfFilterSet.metrics.items()
-        }
+        return {name: f.aggregation for (name, f) in cls.metric_definitions.items()}
 
     @classmethod
     def _get_queryset_for_dates(cls, start_date, end_date, **values):
@@ -325,6 +382,7 @@ class TestResultPerfSummaryBase(models.Model):
                 rel_repo_id=F("build_flow__build__repo"),
                 rel_branch_id=F("build_flow__build__branch"),
                 rel_plan_id=F("build_flow__build__plan"),
+                rel_planrepo_id=F("build_flow__build__planrepo"),
                 **values,
             )
             .annotate(
@@ -395,8 +453,6 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
     @classmethod
     def summarize_week(cls, date):
         assert date
-        # TODO: This is gross but its temporary.
-
         if not hasattr(date, "weekday"):
             date = datetime.datetime.strptime(date, "%Y-%m-%d")
 
@@ -417,4 +473,5 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
 
         new_objects = [cls(**values) for values in method_contexts]
         created = cls.objects.bulk_create(new_objects)
+        print(date, len(created))
         return created

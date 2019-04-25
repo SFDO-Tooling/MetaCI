@@ -96,8 +96,6 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         "duration_average",
         "duration_slow",
         "duration_fast",
-        "duration_stddev",
-        "duration_coefficient_var",
         "cpu_usage_average",
         "cpu_usage_low",
         "cpu_usage_high",
@@ -395,22 +393,3 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
     def test_filter_by_methodname_subset(self):
         rows = self.get_api_results(method_name="Fo")
         self.assertTrue(rows)
-
-
-class TestFastTestMethodPerfRESTAPI(TestTestMethodPerfRESTAPI):
-    route = reverse("fast_testmethod_perf-list")
-
-    includable_fields = [
-        "duration_average",
-        "duration_slow",
-        "duration_fast",
-        "cpu_usage_average",
-        "cpu_usage_low",
-        "cpu_usage_high",
-        "count",
-        "failures",
-        "assertion_failures",
-        "DML_failures",
-        "Other_failures",
-        "success_percentage",
-    ]

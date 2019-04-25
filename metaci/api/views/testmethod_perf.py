@@ -1,3 +1,5 @@
+should_not_be_used_anymore()
+
 import copy
 from collections import namedtuple
 
@@ -9,7 +11,6 @@ from django.db.models import F, Avg, Count, Q, StdDev
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
 
-from postgres_stats.aggregates import Percentile
 
 from rest_framework import generics, exceptions, viewsets, pagination, permissions
 
@@ -194,44 +195,6 @@ class TestMethodPerfFilterSet(
     def dummy(queryset, name, value):
         return queryset
 
-    # don't include method_name in this list. Its already passed by default
-    metrics = {
-        "duration_average": FieldType("Duration: Average", Avg("duration")),
-        "duration_slow": FieldType("Duration: Slow", NearMax("duration")),
-        "duration_fast": FieldType("Duration: Fast", NearMin("duration")),
-        "duration_stddev": FieldType("Duration: Stddev", StdDev("duration")),
-        "duration_coefficient_var": FieldType(
-            "Duration: VarCoef", StdDev("duration") / Avg("duration")
-        ),
-        "cpu_usage_average": FieldType("CPU Usage: Average", Avg("test_cpu_time_used")),
-        "cpu_usage_low": FieldType("CPU Usage: Low", NearMin("test_cpu_time_used")),
-        "cpu_usage_high": FieldType("CPU Usage: High", NearMax("test_cpu_time_used")),
-        "count": FieldType("Count", Count("id")),
-        "failures": FieldType("Failures", Count("id", filter=Q(outcome="Fail"))),
-        "assertion_failures": FieldType(
-            "Assertion Failures",
-            Count("id", filter=Q(message__startswith="System.AssertException")),
-        ),
-        "DML_failures": FieldType(
-            "DML Failures",
-            Count("id", filter=Q(message__startswith="System.DmlException")),
-        ),
-        "Other_failures": FieldType(
-            "Other Failures",
-            Count(
-                "id",
-                filter=~Q(message__startswith="System.DmlException")
-                & ~Q(message__startswith="System.AssertException"),
-            ),
-        ),
-        "success_percentage": FieldType(
-            "Success Percentage",
-            Cast(Count("id", filter=Q(outcome="Pass")), FloatField())
-            / Cast(Count("id"), FloatField())
-            * 100,
-        ),
-    }
-
     metric_choices = tuple((key, field.label) for key, field in metrics.items())
     includable_fields = metric_choices + tuple(
         zip(
@@ -408,57 +371,3 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             queryset = queryset.order_by(Lower("method_name"))
 
         return queryset
-
-
-class TestMethodResultFilterSet(
-    BuildFlowFilterSet, django_filters.rest_framework.FilterSet
-):
-    method_name = TestMethodPerfFilterSet.get_filters()["method_name"]
-
-    dummy = TestMethodPerfFilterSet.dummy
-
-    # this field should be renamed. These aren't really metrics.
-    metrics = {
-        "method_name": FieldType("Method Name", F("method_name")),
-        "duration": FieldType("Duration", F("duration")),
-        "cpu_usage": FieldType("CPU Usage", F("test_cpu_time_used")),
-        "outcome": FieldType("Failures", F("outcome")),
-        "id": FieldType("Id", F("id")),
-        "date": FieldType("Date", F("build_flow__time_end")),
-        "type": FieldType("Type", F("method__testclass__test_type")),
-    }
-
-    metric_choices = tuple((key, field.label) for key, field in metrics.items())
-    includable_fields = metric_choices + tuple(
-        zip(
-            BuildFlowFilterSet.build_fields.keys(),
-            BuildFlowFilterSet.build_fields.keys(),
-        )
-    )
-
-    include_fields = django_filters.rest_framework.MultipleChoiceFilter(
-        label="Include (multi-select okay)",
-        choices=includable_fields,
-        method=dummy,
-        initial=["repo", "duration_average"],
-    )
-
-    ordering_fields = [(key, key) for (key, field) in includable_fields]
-
-    o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
-    ordering_param_name = "o"
-
-
-class TestMethodResultListView(TestMethodPerfListView):
-    serializer_class = SimpleDictSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filterset_class = TestMethodResultFilterSet
-    pagination_class = StandardResultsSetPagination
-    ordering_param_name = filterset_class.ordering_param_name
-
-
-# A bit of hackery to make a dynamic docstring, because the docstring
-# appears in the UI.
-TestMethodPerfListView.__doc__ = TestMethodPerfListView.__doc__.replace(
-    "DEFAULTS.build_flows_limit", str(DEFAULTS.build_flows_limit)
-)

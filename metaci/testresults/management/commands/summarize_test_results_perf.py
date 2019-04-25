@@ -2,7 +2,6 @@ import datetime
 
 from django.core.management.base import BaseCommand
 from metaci.testresults.models import TestResultPerfWeeklySummary
-from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
 
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -21,23 +20,6 @@ def date_range(startString, endString, step):
 class Command(BaseCommand):
     # NOTE: This should only be run at heroku postdeploy stage
     help = "Build rows in testresult_perfsummaries table for a single date"
-    metrics = {
-        name: f.aggregation for (name, f) in TestMethodPerfFilterSet.metrics.items()
-    }
-    annotations = [
-        "count",
-        "duration_average",
-        "duration_slow",
-        "duration_fast",
-        "cpu_usage_average",
-        "cpu_usage_low",
-        "cpu_usage_high",
-        "failures",
-        "assertion_failures",
-        "DML_failures",
-        "Other_failures",
-        "success_percentage",
-    ]
 
     def add_arguments(self, parser):
         parser.add_argument("startdate", type=str)

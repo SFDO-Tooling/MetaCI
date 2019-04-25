@@ -8,11 +8,9 @@ from django.db.models import F, Sum
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
 
-from postgres_stats.aggregates import Percentile
-
 from rest_framework import generics, exceptions, viewsets, pagination, permissions
 
-from metaci.testresults.models import TestResultPerfWeeklySummary
+from metaci.testresults.models import TestResultPerfWeeklySummary, FieldType
 from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
 from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
@@ -24,19 +22,6 @@ class DEFAULTS:
     build_flows_limit = 100
     page_size = 50
     max_page_size = 100
-
-
-FieldType = namedtuple("FieldType", ["label", "aggregation"])
-
-
-def NearMin(field):
-    "DB Statistical function for almost the minimum but not quite."
-    return Percentile(field, 0.5, output_field=FloatField())
-
-
-def NearMax(field):
-    "DB Statistical function for almost the maximum but not quite."
-    return Percentile(field, 0.95, output_field=FloatField())
 
 
 def set_timeout(timeout):
@@ -361,10 +346,3 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
             queryset = queryset.order_by("method_name")
 
         return queryset
-
-
-# A bit of hackery to make a dynamic docstring, because the docstring
-# appears in the UI.
-FastTestMethodPerfListView.__doc__ = FastTestMethodPerfListView.__doc__.replace(
-    "DEFAULTS.build_flows_limit", str(DEFAULTS.build_flows_limit)
-)
