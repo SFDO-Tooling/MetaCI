@@ -1,10 +1,9 @@
-import copy
 from collections import namedtuple
 
 from django.db.models import FloatField, BigIntegerField
 from django.db.models.functions import Cast
 
-from django.db.models import F, Avg, Count, Q, StdDev, Sum, Max
+from django.db.models import F
 
 import django_filters.rest_framework
 from django_filters.widgets import DateRangeWidget
@@ -80,8 +79,18 @@ class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
     repo_choices = (
         Repository.objects.values_list("name", "name").order_by("name").distinct()
     )
+    # This is the start of a UI feature to populate filters conditionally
+    # repo_branches = []
+    # for repo in Repository.objects.prefetch_related("branches").all():
+    #     repo_branches.append(
+    #         (repo.name, [branch.name for branch in repo.branches.all()])
+    #     )
+
     repo = django_filters.rest_framework.ChoiceFilter(
-        field_name="rel_repo__name", label="Repo Name", choices=repo_choices
+        field_name="rel_repo__name",
+        label="Repo Name",
+        choices=repo_choices,
+        # ui={"branches": repo_branches},
     )
 
     branch_choices = (

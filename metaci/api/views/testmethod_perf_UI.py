@@ -67,6 +67,10 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
             elif name in defaults:
                 obj["initial"] = defaults[name]
 
+            if "ui" in filter.extra:
+                for key, value in filter.extra["ui"].items():
+                    obj[key] = value
+
             json_filter_defs[name] = obj
 
         return json_filter_defs
