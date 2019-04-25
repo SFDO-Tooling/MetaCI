@@ -12,6 +12,7 @@ from django.utils import timezone
 
 from metaci.build import models as build_models
 import datetime
+from django.apps import apps
 
 from django.db.models import F, Value, Avg, Count, Q, StdDev, FloatField
 from django.db.models.functions import Cast
@@ -433,6 +434,18 @@ class TestResultPerfSummary(TestResultPerfSummaryBase):
         return created
 
 
+class TestResultPerfWeeklySummaryQuerySet(models.QuerySet):
+    def for_user(self, user, perms=None):
+        if user.is_superuser:
+            return self
+        if perms is None:
+            perms = "plan.view_builds"
+        PlanRepository = apps.get_model("plan.PlanRepository")
+        return self.filter(
+            rel_planrepo__in=PlanRepository.objects.for_user(user, perms)
+        )
+
+
 class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
     class Meta:
         verbose_name = "Test Results Weekly Performance Summary"
@@ -442,6 +455,7 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
         indexes = [models.Index(fields=unique_together, name="weekly_lookup")]
 
     week_start = models.DateField(null=False, blank=False)
+    objects = TestResultPerfWeeklySummaryQuerySet.as_manager()
 
     @classmethod
     def _get_sunday(cls, day):

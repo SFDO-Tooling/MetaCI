@@ -337,7 +337,7 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
         print("aggregations", aggregations)
 
         queryset = (
-            TestResultPerfWeeklySummary.objects.filter()
+            TestResultPerfWeeklySummary.objects.for_user(self.request.user)
             .values(method_name=F("method__name"), **splitter_fields)
             .annotate(**aggregations)
         )
