@@ -88,3 +88,4 @@ django-js-reverse==0.8.2
 
 # Sentry
 sentry-sdk==0.7.10
+
