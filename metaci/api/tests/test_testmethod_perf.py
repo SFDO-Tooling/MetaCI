@@ -103,7 +103,7 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         "failures",
         "assertion_failures",
         "DML_failures",
-        "Other_failures",
+        "other_failures",
         "success_percentage",
     ]
 
@@ -155,7 +155,9 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         """Test counting failed tests"""
         self.insert_identical_tests(method_name="FailingTest", count=15, outcome="Fail")
         self.insert_identical_tests(method_name="FailingTest", count=10, outcome="Pass")
-        rows = self.get_api_results(include_fields=["failures", "success_percentage"])
+        rows = self.get_api_results(
+            include_fields=["failures", "success_percentage", "other_failures"]
+        )
 
         self.assertEqual(
             self.find_first("method_name", rows, "FailingTest")["failures"], 15
@@ -163,6 +165,14 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.assertEqual(
             self.find_first("method_name", rows, "FailingTest")["success_percentage"],
             (10 / 25) * 100,
+        )
+
+        self.assertEqual(
+            self.find_first("method_name", rows, "FailingTest")["other_failures"], 15
+        )
+
+        self.assertEqual(
+            self.find_first("method_name", rows, "Foo")["other_failures"], 0
         )
 
     def test_split_by_repo(self):
@@ -294,8 +304,12 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.assertTrue(rows[0]["success_percentage"] < rows[-1]["success_percentage"])
 
     def test_order_by_success_percentage_desc(self):
-        TestResultFactory(method__name="Foo", outcome="Fail", build_flow__tests_total=1)
-        TestResultFactory(method__name="Bar", outcome="Pass", build_flow__tests_total=1)
+        TestResultFactory(
+            method__name="FailingTest", outcome="Fail", build_flow__tests_total=1
+        )
+        TestResultFactory(
+            method__name="PassingTest", outcome="Pass", build_flow__tests_total=1
+        )
         rows = self.get_api_results(o="-success_percentage")
         self.assertTrue(rows[0]["success_percentage"] > rows[-1]["success_percentage"])
 

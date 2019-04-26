@@ -190,7 +190,7 @@ class TestMethodPerfFilterSet(
             ),
         ),
         "DML_failures": FieldType("DML Failures", Sum("agg_DML_failures")),
-        "Other_failures": FieldType("Other Failures", Sum("agg_other_failures")),
+        "other_failures": FieldType("Other Failures", Sum("agg_other_failures")),
     }
 
     metric_choices = tuple((key, field.label) for key, field in metrics.items())
@@ -220,11 +220,7 @@ class MetaCIApiException(exceptions.APIException):
 
 
 class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
-    """A view for lists of aggregated test metrics.
-
-    Note that the number of build flows covered is limited to **DEFAULTS.build_flows_limit** for performance reasons. You can
-    change this default with the build_flows_limit parameter.
-    """
+    """A view for lists of aggregated test metrics."""
 
     serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
@@ -327,7 +323,7 @@ class FastTestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
     def get_queryset(self):
         """The main method that the Django infrastructure invokes."""
-        set_timeout(10)
+        set_timeout(1000)
         self._check_params()
 
         splitter_fields = self._get_splitter_fields()

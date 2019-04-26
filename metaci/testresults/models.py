@@ -348,11 +348,12 @@ class TestResultPerfSummaryBase(models.Model):
             "DML Failures",
             Count("id", filter=Q(message__startswith="System.DmlException")),
         ),
-        "Other_failures": FieldType(
+        "other_failures": FieldType(
             "Other Failures",
             Count(
                 "id",
-                filter=~Q(message__startswith="System.DmlException")
+                filter=Q(outcome="Fail")
+                & ~Q(message__startswith="System.DmlException")
                 & ~Q(message__startswith="System.AssertException"),
             ),
         ),
@@ -397,7 +398,7 @@ class TestResultPerfSummaryBase(models.Model):
                 agg_failures=metrics["failures"],
                 agg_assertion_failures=metrics["assertion_failures"],
                 agg_DML_failures=metrics["DML_failures"],
-                agg_other_failures=metrics["Other_failures"],
+                agg_other_failures=metrics["other_failures"],
             )
         )
         return method_contexts
