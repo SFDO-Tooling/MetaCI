@@ -69,10 +69,10 @@ class TestResultManager(models.Manager):
                 cls = result.method.testclass.name
                 method = result.method.name
 
-                if not cls in results:
+                if cls not in results:
                     results[cls] = OrderedDict()
 
-                if not method in results[cls]:
+                if method not in results[cls]:
                     results[cls][method] = {}
 
                 for limit in result.get_limit_types():
@@ -268,6 +268,10 @@ def NearMax(field):
 
 
 class TestResultPerfSummaryBase(models.Model):
+    """Abstract base class which can be used to summarize by different
+        time periods e.g. daily, weekly, monthly. Currently used only
+        by a weekly base class"""
+
     class Meta:
         abstract = True
 
@@ -402,37 +406,6 @@ class TestResultPerfSummaryBase(models.Model):
             )
         )
         return method_contexts
-
-
-# This class may become obsolete.
-class TestResultPerfSummary(TestResultPerfSummaryBase):
-    class Meta:
-        verbose_name = "Test Results Performance Summary"
-        verbose_name_plural = "Test Results Performance Summaries"
-        db_table = "testresult_perfsummary"
-        unique_together = ("rel_repo", "rel_branch", "rel_plan", "method", "day")
-        indexes = [models.Index(fields=unique_together, name="lookup")]
-
-    day = models.DateField(null=False, blank=False)
-
-    @classmethod
-    def summarize_day(cls, date):
-        assert date
-        # TODO: This is gross but its temporary.
-        date_with_timezone = timezone.template_localtime(date, use_tz=True)
-
-        method_contexts = cls._get_queryset_for_dates(
-            date_with_timezone,
-            date_with_timezone,
-            day=Value(date, output_field=models.DateField()),
-        )
-
-        obsolete_objects = cls.objects.filter(day=date)
-        obsolete_objects.delete()
-
-        new_objects = [cls(**values) for values in method_contexts]
-        created = cls.objects.bulk_create(new_objects)
-        return created
 
 
 class TestResultPerfWeeklySummaryQuerySet(models.QuerySet):

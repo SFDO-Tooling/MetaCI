@@ -11,7 +11,6 @@ from metaci.testresults.models import (
     TestResult,
     TestMethod,
     TestClass,
-    TestResultPerfSummary,
     TestResultPerfWeeklySummary,
 )
 from metaci.build.models import BuildFlow, Build, BUILD_STATUSES, BUILD_FLOW_STATUSES
@@ -175,7 +174,6 @@ class TestResultFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def summarize(obj, create, extracted, **kwargs):
-        TestResultPerfSummary.summarize_day(obj.build_flow.time_end)
         TestResultPerfWeeklySummary.summarize_week(obj.build_flow.time_end)
 
 
