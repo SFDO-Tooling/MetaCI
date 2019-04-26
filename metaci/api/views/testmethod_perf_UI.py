@@ -1,8 +1,8 @@
 from rest_framework import viewsets, response, permissions
 
-from metaci.api.views.testmethod_perf_fast import BuildFlowFilterSet, DEFAULTS
+from metaci.api.views.testmethod_perf import BuildFlowFilterSet, DEFAULTS
 
-from metaci.api.views.testmethod_perf_fast import TestMethodPerfFilterSet
+from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
 from metaci.api.views.testresults import TestMethodResultFilterSet
 
 

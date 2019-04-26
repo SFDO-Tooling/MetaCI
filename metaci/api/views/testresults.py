@@ -1,6 +1,6 @@
 import django_filters.rest_framework
 
-from .testmethod_perf_fast import (
+from .testmethod_perf import (
     BuildFlowFilterSet,
     TestMethodPerfFilterSet,
     TestMethodPerfListView,
