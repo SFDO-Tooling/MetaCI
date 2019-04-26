@@ -3,7 +3,7 @@ import django_filters.rest_framework
 from .testmethod_perf_fast import (
     BuildFlowFilterSet,
     TestMethodPerfFilterSet,
-    FastTestMethodPerfListView,
+    TestMethodPerfListView,
     StandardResultsSetPagination,
 )
 
@@ -53,7 +53,7 @@ class TestMethodResultFilterSet(
     ordering_param_name = "o"
 
 
-class TestMethodResultListView(FastTestMethodPerfListView):
+class TestMethodResultListView(TestMethodPerfListView):
     serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filterset_class = TestMethodResultFilterSet
