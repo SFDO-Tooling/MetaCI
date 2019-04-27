@@ -87,7 +87,7 @@ class Migration(migrations.Migration):
             model_name="testresultperfweeklysummary",
             index=models.Index(
                 fields=["rel_repo", "rel_branch", "rel_plan", "method", "week_start"],
-                name="weekly_lookup",
+                name="testresult_weekly_lookup",
             ),
         ),
         migrations.AlterUniqueTogether(

@@ -1,20 +1,5 @@
-import datetime
-
 from django.core.management.base import BaseCommand
 from metaci.testresults.models import TestResultPerfWeeklySummary
-
-DATE_FORMAT = "%Y-%m-%d"
-
-
-def date_range(startString, endString, step):
-    start = datetime.datetime.strptime(startString, DATE_FORMAT)
-    end = datetime.datetime.strptime(endString, DATE_FORMAT)
-    date_generated = (
-        start + datetime.timedelta(days=x) for x in range(0, (end - start).days, 7)
-    )
-
-    for date in date_generated:
-        yield date
 
 
 class Command(BaseCommand):
@@ -27,6 +12,7 @@ class Command(BaseCommand):
         parser.add_argument("replace", choices=["replace", "continue"])
 
     def handle(self, startdate, enddate, replace, **options):
+        DATE_FORMAT = "%Y-%m-%d"
         should_replace = replace == "replace"
         if not should_replace:
             try:
@@ -39,6 +25,4 @@ class Command(BaseCommand):
                 startdate = max(startdate, last_day_processed.strftime(DATE_FORMAT))
             except IndexError:
                 pass
-        dates = date_range(startdate, enddate, 7)
-        for date in dates:
-            TestResultPerfWeeklySummary.summarize_week(date)
+        TestResultPerfWeeklySummary.summarize_weeks(startdate, enddate)

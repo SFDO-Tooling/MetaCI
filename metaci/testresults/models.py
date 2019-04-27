@@ -1,22 +1,25 @@
 from __future__ import unicode_literals
 
 import os
+import sys
+import logging
+import datetime
 from collections import OrderedDict, namedtuple
-from django.db import models
+from dateutil.tz import gettz
 
+from django.db import models
+from django.db.models import F, Value, Avg, Count, Q, StdDev, FloatField
+from django.db.models.functions import Cast
 from django.urls import reverse
+from django.utils import timezone
+from django.apps import apps
+
+from postgres_stats.aggregates import Percentile
+
 from metaci.testresults.choices import OUTCOME_CHOICES
 from metaci.testresults.choices import TEST_TYPE_CHOICES
 
-from django.utils import timezone
-
 from metaci.build import models as build_models
-import datetime
-from django.apps import apps
-
-from django.db.models import F, Value, Avg, Count, Q, StdDev, FloatField
-from django.db.models.functions import Cast
-from postgres_stats.aggregates import Percentile
 
 
 class TestClass(models.Model):
@@ -92,10 +95,10 @@ class TestResultManager(models.Manager):
                 for limit, build_flows in limits.items():
                     # Are any values different between the build_flows?
                     if len(set(build_flows.values())) > 1:
-                        if not cls in diff:
+                        if cls not in diff:
                             diff[cls] = OrderedDict()
 
-                        if not method in diff[cls]:
+                        if method not in diff[cls]:
                             diff[cls][method] = {}
 
                         if limit not in diff[cls][method]:
@@ -382,7 +385,10 @@ class TestResultPerfSummaryBase(models.Model):
         )
 
         method_contexts = (
-            TestResult.objects.filter(build_flow_id__in=buildflows)
+            TestResult.objects.filter(
+                build_flow_id__in=buildflows,
+                build_flow__build__planrepo_id__isnull=False,
+            )
             .values(
                 "method_id",
                 rel_repo_id=F("build_flow__build__repo"),
@@ -421,15 +427,72 @@ class TestResultPerfWeeklySummaryQuerySet(models.QuerySet):
 
 
 class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
+    logger = logging.getLogger(__name__)
+    out_hdlr = logging.StreamHandler(sys.stdout)
+    out_hdlr.setLevel(logging.INFO)
+    logger.addHandler(out_hdlr)
+    logger.setLevel(logging.INFO)
+
     class Meta:
         verbose_name = "Test Results Weekly Performance Summary"
         verbose_name_plural = "Test Results Weekly Performance Summaries"
         db_table = "testresult_weekly_perfsummary"
         unique_together = ("rel_repo", "rel_branch", "rel_plan", "method", "week_start")
-        indexes = [models.Index(fields=unique_together, name="weekly_lookup")]
+        indexes = [
+            models.Index(fields=unique_together, name="testresult_weekly_lookup")
+        ]
 
     week_start = models.DateField(null=False, blank=False)
     objects = TestResultPerfWeeklySummaryQuerySet.as_manager()
+
+    @classmethod
+    def date_range(cls, startString, endString, step):
+        """Summarize a date range described by two YYYY-MM-DD strings"""
+        from metaci.build.models import BuildFlow
+
+        DATE_FORMAT = "%Y-%m-%d"
+        if startString:  # User supplied start
+            start = datetime.datetime.strptime(startString, DATE_FORMAT).date()
+            start = start.replace(tzinfo=gettz())
+        else:
+            # Let's see where we left off last time.
+            last_already_created = cls.objects.order_by("week_start").last()
+            if last_already_created:
+                start = last_already_created.week_start
+                # Let's always do at least one week in case it was incomplete
+                # (the week may not have been finished when we ran the scripts)
+                start = start - timezone.timedelta(days=1)
+
+            else:  # Starting from scratch
+                first_buildflow = (
+                    BuildFlow.objects.filter(time_end__isnull=False)
+                    .order_by("time_end")
+                    .first()
+                )
+                if first_buildflow:
+                    start = first_buildflow.time_end.date()
+                else:
+                    return []  # nothing to do if buildflows table is empty!
+
+        start = cls._get_sunday(start)
+
+        if endString:
+            end = datetime.datetime.strptime(endString, DATE_FORMAT).date()
+            end = end.replace(tzinfo=gettz())
+        else:
+            end = (
+                BuildFlow.objects.filter(time_end__isnull=False)
+                .order_by("-time_end")
+                .first()
+                .time_end.date()
+            )
+
+        dates_generator = (
+            start + datetime.timedelta(days=x)
+            for x in range(0, (end - start).days + 1, step)
+        )
+
+        return dates_generator
 
     @classmethod
     def _get_sunday(cls, day):
@@ -453,13 +516,22 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
         method_contexts = cls._get_queryset_for_dates(
             week_start_with_timezone,
             week_end_with_timezone,
-            week_start=Value(date, output_field=models.DateField()),
+            week_start=Value(week_start, output_field=models.DateField()),
         )
 
-        obsolete_objects = cls.objects.filter(week_start=date)
-        obsolete_objects.delete()
+        obsolete_objects = cls.objects.filter(week_start=week_start)
+        deleted = obsolete_objects.delete()
+        cls.logger.info("Deleted %s", deleted)
 
         new_objects = [cls(**values) for values in method_contexts]
+        cls.logger.info("Creating %s", len(new_objects))
         created = cls.objects.bulk_create(new_objects)
-        print(date, len(created))
+        cls.logger.info("Created %s", len(created))
         return created
+
+    @classmethod
+    def summarize_weeks(cls, startDateString=None, endDateString=None):
+        cls.logger.info("Summarization starting")
+        for date in cls.date_range(startDateString, endDateString, 7):
+            cls.summarize_week(date)
+            cls.logger.info("Summarized week starting %s", date)
