@@ -5,24 +5,24 @@ import type { ComponentType } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { t } from 'i18next';
 import BrandBand from '@salesforce/design-system-react/components/brand-band';
 import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 import type { Match, RouterHistory } from 'react-router-dom';
 
-import { QueryParamHelpers, addIds } from './perfTableUtils';
-import PerfDataTable from './perfDataTable';
+import DebugIcon from './debugIcon';
 import PerfTableOptionsUI from './perfTableOptionsUI';
+import PerfDataTable from './perfDataTable';
+import { QueryParamHelpers, addIds } from './perfTableUtils';
 
 import type { AppState } from 'store';
 import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
+import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 import {
   selectPerfState,
   selectPerfUIStatus,
   selectTestMethodPerfUI,
 } from 'store/perfdata/selectors';
-import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 
 export type ServerDataFetcher = (params?: {
   [string]: string | string[] | null | typeof undefined,
@@ -59,17 +59,10 @@ export const UnwrappedPerfPage = ({
     throw new Error('Store error');
   }
 
-  // If there was an error loading at this point, it is very likely to
-  // be an authentication error.
-  // TODO: Parse exception to be sure.
   if (perfUIStatus === 'ERROR' || (perfState && perfState.status === 'ERROR')) {
-    return (
-      <AuthError
-        message={t(
-          'Top Secret! Please ensure you are on the VPN and logged in to MetaCI.',
-        )}
-      />
-    );
+    const message =
+      get(perfState, 'reason.reason') || get(perfState, 'reason.error') || '';
+    throw new Error(message);
   }
 
   // Fetch the data: both UI configuration and also actual data results
@@ -118,7 +111,8 @@ export const UnwrappedPerfPage = ({
           queryparams={queryparams}
           items={results}
         />
-      </div>
+      </div>{' '}
+      <DebugIcon />
     </div>
   );
 };

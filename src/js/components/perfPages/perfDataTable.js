@@ -4,16 +4,13 @@ import get from 'lodash/get';
 import zip from 'lodash/zip';
 import queryString from 'query-string';
 import { t } from 'i18next';
-// flowlint  untyped-import:off
 import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
-// flowlint  untyped-import:error
+import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 
 import { QueryParamHelpers } from './perfTableUtils';
 import type { ServerDataFetcher } from './perfPage';
-
-import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 
 type Props = {|
   fetchServerData: ServerDataFetcher,
@@ -48,7 +45,7 @@ const PerfDataTable = ({
   const page = parseInt(queryparams.get('page') || '1', 10) - 1;
   const custom_page_size = queryparams.get('page_size');
   const count = get(perfState, 'perfdata.count') || -1;
-  const page_size = custom_page_size
+  const page_size = custom_page_size // flowlint-line sketchy-null-number:off
     ? parseInt(custom_page_size, 10)
     : get(perfState, 'perfdata.results.length') || null;
   const previousPage: string = get(perfState, 'perfdata.previous') || '';
@@ -63,11 +60,11 @@ const PerfDataTable = ({
             className="slds-col slds-size--1-of-2"
             style={{ textAlign: 'left' }}
           >
-            {t('Showing')} {(page * page_size).toString()}
-            {t(' to ')}
-            {Math.min((page + 1) * page_size, count)}
-            {t(' of ')}
-            {count.toString()} {t('records')}
+            {t('Showing {{fromnum}} to {{tonum}} of {{totalnum}}', {
+              fromnum: (page * page_size).toString(),
+              tonum: Math.min((page + 1) * page_size, count),
+              totalnum: count.toString(),
+            })}
           </div>
           <div className="slds-col slds-size--1-of-2">
             <button

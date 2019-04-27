@@ -11,7 +11,10 @@ type PerfDataAvailableAction = {
   type: 'PERF_DATA_AVAILABLE',
   payload: PerfData,
 };
-type PerfDataLoadingAction = { type: 'PERF_DATA_LOADING', payload: PerfData };
+type PerfDataLoadingAction = {
+  type: 'PERF_DATA_LOADING',
+  payload: { url: string },
+};
 type PerfDataError = { type: 'PERF_DATA_ERROR', payload: string };
 
 type UIDataAvailableAction = { type: 'UI_DATA_AVAILABLE', payload: UIData };
@@ -32,10 +35,10 @@ export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (
   _getState,
   { apiFetch },
 ) => {
-  dispatch({ type: 'PERF_DATA_LOADING', payload: url });
   if (params) {
     url = `${url}&${queryString.stringify(params)}`;
   }
+  dispatch({ type: 'PERF_DATA_LOADING', payload: { url } });
   apiFetch(url, {
     method: 'GET',
   }).then(payload => {

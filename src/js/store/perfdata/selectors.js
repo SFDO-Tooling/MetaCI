@@ -9,8 +9,12 @@ import type {
 
 export const selectPerfState = (appState: AppState): PerfDataState =>
   appState.perfData;
+
 export const selectPerfUIStatus = (appState: AppState): LoadingStatus =>
   appState.perfDataUI ? appState.perfDataUI.status : 'LOADING';
+
+export const selectPerfDataAPIUrl = (appState: AppState): string =>
+  appState.perfData.status === 'AVAILABLE' ? appState.perfData.url : '';
 
 // TODO: Improve strong typing on these:
 export const selectTestMethodPerfUI = (
@@ -33,3 +37,8 @@ export const selectBuildflowFiltersUI = (
   appState.perfDataUI.status === 'AVAILABLE'
     ? appState.perfDataUI.uidata.buildflow_filters
     : null;
+
+export const selectDebugStatus = (appState: AppState): boolean =>
+  appState.perfDataUI.status === 'AVAILABLE'
+    ? appState.perfDataUI.uidata.debug
+    : false;

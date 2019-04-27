@@ -12,17 +12,20 @@ export type LoadingStatus = 'LOADING' | 'AVAILABLE' | 'ERROR';
 export type PerfDataLoading = {
   status: 'LOADING',
   perfdata: PerfData | null,
+  url: string,
 };
 
 export type PerfDataAvailable = {
   status: 'AVAILABLE',
   perfdata: PerfData,
+  url: string,
 };
 
 export type PerfDataError = {
   status: 'ERROR',
   perfdata: PerfData | null,
   reason: string,
+  url: string,
 };
 
 export type UIDataLoading = {
@@ -38,7 +41,7 @@ export type UIDataAvailable = {
 export type PerfDataState = PerfDataAvailable | PerfDataLoading | PerfDataError;
 
 export const perfDataReducer = (
-  state: PerfDataState = { status: 'LOADING', perfdata: null },
+  state: PerfDataState = { status: 'LOADING', perfdata: null, url: '' },
   action: PerfDataAction,
 ): PerfDataState => {
   switch (action.type) {
@@ -46,13 +49,15 @@ export const perfDataReducer = (
       return ({
         status: 'LOADING',
         perfdata: state && state.perfdata,
+        url: action.payload.url,
       }: PerfDataLoading);
     case 'PERF_DATA_AVAILABLE':
-      return { status: 'AVAILABLE', perfdata: action.payload };
+      return { status: 'AVAILABLE', perfdata: action.payload, url: state.url };
     case 'PERF_DATA_ERROR':
       return {
         status: 'ERROR',
         reason: action.payload,
+        url: state.url,
         perfdata: state ? state.perfdata : null,
       };
   }
