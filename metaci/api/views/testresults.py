@@ -17,6 +17,8 @@ from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
 class TestMethodResultFilterSet(
     BuildFlowFilterSet, django_filters.rest_framework.FilterSet
 ):
+    """Filterset for individual unaggregated test results."""
+
     method_name = TestMethodPerfFilterSet.get_filters()["method_name"]
 
     dummy = TestMethodPerfFilterSet.dummy
@@ -54,6 +56,8 @@ class TestMethodResultFilterSet(
 
 
 class TestMethodResultListView(TestMethodPerfListView):
+    """List view for individual unaggregated test results."""
+
     serializer_class = SimpleDictSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filterset_class = TestMethodResultFilterSet

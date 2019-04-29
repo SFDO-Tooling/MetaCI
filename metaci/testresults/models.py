@@ -271,7 +271,7 @@ def NearMax(field):
 
 
 class TestResultPerfSummaryBase(models.Model):
-    """Abstract base class which can be used to summarize by different
+    """Abstract base class mode which can be used to summarize by different
         time periods e.g. daily, weekly, monthly. Currently used only
         by a weekly base class"""
 
@@ -374,10 +374,12 @@ class TestResultPerfSummaryBase(models.Model):
 
     @classmethod
     def metrics(cls):
+        """Summarize the metrics to {name: calculation} (no displayName)"""
         return {name: f.aggregation for (name, f) in cls.metric_definitions.items()}
 
     @classmethod
     def _get_queryset_for_dates(cls, start_date, end_date, **values):
+        """Get a queryset for a range of dates."""
         metrics = cls.metrics()
 
         buildflows = build_models.BuildFlow.objects.filter(
@@ -427,6 +429,8 @@ class TestResultPerfWeeklySummaryQuerySet(models.QuerySet):
 
 
 class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
+    """Weekly summary table/model"""
+
     logger = logging.getLogger(__name__)
     out_hdlr = logging.StreamHandler(sys.stdout)
     out_hdlr.setLevel(logging.INFO)
@@ -446,13 +450,12 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
     objects = TestResultPerfWeeklySummaryQuerySet.as_manager()
 
     @classmethod
-    def date_range(cls, startString, endString, step):
-        """Summarize a date range described by two YYYY-MM-DD strings"""
+    def _parse_start_and_date_dates(cls, start_string, end_string):
         from metaci.build.models import BuildFlow
 
         DATE_FORMAT = "%Y-%m-%d"
-        if startString:  # User supplied start
-            start = datetime.datetime.strptime(startString, DATE_FORMAT).date()
+        if start_string:  # User supplied start
+            start = datetime.datetime.strptime(start_string, DATE_FORMAT).date()
             start = start.replace(tzinfo=gettz())
         else:
             # Let's see where we left off last time.
@@ -472,12 +475,10 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
                 if first_buildflow:
                     start = first_buildflow.time_end.date()
                 else:
-                    return []  # nothing to do if buildflows table is empty!
+                    return None, None  # nothing to do if buildflows table is empty!
 
-        start = cls._get_sunday(start)
-
-        if endString:
-            end = datetime.datetime.strptime(endString, DATE_FORMAT).date()
+        if end_string:
+            end = datetime.datetime.strptime(end_string, DATE_FORMAT).date()
             end = end.replace(tzinfo=gettz())
         else:
             end = (
@@ -486,16 +487,30 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
                 .first()
                 .time_end.date()
             )
+        return start, end
+
+    @classmethod
+    def date_range(cls, start_date, end_date):
+        """Generate a list of weeks described by two YYYY-MM-DD strings"""
+        start, end = cls._parse_start_and_date_dates(start_date, end_date)
+
+        # Turns out there is nothing to summarize
+        if not start:
+            return []
+
+        # start weeks on Sunday
+        start = cls._get_sunday(start)
 
         dates_generator = (
             start + datetime.timedelta(days=x)
-            for x in range(0, (end - start).days + 1, step)
+            for x in range(0, (end - start).days + 1, 7)
         )
 
         return dates_generator
 
     @classmethod
     def _get_sunday(cls, day):
+        """Go backwards to find the previous Sunday"""
         day_of_week = (day.weekday() + 1) % 7  # Sunday is 0, Monday is 1, etc.
         to_subtract = datetime.timedelta(days=day_of_week)
         sunday_of_week = day - to_subtract
@@ -503,6 +518,7 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
 
     @classmethod
     def summarize_week(cls, date):
+        """Build summarize rows for a week containing a date"""
         assert date
         if not hasattr(date, "weekday"):
             date = datetime.datetime.strptime(date, "%Y-%m-%d")
@@ -530,8 +546,9 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
         return created
 
     @classmethod
-    def summarize_weeks(cls, startDateString=None, endDateString=None):
+    def summarize_weeks(cls, startdate_string=None, enddate_string=None):
+        """Summarize all of the weeks in a range."""
         cls.logger.info("Summarization starting")
-        for date in cls.date_range(startDateString, endDateString, 7):
+        for date in cls.date_range(startdate_string, enddate_string):
             cls.summarize_week(date)
             cls.logger.info("Summarized week starting %s", date)
