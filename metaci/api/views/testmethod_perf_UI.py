@@ -2,9 +2,11 @@ from django.conf import settings
 
 from rest_framework import viewsets, response, permissions
 
-from metaci.api.views.testmethod_perf import BuildFlowFilterSet, DEFAULTS
-
-from metaci.api.views.testmethod_perf import TestMethodPerfFilterSet
+from metaci.api.views.testmethod_perf import (
+    BuildFlowFilterSet,
+    TestMethodPerfFilterSet,
+    DEFAULTS,
+)
 from metaci.api.views.testresults import TestMethodResultFilterSet
 
 
@@ -69,10 +71,6 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
                 obj["initial"] = initial
             elif name in defaults:
                 obj["initial"] = defaults[name]
-
-            if "ui" in filter.extra:
-                for key, value in filter.extra["ui"].items():
-                    obj[key] = value
 
             json_filter_defs[name] = obj
 
