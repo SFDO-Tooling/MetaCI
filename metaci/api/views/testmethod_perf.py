@@ -323,14 +323,11 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
     def get_queryset(self):
         """The main method that the Django infrastructure invokes."""
-        set_timeout(1000)
+        set_timeout(10)
         self._check_params()
 
         splitter_fields = self._get_splitter_fields()
         aggregations = self._get_aggregation_fields()
-
-        print("Splitter fields", splitter_fields)
-        print("aggregations", aggregations)
 
         queryset = (
             TestResultPerfWeeklySummary.objects.for_user(self.request.user)

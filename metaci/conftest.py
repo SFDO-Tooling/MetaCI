@@ -117,7 +117,7 @@ class BuildFlowFactory(factory.django.DjangoModelFactory):
         datetime.datetime.utcnow()
         .replace(tzinfo=datetime.timezone.utc)
         .isoformat()
-        .split("T")[0]
+        .split("T")[0]  # Area before the split
     )
 
 

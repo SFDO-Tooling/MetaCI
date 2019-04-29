@@ -22,7 +22,6 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
         testmethodperf_filters = self.collect_filter_defs(
             TestMethodPerfFilterSet, buildflow_filters.keys()
         )
-        # Future feature
         testmethodresult_filters = self.collect_filter_defs(
             TestMethodResultFilterSet, buildflow_filters.keys()
         )

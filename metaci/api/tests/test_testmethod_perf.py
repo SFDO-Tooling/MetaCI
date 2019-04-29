@@ -198,45 +198,6 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             self.find_first("method_name", rows, "NPSPTest")["repo"], "Cumulus"
         )
 
-    @pytest.mark.skip(reason="removing the ability to search by flow")
-    def test_split_by_flow(self):
-        """Test splitting on flow"""
-        self.insert_identical_tests(
-            method_name="HedaTest", count=15, build_flow__flow="ci_feature"
-        )
-        self.insert_identical_tests(
-            method_name="HedaTest", count=20, build_flow__flow="ci_beta"
-        )
-        rows = self.get_api_results(
-            include_fields=["count", "flow"], method_name="HedaTest"
-        )
-
-        for row in rows:
-            self.assertIn(row["flow"], ["ci_feature", "ci_beta", "rida"])
-
-        self.assertEqual(self.find_first("flow", rows, "ci_feature")["count"], 15)
-        self.assertEqual(self.find_first("flow", rows, "ci_beta")["count"], 20)
-
-    @pytest.mark.skip(reason="removing the ability to search by flow")
-    def test_split_by_flow_ignoring_repo(self):
-        """Test splitting on flow regardless of repro"""
-        self.insert_identical_tests(
-            count=3, build_flow__build__repo__name="HEDA", build_flow__flow="Flow1"
-        )
-        self.insert_identical_tests(
-            count=5, build_flow__build__repo__name="HEDA", build_flow__flow="Flow2"
-        )
-        self.insert_identical_tests(
-            count=7, build_flow__build__repo__name="Cumulus", build_flow__flow="Flow1"
-        )
-        self.insert_identical_tests(
-            count=9, build_flow__build__repo__name="Cumulus", build_flow__flow="Flow2"
-        )
-        rows = self.get_api_results(include_fields=["count", "flow"])
-
-        self.assertEqual(self.find_first("flow", rows, "Flow1")["count"], 10)
-        self.assertEqual(self.find_first("flow", rows, "Flow2")["count"], 14)
-
     def test_split_by_plan(self):
         """Test splitting on plan regardless of the rest"""
         plan1 = PlanFactory(name="plan1")
