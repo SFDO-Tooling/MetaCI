@@ -85,7 +85,3 @@ django-postgres-stats==1.0.0
 
 # Let Javascript refer to Django URLs by name
 django-js-reverse==0.8.2
-
-# Sentry
-sentry-sdk==0.7.10
-
