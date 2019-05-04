@@ -1,5 +1,6 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import fetchMock from 'fetch-mock';
 
 import { renderWithRedux, storeWithApi } from '../../utils';
 
@@ -17,6 +18,7 @@ const initialStoreState = {
 
 describe('Perf Page', () => {
   test('Initial Render', () => {
+    fetchMock.mock('*', 200);
     const { getByText } = renderWithRedux(
       <MemoryRouter>
         <PerfPage />
@@ -32,6 +34,7 @@ describe('Perf Page', () => {
   });
   test('Render UI without data', () => {
     const store = { ...initialStoreState, perfDataUI: testmethod_perf_UI_data };
+    fetchMock.mock('*', 200);
     const { getByText } = renderWithRedux(
       <MemoryRouter>
         <PerfPage />
@@ -48,6 +51,7 @@ describe('Perf Page', () => {
   test('TODO: Render data without UI', () => {
     const store = { ...initialStoreState, perfData: testmethod_perf_data };
 
+    fetchMock.mock('*', 200);
     const { getByText } = renderWithRedux(
       <MemoryRouter>
         <PerfPage />
@@ -62,6 +66,7 @@ describe('Perf Page', () => {
     expect(getByText('Options')).toBeVisible();
   });
   test('TODO: Render data and UI', () => {
+    fetchMock.mock('*', 200);
     const { getByText } = renderWithRedux(
       <MemoryRouter>
         <PerfPage />
