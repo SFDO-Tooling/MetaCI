@@ -3,6 +3,8 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 import Illustration from '@salesforce/design-system-react/components/illustration';
+import BrandBand from '@salesforce/design-system-react/components/brand-band';
+import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 
 import svgPath from 'images/broken.svg';
 import { logError } from 'utils/logging';
@@ -46,7 +48,46 @@ class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
   }
 }
 
-export const EmptyIllustration = ({ message }: { message: React.Node }) => (
+const gradient = 'linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)';
+
+export const AuthError = ({ message }: { message: string }) => (
+  <BrandBand
+    id="brand-band-lightning-blue"
+    className="slds-p-around_small"
+    theme="lightning-blue"
+    style={{
+      textAlign: 'center',
+      backgroundImage: `url(${BrandBannerBackground}), ${gradient}`,
+    }}
+  >
+    <div
+      className="slds-box slds-theme_default"
+      style={{ marginLeft: 'auto', marginRight: 'auto' }}
+    >
+      <h3 className="slds-text-heading_label slds-truncate">{message}</h3>
+    </div>
+    <div>
+      <video
+        onEnded={evt => {
+          evt.target.load();
+          evt.target.play();
+        }}
+        loop
+        autoPlay
+        muted
+        playsInline
+      >
+        <source
+          src="/static/images/NoNoNo.mp4"
+          itemProp="contentUrl"
+          type="video/mp4"
+        />
+      </video>
+    </div>
+  </BrandBand>
+);
+
+const EmptyIllustration = ({ message }: { message: React.Node }) => (
   <Illustration
     heading="Yikes! An error occurred!  :("
     messageBody={message}

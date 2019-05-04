@@ -5,8 +5,6 @@ import type { ComponentType } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import BrandBand from '@salesforce/design-system-react/components/brand-band';
-import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 import type { Match, RouterHistory } from 'react-router-dom';
 
 import DebugIcon from './debugIcon';
@@ -27,8 +25,6 @@ import {
 export type ServerDataFetcher = (params?: {
   [string]: string | string[] | null | typeof undefined,
 }) => void;
-
-const gradient = 'linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)';
 
 // TODO: Stronger typing in these
 type ReduxProps = {|
@@ -99,7 +95,6 @@ export const UnwrappedPerfPage = ({
     <div key="perfContainerDiv">
       <PerfTableOptionsUI
         fetchServerData={fetchServerData}
-        uiAvailable={uiAvailable}
         testMethodPerfUI={testMethodPerfUI}
         queryparams={queryparams}
         key="thePerfAccordian"
@@ -117,42 +112,6 @@ export const UnwrappedPerfPage = ({
   );
 };
 
-const AuthError = ({ message }: { message: string }) => (
-  <BrandBand
-    id="brand-band-lightning-blue"
-    className="slds-p-around_small"
-    theme="lightning-blue"
-    style={{
-      textAlign: 'center',
-      backgroundImage: `url(${BrandBannerBackground}), ${gradient}`,
-    }}
-  >
-    <div
-      className="slds-box slds-theme_default"
-      style={{ marginLeft: 'auto', marginRight: 'auto' }}
-    >
-      <h3 className="slds-text-heading_label slds-truncate">{message}</h3>
-    </div>
-    <div>
-      <video
-        onEnded={evt => {
-          evt.target.load();
-          evt.target.play();
-        }}
-        loop
-        autoPlay
-        muted
-        playsInline
-      >
-        <source
-          src="/static/images/NoNoNo.mp4"
-          itemProp="contentUrl"
-          type="video/mp4"
-        />
-      </video>
-    </div>
-  </BrandBand>
-);
 
 const select = (appState: AppState) => ({
   perfState: selectPerfState(appState),
