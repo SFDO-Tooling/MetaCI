@@ -113,3 +113,15 @@ export const createField = (
   return null;
   // throw new Error(`Unknown field type: ${filterDef.field_type}`);
 };
+
+export const AllFilters = ({ filters }: { filters: Field[] }) => (
+  <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
+    {filters
+      .filter(x => x) // filter out nulls from unknown filter types
+      .map(filter => (
+        <div key={filter.name} className="slds-col slds-size_3-of-12">
+          {filter.render()}
+        </div>
+      ))}
+  </div>
+);

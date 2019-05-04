@@ -9,7 +9,7 @@ import { t } from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
 
-import { createField } from './formFields';
+import { createField, AllFilters } from './formFields';
 import type { Field } from './formFields';
 import TextInput from './formFields/textInput';
 import MultiPicker from './formFields/multiPicker';
@@ -67,31 +67,18 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
 
   // collect filters to display in filters accordion
   const gatherFilters = (perfdataUIstate: typeof testMethodPerfUI): Field[] => {
-    const filters: Field[] = [];
-    if (!uiAvailable) {
-      return filters;
-    }
-
     const testmethod_perf_filters = perfdataUIstate.filters;
     const all_filters = [...buildflow_filters, ...testmethod_perf_filters];
     const relevant_filters = all_filters.filter(filter =>
       ['ChoiceField', 'CharField', 'DecimalField'].includes(filter.field_type),
     );
-    if (relevant_filters.length) {
-      relevant_filters.forEach(filterDef => {
-        const onSubmit = value => fetchServerData({ [filterDef.name]: value });
-        const newField = createField(
-          filterDef,
-          queryparams.get(filterDef.name),
-          onSubmit,
-        );
-
-        if (newField) {
-          filters.push(newField);
-        }
-      });
-    }
-    return filters;
+    return relevant_filters
+      .map(filterDef =>
+        createField(filterDef, queryparams.get(filterDef.name), value =>
+          fetchServerData({ [filterDef.name]: value }),
+        ),
+      )
+      .filter(Boolean); // filter out nulls
   };
 
   // get the filter configurations from the server if they have
@@ -140,12 +127,7 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
           setPerfPanelFiltersExpanded(!perfPanelFiltersExpanded);
         }}
       >
-        {uiAvailable && (
-          <AllFilters
-            filters={filterPanelFilters}
-            fetchServerData={fetchServerData}
-          />
-        )}
+        {uiAvailable && <AllFilters filters={filterPanelFilters} />}
       </AccordionPanel>
       <AccordionPanel
         id="perfPaneDates"
@@ -195,16 +177,6 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
     </Accordion>
   );
 };
-
-const AllFilters = ({ filters }: { filters: Field[] }) => (
-  <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
-    {filters.map(filter => (
-      <div key={filter.name} className="slds-col slds-size_3-of-12">
-        {filter.render()}
-      </div>
-    ))}
-  </div>
-);
 
 const select = (appState: AppState) => ({
   perfUIStatus: selectPerfUIStatus(appState),
