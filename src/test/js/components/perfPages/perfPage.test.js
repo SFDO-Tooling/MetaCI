@@ -15,8 +15,8 @@ const initialStoreState = {
 };
 
 const mockHTTP = () => {
-  fetchMock.getOnce('begin:/api/testmethod_perf', 200);
-  fetchMock.getOnce('begin:/api/testmethod_perf_UI', 200);
+  fetchMock.getOnce('begin:/api/testmethod_perf', testmethod_perf_data);
+  fetchMock.getOnce('begin:/api/testmethod_perf_UI', testmethod_perf_UI_data);
 };
 
 describe('Perf Page', () => {
@@ -41,7 +41,7 @@ describe('Perf Page', () => {
       ...initialStoreState,
       perfDataUI: { status: 'AVAILABLE', uidata: testmethod_perf_UI_data },
     };
-    fetchMock.mock('*', 200);
+    mockHTTP();
     const { getByText } = renderWithRedux(
       <MemoryRouter>
         <PerfPage />
@@ -62,7 +62,7 @@ describe('Perf Page', () => {
       perfData: { status: 'AVAILABLE', perfdata: testmethod_perf_data },
     };
 
-    fetchMock.mock('*', 200);
+    mockHTTP();
     const { getByText } = renderWithRedux(
       <MemoryRouter>
         <PerfPage />
@@ -78,7 +78,7 @@ describe('Perf Page', () => {
     expect(getByText('accFinderBuildsCorrectSearchQuery')).toBeVisible();
   });
   test('Render data and UI both from store', () => {
-    fetchMock.mock('*', 200);
+    mockHTTP();
     const store = {
       ...initialStoreState,
       perfData: { status: 'AVAILABLE', perfdata: testmethod_perf_data },
@@ -97,8 +97,5 @@ describe('Perf Page', () => {
     expect(getByText('Date Range')).toBeVisible();
     expect(getByText('Options')).toBeVisible();
     expect(getByText('accFinderBuildsCorrectSearchQuery')).toBeVisible();
-  });
-  test('Render data and UI from server', () => {
-
   });
 });
