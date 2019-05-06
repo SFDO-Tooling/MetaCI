@@ -84,4 +84,4 @@ django-postgres-stats==1.0.0
 -e git+https://github.com/SFDO-Tooling/sfdo-template-helpers.git@v0.6.0#egg=sfdo_template_helpers
 
 # Let Javascript refer to Django URLs by name
-django-js-reverse==0.8.2
+django-js-reverse==0.9.0
