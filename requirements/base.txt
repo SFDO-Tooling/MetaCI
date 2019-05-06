@@ -16,7 +16,7 @@ django_filter==2.1.0
 django-model-utils==3.1.2
 
 # Per Object Permissions
-django-guardian==1.5.0
+django-guardian==1.5.1
 
 # Images
 Pillow==6.0.0
