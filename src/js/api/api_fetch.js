@@ -64,30 +64,4 @@ const getApiFetch = () => (url: string, opts: { [string]: mixed } = {}) => {
     });
 };
 
-// Based on https://fetch.spec.whatwg.org/#fetch-api
-export const addUrlParams = (
-  baseUrl: string,
-  params: UrlParams = {},
-): string => {
-  const url = new URL(baseUrl, window.location.origin);
-  Object.keys(params).forEach(key => {
-    const value = params[key].toString();
-    // Disallow duplicate params with the same key:value
-    if (url.searchParams.get(key) !== value) {
-      url.searchParams.append(key, value);
-    }
-  });
-  return url.pathname + url.search + url.hash;
-};
-
-export const getUrlParam = (key: string, search?: string): string | null =>
-  new URLSearchParams(search || window.location.search).get(key);
-
-export const removeUrlParam = (key: string, search?: string): string => {
-  const params = new URLSearchParams(search || window.location.search);
-  // This deletes _all_ occurences of the given key
-  params.delete(key);
-  return params.toString();
-};
-
 export default getApiFetch;
