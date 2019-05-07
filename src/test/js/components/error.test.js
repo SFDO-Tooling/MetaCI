@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-testing-library';
 
-import ErrorBoundary from 'components/error';
+import ErrorBoundary, { AuthError } from 'components/error';
 
 class TestableErrorBoundary extends ErrorBoundary {
   constructor(props) {
@@ -30,5 +30,12 @@ describe('<ErrorBoundary />', () => {
 
     expect(queryByText('child')).toBeNull();
     expect(getByText('Yikes!', { exact: false })).toBeVisible();
+  });
+});
+
+describe('<AuthError />', () => {
+  test('authentication error component', () => {
+    const { getByText } = render(<AuthError message={'This is the error'} />);
+    expect(getByText('This is the error')).toBeVisible();
   });
 });

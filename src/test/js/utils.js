@@ -4,7 +4,7 @@ import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import { render } from 'react-testing-library';
 
-import getApiFetch from 'utils/api';
+import getApiFetch from 'api/api_fetch';
 
 const mockStore = configureStore([]);
 

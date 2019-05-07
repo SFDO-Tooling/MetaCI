@@ -42,9 +42,27 @@ describe('perfRESTFetch', () => {
     });
   });
 
-  test('Freaks out if server returns HTTP error', () => {
+  test('Freaks out if server returns Server error', () => {
     const store = storeWithApi({});
     fetchMock.getOnce(`begin:${actions.testmethod_perfdata_url}`, 500);
+    expect.assertions(1);
+    return store.dispatch(actions.perfRESTFetch(url)).catch(reason => {
+      expect(reason).toHaveProperty('message');
+    });
+  });
+  test('Freaks out if server returns werd HTTP error', () => {
+    const store = storeWithApi({});
+    fetchMock.getOnce(`begin:${actions.testmethod_perfdata_url}`, 100);
+    expect.assertions(1);
+    return store.dispatch(actions.perfRESTFetch(url)).catch(reason => {
+      expect(reason).toHaveProperty('message');
+    });
+  });
+  test('Freaks out if there are networking problems', () => {
+    const store = storeWithApi({});
+    fetchMock.getOnce(`begin:${actions.testmethod_perfdata_url}`, () => {
+      throw new Error('my error');
+    });
     expect.assertions(1);
     return store.dispatch(actions.perfRESTFetch(url)).catch(reason => {
       expect(reason).toHaveProperty('message');
