@@ -1,17 +1,10 @@
 import django_filters.rest_framework
 
-from .testmethod_perf import (
-    BuildFlowFilterSet,
-    TestMethodPerfFilterSet,
-    TestMethodPerfListView,
-    StandardResultsSetPagination,
-)
+from .testmethod_perf import BuildFlowFilterSet, TestMethodPerfFilterSet
 
 from metaci.testresults.models import FieldType
 
 from django.db.models import F
-
-from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
 
 
 class TestMethodResultFilterSet(
