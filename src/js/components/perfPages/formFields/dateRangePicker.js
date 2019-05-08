@@ -8,7 +8,7 @@ type SLDSDateOption = {
   date: Date,
 };
 
-const dateRangePicker = ({
+const DateRangePicker = ({
   onChange,
   startName,
   endName,
@@ -86,4 +86,4 @@ const dateRangePicker = ({
   );
 };
 
-export default dateRangePicker;
+export default DateRangePicker;
