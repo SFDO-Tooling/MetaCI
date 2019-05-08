@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import os
-import sys
 import logging
 import datetime
 from collections import OrderedDict, namedtuple
@@ -432,9 +431,6 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
     """Weekly summary table/model"""
 
     logger = logging.getLogger(__name__)
-    out_hdlr = logging.StreamHandler(sys.stdout)
-    out_hdlr.setLevel(logging.INFO)
-    logger.addHandler(out_hdlr)
     logger.setLevel(logging.INFO)
 
     class Meta:
@@ -451,6 +447,9 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
 
     @classmethod
     def _parse_start_and_date_dates(cls, start_string, end_string):
+        """This code can be called from command lines, periodic jobs or
+           other code. This function provides helpful default behaviours
+           and date parsing to all of those contexts."""
         from metaci.build.models import BuildFlow
 
         DATE_FORMAT = "%Y-%m-%d"
@@ -458,7 +457,7 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
             start = datetime.datetime.strptime(start_string, DATE_FORMAT).date()
             start = start.replace(tzinfo=gettz())
         else:
-            # Let's see where we left off last time.
+            # Infer a start date. Let's see where we left off last time.
             last_already_created = cls.objects.order_by("week_start").last()
             if last_already_created:
                 start = last_already_created.week_start
@@ -535,6 +534,9 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
             week_start=Value(week_start, output_field=models.DateField()),
         )
 
+        # If a week was only partially processed then we need
+        # to process it again from the beginning incorporating new data.
+        # So let's get rid of the old summary files.
         obsolete_objects = cls.objects.filter(week_start=week_start)
         deleted = obsolete_objects.delete()
         cls.logger.info("Deleted %s", deleted)
