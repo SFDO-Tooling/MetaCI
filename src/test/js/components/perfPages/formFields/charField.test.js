@@ -43,14 +43,11 @@ describe('Text Field', () => {
     const field = createField(filterDef);
 
     const filters = [field];
-    const { getByLabelText, getByDisplayValue } = render(<AllFilters filters={filters} />);
+    const { getByLabelText, getByDisplayValue } = render(
+      <AllFilters filters={filters} />,
+    );
     const charField = getByLabelText('MyLabel');
     fireEvent.change(charField, { target: { value: 'abc' } });
-    expect( getByDisplayValue('abc') ).toBeVisible()
-    // expect(charField).toHaveAttribute('value', 'abc');
+    expect(getByDisplayValue('abc')).toBeVisible();
   });
 });
-
-// ChoiceField,
-// CharField,
-// DecimalField,
