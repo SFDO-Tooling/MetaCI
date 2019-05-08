@@ -1,37 +1,20 @@
 import React from 'react';
 import { render } from 'react-testing-library';
 
-import { createField, AllFilters } from 'components/perfPages/formFields';
+import MultiPicker from '../../../../../js/components/perfPages/formFields/multiPicker';
 
 describe('Choice Field', () => {
-  test('Renders Choice Fields with defauled value', () => {
-    const filterDef = {
-      name: 'MyChoiceFilter',
-      field_type: 'ChoiceField',
-      field_module: '',
-      choices: [['choice1', 'value1'], ['choicd2', 'value2']],
-    };
-    const field = createField(filterDef, 'value1');
-
-    const filters = [field];
-    const { getByPlaceholderText } = render(<AllFilters filters={filters} />);
-
-    const input = getByPlaceholderText('Select MyChoiceFilter');
-    expect(input).toBeVisible();
+  test('Renders simple multipicker', () => {
+    const choices = [['a', 'AXYZZY'], ['b', 'BXYZZY']];
+    const { getByPlaceholderText } = render(<MultiPicker choices={choices} />);
+    expect(getByPlaceholderText('Select an Option')).toBeVisible();
   });
-  test('renders CharField with no value', () => {
-    const filterDef = {
-      name: 'MyCharFilter',
-      label: 'MyLabel',
-      field_type: 'CharField',
-      field_module: '',
-    };
-    const field = createField(filterDef);
 
-    const filters = [field];
-    const { getByLabelText } = render(<AllFilters filters={filters} />);
-
-    expect(getByLabelText('MyLabel')).toBeVisible();
-    expect(getByLabelText('MyLabel').getAttribute('value')).toBeFalsy();
+  test('Renders multipicker with default', () => {
+    const choices = [['a', 'AXYZZY'], ['b', 'BXYZZY']];
+    const { getByPlaceholderText } = render(
+      <MultiPicker choices={choices} defaultValue="b" />,
+    );
+    expect(getByPlaceholderText('Select an Option')).toBeVisible();
   });
 });
