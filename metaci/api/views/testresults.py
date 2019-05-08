@@ -53,13 +53,3 @@ class TestMethodResultFilterSet(
 
     o = django_filters.rest_framework.OrderingFilter(fields=ordering_fields)
     ordering_param_name = "o"
-
-
-class TestMethodResultListView(TestMethodPerfListView):
-    """List view for individual unaggregated test results."""
-
-    serializer_class = SimpleDictSerializer
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filterset_class = TestMethodResultFilterSet
-    pagination_class = StandardResultsSetPagination
-    ordering_param_name = filterset_class.ordering_param_name
