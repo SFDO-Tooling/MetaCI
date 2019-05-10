@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import os
 import logging
 import datetime
-import itertools
 from collections import OrderedDict, namedtuple
 from dateutil.tz import gettz
 
@@ -20,6 +19,7 @@ from metaci.testresults.choices import OUTCOME_CHOICES
 from metaci.testresults.choices import TEST_TYPE_CHOICES
 
 from metaci.build import models as build_models
+from metaci.utils import split_seq
 
 
 class TestClass(models.Model):
@@ -542,20 +542,11 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
         deleted = obsolete_objects.delete()
         cls.logger.info("Deleted %s", deleted)
 
-        # from https://stackoverflow.com/a/3226719/11151197
-        def split_seq(iterable, size):
-            it = iter(iterable)
-            item = list(itertools.islice(it, size))
-            while item:
-                yield item
-                item = list(itertools.islice(it, size))
-
         for batch in split_seq(method_contexts, 5000):
             new_objects = [cls(**values) for values in batch]
             cls.logger.info("Creating %s for %s", len(new_objects), date)
             created = cls.objects.bulk_create(new_objects)
             cls.logger.info("Created %s for %s", len(created), date)
-        return
 
     @classmethod
     def summarize_weeks(cls, startdate_string=None, enddate_string=None):
