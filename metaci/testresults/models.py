@@ -19,6 +19,7 @@ from metaci.testresults.choices import OUTCOME_CHOICES
 from metaci.testresults.choices import TEST_TYPE_CHOICES
 
 from metaci.build import models as build_models
+from metaci.utils import split_seq
 
 
 class TestClass(models.Model):
@@ -541,11 +542,11 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
         deleted = obsolete_objects.delete()
         cls.logger.info("Deleted %s", deleted)
 
-        new_objects = [cls(**values) for values in method_contexts]
-        cls.logger.info("Creating %s", len(new_objects))
-        created = cls.objects.bulk_create(new_objects)
-        cls.logger.info("Created %s", len(created))
-        return created
+        for batch in split_seq(method_contexts, 5000):
+            new_objects = [cls(**values) for values in batch]
+            cls.logger.info("Creating %s for %s", len(new_objects), date)
+            created = cls.objects.bulk_create(new_objects)
+            cls.logger.info("Created %s for %s", len(created), date)
 
     @classmethod
     def summarize_weeks(cls, startdate_string=None, enddate_string=None):
