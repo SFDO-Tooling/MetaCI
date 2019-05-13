@@ -33,7 +33,7 @@ module.exports = merge(common, {
     },
     hot: false,
     writeToDisk: true,
-    port: 4088
+    port: 4088,
   },
   plugins: [
     new CleanWebpackPlugin(['dist/*.*']),
