@@ -19,6 +19,7 @@ from metaci.testresults.choices import OUTCOME_CHOICES
 from metaci.testresults.choices import TEST_TYPE_CHOICES
 
 from metaci.build import models as build_models
+from metaci.utils import split_seq
 
 
 class TestClass(models.Model):
@@ -454,8 +455,8 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
 
         DATE_FORMAT = "%Y-%m-%d"
         if start_string:  # User supplied start
-            start = datetime.datetime.strptime(start_string, DATE_FORMAT).date()
-            start = start.replace(tzinfo=gettz())
+            start = datetime.datetime.strptime(start_string, DATE_FORMAT)
+            start = start.replace(tzinfo=gettz()).date()
         else:
             # Infer a start date. Let's see where we left off last time.
             last_already_created = cls.objects.order_by("week_start").last()
@@ -477,8 +478,8 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
                     return None, None  # nothing to do if buildflows table is empty!
 
         if end_string:
-            end = datetime.datetime.strptime(end_string, DATE_FORMAT).date()
-            end = end.replace(tzinfo=gettz())
+            end = datetime.datetime.strptime(end_string, DATE_FORMAT)
+            end = end.replace(tzinfo=gettz()).date()
         else:
             end = (
                 BuildFlow.objects.filter(time_end__isnull=False)
@@ -541,11 +542,11 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
         deleted = obsolete_objects.delete()
         cls.logger.info("Deleted %s", deleted)
 
-        new_objects = [cls(**values) for values in method_contexts]
-        cls.logger.info("Creating %s", len(new_objects))
-        created = cls.objects.bulk_create(new_objects)
-        cls.logger.info("Created %s", len(created))
-        return created
+        for batch in split_seq(method_contexts, 5000):
+            new_objects = [cls(**values) for values in batch]
+            cls.logger.info("Creating %s for %s", len(new_objects), date)
+            created = cls.objects.bulk_create(new_objects)
+            cls.logger.info("Created %s for %s", len(created), date)
 
     @classmethod
     def summarize_weeks(cls, startdate_string=None, enddate_string=None):
