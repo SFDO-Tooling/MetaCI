@@ -71,7 +71,9 @@ export const perfREST_UI_Fetch = (): ThunkAction => (
     checkValid: assertUIData,
   });
 
-// $FlowFixMe
+// flowlint-next-line unclear-type:off
+type UntypedFunc = Function; // the types would be quite complex.
+
 export const perfREST_API = ({
   dispatch,
   _getState,
@@ -79,12 +81,23 @@ export const perfREST_API = ({
   prefix,
   url,
   checkValid,
+}: {
+  dispatch: UntypedFunc,
+  _getState: UntypedFunc,
+  apiFetch: UntypedFunc,
+  prefix: string,
+  url: string,
+  checkValid: UntypedFunc,
 }) => {
   dispatch({ type: `${prefix}_DATA_LOADING`, payload: { url } });
   return apiFetch(url, { method: 'GET' }).then(payload => {
     try {
-      if (!payload){ throw new Error('No payload');} // prettier-ignore
-      if (payload.error){ throw new Error(`Server error: ${payload.error}`);} // prettier-ignore
+      if (!payload) {
+        throw new Error('No payload');
+      }
+      if (payload.error) {
+        throw new Error(`Server error: ${payload.error}`);
+      }
       const checkedPayload = checkValid(payload);
       return dispatch({
         type: `${prefix}_DATA_AVAILABLE`,
