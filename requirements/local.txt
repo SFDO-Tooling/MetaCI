@@ -2,7 +2,7 @@
 -r test.txt
 
 black==19.3b0
-isort==4.3.18
+isort==4.3.19
 pre-commit==1.16.0
 
 Sphinx==2.0.1
