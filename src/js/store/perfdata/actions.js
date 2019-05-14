@@ -1,60 +1,76 @@
 // @flow
 
 import queryString from 'query-string';
-
 import type { ThunkAction } from 'redux-thunk';
 
 import type { PerfData } from 'store/perfdata/reducer';
+import type { UIData } from 'api/testmethod_perf_UI_JSON_schema';
+import { assertUIData } from 'api/testmethod_perf_UI_JSON_schema';
 
-type PerfDataAvailable = { type: 'PERF_DATA_AVAILABLE', payload: PerfData };
-type PerfDataLoading = { type: 'PERF_DATA_LOADING', payload: PerfData };
-type PerfDataError = { type: 'PERF_DATA_ERROR', payload: string};
-type UIDataAvailable = { type: 'UI_DATA_AVAILABLE', payload: PerfData };
-type UIDataLoading = { type: 'UI_DATA_LOADING', payload: PerfData };
+type PerfDataAvailableAction = {
+  type: 'PERF_DATA_AVAILABLE',
+  payload: PerfData,
+};
+type PerfDataLoadingAction = {
+  type: 'PERF_DATA_LOADING',
+  payload: { url: string },
+};
+type PerfDataError = { type: 'PERF_DATA_ERROR', payload: string };
+
+type UIDataAvailableAction = { type: 'UI_DATA_AVAILABLE', payload: UIData };
+type UIDataLoadingAction = { type: 'UI_DATA_LOADING', payload: PerfData };
 type UIDataError = { type: 'UI_DATA_ERROR', payload: string };
 
-export type PerfDataAction = PerfDataAvailable | PerfDataLoading | PerfDataError;
-export type UIDataAction = UIDataAvailable | UIDataLoading | UIDataError;
+export type PerfDataAction =
+  | PerfDataAvailableAction
+  | PerfDataLoadingAction
+  | PerfDataError;
+export type UIDataAction =
+  | UIDataAvailableAction
+  | UIDataLoadingAction
+  | UIDataError;
 
-export const perfRESTFetch = (url : string, params?: {}):
-        ThunkAction => (dispatch, getState, { apiFetch }) => {
-  dispatch({ type: 'PERF_DATA_LOADING', payload: url });
-  if(params){
-    url = url + "&"+ queryString.stringify(params);
+export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (
+  dispatch,
+  _getState,
+  { apiFetch },
+) => {
+  if (params) {
+    url = `${url}&${queryString.stringify(params)}`;
   }
+  dispatch({ type: 'PERF_DATA_LOADING', payload: { url } });
   apiFetch(url, {
     method: 'GET',
-  }).then((payload) => {
-    if(payload){
-      if(!payload.error){
+  }).then(payload => {
+    if (payload) {
+      if (!payload.error) {
         return dispatch({ type: 'PERF_DATA_AVAILABLE', payload });
-      }else{
-        // TODO: PERF_DATA_ERROR is not handled yet
-        return dispatch({ type: 'PERF_DATA_ERROR', payload });
       }
-    }else{
-      alert("Missing payload from server");
+      return dispatch({ type: 'PERF_DATA_ERROR', payload });
     }
+    return undefined;
   });
-}
+};
 
-export const perfREST_UI_Fetch = ():
-        ThunkAction => (dispatch, getState, { apiFetch }) => {
-  // todo use reverse
-  let url = "/api/testmethod_perf_UI";
+export const perfREST_UI_Fetch = (): ThunkAction => (
+  dispatch,
+  _getState,
+  { apiFetch },
+) => {
+  const url = '/api/testmethod_perf_UI';
   dispatch({ type: 'UI_DATA_LOADING', payload: url });
   apiFetch(url, {
     method: 'GET',
-  }).then((payload) => {
+  }).then(payload => {
     if (payload) {
       if (!payload.error) {
-        return dispatch({ type: 'UI_DATA_AVAILABLE', payload });
-      } else {
-        // TODO: UI_DATA_ERROR is not handled yet
-        return dispatch({ type: 'UI_DATA_ERROR', payload });
+        const typedPayload: UIData = assertUIData(payload);
+        return dispatch({ type: 'UI_DATA_AVAILABLE', payload: typedPayload });
       }
-    } else {
-      alert("Missing payload from server");
+      return dispatch({ type: 'UI_DATA_ERROR', payload });
     }
+    // eslint-disable-next-line no-console
+    console.log('Missing payload from server');
+    return undefined;
   });
-}
+};

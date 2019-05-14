@@ -1,11 +1,13 @@
+from django.conf import settings
+
 from rest_framework import viewsets, response, permissions
 
 from metaci.api.views.testmethod_perf import (
     BuildFlowFilterSet,
     TestMethodPerfFilterSet,
-    TestMethodResultFilterSet,
     DEFAULTS,
 )
+from metaci.api.views.testresults import TestMethodResultFilterSet
 
 
 class TestMethodPerfUIApiView(viewsets.ViewSet):
@@ -33,41 +35,43 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
                     "choices"
                 ],
                 "filters": testmethodperf_filters.values(),
+                "defaults": {**dict(self.defaults)},
             },
             "testmethod_results": {
                 "includable_fields": testmethodresult_filters["include_fields"][
                     "choices"
                 ],
                 "filters": testmethodresult_filters.values(),
+                "defaults": {**dict(self.defaults)},
             },
-            "defaults": dict(self.defaults),
+            "debug": settings.DEBUG,
         }
 
         return response.Response(json)
 
     def collect_filter_defs(self, filterSet, exclusion_names):
         json_filter_defs = {}
+        defaults = dict(self.defaults)
         for name, filter in filterSet.get_filters().items():
             if name in exclusion_names:
                 continue
-            if filter.extra.get("choices"):
-                choices = filter.extra["choices"]
-            else:
-                choices = None
-
-            default_value = dict(self.defaults).get(name)
             obj = {
                 "name": name,
                 "label": filter._label,
-                "choices": choices,
                 "field_type": filter.field_class.__name__,
                 "field_module": filter.field_class.__module__,
                 "lookup_expr": filter.lookup_expr,
             }
+            choices = filter.extra.get("choices")
             if choices:
                 obj["choices"] = choices
-            if default_value:
-                obj["default"] = default_value
+
+            initial = filter.extra.get("initial")
+            if initial:
+                obj["initial"] = initial
+            elif name in defaults:
+                obj["initial"] = defaults[name]
+
             json_filter_defs[name] = obj
 
         return json_filter_defs
