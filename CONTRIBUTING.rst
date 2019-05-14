@@ -181,6 +181,20 @@ translations to ``locales/<language>/translation.json``.
 .. _GNU gettext toolset: https://www.gnu.org/software/gettext/
 .. _user language is auto-detected at runtime: https://github.com/i18next/i18next-browser-languageDetector
 
+Type Checking
+--------------
+
+We use "flow_" for type-checking for the time being. You should be able to just
+type "flow" to validate that there are no known type errors.
+
+If you need to use libraries that do not have flow definitions, you could edit
+a file with a name like ``flow-typed/npm/@package/module_vx.x.x.js`` to stub out addition component
+type definitions. OR you can run ``flow-typed update --ignoreDeps dev`` to allow
+it to automatically generate stubs for modules with missing type definitions.
+
+At some point we will probably move to TypeScript.
+
+.. _flow: https://flow.org/
 
 Developing with SLDS
 --------------------
