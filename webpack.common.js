@@ -99,7 +99,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: false,
       template: path.join(__dirname, 'src', 'testperf.html'),
-      filename: "testperf.html"
+      filename: 'testperf.html',
     }),
   ],
 };
