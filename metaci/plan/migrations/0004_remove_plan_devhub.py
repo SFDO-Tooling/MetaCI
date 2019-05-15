@@ -7,6 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [("plan", "0003_planschedule")]
+    dependencies = [("plan", "0002_plan_devhub")]
 
     operations = [migrations.RemoveField(model_name="plan", name="devhub")]
