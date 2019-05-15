@@ -14,6 +14,8 @@ rand.seed("xyzzy")
 
 
 class _TestingHelpers:
+    route = reverse("testmethod_perf-list")
+
     def debugmsg(self, *args):
         print(*args)  # Pytest does useful stuff with stdout, better than logger data
 
@@ -29,7 +31,7 @@ class _TestingHelpers:
     def api_url(self, **kwargs):
         params = urlencode(kwargs, True)
         self.debugmsg("QueryParams", params)
-        return reverse("testmethod_perf-list") + "?" + params
+        return self.route + "?" + params
 
     def find_first(self, fieldname, objs, value):
         """ Find objects in JSON result sets that match a value """
@@ -90,24 +92,22 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
             self.find_first("method_name", objs, "Bar")["duration_average"], 4
         )
 
-    def test_all_included_fields(self):
-        includable_fields = [
-            "duration_average",
-            "duration_slow",
-            "duration_fast",
-            "duration_stddev",
-            "duration_coefficient_var",
-            "cpu_usage_average",
-            "cpu_usage_low",
-            "cpu_usage_high",
-            "count",
-            "failures",
-            "assertion_failures",
-            "DML_failures",
-            "Other_failures",
-            "success_percentage",
-        ]
+    includable_fields = [
+        "duration_average",
+        "duration_slow",
+        "duration_fast",
+        "cpu_usage_average",
+        "cpu_usage_low",
+        "cpu_usage_high",
+        "count",
+        "failures",
+        "assertion_failures",
+        "DML_failures",
+        "other_failures",
+        "success_percentage",
+    ]
 
+    def test_all_included_fields(self):
         def _test_fields(fields):
             response = self.client.get(self.api_url(include_fields=fields))
             self.assertEqual(response.status_code, 200)
@@ -116,18 +116,18 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
                 self.assertSetEqual(set(fields + ["method_name"]), set(row))
 
         for i in range(10):
-            field = rand.sample(includable_fields, 1)
+            field = rand.sample(self.includable_fields, 1)
             _test_fields(field)
 
         for i in range(10):
-            field1, field2 = rand.sample(includable_fields, 2)
+            field1, field2 = rand.sample(self.includable_fields, 2)
             _test_fields([field1, field2])
 
         for i in range(10):
-            field1, field2, field3 = rand.sample(includable_fields, 3)
+            field1, field2, field3 = rand.sample(self.includable_fields, 3)
             _test_fields([field1, field2, field3])
 
-        _test_fields(includable_fields)
+        _test_fields(self.includable_fields)
 
     def test_duration_slow(self):
         """Test counting high durations"""
@@ -137,25 +137,27 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         rows = self.get_api_results(include_fields=["duration_slow", "count"])
 
         self.assertEqual(
-            self.find_first("method_name", rows, "Foo")["duration_slow"], 10
+            round(self.find_first("method_name", rows, "Foo")["duration_slow"]), 10
         )
 
     def test_duration_fast(self):
         """Test counting high durations"""
 
-        self.insert_identical_tests(method_name="Foo", count=20, duration=2)
-        _outlier = TestResultFactory(method__name="Foo", duration=1)  # noqa
+        self.insert_identical_tests(method_name="FooBar", count=20, duration=2)
+        _outlier = TestResultFactory(method__name="FooBar", duration=1)  # noqa
         rows = self.get_api_results(include_fields=["duration_slow", "count"])
 
         self.assertEqual(
-            self.find_first("method_name", rows, "Foo")["duration_slow"], 2
+            round(self.find_first("method_name", rows, "FooBar")["duration_slow"]), 2
         )
 
     def test_count_failures(self):
         """Test counting failed tests"""
         self.insert_identical_tests(method_name="FailingTest", count=15, outcome="Fail")
         self.insert_identical_tests(method_name="FailingTest", count=10, outcome="Pass")
-        rows = self.get_api_results(include_fields=["failures", "success_percentage"])
+        rows = self.get_api_results(
+            include_fields=["failures", "success_percentage", "other_failures"]
+        )
 
         self.assertEqual(
             self.find_first("method_name", rows, "FailingTest")["failures"], 15
@@ -163,6 +165,14 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.assertEqual(
             self.find_first("method_name", rows, "FailingTest")["success_percentage"],
             (10 / 25) * 100,
+        )
+
+        self.assertEqual(
+            self.find_first("method_name", rows, "FailingTest")["other_failures"], 15
+        )
+
+        self.assertEqual(
+            self.find_first("method_name", rows, "Foo")["other_failures"], 0
         )
 
     def test_split_by_repo(self):
@@ -187,43 +197,6 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.assertEqual(
             self.find_first("method_name", rows, "NPSPTest")["repo"], "Cumulus"
         )
-
-    def test_split_by_flow(self):
-        """Test splitting on flow"""
-        self.insert_identical_tests(
-            method_name="HedaTest", count=15, build_flow__flow="ci_feature"
-        )
-        self.insert_identical_tests(
-            method_name="HedaTest", count=20, build_flow__flow="ci_beta"
-        )
-        rows = self.get_api_results(
-            include_fields=["count", "flow"], method_name="HedaTest"
-        )
-
-        for row in rows:
-            self.assertIn(row["flow"], ["ci_feature", "ci_beta", "rida"])
-
-        self.assertEqual(self.find_first("flow", rows, "ci_feature")["count"], 15)
-        self.assertEqual(self.find_first("flow", rows, "ci_beta")["count"], 20)
-
-    def test_split_by_flow_ignoring_repo(self):
-        """Test splitting on flow regardless of repro"""
-        self.insert_identical_tests(
-            count=3, build_flow__build__repo__name="HEDA", build_flow__flow="Flow1"
-        )
-        self.insert_identical_tests(
-            count=5, build_flow__build__repo__name="HEDA", build_flow__flow="Flow2"
-        )
-        self.insert_identical_tests(
-            count=7, build_flow__build__repo__name="Cumulus", build_flow__flow="Flow1"
-        )
-        self.insert_identical_tests(
-            count=9, build_flow__build__repo__name="Cumulus", build_flow__flow="Flow2"
-        )
-        rows = self.get_api_results(include_fields=["count", "flow"])
-
-        self.assertEqual(self.find_first("flow", rows, "Flow1")["count"], 10)
-        self.assertEqual(self.find_first("flow", rows, "Flow2")["count"], 14)
 
     def test_split_by_plan(self):
         """Test splitting on plan regardless of the rest"""
@@ -282,12 +255,22 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.assertTrue(rows[0]["method_name"] > rows[-1]["method_name"])
 
     def test_order_by_success_percentage(self):
-        TestResultFactory(method__name="Bar", outcome="Pass", build_flow__tests_total=1)
+        TestResultFactory(
+            method__name="Foo2", outcome="Fail", build_flow__tests_total=1
+        )
+        TestResultFactory(
+            method__name="Bar2", outcome="Pass", build_flow__tests_total=1
+        )
         rows = self.get_api_results(o="success_percentage")
         self.assertTrue(rows[0]["success_percentage"] < rows[-1]["success_percentage"])
 
     def test_order_by_success_percentage_desc(self):
-        TestResultFactory(method__name="Bar", outcome="Pass", build_flow__tests_total=1)
+        TestResultFactory(
+            method__name="FailingTest", outcome="Fail", build_flow__tests_total=1
+        )
+        TestResultFactory(
+            method__name="PassingTest", outcome="Pass", build_flow__tests_total=1
+        )
         rows = self.get_api_results(o="-success_percentage")
         self.assertTrue(rows[0]["success_percentage"] > rows[-1]["success_percentage"])
 
@@ -352,3 +335,36 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
         self.debugmsg(response)
         self.assertEqual(response.status_code, 200)
         self.assertIn("text/html", response["content-type"])
+
+    def test_filter_by_count(self):
+        TestResultFactory(method__name="Bar1")
+        TestResultFactory(method__name="Bar1")
+        TestResultFactory(method__name="Bar1")
+        TestResultFactory(method__name="Bar1")
+        rows = self.get_api_results(count_gt=3, count_lt=5)
+        self.assertEqual(len(rows), 1)
+        for row in rows:
+            self.assertEqual(row["method_name"], "Bar1")
+
+    def test_default_fields(self):
+        rows = self.get_api_results()
+
+        self.assertIn("duration_average", rows[0].keys())
+        self.assertIn("method_name", rows[0].keys())
+
+    def test_default_fields_repo_only(self):
+        TestResultFactory(
+            method__name="Bar1", build_flow__build__planrepo__repo__name="myrepo"
+        )
+        rows = self.get_api_results(repo="myrepo")
+
+        self.assertIn("duration_average", rows[0].keys())
+        self.assertIn("method_name", rows[0].keys())
+
+    def test_filter_by_methodname(self):
+        rows = self.get_api_results(method_name="Foo")
+        self.assertTrue(rows)
+
+    def test_filter_by_methodname_subset(self):
+        rows = self.get_api_results(method_name="Fo")
+        self.assertTrue(rows)

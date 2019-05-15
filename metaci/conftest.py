@@ -3,9 +3,16 @@ import factory.fuzzy
 
 import numbers
 import random
+import datetime
+
 
 from metaci.plan.models import Plan, PlanRepository
-from metaci.testresults.models import TestResult, TestMethod, TestClass
+from metaci.testresults.models import (
+    TestResult,
+    TestMethod,
+    TestClass,
+    TestResultPerfWeeklySummary,
+)
 from metaci.build.models import BuildFlow, Build, BUILD_STATUSES, BUILD_FLOW_STATUSES
 from metaci.repository.models import Branch, Repository
 
@@ -106,6 +113,12 @@ class BuildFlowFactory(factory.django.DjangoModelFactory):
 
     flow = factory.fuzzy.FuzzyChoice(["rida", "andebb", "ttank", "tleft"])
     status = factory.fuzzy.FuzzyChoice(BUILD_FLOW_STATUS_NAMES)
+    time_end = (
+        datetime.datetime.utcnow()
+        .replace(tzinfo=datetime.timezone.utc)
+        .isoformat()
+        .split("T")[0]  # Area before the split
+    )
 
 
 class TestClassFactory(factory.django.DjangoModelFactory):
@@ -158,6 +171,10 @@ class TestResultFactory(factory.django.DjangoModelFactory):
             return "success"
         else:
             return rand.choice(["CompileFail", "Fail", "Skip"])
+
+    @factory.post_generation
+    def summarize(obj, create, extracted, **kwargs):
+        TestResultPerfWeeklySummary.summarize_week(obj.build_flow.time_end)
 
 
 class UserFactory(factory.django.DjangoModelFactory):
