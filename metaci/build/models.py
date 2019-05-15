@@ -126,6 +126,8 @@ class Build(models.Model):
                             blank=True, on_delete=models.CASCADE)
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
                                      related_name='builds', null=True, blank=True, on_delete=models.CASCADE)
+    schedule = models.ForeignKey('plan.PlanSchedule', related_name='builds',
+                                 null=True, blank=True, on_delete=models.CASCADE)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
@@ -229,6 +231,10 @@ class Build(models.Model):
         self.flush_log()
         build = self.current_rebuild if self.current_rebuild else self
         set_build_info(build, status='running', time_start=timezone.now())
+
+        if self.schedule:
+            self.logger.info('Build triggered by {} schedule #{}'.format(
+                self.schedule.schedule, self.schedule.id))
 
         try:
             # Extract the repo to a temp build dir
