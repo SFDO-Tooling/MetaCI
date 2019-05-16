@@ -12,11 +12,6 @@ class Migration(migrations.Migration):
         ('plan', '0004_remove_plan_devhub'),
         ('build', '0007_auto_20170505_1607'),
     ]
-
-    operations = [
-        migrations.AddField(
-            model_name='build',
-            name='schedule',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='builds', to='plan.PlanSchedule'),
-        ),
-    ]
+    # obsolete operations were removed here
+    # because they were causing errors:
+    operations = []

@@ -16,9 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterModelOptions(
             name="planrepository", options={"verbose_name_plural": "Plan Repositories"}
         ),
-        migrations.AlterModelOptions(
-            name="planschedule", options={"verbose_name_plural": "Plan Schedules"}
-        ),
         migrations.AlterField(
             model_name="plan",
             name="repos",
