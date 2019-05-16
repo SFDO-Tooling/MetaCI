@@ -6,25 +6,34 @@ from datetime import datetime, timezone, time
 
 
 def install_periodic_builds_job(apps, schema_editor):
-    now = datetime.now(tz=timezone.utc).replace(hour=16)
+    midnight_utc = datetime.now(tz=timezone.utc).replace(hour=0, minute=0)
     job, created = RepeatableJob.objects.get_or_create(
         callable="metaci.plan.tasks.run_scheduled_hourly",
         enabled=True,
         name="hourly_builds_job",
         queue="short",
-        defaults={"interval": 1, "interval_unit": "hours", "scheduled_time": now},
+        defaults={
+            "interval": 1,
+            "interval_unit": "hours",
+            "scheduled_time": midnight_utc,
+        },
     )
     job, created = RepeatableJob.objects.get_or_create(
         callable="metaci.plan.tasks.run_scheduled_daily",
         enabled=True,
         name="daily_builds_job",
         queue="short",
-        defaults={"interval": 24, "interval_unit": "hours", "scheduled_time": now},
+        defaults={
+            "interval": 24,
+            "interval_unit": "hours",
+            "scheduled_time": midnight_utc,
+        },
     )
 
 
 def uninstall_periodic_builds_job(apps, schema_editor):
-    RepeatableJob.objects.filter(name="periodic_builds_job").delete()
+    RepeatableJob.objects.filter(name="hourly_builds_job").delete()
+    RepeatableJob.objects.filter(name="daily_builds_job").delete()
 
 
 class Migration(migrations.Migration):
