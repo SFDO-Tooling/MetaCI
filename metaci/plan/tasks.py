@@ -26,7 +26,7 @@ def run_scheduled(schedule):
             )
 
         except Exception as e:
-            log.append("Schedule {} failed with error:\n{}".format(sched, unicode(e)))
+            log.append("Schedule {} failed with error:\n{}".format(sched, str(e)))
 
     return "\n".join(log)
 
