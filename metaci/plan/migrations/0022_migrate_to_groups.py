@@ -94,7 +94,11 @@ def grant_anonymous_perms(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("plan", "0021_auto_20181018_2143")]
+    dependencies = [
+        ("plan", "0021_auto_20181018_2143"),
+        ("build", "0026_auto_20190122_2128"),
+        ("guardian", "0001_initial"),
+    ]
 
     operations = [
         migrations.RunPython(migrate_permissions),
