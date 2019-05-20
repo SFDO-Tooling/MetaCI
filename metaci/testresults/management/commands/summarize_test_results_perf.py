@@ -9,7 +9,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("startdate", type=str)
         parser.add_argument("enddate", type=str)
-        parser.add_argument("replace", choices=["replace", "continue"])
 
     def handle(self, startdate, enddate, replace, **options):
         TestResultPerfWeeklySummary.summarize_weeks(startdate, enddate)

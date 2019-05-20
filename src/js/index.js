@@ -7,7 +7,6 @@ import IconSettings from '@salesforce/design-system-react/components/icon-settin
 import logger from 'redux-logger';
 import settings from '@salesforce/design-system-react/components/settings';
 import thunk from 'redux-thunk';
-import { withRouter } from 'react-router';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
@@ -21,21 +20,13 @@ import utilitySprite from '@salesforce-ux/design-system/assets/icons/utility-spr
 
 import init_i18n from './i18n';
 
-import AuthError from 'components/authError';
 import ErrorBoundary from 'components/error';
-import Footer from 'components/footer';
-import FourOhFour from 'components/404';
-import Header from 'components/header';
-import PerfTable from 'components/perfTable';
-import TestMethodsResultsTable from 'components/testMethodResultsTable';
+import PerfPage from 'components/perfPages/perfPage';
+// import TestMethodsResultsTable from 'components/perfPages/testMethodResultsTable';
 import getApiFetch from 'utils/api';
 import reducer from 'store';
 import { logError } from 'utils/logging';
 import { login } from 'store/user/actions';
-import { routePatterns } from 'utils/routes';
-
-
-const SF_logo = require('images/salesforce-logo.png');
 
 const App = () => (
   <DocumentTitle title={t('Meta CI')}>
@@ -50,8 +41,11 @@ const App = () => (
         >
           <ErrorBoundary>
             <Switch>
-             <Route path="/repos/:owner/:repo/perf" component={PerfTable} />
-             <Route path="/repos/:owner/:repo/tests" component={TestMethodsResultsTable} />
+              <Route path="/repos/:owner/:repo/perf" component={PerfPage} />
+              {/* <Route
+                path="/repos/:owner/:repo/tests"
+                component={TestMethodsResultsTable}
+              /> */}
             </Switch>
           </ErrorBoundary>
         </div>
@@ -107,12 +101,6 @@ init_i18n(() => {
 
     // Set App element (used for react-SLDS modals)
     settings.setAppElement(el);
-
-    // TODO: Delete this in April, 2019.
-    // if( window.location.pathname.match(/\/repos\/.*\/perf/)>=0){
-    //   let pathParts = window.location.pathname.split("/");
-    //   changeUrl({repo: pathParts[pathParts.length-2]})
-    // }
 
     ReactDOM.render(
       <Provider store={appStore}>
