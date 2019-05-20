@@ -8,7 +8,7 @@ gunicorn==19.9.0
 
 # Email backends for Mailgun, Postmark, SendGrid and more
 # -------------------------------------------------------
-django-anymail==6.0
+django-anymail==6.0.1
 
 # Raven is the Sentry client
 # --------------------------
