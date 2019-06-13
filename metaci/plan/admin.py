@@ -1,5 +1,5 @@
 from django.contrib import admin
-from metaci.plan.models import Plan, PlanRepository, PlanRepositoryTrigger
+from metaci.plan.models import Plan, PlanRepository, PlanRepositoryTrigger, PlanSchedule
 from guardian.admin import GuardedModelAdmin
 
 
@@ -31,3 +31,11 @@ class PlanRepositoryTriggerAdmin(GuardedModelAdmin):
 
 
 admin.site.register(PlanRepositoryTrigger, PlanRepositoryTriggerAdmin)
+
+
+class PlanScheduleAdmin(GuardedModelAdmin):
+    list_display = ("plan", "branch", "schedule")
+    list_filter = ("plan", "branch", "schedule")
+
+
+admin.site.register(PlanSchedule, PlanScheduleAdmin)

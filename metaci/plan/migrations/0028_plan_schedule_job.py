@@ -16,6 +16,7 @@ def install_periodic_builds_job(apps, schema_editor):
             "interval": 1,
             "interval_unit": "hours",
             "scheduled_time": midnight_utc,
+            "enabled": True,
         },
     )
     job, created = RepeatableJob.objects.get_or_create(
@@ -27,6 +28,7 @@ def install_periodic_builds_job(apps, schema_editor):
             "interval": 24,
             "interval_unit": "hours",
             "scheduled_time": midnight_utc,
+            "enabled": True,
         },
     )
 
