@@ -19,6 +19,7 @@ from django.db import connection
 class DEFAULTS:
     page_size = 50
     max_page_size = 100
+    branch = "master"
 
 
 def set_timeout(timeout):
