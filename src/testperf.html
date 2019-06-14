@@ -8,7 +8,7 @@
     -->
   </head>
   <body>
-      {% if request.user.is_staff %}
+      {% if request.user.is_authenticated %}
         <main id="app" class="slds-grid slds-grid_vertical">
           <div role="status" class="slds-spinner slds-spinner_large">
             <span class="slds-assistive-text">Loading…</span>

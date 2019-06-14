@@ -1,5 +1,3 @@
-from collections import namedtuple
-
 from django.db.models import FloatField, BigIntegerField
 from django.db.models.functions import Cast
 
@@ -323,7 +321,7 @@ class TestMethodPerfListView(generics.ListAPIView, viewsets.ViewSet):
 
     def get_queryset(self):
         """The main method that the Django infrastructure invokes."""
-        set_timeout(10)
+        set_timeout(30)
         self._check_params()
 
         splitter_fields = self._get_splitter_fields()

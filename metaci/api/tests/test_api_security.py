@@ -1,6 +1,8 @@
 import json
+import pytest
 
 from guardian.shortcuts import assign_perm
+from django.contrib.auth.models import Group
 
 from metaci.conftest import (
     StaffSuperuserFactory,
@@ -33,7 +35,8 @@ class TestAPISecurity(APITestCase):
         p2 = PlanFactory(name="Plan2")
         r1 = RepositoryFactory(name="PublicRepo")
         r2 = RepositoryFactory(name="PrivateRepo")
-        PlanRepositoryFactory(plan=p1, repo=r1)
+        public_pr = PlanRepositoryFactory(plan=p1, repo=r1)
+        assign_perm("plan.view_builds", Group.objects.get(name="Public"), public_pr)
         pr2 = PlanRepositoryFactory(plan=p2, repo=r2)
         BranchFactory(name="Branch1", repo=r1)
         BranchFactory(name="Branch2", repo=r2)
@@ -79,6 +82,44 @@ class TestAPISecurity(APITestCase):
         response = client.get("/api/testmethod_perf_UI/")
         self.debugmsg(response)
         self.assertEqual(response.status_code, 200)
+
+    # not an API test strictly speaking but it depends on the infrastructure
+    # for API tests so this is a good place for it until we have more such
+    # tests
+    #
+    # Disabled until I can work out a build problem.
+    @pytest.mark.skip
+    def test_login_required_for_testresults_page(self):
+        client = APIClient()
+        client.logout()
+
+        private = PlanRepository.objects.filter(repo__name="PrivateRepo").first().repo
+
+        response = client.get(f"/repos/{private}/perf")
+        self.debugmsg(response)
+        self.assertEqual(response.status_code, 404)  # don't acknowledge repo exists
+
+        public = PlanRepository.objects.filter(repo__name="PublicRepo").first().repo
+        response = client.get(f"/repos/{public}/perf")
+        self.debugmsg(response)
+        self.assertEqual(
+            response.status_code, 200
+        )  # repo exists but you can't see test data on it
+        self.assertIn("Please login", response.content.decode("utf-8"))
+
+    # same comment as above
+    @pytest.mark.skip
+    def test_testresults_page_visible_to_logged_in_users(self):
+        client, user = self.make_user_and_client(UserFactory())
+        private_planrepo = PlanRepository.objects.filter(
+            repo__name="PrivateRepo"
+        ).first()
+        assign_perm("plan.view_builds", user, private_planrepo)
+
+        response = client.get(f"/repos/{private_planrepo.repo}/perf")
+        self.debugmsg(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("Please login", response.content.decode("utf-8"))
 
     def test_api_methods_IP_view_protection_normal_user(self):
         client, user = self.make_user_and_client()

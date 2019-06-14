@@ -127,7 +127,7 @@ class Build(models.Model):
     org_instance = models.ForeignKey('cumulusci.ScratchOrgInstance',
                                      related_name='builds', null=True, blank=True, on_delete=models.CASCADE)
     schedule = models.ForeignKey('plan.PlanSchedule', related_name='builds',
-                                 null=True, blank=True, on_delete=models.CASCADE)
+                                 null=True, blank=True, on_delete=models.SET_NULL)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
