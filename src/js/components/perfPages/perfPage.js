@@ -71,10 +71,12 @@ export const UnwrappedPerfPage = ({
      * path into query params with other filters
      */
     const pathParts = window.location.pathname.split('/');
-    const repo = pathParts[pathParts.length - 2];
-    const branch = 'master';
+    const default_repo = pathParts[pathParts.length - 2];
+    const default_branch = 'master';
+    const repo = (queryparams.get('repo') || default_repo).toString();
+    const branch = (queryparams.get('branch') || default_branch).toString();
     queryparams.set({ repo, branch });
-    doPerfRESTFetch({ ...queryparams.getAll(), repo, branch });
+    doPerfRESTFetch({ repo, branch, ...queryparams.getAll() });
     doPerfREST_UI_Fetch();
   }, []);
 
