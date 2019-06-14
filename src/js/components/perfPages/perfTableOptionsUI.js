@@ -98,7 +98,7 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
   // arrived
   const filters = uiAvailable ? gatherFilters(testMethodPerfUI) : [];
 
-  const exclude = ['o', 'include_fields', 'build_flows_limit'];
+  const exclude = ['o', 'include_fields'];
   const filterPanelFilters = filters.filter(
     filter => !exclude.includes(filter.name),
   );

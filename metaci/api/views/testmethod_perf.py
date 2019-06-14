@@ -17,7 +17,6 @@ from django.db import connection
 
 
 class DEFAULTS:
-    build_flows_limit = 100
     page_size = 50
     max_page_size = 100
 
@@ -98,12 +97,6 @@ class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
         field_name="week_start",
         label="Date range",
         widget=DateRangeWidget(attrs={"type": "date"}),
-    )
-
-    # This is not really a filter. It's actually just a query input but putting it
-    # here lets me get it in the django-filters form.
-    build_flows_limit = django_filters.rest_framework.NumberFilter(
-        method="dummy_filter", label="Build Flows Limit (default: 100)"
     )
 
     def dummy_filter(self, queryset, name, value):

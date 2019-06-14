@@ -67,7 +67,6 @@ class TestTestMethodPerfUI_RESTAPI(APITestCase, _TestingHelpers):
         other_buildflow_filters = buildflow_filters["other_buildflow_filters"]
 
         self.assertIn("daterange", other_buildflow_filters)
-        self.assertIn("build_flows_limit", other_buildflow_filters)
 
         self.assertIn("Repo1", keys(choice_filters["repo"]["choices"]))
         self.assertIn("Repo2", keys(choice_filters["repo"]["choices"]))
