@@ -98,7 +98,7 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
   // arrived
   const filters = uiAvailable ? gatherFilters(testMethodPerfUI) : [];
 
-  const exclude = ['o', 'include_fields', 'build_flows_limit'];
+  const exclude = ['o', 'include_fields'];
   const filterPanelFilters = filters.filter(
     filter => !exclude.includes(filter.name),
   );
@@ -196,15 +196,38 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
   );
 };
 
-const AllFilters = ({ filters }: { filters: Field[] }) => (
-  <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
-    {filters.map(filter => (
-      <div key={filter.name} className="slds-col slds-size_3-of-12">
-        {filter.render()}
-      </div>
-    ))}
-  </div>
-);
+// This is a gross hack but its a legitimately hard problem: the server
+// controls what fields it sends but the client needs to make it look nice.
+// I need the fourth field (which I know is "Success Percentage") to wrap
+// to the next line.
+//
+// There is no good place to put the responsibility for deciding how to lay
+// things out. In the future we will use a filter UI more like Salesforce's
+// and this hack can go away.
+//
+// Essentially random layout of server fields is why so many enterprise apps
+// look horrible. This small hack is a compromise. It means that the client
+// and server are more tightly bound then they otherwise would be. Adding
+// or removing fields requires a change here.
+const spacerField = {
+  name: 'Blank "field" to space things out',
+  currentValue: '',
+  render: () => <span />,
+};
+
+const AllFilters = ({ filters }: { filters: Field[] }) => {
+  // Yes...this is gross. I'm sorry.
+  filters.splice(3, 0, spacerField);
+  return (
+    <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
+      {filters.map(filter => (
+        <div key={filter.name} className="slds-col slds-size_3-of-12">
+          {filter.render()}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const select = (appState: AppState) => ({
   perfUIStatus: selectPerfUIStatus(appState),
