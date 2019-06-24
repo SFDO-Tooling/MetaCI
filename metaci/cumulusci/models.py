@@ -1,25 +1,21 @@
 from __future__ import unicode_literals
 
 import json
-import os
 from calendar import timegm
 from datetime import datetime
 from urllib.parse import urljoin
 
 import jwt
 import requests
-from cumulusci.core.config import ScratchOrgConfig
-from cumulusci.core.config import OrgConfig
-from cumulusci.core.exceptions import ScratchOrgException
+from cumulusci.core.config import OrgConfig, ScratchOrgConfig
 from django.apps import apps
+from django.conf import settings
 from django.core.cache import cache
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.conf import settings
-from guardian.shortcuts import get_objects_for_user
 from simple_salesforce import Salesforce as SimpleSalesforce
 from simple_salesforce.exceptions import SalesforceError
 
@@ -196,7 +192,8 @@ class ScratchOrgInstance(models.Model):
         return ScratchOrgConfig(org_config, self.org.name)
 
     def get_jwt_based_session(self):
-        return jwt_session("https://test.salesforce.com", self.username)
+        config = json.loads(self.json)
+        return jwt_session(config["instance_url"], self.username)
 
     def delete_org(self, org_config=None):
         if org_config is None:
