@@ -5,11 +5,11 @@ black==19.3b0
 isort==4.3.20
 pre-commit==1.17.0
 
-Sphinx==2.1.1
+Sphinx==2.1.2
 django-extensions==2.1.9
 Werkzeug==0.15.4
 
-django-debug-toolbar==1.11
+django-debug-toolbar==2.0
 
 # improved REPL
 ipdb==0.12
