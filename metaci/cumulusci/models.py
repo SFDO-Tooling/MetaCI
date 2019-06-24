@@ -192,7 +192,8 @@ class ScratchOrgInstance(models.Model):
         return ScratchOrgConfig(org_config, self.org.name)
 
     def get_jwt_based_session(self):
-        return jwt_session(self.json["instance_url"], self.username)
+        config = json.loads(self.json)
+        return jwt_session(config["instance_url"], self.username)
 
     def delete_org(self, org_config=None):
         if org_config is None:
