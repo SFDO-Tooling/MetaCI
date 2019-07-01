@@ -164,6 +164,21 @@ class Build(models.Model):
             ('search_builds', 'Search Builds'),
         )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._populate_planrepo()
+
+    def save(self, *args, **kwargs):
+        self._populate_planrepo()
+        super().save(*args, **kwargs)
+
+    def _populate_planrepo(self):
+        if self.plan and self.repo and not self.planrepo:
+            PlanRepository = apps.get_model("plan.PlanRepository")
+            self.planrepo = PlanRepository.objects.get_or_create(
+                plan=self.plan, repo=self.repo
+            )
+
     def __str__(self):
         return '{}: {} - {}'.format(self.id, self.repo, self.commit)
 
