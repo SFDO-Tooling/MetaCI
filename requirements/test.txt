@@ -2,7 +2,7 @@
 -r base.txt
 
 pytest==5.0.0
-pytest-django==3.5.0
+pytest-django==3.5.1
 pytest-tap==2.3
 coverage==4.5.3
 coveralls==1.8.1
