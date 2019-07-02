@@ -20,6 +20,9 @@ class BuildTestCase(TestCase):
         branch = BranchFactory(name="branch", repo=repo)
         schedule = PlanScheduleFactory(branch=branch)
         plan = PlanFactory()
+
+        planrepo = PlanRepositoryFactory(plan=plan, repo=repo)
+
         build = Build(
             repo=branch.repo,
             plan=plan,
@@ -28,15 +31,8 @@ class BuildTestCase(TestCase):
             schedule=schedule,
             build_type="scheduled",
         )
-        self.assertTrue(build.planrepo)
+        self.assertEqual(build.planrepo, planrepo)
         build.save()
-
-    def test_planrepo_create_on_build_init(self):
-        repo = RepositoryFactory()
-        plan = PlanFactory()
-
-        build = Build(repo=repo, plan=plan)
-        self.assertTrue(build.planrepo)
 
     def test_planrepo_find_on_build_init(self):
         repo = RepositoryFactory()
