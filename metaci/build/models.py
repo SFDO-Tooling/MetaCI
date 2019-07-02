@@ -173,9 +173,9 @@ class Build(models.Model):
         super().save(*args, **kwargs)
 
     def _populate_planrepo(self):
-        if self.plan and self.repo and not self.planrepo:
+        if self.plan_id and self.repo_id and not self.planrepo:
             PlanRepository = apps.get_model("plan.PlanRepository")
-            self.planrepo = PlanRepository.objects.get_or_create(
+            self.planrepo, created = PlanRepository.objects.get_or_create(
                 plan=self.plan, repo=self.repo
             )
 
