@@ -12,8 +12,7 @@ from metaci.conftest import (
 # Create your tests here.
 class BuildTestCase(TestCase):
     def test_empty_build_init(self):
-        build = Build()
-        self.assertTrue(build)
+        Build()
 
     def test_scheduled_build_init(self):
         repo = RepositoryFactory()
