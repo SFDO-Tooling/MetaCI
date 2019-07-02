@@ -6,7 +6,7 @@ import random
 import datetime
 
 
-from metaci.plan.models import Plan, PlanRepository
+from metaci.plan.models import Plan, PlanRepository, PlanSchedule
 from metaci.testresults.models import (
     TestResult,
     TestMethod,
@@ -190,3 +190,11 @@ class UserFactory(factory.django.DjangoModelFactory):
 class StaffSuperuserFactory(UserFactory):
     is_staff = True
     is_superuser = True
+
+
+class PlanScheduleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = PlanSchedule
+
+    branch = factory.SubFactory(BranchFactory)
+    plan = factory.SubFactory(PlanFactory)
