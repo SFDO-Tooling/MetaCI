@@ -147,7 +147,9 @@ def import_robot_test_results(build_flow, path):
 
     with open(path, "rb") as f:
         asset = BuildFlowAsset(
-            build_flow=build_flow, asset=ContentFile(f.read(), 'output.xml'), category='robot-output'
+            build_flow=build_flow,
+            asset=ContentFile(f.read(), "output.xml"),
+            category="robot-output",
         )
         asset.save()
 
