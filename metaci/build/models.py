@@ -200,6 +200,23 @@ class Build(models.Model):
         ordering = ["-time_queue"]
         permissions = (("search_builds", "Search Builds"),)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._try_populate_planrepo()
+
+    def save(self, *args, **kwargs):
+        self._try_populate_planrepo()
+        super().save(*args, **kwargs)
+
+    def _try_populate_planrepo(self):
+        if self.plan_id and self.repo_id and not self.planrepo:
+            PlanRepository = apps.get_model("plan.PlanRepository")
+            matching_repo = PlanRepository.objects.filter(
+                plan=self.plan, repo=self.repo
+            )
+            if matching_repo.exists():
+                self.planrepo = matching_repo[0]
+
     def __str__(self):
         return "{}: {} - {}".format(self.id, self.repo, self.commit)
 
