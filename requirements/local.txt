@@ -6,7 +6,7 @@ isort==4.3.21
 pre-commit==1.17.0
 
 Sphinx==2.1.2
-django-extensions==2.1.9
+django-extensions==2.2.1
 Werkzeug==0.15.4
 
 django-debug-toolbar==2.0
