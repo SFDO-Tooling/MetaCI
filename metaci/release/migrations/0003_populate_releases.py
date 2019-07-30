@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import logging
 import re
 
-from cumulusci.core.github import get_github_api
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import migrations
@@ -26,9 +25,8 @@ def populate_releases(apps, schema_editor):
             repos[build.branch.repo.id] = {"repo": build.branch.repo, "tags": set()}
         repos[build.branch.repo.id]["tags"].add(build.branch.name.replace("tag: ", ""))
 
-    github = get_github_api(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
     for info in repos.values():
-        repo_api = github.repository(info["repo"].owner, info["repo"].name)
+        repo_api = info["repo"].github_api
         for tag in info["tags"]:
             existing = Release.objects.filter(repo=info["repo"], git_tag=tag)
             if existing.exists():

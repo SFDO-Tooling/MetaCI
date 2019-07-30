@@ -12,11 +12,10 @@ Production Configurations
 """
 from __future__ import absolute_import, unicode_literals
 
-import logging
-
-from django.utils import six
-
 from .common import *  # noqa
+
+# from django.utils import six
+
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -268,8 +267,6 @@ SITE_URL = env("SITE_URL")
 FROM_EMAIL = env("FROM_EMAIL")
 
 # Github credentials
-GITHUB_USERNAME = env("GITHUB_USERNAME")
-GITHUB_PASSWORD = env("GITHUB_PASSWORD")
 GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET")
 
 # Salesforce OAuth Connected App credentials
