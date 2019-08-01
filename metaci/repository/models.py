@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 
-from cumulusci.core.github import get_github_api
+import github3.exceptions
+from cumulusci.core.github import get_github_api_for_repo
 from django.apps import apps
-from django.conf import settings
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
 from model_utils.models import SoftDeletableModel
-import github3.exceptions
+
+from metaci.cumulusci.keychain import GitHubSettingsKeychain
 
 
 class RepositoryQuerySet(models.QuerySet):
@@ -50,7 +51,7 @@ class Repository(models.Model):
 
     @property
     def github_api(self):
-        gh = get_github_api(settings.GITHUB_USERNAME, settings.GITHUB_PASSWORD)
+        gh = get_github_api_for_repo(GitHubSettingsKeychain(), self.owner, self.name)
         repo = gh.repository(self.owner, self.name)
         return repo
 

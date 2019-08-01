@@ -113,8 +113,6 @@ HIREFIRE_TOKEN = env("HIREFIRE_TOKEN", default="localtest")
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 # Github credentials
-GITHUB_USERNAME = env("GITHUB_USERNAME")
-GITHUB_PASSWORD = env("GITHUB_PASSWORD")
 GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET")
 
 # Salesforce OAuth Connected App credentials

@@ -1,16 +1,13 @@
 import json
-import os
-from cumulusci.core.keychain import BaseProjectKeychain
-from cumulusci.core.config import OrgConfig
-from cumulusci.core.config import ScratchOrgConfig
-from cumulusci.core.config import ServiceConfig
+
+from cumulusci.core.config import OrgConfig, ScratchOrgConfig, ServiceConfig
 from cumulusci.core.exceptions import ServiceNotConfigured
+from cumulusci.core.keychain import BaseProjectKeychain
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
+
 from metaci.cumulusci.logger import init_logger
-from metaci.cumulusci.models import Org
-from metaci.cumulusci.models import ScratchOrgInstance
-from metaci.cumulusci.models import Service
+from metaci.cumulusci.models import Org, ScratchOrgInstance, Service
 from metaci.cumulusci.utils import get_connected_app
 
 
@@ -126,3 +123,13 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         org.scratch = isinstance(org_config, ScratchOrgConfig)
         if not org.scratch:
             org.save()
+
+
+class GitHubSettingsKeychain(object):
+    """Limited keychain to supply GitHub credentials from Django settings"""
+
+    def get_service(self, name):
+        assert name == "github"
+        return ServiceConfig(
+            {"username": settings.GITHUB_USERNAME, "password": settings.GITHUB_PASSWORD}
+        )

@@ -10,10 +10,10 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
-import environ
 from ipaddress import IPv4Network
 from typing import List
 
+import environ
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
@@ -319,8 +319,8 @@ SITE_URL = None
 FROM_EMAIL = "test@mailinator.com"
 
 # Github credentials
-GITHUB_USERNAME = None
-GITHUB_PASSWORD = None
+GITHUB_USERNAME = env("GITHUB_USERNAME", default=None)
+GITHUB_PASSWORD = env("GITHUB_PASSWORD", default=None)
 GITHUB_WEBHOOK_SECRET = None
 
 # Salesforce OAuth Connected App credentials

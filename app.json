@@ -51,14 +51,6 @@
       "description": "The email address outbound mail should be sent from",
       "value": ""
     },
-    "GITHUB_USERNAME": {
-      "description": "The Github username used to connect to repositories and create web hooks",
-      "value": ""
-    },
-    "GITHUB_PASSWORD": {
-      "description": "The Github password used to connect to repositories and create web hooks.  Using an application token instead of password is recommended",
-      "value": ""
-    },
     "GITHUB_WEBHOOK_SECRET": {
       "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
       "generator": "secret"
