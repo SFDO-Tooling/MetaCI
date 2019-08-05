@@ -1,7 +1,7 @@
 setuptools==41.0.1 
 
 # Django
-django==2.2.3
+django==2.2.4
 
 # Configuration
 django-environ==0.4.5
