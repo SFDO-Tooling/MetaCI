@@ -1,25 +1,23 @@
+import html
 import os
+import re
 from tempfile import mkstemp
+
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.clickjacking import xframe_options_exempt
 from robot import rebot
 
-from metaci.build.models import Build
-from metaci.build.models import BuildFlow
+from metaci.build.models import Build, BuildFlow
 from metaci.build.utils import paginate
-from metaci.build.utils import view_queryset
-from metaci.testresults.importer import STATS_MAP
-from metaci.testresults.models import TestMethod
-from metaci.testresults.models import TestResult
 from metaci.repository.models import Repository
-
 from metaci.testresults.filters import BuildFlowFilter
+from metaci.testresults.importer import STATS_MAP
+from metaci.testresults.models import TestMethod, TestResult, TestResultAsset
 from metaci.testresults.utils import find_buildflow
+
+ASSET_URL_RE = re.compile(r'"asset://(\d+)"')
 
 
 def build_flow_tests(request, build_id, flow):
@@ -149,10 +147,22 @@ def test_result_robot(request, result_id):
     result = get_object_or_404(TestResult, id=result_id, build_flow__build__in=build_qs)
 
     if result.robot_xml:
+        # resolve linked assets into temporary S3 URLs
+        def resolve_asset_url(m):
+            asset_id = int(m.group(1))
+            try:
+                asset = result.assets.get(id=asset_id)
+                url = asset.asset.url
+            except TestResultAsset.DoesNotExist:
+                url = ""
+            return '"{}"'.format(html.escape(url))
+
+        robot_xml = ASSET_URL_RE.sub(resolve_asset_url, result.robot_xml)
+
         source = mkstemp()[1]
         log = mkstemp(".html")[1]
         with open(source, "w") as f:
-            f.write(result.robot_xml)
+            f.write(robot_xml)
         rebot(source, log=log, output=None, report=None)
         with open(log, "r") as f:
             log_html = f.read()
@@ -272,7 +282,7 @@ def build_flow_compare_to(request, build_id, flow):
 def test_dashboard(request, repo_owner, repo_name):
     """ display a dashboard of test results from preconfigured methods """
     repo = get_object_or_404(Repository, name=repo_name, owner=repo_owner)
-    build = Build.objects.for_user(request.user)
+    builds = Build.objects.for_user(request.user)
     methods = TestMethod.objects.filter(testclass__repo=repo, test_dashboard=True)
     methods = methods.filter(testresult__build__in=builds).distinct()
     data = {"repo": repo, "methods": methods}

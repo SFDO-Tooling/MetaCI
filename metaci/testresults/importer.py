@@ -1,14 +1,12 @@
-import json
 import os
 import re
 import xml.etree.ElementTree as ET
 from datetime import datetime
+
 from cumulusci.utils import elementtree_parse_file
 from django.core.files.base import ContentFile
-from metaci.testresults.models import TestClass
-from metaci.testresults.models import TestMethod
-from metaci.testresults.models import TestResult
-from metaci.testresults.models import TestResultAsset
+
+from metaci.testresults.models import TestClass, TestMethod, TestResult, TestResultAsset
 
 STATS_MAP = {
     "email_invocations": "Number of Email Invocations",
@@ -172,8 +170,6 @@ def import_robot_test_results(build_flow, path):
             )
             methods[class_and_method] = method
 
-        robot_xml = result["xml"]
-
         testresult = TestResult(
             build_flow=build_flow,
             method=method,
@@ -195,8 +191,9 @@ def import_robot_test_results(build_flow, path):
                         result=testresult, asset=ContentFile(f.read(), screenshot)
                     )
                     asset.save()
+                    # replace references to local files with TestResultAsset ids
                     testresult.robot_xml = testresult.robot_xml.replace(
-                        '"{}"'.format(screenshot), asset.asset.url
+                        '"{}"'.format(screenshot), '"asset://{}"'.format(asset.id)
                     )
                 os.remove(screenshot_path)
             testresult.save()
@@ -221,7 +218,6 @@ def get_robot_tests(root, elem, parents=[]):
             parents = parents[:-1]
 
     if not has_children:
-        suite_name = "/".join([suite.attrib["name"] for suite in parents])
         suite_file = elem.attrib["source"].replace(os.getcwd(), "")
         suite = {
             "file": suite_file,
