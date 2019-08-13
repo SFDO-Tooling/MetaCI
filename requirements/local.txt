@@ -3,7 +3,7 @@
 
 black==19.3b0
 isort==4.3.21
-pre-commit==1.18.0
+pre-commit==1.18.1
 
 Sphinx==2.1.2
 django-extensions==2.2.1
