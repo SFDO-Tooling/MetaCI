@@ -321,7 +321,7 @@ FROM_EMAIL = "test@mailinator.com"
 # Github credentials
 GITHUB_USERNAME = env("GITHUB_USERNAME", default=None)
 GITHUB_PASSWORD = env("GITHUB_PASSWORD", default=None)
-GITHUB_WEBHOOK_SECRET = None
+GITHUB_WEBHOOK_SECRETS = []
 
 # Salesforce OAuth Connected App credentials
 CONNECTED_APP_CLIENT_ID = None

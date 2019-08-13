@@ -7,7 +7,6 @@ Test settings
 
 from .common import *  # noqa
 
-
 # DEBUG
 # ------------------------------------------------------------------------------
 # Turn debug off so tests run faster
@@ -15,7 +14,7 @@ DEBUG = False
 TEMPLATES[0]["OPTIONS"]["debug"] = False
 
 # Allow requests with Host: testserver
-ALLOWED_HOSTS = ['testserver']
+ALLOWED_HOSTS = ["testserver"]
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -69,7 +68,7 @@ TEMPLATES[0]["OPTIONS"]["loaders"] = [
 
 GITHUB_USERNAME = "TestUser"
 GITHUB_PASSWORD = "TestUserPass123"
-GITHUB_WEBHOOK_SECRET = "a secret"
+GITHUB_WEBHOOK_SECRETS = ["a secret"]
 
 # Salesforce OAuth Connected App credentials
 CONNECTED_APP_CLIENT_ID = "1234567890"

@@ -1,21 +1,19 @@
 import hmac
 import json
 import re
-
 from hashlib import sha1
 
-from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from metaci.repository.models import Branch
-from metaci.repository.models import Repository
-from metaci.release.models import Release
+
 from metaci.build.models import Build
 from metaci.build.utils import view_queryset
+from metaci.release.models import Release
+from metaci.repository.models import Branch, Repository
 
 
 def repo_list(request, owner=None):
@@ -137,13 +135,16 @@ def commit_detail(request, owner, name, sha):
 
 
 def validate_github_webhook(request):
-    key = settings.GITHUB_WEBHOOK_SECRET
+    keys = [
+        key.encode() if isinstance(key, str) else key
+        for key in settings.GITHUB_WEBHOOK_SECRETS
+    ]
     signature = request.META.get("HTTP_X_HUB_SIGNATURE").split("=")[1]
-    if isinstance(key, str):
-        key = key.encode()
-    mac = hmac.new(key, msg=request.body, digestmod=sha1)
-    if not hmac.compare_digest(mac.hexdigest(), signature):
-        raise PermissionDenied()
+    for key in keys:
+        mac = hmac.new(key, msg=request.body, digestmod=sha1)
+        if hmac.compare_digest(mac.hexdigest(), signature):
+            return
+    raise PermissionDenied()
 
 
 @csrf_exempt

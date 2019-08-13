@@ -52,7 +52,7 @@
       "value": ""
     },
     "GITHUB_WEBHOOK_SECRET": {
-      "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
+      "description": "The secret for validating Github webhooks.",
       "generator": "secret"
     },
     "HIREFIRE_TOKEN": {
