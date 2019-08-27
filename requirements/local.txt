@@ -3,9 +3,9 @@
 
 black==19.3b0
 isort==4.3.21
-pre-commit==1.18.1
+pre-commit==1.18.2
 
-Sphinx==2.1.2
+Sphinx==2.2.0
 django-extensions==2.2.1
 Werkzeug==0.15.5
 
