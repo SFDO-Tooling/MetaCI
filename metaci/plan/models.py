@@ -76,6 +76,8 @@ class Plan(models.Model):
     org = models.CharField(max_length=255)
     context = models.CharField(max_length=255, null=True, blank=True)
     active = models.BooleanField(default=True)
+    keep_org_on_error = models.BooleanField(default=False)
+    keep_org_on_fail = models.BooleanField(default=False)
     dashboard = models.CharField(
         max_length=8, choices=DASHBOARD_CHOICES, default=None, null=True, blank=True
     )
