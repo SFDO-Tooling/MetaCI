@@ -204,3 +204,16 @@ Developing with SLDS
 MetaCI uses https://github.com/SalesforceFoundation/django-slds which imports version 2.1.2 of the Salesforce Lightning Design System.
 
 You can find a CSS and component reference archived here: https://archive-2_1_2.lightningdesignsystem.com/
+
+Setting up MetaCI with CumulusCI-Test
+-------------------------------------
+
+To connect your local MetaCI to the CumulustCI-Test repository you will need to perform the following:
+- Login to the Django Admin page (`localhost:8000/admin/login`)
+- Scroll down and click on the "Repositories" object
+- In the top right click the "Add Repository +" button
+- Enter the following:
+    - Name: CumulusCI-Test
+    - Owner: SFDO-Tooling
+    - Url: https://github.com/SFDO-Tooling/CumulusCI-Test
+- Click 'Save'
