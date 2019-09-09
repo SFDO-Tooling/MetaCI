@@ -217,3 +217,4 @@ To connect your local MetaCI to the CumulustCI-Test repository you will need to 
     - Owner: SFDO-Tooling
     - Url: https://github.com/SFDO-Tooling/CumulusCI-Test
 - Click 'Save'
+* Note: You'll want to ensure that you have the github variables set in your corresponding env.example file.
