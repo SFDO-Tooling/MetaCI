@@ -221,7 +221,7 @@ To connect your local MetaCI to the CumulustCI-Test repository you will need to 
 
 In order to run a build against the CumulusCI-Test repository you will also need to create an `org` to associate with the new CumulusCI-Test repository.
 
-- Navigate to the Django Admin Page
+- Navigate to the Django Admin page
 - Under the 'CumulusCI' section click on 'Orgs'
 - In the top right click the "Add Org +" button
 - Enter the following to setup a dev org:
@@ -230,3 +230,13 @@ In order to run a build against the CumulusCI-Test repository you will also need
     - Scratch (checkbox): checked/true
     - Repo (picklis): SFDO-Tooling/CumulusCI-Test
 - Click the 'SAVE' button
+
+Finally, you'll want to ensure that the "Dev Org" plan is associated with the CumulusCI-Repository:
+
+- Navigate to the Django Admin page
+- Under 'Plan' click on 'Plans'
+- Click on 'Dev Org'
+- Scroll down to the bottom to the 'Plan Repositories' section:
+    - Click 'Add another Plan repository
+    - Select the 'SFDO-Tooling/CumuluCI-Test repository
+    - Click the 'SAVE' button
