@@ -25,6 +25,7 @@ class ScratchOrgInstanceAdmin(admin.ModelAdmin):
         "build",
         "sf_org_id",
         "username",
+        "org_note",
         "deleted",
         "time_created",
         "time_deleted",

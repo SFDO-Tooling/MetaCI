@@ -4,39 +4,37 @@
 {% block layout_header_text %}User Details{% endblock %}
 
 {% block layout_header_details %}
-  <ul class="slds-grid slds-page-header__detail-row">
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Username">Username</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ object.username }}">
-        {{ object.username }}
-      </p>
-    </li>
+<ul class="slds-grid slds-page-header__detail-row">
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Username">Username</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{ object.username }}">
+      {{ object.username }}
+    </p>
+  </li>
 
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Name">Name</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ object.name }}">
-        {{ object.name }}
-      </p>
-    </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Name">Name</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{ object.name }}">
+      {{ object.name }}
+    </p>
+  </li>
 
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Is Staff">Is Staff</p>
-          <div
-            class="slds-truncate slds-badge {% if object.is_staff %}slds-theme--success{% endif %}"
-            title="{{ object.is_staff }}">
-            {{ object.is_staff|yesno }}
-          </div>
-    </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Is Staff">Is Staff</p>
+    <div class="slds-truncate slds-badge {% if object.is_staff %}slds-theme--success{% endif %}"
+      title="{{ object.is_staff }}">
+      {{ object.is_staff|yesno }}
+    </div>
+  </li>
 
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Is Admin">Is Admin</p>
-        <div
-            class="slds-truncate slds-badge {% if object.is_superuser %}slds-theme--success{% endif %}"
-            title="{{ object.is_superuser }}">
-            {{ object.is_superuser|yesno }}
-          </div>
-    </li>
-  </ul>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Is Admin">Is Admin</p>
+    <div class="slds-truncate slds-badge {% if object.is_superuser %}slds-theme--success{% endif %}"
+      title="{{ object.is_superuser }}">
+      {{ object.is_superuser|yesno }}
+    </div>
+  </li>
+</ul>
 {% endblock %}
 
 {% block layout_header_buttons %}
@@ -48,7 +46,7 @@
 </a>
 <a href="{% url 'account_email' %}">
   <button class="slds-button slds-m-horizontal--medium">
-   Email
+    Email
   </button>
 </a>
 {% endif %}
@@ -79,6 +77,7 @@
           <th>ID</th>
           <th>Repo</th>
           <th>Branch/Tag</th>
+          <th>Note</th>
           <th>Org ID</th>
           <th>Username</th>
           <th>Time Created</th>
@@ -87,25 +86,30 @@
         </tr>
       </thead>
       <tbody>
-{% for soi in orgs %}
+        {% for soi in orgs %}
         <tr class="slds-hint-parent">
           <th scope="row"><a href="{% url 'org_instance_detail' soi.org_id soi.id %}">{{ soi.id }}</a></th>
           <td>{{ soi.org.repo.name }}</td>
           <td>{{ soi.build.branch.name }}</td>
+          <td>{{ soi.org_note }}</td>
           <td>{{ soi.sf_org_id }}</td>
           <td>{{ soi.username }}</td>
           <td>{{ soi.time_created }}</td>
           <td>{{ soi.days_alive }} of {{ soi.days }}</td>
-          <td><div class="slds-shrink-none">
-            <div class="slds-button-group" role="group">
-              <a href="{% url 'org_instance_login' soi.org_id soi.id %}" target="_blank"><button class="slds-button slds-button--neutral">Login</button></a>
-              <a href="{% url 'org_instance_delete' soi.org_id soi.id %}"><button class="slds-button slds-button--neutral">Delete</button></a>
+          <td>
+            <div class="slds-shrink-none">
+              <div class="slds-button-group" role="group">
+                <a href="{% url 'org_instance_login' soi.org_id soi.id %}" target="_blank"><button
+                    class="slds-button slds-button--neutral">Login</button></a>
+                <a href="{% url 'org_instance_delete' soi.org_id soi.id %}"><button
+                    class="slds-button slds-button--neutral">Delete</button></a>
+              </div>
             </div>
-          </div></td>
+          </td>
         </tr>
-{% endfor %}
+        {% endfor %}
       </tbody>
     </table>
-    </div>
+  </div>
 </article>
 {% endblock %}
