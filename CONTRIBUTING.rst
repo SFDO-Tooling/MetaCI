@@ -217,4 +217,15 @@ To connect your local MetaCI to the CumulustCI-Test repository you will need to 
     - Owner: SFDO-Tooling
     - Url: https://github.com/SFDO-Tooling/CumulusCI-Test
 - Click 'Save'
-* Note: You'll want to ensure that you have the github variables set in your corresponding env.example file.
+- Note: You'll want to ensure that you have the github variables set in your corresponding env.example file.
+
+In order to run a build against the CumulusCI-Test repository you will also need to create an `org` to associate with the new CumulusCI-Test repository.
+- Navigate to the Django Admin Page
+- Under the 'CumulusCI' section click on 'Orgs'
+- In the top right click the "Add Org +" button
+- Enter the following to setup a dev org:
+    - Name: dev
+    - Json: {"config_file":"orgs/dev.json","scratch":true}
+    - Scratch (checkbox): checked/true
+    - Repo (picklis): SFDO-Tooling/CumulusCI-Test
+- Click the 'SAVE' button
