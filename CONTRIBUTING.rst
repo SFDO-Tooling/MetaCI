@@ -220,6 +220,7 @@ To connect your local MetaCI to the CumulustCI-Test repository you will need to 
 - Note: You'll want to ensure that you have the github variables set in your corresponding env.example file.
 
 In order to run a build against the CumulusCI-Test repository you will also need to create an `org` to associate with the new CumulusCI-Test repository.
+
 - Navigate to the Django Admin Page
 - Under the 'CumulusCI' section click on 'Orgs'
 - In the top right click the "Add Org +" button
