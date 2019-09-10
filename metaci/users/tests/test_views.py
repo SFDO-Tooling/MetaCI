@@ -1,13 +1,17 @@
+import unittest
+
 from django.test import RequestFactory
+import pytest
 
-from test_plus.test import TestCase
-
+from ..models import User
 from ..views import UserRedirectView, UserUpdateView
 
 
-class BaseUserTestCase(TestCase):
+@pytest.mark.django_db
+class BaseUserTestCase(unittest.TestCase):
     def setUp(self):
-        self.user = self.make_user()
+        self.user = User(username="testuser")
+        self.user.save()
         self.factory = RequestFactory()
 
 
@@ -21,8 +25,6 @@ class TestUserRedirectView(BaseUserTestCase):
         request.user = self.user
         # Attach the request to the view
         view.request = request
-        # Expect: '/users/testuser/', as that is the default username for
-        #   self.make_user()
         self.assertEqual(view.get_redirect_url(), "/users/testuser/")
 
 
@@ -40,8 +42,6 @@ class TestUserUpdateView(BaseUserTestCase):
         self.view.request = request
 
     def test_get_success_url(self):
-        # Expect: '/users/testuser/', as that is the default username for
-        #   self.make_user()
         self.assertEqual(self.view.get_success_url(), "/users/testuser/")
 
     def test_get_object(self):
