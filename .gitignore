@@ -59,6 +59,7 @@ node_modules/
 .sass-cache
 
 # virtual environments
+/env
 .env
 .envrc
 local_setup.sh

@@ -1,17 +1,18 @@
+from unittest.mock import Mock
+
+import pytest
 from cumulusci.core.config import OrgConfig
+
 from metaci.build.models import Build
 from metaci.conftest import (
-    RepositoryFactory,
     BranchFactory,
     BuildFactory,
     PlanFactory,
     PlanRepositoryFactory,
     PlanScheduleFactory,
+    RepositoryFactory,
     ScratchOrgInstanceFactory,
 )
-from unittest.mock import Mock
-import pytest
-import unittest
 
 
 @pytest.mark.django_db
