@@ -204,39 +204,3 @@ Developing with SLDS
 MetaCI uses https://github.com/SalesforceFoundation/django-slds which imports version 2.1.2 of the Salesforce Lightning Design System.
 
 You can find a CSS and component reference archived here: https://archive-2_1_2.lightningdesignsystem.com/
-
-Setting up MetaCI with CumulusCI-Test
--------------------------------------
-
-To connect your local MetaCI to the CumulustCI-Test repository you will need to perform the following:
-- Login to the Django Admin page (`localhost:8000/admin/login`)
-- Scroll down and click on the "Repositories" object
-- In the top right click the "Add Repository +" button
-- Enter the following:
-    - Name: CumulusCI-Test
-    - Owner: SFDO-Tooling
-    - Url: https://github.com/SFDO-Tooling/CumulusCI-Test
-- Click 'Save'
-- Note: You'll want to ensure that you have the github variables set in your corresponding env.example file.
-
-In order to run a build against the CumulusCI-Test repository you will also need to create an `org` to associate with the new CumulusCI-Test repository.
-
-- Navigate to the Django Admin page
-- Under the 'CumulusCI' section click on 'Orgs'
-- In the top right click the "Add Org +" button
-- Enter the following to setup a dev org:
-    - Name: dev
-    - Json: {"config_file":"orgs/dev.json","scratch":true}
-    - Scratch (checkbox): checked/true
-    - Repo (picklis): SFDO-Tooling/CumulusCI-Test
-- Click the 'SAVE' button
-
-Finally, you'll want to ensure that the "Dev Org" plan is associated with the CumulusCI-Repository:
-
-- Navigate to the Django Admin page
-- Under 'Plan' click on 'Plans'
-- Click on 'Dev Org'
-- Scroll down to the bottom to the 'Plan Repositories' section:
-    - Click 'Add another Plan repository
-    - Select the 'SFDO-Tooling/CumuluCI-Test repository
-    - Click the 'SAVE' button
