@@ -1,11 +1,16 @@
-from test_plus.test import TestCase
+import unittest
+
+import pytest
 
 from ..admin import MyUserCreationForm
+from ..models import User
 
 
-class TestMyUserCreationForm(TestCase):
+@pytest.mark.django_db
+class TestMyUserCreationForm(unittest.TestCase):
     def setUp(self):
-        self.user = self.make_user("notalamode", "notalamodespassword")
+        self.user = User(username="notalamode", password="notalamodespassword")
+        self.user.save()
 
     def test_clean_username_success(self):
         # Instantiate the form with a new username

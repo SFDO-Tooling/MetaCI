@@ -14,8 +14,8 @@ from metaci.testresults.models import (
     TestResultPerfWeeklySummary,
 )
 from metaci.build.models import BuildFlow, Build, BUILD_STATUSES, BUILD_FLOW_STATUSES
+from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.repository.models import Branch, Repository
-
 from metaci.users.models import User
 
 BUILD_STATUS_NAMES = (
@@ -70,11 +70,25 @@ class RepositoryFactory(factory.django.DjangoModelFactory):
     owner = factory.fuzzy.FuzzyChoice(["SFDO", "SFDC", "Partner1", "Partner2"])
 
 
+class OrgFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Org
+
+    repo = factory.SubFactory(RepositoryFactory)
+
+
+class ScratchOrgInstanceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ScratchOrgInstance
+
+    org = factory.SubFactory(OrgFactory)
+
+
 class PlanRepositoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = PlanRepository
 
-    plan = factory.LazyAttribute(lambda x: rand.choice(Plan.objects.all()))
+    plan = factory.SubFactory(PlanFactory)
     repo = factory.SubFactory(RepositoryFactory)
 
 
@@ -83,12 +97,7 @@ class BranchFactory(factory.django.DjangoModelFactory):
         model = Branch
 
     name = factory.fuzzy.FuzzyChoice(["master", "branch1", "branch2"])
-
-    @factory.post_generation
-    def postgen(obj, create, extracted, **kwargs):
-        if not obj.repo:
-            obj.repo = rand.choice(Repository.objects.all())
-            obj.save()
+    repo = factory.SubFactory(RepositoryFactory)
 
 
 class BuildFactory(factory.django.DjangoModelFactory):
@@ -96,8 +105,8 @@ class BuildFactory(factory.django.DjangoModelFactory):
         model = Build
 
     planrepo = factory.SubFactory(PlanRepositoryFactory)
-    plan = factory.LazyAttribute(lambda build: build.planrepo.plan)
-    repo = factory.LazyAttribute(lambda build: build.planrepo.repo)
+    plan = factory.SelfAttribute("planrepo.plan")
+    repo = factory.SelfAttribute("planrepo.repo")
     branch = factory.LazyAttribute(
         lambda build: BranchFactory(repo=build.planrepo.repo)
     )

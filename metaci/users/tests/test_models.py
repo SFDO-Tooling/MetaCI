@@ -1,14 +1,17 @@
-from test_plus.test import TestCase
+import unittest
 
 
-class TestUser(TestCase):
+from metaci.users.models import User
+
+
+class TestUser(unittest.TestCase):
     def setUp(self):
-        self.user = self.make_user()
+        self.user = User(username="testuser")
 
     def test__str__(self):
         self.assertEqual(
             self.user.__str__(),
-            "testuser",  # This is the default username for self.make_user()
+            "testuser",
         )
 
     def test_get_absolute_url(self):
