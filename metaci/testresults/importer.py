@@ -279,6 +279,8 @@ def get_robot_tests(root, elem, parents=[]):
 
 
 def find_screenshots(root):
+    if root is None:
+        return []
     screenshots = []
     for msg in root.findall(".//msg[@html='yes']"):
         txt = "".join([text for text in msg.itertext()])
