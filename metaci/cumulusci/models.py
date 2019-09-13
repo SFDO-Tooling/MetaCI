@@ -149,6 +149,7 @@ class ScratchOrgInstance(models.Model):
         blank=True,
         on_delete=models.CASCADE,
     )
+    org_note = models.CharField(max_length=255, default="", blank=True, null=True)
     username = models.CharField(max_length=255)
     sf_org_id = models.CharField(max_length=32)
     deleted = models.BooleanField(default=False)
