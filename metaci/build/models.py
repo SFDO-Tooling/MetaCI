@@ -500,6 +500,17 @@ class Build(models.Model):
                 "Skipping scratch org deletion since keep_org was requested"
             )
             return
+        if self.status == "error" and self.plan.keep_org_on_error:
+            self.logger.info(
+                "Skipping scratch org deletion since keep_org_on_error is enabled"
+            )
+            return
+        if self.status == "fail" and self.plan.keep_org_on_fail:
+            self.logger.info(
+                "Skipping scratch org deletion since keep_org_on_fail is enabled"
+            )
+            return
+        
         try:
             org_instance = self.get_org_instance()
             org_instance.delete_org(org_config)

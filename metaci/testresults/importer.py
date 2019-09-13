@@ -151,6 +151,7 @@ def import_robot_test_results(build_flow, path):
         )
         asset.save()
 
+    suite_screenshots = {}
     for result in parse_robot_output(path):
         class_and_method = "{}.{}".format(result["suite"]["name"], result["name"])
 
@@ -162,6 +163,24 @@ def import_robot_test_results(build_flow, path):
                 test_type="Robot",
             )
             classes[result["suite"]["name"]] = testclass
+
+        # Attach suite screenshots to buildflow
+        dirname = os.path.dirname(path)
+        for screenshot in result["suite"]["screenshots"]:
+            if screenshot in suite_screenshots:
+                continue
+            screenshot_path = screenshot
+            if dirname:
+                screenshot_path = "{}/{}".format(dirname, screenshot)
+            with open(screenshot_path, "rb") as f:
+                asset = BuildFlowAsset(
+                    build_flow=build_flow,
+                    asset=ContentFile(f.read(), screenshot),
+                    category="robot-screenshot",
+                )
+                asset.save()
+                suite_screenshots[screenshot] = asset.id
+            os.remove(screenshot_path)
 
         method = methods.get(class_and_method, None)
         if not method:
@@ -180,8 +199,8 @@ def import_robot_test_results(build_flow, path):
         )
         testresult.save()
 
-        if result["screenshots"]:
-            dirname = os.path.dirname(path)
+        # attach test case screenshots to test result
+        if result["screenshots"] or suite_screenshots:
             for screenshot in result["screenshots"]:
                 screenshot_path = screenshot
                 if dirname:
@@ -196,6 +215,11 @@ def import_robot_test_results(build_flow, path):
                         '"{}"'.format(screenshot), '"asset://{}"'.format(asset.id)
                     )
                 os.remove(screenshot_path)
+            # replace references to suite screenshots with BuildFlowAsset ids
+            for screenshot, asset_id in suite_screenshots.items():
+                testresult.robot_xml = testresult.robot_xml.replace(
+                    '"{}"'.format(screenshot), '"buildflowasset://{}"'.format(asset_id)
+                )
             testresult.save()
 
 
@@ -219,13 +243,16 @@ def get_robot_tests(root, elem, parents=[]):
 
     if not has_children:
         suite_file = elem.attrib["source"].replace(os.getcwd(), "")
+        setup = elem.find("kw[@type='setup']")
+        teardown = elem.find("kw[@type='teardown']")
         suite = {
             "file": suite_file,
             "elem": elem,
             "name": "/".join([suite.attrib["name"] for suite in parents]),
-            "setup": elem.find("kw[@type='setup']"),
+            "setup": setup,
             "status": elem.find("status"),
-            "teardown": elem.find("kw[@type='teardown']"),
+            "teardown": teardown,
+            "screenshots": find_screenshots(setup) + find_screenshots(teardown),
         }
         for test in elem.iter("test"):
             status = test.find("status")
@@ -241,11 +268,7 @@ def get_robot_tests(root, elem, parents=[]):
             delta = end - start
 
             # Process screenshots
-            for msg in test.findall(".//msg[@html='yes']"):
-                txt = "".join([text for text in msg.itertext()])
-                for screenshot in re.findall(r'href="([\w.-]+)">', txt):
-                    test_info["screenshots"].append(screenshot)
-
+            test_info["screenshots"] = find_screenshots(test)
             test_info["duration"] = float(
                 "{}.{}".format(delta.seconds, delta.microseconds)
             )
@@ -253,6 +276,17 @@ def get_robot_tests(root, elem, parents=[]):
             tests.append(test_info)
 
     return tests
+
+
+def find_screenshots(root):
+    if root is None:
+        return []
+    screenshots = []
+    for msg in root.findall(".//msg[@html='yes']"):
+        txt = "".join([text for text in msg.itertext()])
+        for screenshot in re.findall(r'href="([\w.-]+)">', txt):
+            screenshots.append(screenshot)
+    return screenshots
 
 
 def render_robot_test_xml(root, test):
