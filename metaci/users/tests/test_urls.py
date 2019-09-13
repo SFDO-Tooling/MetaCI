@@ -1,13 +1,15 @@
+import unittest
+
 from django.urls import reverse, resolve
 
-from test_plus.test import TestCase
+from metaci.users.models import User
 
 
-class TestUserURLs(TestCase):
+class TestUserURLs(unittest.TestCase):
     """Test URL patterns for users app."""
 
     def setUp(self):
-        self.user = self.make_user()
+        self.user = User(username="testuser")
 
     def test_list_reverse(self):
         """users:list should reverse to /users/."""

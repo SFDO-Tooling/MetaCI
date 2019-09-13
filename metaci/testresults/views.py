@@ -4,6 +4,7 @@ import re
 from tempfile import mkstemp
 
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -14,10 +15,10 @@ from metaci.build.utils import paginate
 from metaci.repository.models import Repository
 from metaci.testresults.filters import BuildFlowFilter
 from metaci.testresults.importer import STATS_MAP
-from metaci.testresults.models import TestMethod, TestResult, TestResultAsset
+from metaci.testresults.models import TestMethod, TestResult
 from metaci.testresults.utils import find_buildflow
 
-ASSET_URL_RE = re.compile(r'"asset://(\d+)"')
+ASSET_URL_RE = re.compile(r'"(buildflow)?asset://(\d+)"')
 
 
 def build_flow_tests(request, build_id, flow):
@@ -141,6 +142,24 @@ def test_result_detail(request, result_id):
     return render(request, "testresults/test_result_detail.html", data)
 
 
+def make_asset_resolver(result):
+    def resolve_asset_url(m):
+        asset_type = m.group(1)
+        if asset_type == "buildflow":
+            queryset = result.build_flow.assets
+        elif asset_type is None:
+            queryset = result.assets
+        asset_id = int(m.group(2))
+        try:
+            asset = queryset.get(id=asset_id)
+            url = asset.asset.url
+        except ObjectDoesNotExist:
+            url = ""
+        return '"{}"'.format(html.escape(url))
+
+    return resolve_asset_url
+
+
 @xframe_options_exempt
 def test_result_robot(request, result_id):
     build_qs = Build.objects.for_user(request.user)
@@ -148,16 +167,7 @@ def test_result_robot(request, result_id):
 
     if result.robot_xml:
         # resolve linked assets into temporary S3 URLs
-        def resolve_asset_url(m):
-            asset_id = int(m.group(1))
-            try:
-                asset = result.assets.get(id=asset_id)
-                url = asset.asset.url
-            except TestResultAsset.DoesNotExist:
-                url = ""
-            return '"{}"'.format(html.escape(url))
-
-        robot_xml = ASSET_URL_RE.sub(resolve_asset_url, result.robot_xml)
+        robot_xml = ASSET_URL_RE.sub(make_asset_resolver(result), result.robot_xml)
 
         source = mkstemp()[1]
         log = mkstemp(".html")[1]
