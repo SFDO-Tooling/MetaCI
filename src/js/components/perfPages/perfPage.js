@@ -14,6 +14,7 @@ import PerfTableOptionsUI from './perfTableOptionsUI';
 import PerfDataTable from './perfDataTable';
 import { QueryParamHelpers, addIds } from './perfTableUtils';
 
+import ErrorBoundary from 'components/error';
 import type { AppState } from 'store';
 import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
@@ -59,7 +60,7 @@ export const UnwrappedPerfPage = ({
     throw new Error('Store error');
   }
 
-  if (perfUIStatus === 'ERROR' || (perfState && perfState.status === 'ERROR')) {
+  if (perfUIStatus === 'ERROR') {
     const message =
       get(perfState, 'reason.reason') || get(perfState, 'reason.error') || '';
     throw new Error(message);
@@ -104,14 +105,16 @@ export const UnwrappedPerfPage = ({
         queryparams={queryparams}
         key="thePerfAccordian"
       />
-      <div style={{ position: 'relative' }}>
-        <PerfDataTable
-          fetchServerData={fetchServerData}
-          perfState={perfState}
-          queryparams={queryparams}
-          items={results}
-        />
-      </div>{' '}
+      <ErrorBoundary>
+        <div style={{ position: 'relative' }}>
+          <PerfDataTable
+            fetchServerData={fetchServerData}
+            perfState={perfState}
+            queryparams={queryparams}
+            items={results}
+          />
+        </div>{' '}
+      </ErrorBoundary>
       <DebugIcon />
     </div>
   );
