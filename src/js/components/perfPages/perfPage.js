@@ -65,7 +65,7 @@ export const UnwrappedPerfPage = ({
     throw new Error(message);
   }
 
-  // Fetch the data: both UI configuration and also actual data results
+  // Fetch the UI data
   useEffect(() => {
     /* Special case for getting repo name from URL
      * path into query params with other filters
@@ -73,9 +73,15 @@ export const UnwrappedPerfPage = ({
     const pathParts = window.location.pathname.split('/');
     const repo = pathParts[pathParts.length - 2];
     queryparams.set({ repo });
-    doPerfRESTFetch({ ...queryparams.getAll() });
     doPerfREST_UI_Fetch();
   }, []);
+
+  // Fetch the real data
+  useEffect(() => {
+    if (uiAvailable) {
+      doPerfRESTFetch({ ...queryparams.getAll() });
+    }
+  }, [uiAvailable]);
 
   let results;
   if (
