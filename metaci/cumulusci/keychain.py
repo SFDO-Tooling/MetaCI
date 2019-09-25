@@ -106,6 +106,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
             username=info["username"],
             json=org_json,
             expiration_date=org_config.expires,
+            org_note=self.build.org_note,
         )
         instance.save()
         org_config.org_instance = instance

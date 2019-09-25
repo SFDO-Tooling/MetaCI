@@ -14,12 +14,16 @@ from metaci.repository.models import Repository, Branch
 from metaci.plan.models import Plan
 
 from django.db import connection
+from datetime import datetime, timedelta
+
+thirty_days_ago = datetime.now() - timedelta(days=30)
 
 
 class DEFAULTS:
     page_size = 50
     max_page_size = 100
     branch = "master"
+    daterange_after = thirty_days_ago.isoformat("T").split("T")[0]
 
 
 def set_timeout(timeout):
