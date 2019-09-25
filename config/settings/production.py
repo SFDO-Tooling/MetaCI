@@ -261,6 +261,11 @@ HIREFIRE_TOKEN = env("HIREFIRE_TOKEN", default=None)
 if HIREFIRE_TOKEN:
     HIREFIRE_PROCS = ["config.procs.WorkerProc"]
 
+HEROKU_TOKEN = env("HEROKU_TOKEN", default=None)
+HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
+if HEROKU_TOKEN and HEROKU_APP_NAME:
+    METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
+
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")
 

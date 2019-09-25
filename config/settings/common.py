@@ -341,10 +341,10 @@ SCRATCH_ORG_RESERVE = env.int("METACI_SCRATCH_ORG_RESERVE", 10)
 # Autoscaler class used for scaling the worker formation
 METACI_WORKER_AUTOSCALER = env("METACI_WORKER_AUTOSCALER", default=None)
 # What's the max number of worker dynos we should scale up to
-METACI_MAX_WORKERS = env.int("METACI_MAX_WORKERS", 2)
+METACI_MAX_WORKERS = env.int("METACI_MAX_WORKERS", 3)
 # How many worker slots to reserve for high-priority jobs.
 # Should be less than METACI_MAX_WORKERS
-METACI_WORKER_RESERVE = env.int("METACI_WORKER_RESERVE", 0)
+METACI_WORKER_RESERVE = env.int("METACI_WORKER_RESERVE", 1)
 
 # Django REST Framework
 REST_FRAMEWORK = {

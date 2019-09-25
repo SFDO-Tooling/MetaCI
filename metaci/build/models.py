@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-from glob import iglob
-from io import BytesIO
 import json
 import os
 import shutil
@@ -9,34 +7,36 @@ import sys
 import tempfile
 import traceback
 import zipfile
-from cumulusci.core.config import FlowConfig
-from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
+from glob import iglob
+from io import BytesIO
+
+from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG, FlowConfig
+from cumulusci.core.exceptions import (
+    ApexTestException,
+    BrowserTestFailure,
+    FlowNotFoundError,
+    RobotTestFailure,
+    ScratchOrgException,
+)
 from cumulusci.core.flowrunner import FlowCoordinator
-from cumulusci.core.exceptions import ApexTestException
-from cumulusci.core.exceptions import BrowserTestFailure
-from cumulusci.core.exceptions import RobotTestFailure
-from cumulusci.core.exceptions import FlowNotFoundError
-from cumulusci.core.exceptions import ScratchOrgException
-from cumulusci.utils import elementtree_parse_file
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
+from cumulusci.utils import elementtree_parse_file
 from django.apps import apps
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist
 
 from metaci.build.tasks import set_github_status
-from metaci.build.utils import format_log
-from metaci.build.utils import set_build_info
+from metaci.build.utils import format_log, set_build_info
 from metaci.cumulusci.config import MetaCIGlobalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
-from metaci.testresults.importer import import_test_results
-from metaci.testresults.importer import import_robot_test_results
+from metaci.testresults.importer import import_robot_test_results, import_test_results
 from metaci.utils import generate_hash
 
 BUILD_STATUSES = (
@@ -202,6 +202,8 @@ class Build(models.Model):
         permissions = (("search_builds", "Search Builds"),)
 
     def __init__(self, *args, **kwargs):
+        if "plan" in kwargs and "priority" not in kwargs:
+            kwargs["priority"] = kwargs["plan"].priority
         super().__init__(*args, **kwargs)
         self._try_populate_planrepo()
 
