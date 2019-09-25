@@ -21,7 +21,7 @@ export const selectPerfUIStatus = (appState: AppState): LoadingStatus =>
   appState.perfDataUI ? appState.perfDataUI.status : 'LOADING';
 
 export const selectPerfDataAPIUrl = (appState: AppState): string =>
-  appState.perfData.status === 'AVAILABLE' ? appState.perfData.url : '';
+  (appState.perfData && appState.perfData.url) || '';
 
 // TODO: Improve strong typing on these:
 export const selectTestMethodPerfUI = (
