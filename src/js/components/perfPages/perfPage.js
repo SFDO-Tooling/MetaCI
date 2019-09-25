@@ -16,11 +16,16 @@ import { QueryParamHelpers, addIds } from './perfTableUtils';
 
 import ErrorBoundary from 'components/error';
 import type { AppState } from 'store';
-import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
+import type {
+  PerfDataState,
+  PerfData_UI_State,
+  LoadingStatus,
+} from 'store/perfdata/reducer';
 import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
 import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 import {
   selectPerfState,
+  selectPerfUIState,
   selectPerfUIStatus,
   selectTestMethodPerfUI,
 } from 'store/perfdata/selectors';
@@ -34,6 +39,7 @@ const gradient = 'linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)';
 // TODO: Stronger typing in these
 type ReduxProps = {|
   perfState: PerfDataState,
+  perfUIState: PerfData_UI_State,
   perfUIStatus: LoadingStatus,
   testMethodPerfUI: TestMethodPerfUI,
   doPerfRESTFetch: ({}) => null,
@@ -49,6 +55,7 @@ export const UnwrappedPerfPage = ({
   doPerfRESTFetch,
   doPerfREST_UI_Fetch,
   perfState,
+  perfUIState,
   testMethodPerfUI,
   perfUIStatus,
 }: ReduxProps & RouterProps & SelfProps) => {
@@ -62,7 +69,9 @@ export const UnwrappedPerfPage = ({
 
   if (perfUIStatus === 'ERROR') {
     const message =
-      get(perfState, 'reason.reason') || get(perfState, 'reason.error') || '';
+      get(perfUIState, 'reason.reason') ||
+      get(perfUIState, 'reason.error') ||
+      '';
     throw new Error(message);
   }
 
@@ -161,6 +170,7 @@ const select = (appState: AppState) => ({
   perfState: selectPerfState(appState),
   testMethodPerfUI: selectTestMethodPerfUI(appState),
   perfUIStatus: selectPerfUIStatus(appState),
+  perfUIState: selectPerfUIState(appState),
 });
 
 const actions = {
