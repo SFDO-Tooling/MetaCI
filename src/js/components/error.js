@@ -41,7 +41,12 @@ class ErrorBoundary extends React.Component<
                 <br />
               </Trans>
               <p>
-                The error was &ldquo;{get(this.state, 'error.message')}&rdquo;
+                {get(this.state, 'error.message') && (
+                  <>
+                    The error was &ldquo;{get(this.state, 'error.message')}
+                    &rdquo;
+                  </>
+                )}
               </p>
             </>
           }
