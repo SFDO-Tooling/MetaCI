@@ -15,6 +15,7 @@ class RunPlanForm(forms.Form):
     commit = forms.CharField(required=False)
     keep_org = forms.BooleanField(required=False)
     release = forms.ModelChoiceField(None, required=False)
+    org_note = forms.CharField(required=False)
 
     def __init__(self, planrepo, user, *args, **kwargs):
         self.planrepo = planrepo
@@ -38,7 +39,12 @@ class RunPlanForm(forms.Form):
                 "Choose the branch you want to build",
                 Field("branch", css_class="slds-input"),
                 css_class="slds-form-element",
-            )
+            ),
+            Fieldset(
+                "A custom note about the org being created",
+                Field("org_note", css_class="slds-input"),
+                css_class="slds-form-element",
+            ),
         )
         if self.advanced_mode:
             self.helper.layout.extend(
@@ -99,6 +105,7 @@ class RunPlanForm(forms.Form):
             branch.save()
 
         keep_org = self.cleaned_data.get("keep_org")
+        org_note = self.cleaned_data.get("org_note")
 
         build = Build(
             repo=self.repo,
@@ -111,6 +118,7 @@ class RunPlanForm(forms.Form):
             build_type="manual",
             user=self.user,
             release=release,
+            org_note=org_note,
             release_relationship_type="manual",
         )
 

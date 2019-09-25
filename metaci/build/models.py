@@ -193,6 +193,7 @@ class Build(models.Model):
     release = models.ForeignKey(
         "release.Release", on_delete=models.SET_NULL, null=True, blank=True
     )
+    org_note = models.CharField(max_length=255, default="", blank=True, null=True)
 
     objects = BuildQuerySet.as_manager()
 
