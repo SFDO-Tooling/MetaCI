@@ -151,6 +151,7 @@ class Build(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    priority = models.IntegerField(default=0)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
@@ -509,7 +510,7 @@ class Build(models.Model):
                 "Skipping scratch org deletion since keep_org_on_fail is enabled"
             )
             return
-        
+
         try:
             org_instance = self.get_org_instance()
             org_instance.delete_org(org_config)

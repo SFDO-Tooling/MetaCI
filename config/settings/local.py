@@ -109,11 +109,14 @@ TEST_RUNNER = "django.test.runner.DiscoverRunner"
 HIREFIRE_PROCS = ["config.procs.WorkerProc"]
 HIREFIRE_TOKEN = env("HIREFIRE_TOKEN", default="localtest")
 
+METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.LocalAutoscaler"
+
 # Site URL
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 # Github credentials
 GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET")
+GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", False)
 
 # Salesforce OAuth Connected App credentials
 CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID")
@@ -125,6 +128,11 @@ SFDX_CLIENT_ID = env("SFDX_CLIENT_ID")
 SFDX_HUB_KEY = env("SFDX_HUB_KEY")
 SFDX_HUB_USERNAME = env("SFDX_HUB_USERNAME")
 
-GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", False)
-
 SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=False)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"metaci": {"handlers": ["console"], "level": "DEBUG"}},
+}

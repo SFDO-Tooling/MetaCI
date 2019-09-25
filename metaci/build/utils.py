@@ -1,4 +1,3 @@
-import os
 import subprocess
 
 from ansi2html import Ansi2HTMLConverter
