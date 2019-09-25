@@ -97,7 +97,8 @@ export const UnwrappedPerfPage = ({
   const fetchServerData: ServerDataFetcher = params => {
     // its okay to pass null or undefined because query-string has reasonable
     // and useful interpretations of both of them.
-    queryparams.set({ ...queryparams.getAll(), ...params });
+    const page = (params && params.page) || 1;
+    queryparams.set({ ...queryparams.getAll(), ...params, page });
     doPerfRESTFetch(queryparams.getAll());
   };
 
