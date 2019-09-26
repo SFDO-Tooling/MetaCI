@@ -79,12 +79,18 @@ class HerokuAutoscaler(Autoscaler):
         }
         # We should only scale down if there are no active builds,
         # because we don't know which worker will be stopped.
-        if self.active_workers and not self.active_builds:
+        # (count queued builds too, since workers may still be starting)
+        builds = self.active_builds + self.queue.count
+        if self.active_workers and not builds:
             logger.info(f"Scaling down to 0 workers")
-            requests.patch(url, json={"quantity": 0}, headers=headers)
-        elif self.active_workers > self.count_workers():
-            logger.info(f"Scaling up to {self.active_workers} workers")
-            requests.patch(url, json={"quantity": self.active_workers}, headers=headers)
+            resp = requests.patch(url, json={"quantity": 0}, headers=headers)
+            resp.raise_for_status()
+        elif self.target_workers > self.count_workers():
+            logger.info(f"Scaling up to {self.target_workers} workers")
+            resp = requests.patch(
+                url, json={"quantity": self.target_workers}, headers=headers
+            )
+            resp.raise_for_status()
 
 
 if settings.METACI_WORKER_AUTOSCALER:
