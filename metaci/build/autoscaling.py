@@ -73,7 +73,10 @@ class HerokuAutoscaler(Autoscaler):
 
     def apply_formation(self):
         url = f"https://api.heroku.com/apps/{settings.HEROKU_APP_NAME}/formation/worker"
-        headers = {"Authorization": f"Bearer {settings.HEROKU_TOKEN}"}
+        headers = {
+            "Accept": "application/vnd.heroku+json; version=3",
+            "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
+        }
         # We should only scale down if there are no active builds,
         # because we don't know which worker will be stopped.
         if self.active_workers and not self.active_builds:
