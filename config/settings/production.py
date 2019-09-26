@@ -231,6 +231,7 @@ LOGGING = {
             "propagate": False,
         },
         "rq.worker": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
+        "metaci": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
 
