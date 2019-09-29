@@ -84,7 +84,7 @@ class Branch(SoftDeletableModel):
         )
 
     def __str__(self):
-        return self.name
+        return f"{self.repo.name}: {self.name}"
 
     @property
     def github_api(self):
