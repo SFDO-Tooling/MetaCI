@@ -25,6 +25,13 @@ const PerfDataTable = ({
   perfState,
   queryparams,
 }: Props) => {
+  if (perfState && perfState.status === 'ERROR') {
+    const message =
+      get(perfState, 'reason.reason.detail') ||
+      get(perfState, 'reason.error') ||
+      '';
+    throw new Error(message);
+  }
   /*
    * Extract the page from the server-generated URL and ensure it is
    * browser URL before fetching it.

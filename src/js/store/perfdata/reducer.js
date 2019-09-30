@@ -38,6 +38,11 @@ export type UIDataAvailable = {
   uidata: UIData,
 };
 
+export type UIDataError = {
+  status: 'ERROR',
+  uidata: UIData,
+};
+
 export type PerfDataState = PerfDataAvailable | PerfDataLoading | PerfDataError;
 
 export const perfDataReducer = (
@@ -64,7 +69,7 @@ export const perfDataReducer = (
   return state;
 };
 
-export type PerfData_UI_State = UIDataLoading | UIDataAvailable;
+export type PerfData_UI_State = UIDataLoading | UIDataAvailable | UIDataError;
 
 export const perfDataUIReducer = (
   state: PerfData_UI_State = { status: 'LOADING', uidata: null },
@@ -75,6 +80,8 @@ export const perfDataUIReducer = (
       return { status: 'LOADING', uidata: action.payload };
     case 'UI_DATA_AVAILABLE':
       return { status: 'AVAILABLE', uidata: action.payload };
+    case 'UI_DATA_ERROR':
+      return { status: 'ERROR', uidata: action.payload };
   }
   return state;
 };
