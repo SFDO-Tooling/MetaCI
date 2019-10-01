@@ -2,10 +2,8 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from metaci.build.models import Build
-from metaci.build.models import Rebuild
-from metaci.build.tasks import check_waiting_builds
-from metaci.build.tasks import set_github_status
+from metaci.build.models import Build, Rebuild
+from metaci.build.tasks import check_waiting_builds, set_github_status
 
 
 @receiver(post_save, sender=Build)
@@ -39,6 +37,7 @@ def queue_rebuild(sender, **kwargs):
         return
 
     build.current_rebuild = rebuild
+    build.status = "queued"
 
     # Queue the pending status task
     if settings.GITHUB_STATUS_UPDATES_ENABLED:

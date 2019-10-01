@@ -176,7 +176,7 @@ def check_waiting_builds():
         if autoscaler.target_workers > autoscaler.active_builds:
             with transaction.atomic():
                 try:
-                    build.set_status("running")
+                    build.status = "running"
                     build.save()
                     run_build.delay(build.id)
                     count_started += 1
