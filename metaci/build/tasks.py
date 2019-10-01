@@ -1,12 +1,13 @@
-from collections import namedtuple
 import functools
 import logging
 import time
+from collections import namedtuple
 
+import django_rq
 from django import db
 from django.conf import settings
 from django.core.cache import cache
-import django_rq
+from django.db import transaction
 
 from metaci.build.autoscaling import get_autoscaler
 from metaci.build.signals import build_complete
@@ -173,12 +174,16 @@ def check_waiting_builds():
         # (if autoscaling is enabled, scale up when possible)
         autoscaler.allocate_worker(high_priority=bool(build.priority))
         if autoscaler.target_workers > autoscaler.active_builds:
-            logger.info(f"Starting build {build.id}")
-            build.set_status("running")
-            build.save()
-            run_build.delay(build.id)
-            count_started += 1
-            autoscaler.build_started()
+            with transaction.atomic():
+                try:
+                    build.set_status("running")
+                    build.save()
+                    run_build.delay(build.id)
+                    count_started += 1
+                    autoscaler.build_started()
+                    logger.info(f"Starting build {build.id}")
+                except Exception:
+                    logger.exception(f"Failed to start build {build.id}")
 
     autoscaler.apply_formation()
 
