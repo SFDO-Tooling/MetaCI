@@ -1,7 +1,11 @@
 // @flow
 
 import type { AppState } from 'store';
-import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
+import type {
+  PerfDataState,
+  PerfData_UI_State,
+  LoadingStatus,
+} from 'store/perfdata/reducer';
 import type {
   TestMethodPerfUI,
   FilterDefinition,
@@ -10,11 +14,14 @@ import type {
 export const selectPerfState = (appState: AppState): PerfDataState =>
   appState.perfData;
 
+export const selectPerfUIState = (appState: AppState): PerfData_UI_State =>
+  appState.perfDataUI;
+
 export const selectPerfUIStatus = (appState: AppState): LoadingStatus =>
   appState.perfDataUI ? appState.perfDataUI.status : 'LOADING';
 
 export const selectPerfDataAPIUrl = (appState: AppState): string =>
-  appState.perfData.status === 'AVAILABLE' ? appState.perfData.url : '';
+  (appState.perfData && appState.perfData.url) || '';
 
 // TODO: Improve strong typing on these:
 export const selectTestMethodPerfUI = (

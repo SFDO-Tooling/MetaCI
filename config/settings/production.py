@@ -214,17 +214,8 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django.db.backends": {
-            "level": "ERROR",
-            "handlers": ["console_w_req"],
-            "propagate": False,
-        },
+        "django": {"level": "ERROR", "handlers": ["console_w_req"], "propagate": False},
         "raven": {"level": "DEBUG", "handlers": ["console_w_req"], "propagate": False},
-        "django.security.DisallowedHost": {
-            "level": "ERROR",
-            "handlers": ["console_w_req"],
-            "propagate": False,
-        },
         "log_request_id.middleware": {
             "handlers": ["console_w_req"],
             "level": "DEBUG",
