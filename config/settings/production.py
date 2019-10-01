@@ -245,7 +245,7 @@ if SENTRY_DSN:
         "propagate": False,
     }
     LOGGING["root"]["handlers"].append("sentry")
-    LOGGING["loggers"]["django.security.DisallowedHost"]["handlers"].append("sentry")
+    LOGGING["loggers"]["django"]["handlers"].append("sentry")
 
 # Add the HireFire middleware for monitoring queue to scale dynos
 # See: https://hirefire.readthedocs.io/

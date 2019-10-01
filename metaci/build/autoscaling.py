@@ -15,8 +15,10 @@ logger = logging.getLogger(__name__)
 class Autoscaler(object):
     def __init__(self, queue="default"):
         self.queue = django_rq.get_queue("default")
-        self.target_workers = self.active_workers = self.count_workers()
-        self.active_builds = len(StartedJobRegistry(queue=self.queue))
+        queued_builds = self.queue.count
+        self.target_workers = self.active_workers = self.count_workers() + queued_builds
+        started_builds = len(StartedJobRegistry(queue=self.queue))
+        self.active_builds = queued_builds + started_builds
 
     def __repr__(self):
         return (
@@ -79,9 +81,7 @@ class HerokuAutoscaler(Autoscaler):
         }
         # We should only scale down if there are no active builds,
         # because we don't know which worker will be stopped.
-        # (count queued builds too, since workers may still be starting)
-        builds = self.active_builds + self.queue.count
-        if self.active_workers and not builds:
+        if self.active_workers and not self.active_builds:
             logger.info(f"Scaling down to 0 workers")
             resp = requests.patch(url, json={"quantity": 0}, headers=headers)
             resp.raise_for_status()
