@@ -129,8 +129,3 @@ def autoscale():
     autoscaler.measure()
     autoscaler.scale()
     return autoscaler.target_workers
-
-
-# to do:
-# - docs
-# - fix requeueing
