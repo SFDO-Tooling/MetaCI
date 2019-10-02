@@ -15,8 +15,8 @@ const initialStoreState = {
 };
 
 const mockHTTP = () => {
-  fetchMock.getOnce('begin:/api/testmethod_perf', testmethod_perf_data);
   fetchMock.getOnce('begin:/api/testmethod_perf_UI', testmethod_perf_UI_data);
+  fetchMock.getOnce('begin:/api/testmethod_perf', testmethod_perf_data);
 };
 
 describe('Perf Page', () => {
@@ -51,7 +51,7 @@ describe('Perf Page', () => {
     );
 
     expect(getByText('Columns')).toBeVisible();
-    expect(getByText('Filters')).toBeVisible();
+    expect(getByText(/Filters.*/)).toBeVisible();
     expect(getByText('Date Range')).toBeVisible();
     expect(getByText('Options')).toBeVisible();
     expect(getByText('Success percentage above')).toBeVisible();
@@ -93,7 +93,7 @@ describe('Perf Page', () => {
     );
 
     expect(getByText('Columns')).toBeVisible();
-    expect(getByText('Filters')).toBeVisible();
+    expect(getByText(/Filters.*/)).toBeVisible();
     expect(getByText('Date Range')).toBeVisible();
     expect(getByText('Options')).toBeVisible();
     expect(getByText('accFinderBuildsCorrectSearchQuery')).toBeVisible();
