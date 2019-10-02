@@ -6,6 +6,7 @@ from django import db
 from django.conf import settings
 from django.core.cache import cache
 
+from metaci.build.autoscaling import autoscale
 from metaci.build.signals import build_complete
 from metaci.cumulusci.models import Org, jwt_session, sf_session
 from metaci.repository.utils import create_status
@@ -77,6 +78,16 @@ def run_build(build_id, lock_id=None):
     return build.get_status()
 
 
+def start_build(build, lock_id=None):
+    queue = django_rq.get_queue(build.plan.queue)
+    result = queue.enqueue(run_build, build.id, lock_id, job_timeout=BUILD_TIMEOUT)
+    build.task_id_check = None
+    build.task_id_run = result.id
+    build.save()
+    autoscale()
+    return result
+
+
 @django_rq.job("short", timeout=60)
 def check_queued_build(build_id):
     reset_database_connection()
@@ -110,11 +121,7 @@ def check_queued_build(build_id):
             build.log = msg
             build.save()
             return msg
-        queue = django_rq.get_queue(build.plan.queue)
-        res_run = queue.enqueue(run_build, build.id, job_timeout=BUILD_TIMEOUT)
-        build.task_id_check = None
-        build.task_id_run = res_run.id
-        build.save()
+        res_run = start_build(build)
         return (
             "DevHub has scratch org capacity, running the build "
             + "as task {}".format(res_run.id)
@@ -127,12 +134,7 @@ def check_queued_build(build_id):
 
         if status is True:
             # Lock successful, run the build
-            queue = django_rq.get_queue(build.plan.queue)
-            res_run = queue.enqueue(
-                run_build, build.id, org.lock_id, job_timeout=BUILD_TIMEOUT
-            )
-            build.task_id_run = res_run.id
-            build.save()
+            res_run = start_build(build, org.lock_id)
             return "Got a lock on the org, running as task {}".format(res_run.id)
         else:
             # Failed to get lock, queue next check
