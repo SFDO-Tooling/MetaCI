@@ -9,33 +9,44 @@ from rq import Worker
 from rq.registry import StartedJobRegistry
 
 logger = logging.getLogger(__name__)
-QUEUES = ("high", "medium", "default")
 
 
 class Autoscaler(object):
-    def __init__(self):
-        self.queues = [django_rq.get_queue(name) for name in QUEUES]
-        self.active_builds = sum(
-            queue.count + len(StartedJobRegistry(queue=queue)) for queue in self.queues
+    """Utility to adjust the # of workers based on queue size."""
+
+    def __init__(self, queues=("high", "medium", "default")):
+        self.queues = [django_rq.get_queue(name) for name in queues]
+
+        # Check how many builds are active (queued or started)
+        active_builds = 0
+        high_priority_builds = 0
+        for queue in self.queues:
+            active_builds = queue.count + len(StartedJobRegistry(queue=queue))
+            self.active_builds += active_builds
+            if queue.name == "high":
+                high_priority_builds += active_builds
+
+        # Allocate as many high-priority builds as possible to reserve workers,
+        # then the remainder to standard workers
+        reserve_workers = min(high_priority_builds, settings.METACI_WORKER_RESERVE)
+        other_workers = min(
+            self.active_builds - reserve_workers,
+            settings.METACI_MAX_WORKERS - settings.METACI_WORKER_RESERVE,
         )
-        # use as many workers as we have builds or our max (whichever is less)
-        # but also keep aside a reserve for high-priority builds
-        max_workers = settings.METACI_MAX_WORKERS - settings.METACI_WORKER_RESERVE
-        self.target_workers = min(self.active_builds, max_workers)
-        # if there's a backlog of high-priority builds, use the reserve
-        high_priority_backlog = django_rq.get_queue("high").count
-        if self.active_builds > max_workers and high_priority_backlog:
-            self.target_workers += min(
-                high_priority_backlog, settings.METACI_WORKER_RESERVE
-            )
+        self.target_workers = reserve_workers + other_workers
 
     def __repr__(self):
         return f"<{self.__class__} builds: {self.active_builds}, workers: {self.target_workers}>"
 
     def count_workers(self):
+        """Count how many workers are active
+
+        (Note: this assumes that all workers process the first (high-priority) queue.)
+        """
         return Worker.count(queue=self.queues[0])
 
     def scale(self):
+        """Do what is needed to achieve the target # of workers."""
         pass
 
 
@@ -50,6 +61,8 @@ class LocalAutoscaler(Autoscaler):
 
     def scale(self):
         if not self.active_builds:
+            # Workers in burst mode will stop themselves once the queue is empty;
+            # we just need to clear our references.
             LocalAutoscaler.processes = []
         else:
             count = self.target_workers - self.count_workers()
@@ -99,12 +112,16 @@ get_autoscaler = import_global(settings.METACI_WORKER_AUTOSCALER)
 
 @django_rq.job("short")
 def autoscale():
+    """Apply autoscaling.
+
+    This is meant to run frequently as a RepeatableJob.
+    """
     autoscaler = get_autoscaler()
     autoscaler.scale()
     return autoscaler.target_workers
 
 
 # to do:
-# - test on heroku
 # - test coverage
+# - docs
 # - fix requeueing
