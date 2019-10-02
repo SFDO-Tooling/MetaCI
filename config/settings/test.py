@@ -15,7 +15,7 @@ DEBUG = False
 TEMPLATES[0]["OPTIONS"]["debug"] = False
 
 # Allow requests with Host: testserver
-ALLOWED_HOSTS = ['testserver']
+ALLOWED_HOSTS = ["testserver"]
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -45,6 +45,8 @@ CACHES = {
 # Use Redis for RQ queues instead of cache which uses LocMemCache
 RQ_QUEUES = {
     "default": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
+    "high": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
+    "medium": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
     "short": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 500, "AUTOCOMMIT": False},
 }
 
@@ -75,3 +77,6 @@ GITHUB_WEBHOOK_SECRET = "a secret"
 CONNECTED_APP_CLIENT_ID = "1234567890"
 CONNECTED_APP_CLIENT_SECRET = "abcdefg1234567890"
 CONNECTED_APP_CALLBACK_URL = "http://localhost/callback"
+
+HEROKU_TOKEN = "BOGUS"
+HEROKU_APP_NAME = "testapp"

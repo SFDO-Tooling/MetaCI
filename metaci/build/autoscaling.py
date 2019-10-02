@@ -14,14 +14,18 @@ logger = logging.getLogger(__name__)
 class Autoscaler(object):
     """Utility to adjust the # of workers based on queue size."""
 
+    active_builds = 0
+    target_workers = 0
+
     def __init__(self, queues=("high", "medium", "default")):
         self.queues = [django_rq.get_queue(name) for name in queues]
 
+    def measure(self):
         # Check how many builds are active (queued or started)
-        active_builds = 0
+        self.active_builds = 0
         high_priority_builds = 0
         for queue in self.queues:
-            active_builds = queue.count + len(StartedJobRegistry(queue=queue))
+            active_builds = self.count_builds(queue)
             self.active_builds += active_builds
             if queue.name == "high":
                 high_priority_builds += active_builds
@@ -36,7 +40,10 @@ class Autoscaler(object):
         self.target_workers = reserve_workers + other_workers
 
     def __repr__(self):
-        return f"<{self.__class__} builds: {self.active_builds}, workers: {self.target_workers}>"
+        return f"<{self.__class__.__name__} builds: {self.active_builds}, workers: {self.target_workers}>"
+
+    def count_builds(self, queue):
+        return queue.count + len(StartedJobRegistry(queue=queue))
 
     def count_workers(self):
         """Count how many workers are active
@@ -46,8 +53,10 @@ class Autoscaler(object):
         return Worker.count(queue=self.queues[0])
 
     def scale(self):
-        """Do what is needed to achieve the target # of workers."""
-        pass
+        """Do what is needed to achieve the target # of workers.
+
+        The default is to do no autoscaling.
+        """
 
 
 class NonAutoscaler(Autoscaler):
@@ -117,11 +126,11 @@ def autoscale():
     This is meant to run frequently as a RepeatableJob.
     """
     autoscaler = get_autoscaler()
+    autoscaler.measure()
     autoscaler.scale()
     return autoscaler.target_workers
 
 
 # to do:
-# - test coverage
 # - docs
 # - fix requeueing
