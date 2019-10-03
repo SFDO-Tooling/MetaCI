@@ -23,7 +23,7 @@ import init_i18n from './i18n';
 import ErrorBoundary from 'components/error';
 import PerfPage from 'components/perfPages/perfPage';
 // import TestMethodsResultsTable from 'components/perfPages/testMethodResultsTable';
-import getApiFetch from 'utils/api';
+import getApiFetch from 'api/api_fetch';
 import reducer from 'store';
 import { logError } from 'utils/logging';
 import { login } from 'store/user/actions';

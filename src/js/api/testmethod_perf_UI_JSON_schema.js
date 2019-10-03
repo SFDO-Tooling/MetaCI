@@ -44,5 +44,5 @@ export type NumberFilterDefinition = AssertionType<
   typeof NumberFilterDefinitionShape,
 >;
 
-export const assertUIData = (data: mixed): UIData =>
-  is(data, UIDataShape, 'UIData from server: ');
+export const assertUIData = (data: mixed, context?: string): UIData =>
+  is(data, UIDataShape, context || 'UIData from server: ');

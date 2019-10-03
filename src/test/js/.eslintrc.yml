@@ -1,0 +1,16 @@
+# http://eslint.org/docs/rules/
+
+parserOptions:
+  ecmaFeatures:
+    impliedStrict: true
+    jsx: true
+  sourceType: module
+env:
+  browser: true
+  commonjs: true
+  jest: true
+  node: false
+rules:
+  import/namespace:
+    - 2
+    - allowComputed: true
