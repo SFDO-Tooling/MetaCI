@@ -68,6 +68,7 @@ class Branch(SoftDeletableModel):
     repo = models.ForeignKey(
         Repository, related_name="branches", on_delete=models.CASCADE
     )
+    include_deleted = models.QuerySet.as_manager()
 
     class Meta:
         ordering = ["repo__name", "repo__owner", "name"]
