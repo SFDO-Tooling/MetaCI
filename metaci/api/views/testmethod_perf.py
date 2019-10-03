@@ -10,7 +10,7 @@ from rest_framework import generics, exceptions, viewsets, pagination, permissio
 
 from metaci.testresults.models import TestResultPerfWeeklySummary, FieldType
 from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
-from metaci.repository.models import Repository, Branch
+from metaci.repository.models import Repository
 from metaci.plan.models import Plan
 
 from django.db import connection
@@ -80,11 +80,8 @@ class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
         # ui={"branches": repo_branches},
     )
 
-    branch_choices = (
-        Branch.objects.values_list("name", "name").order_by("name").distinct()
-    )
-    branch = django_filters.rest_framework.ChoiceFilter(
-        field_name="rel_branch__name", label="Branch Name", choices=branch_choices
+    branch = django_filters.rest_framework.CharFilter(
+        field_name="rel_branch__name", label="Branch Name"
     )
 
     plan_choices = Plan.objects.values_list("name", "name").order_by("name").distinct()
