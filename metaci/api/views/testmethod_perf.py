@@ -53,31 +53,14 @@ class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
     2. It populates the django-filter form.
 
     3. It drives actual filtering of the build-list sub-query.
-
-    Feature 3 is turned on and off by the really_filter parameter.
-    We do NOT want django-filter to try to automatically filter the
-    output queryset based on these filters because it is actually the
-    sub-query that we need to filter.
-
-    Accordingly, its fields are turned off by default (see disable_by_default)
-    and turned on explicitly ("really_filter") when it is created by get_queryset
     """
 
     repo_choices = (
         Repository.objects.values_list("name", "name").order_by("name").distinct()
     )
-    # This is the start of a UI feature to populate filters conditionally
-    # repo_branches = []
-    # for repo in Repository.objects.prefetch_related("branches").all():
-    #     repo_branches.append(
-    #         (repo.name, [branch.name for branch in repo.branches.all()])
-    #     )
 
     repo = django_filters.rest_framework.ChoiceFilter(
-        field_name="rel_repo__name",
-        label="Repo Name",
-        choices=repo_choices,
-        # ui={"branches": repo_branches},
+        field_name="rel_repo__name", label="Repo Name", choices=repo_choices
     )
 
     branch = django_filters.rest_framework.CharFilter(
@@ -111,6 +94,18 @@ class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
     for name in ("repo", "plan", "branch"):
         # make a list of db field_names for use in grouping
         build_fields[name] = fields_and_stuff[name].field_name
+
+
+def dynamicBuildFlowFilterSetBuilder(repo_name):
+    class DynamicBuildFlowFilterSet(BuildFlowFilterSet):
+        if repo_name:
+            branch = django_filters.rest_framework.ChoiceFilter(
+                field_name="rel_branch__name",
+                label="Branch Name",
+                choices=["choices", "for", repo_name],
+            )
+
+    return DynamicBuildFlowFilterSet
 
 
 def AsInt(expr):

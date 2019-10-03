@@ -3,7 +3,7 @@ from django.conf import settings
 from rest_framework import viewsets, response, permissions
 
 from metaci.api.views.testmethod_perf import (
-    BuildFlowFilterSet,
+    dynamicBuildFlowFilterSetBuilder,
     TestMethodPerfFilterSet,
     DEFAULTS,
 )
@@ -20,7 +20,9 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
     ]
 
     def list(self, request, format=None):
-        buildflow_filters = self.collect_filter_defs(BuildFlowFilterSet, [])
+        repo_name = request.query_params.get("repo", None)
+        buildFlowFilterSetClass = dynamicBuildFlowFilterSetBuilder(repo_name=repo_name)
+        buildflow_filters = self.collect_filter_defs(buildFlowFilterSetClass, [])
         testmethodperf_filters = self.collect_filter_defs(
             TestMethodPerfFilterSet, buildflow_filters.keys()
         )
