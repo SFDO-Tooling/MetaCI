@@ -35,6 +35,12 @@ DASHBOARD_CHOICES = (
     ("branches", "Latest Builds by Branch"),
 )
 
+QUEUES = (
+    ("default", "default"),
+    ("medium", "medium priority"),
+    ("high", "high priority"),
+)
+
 
 def validate_yaml_field(value):
     try:
@@ -71,7 +77,7 @@ class Plan(models.Model):
     )
     trigger = models.CharField(max_length=8, choices=TRIGGER_TYPES)
     role = models.CharField(max_length=16, choices=BUILD_ROLES)
-    priority = models.IntegerField(default=0)
+    queue = models.CharField(max_length=16, choices=QUEUES, default="default")
     regex = models.CharField(max_length=255, null=True, blank=True)
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)

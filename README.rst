@@ -91,7 +91,7 @@ Check the Procfile to see the commands used to run the workers on Heroku.  You c
 
 .. code-block:: bash
 
-    python manage.py rqworker default short --worker-class metaci.build.worker.RequeueingWorker
+    python manage.py metaci_rqworker high medium default short --worker-class metaci.build.worker.RequeueingWorker
 
 Configuring Repositories
 ------------------------
@@ -137,12 +137,18 @@ Notifications
 
 Click the bell icon at the top to view the My Notifications page (/notifications) where you can view and add your notifications.
 
-Scaling with Hirefire.io
-------------------------
+Automatic Scaling
+-----------------
 
-Hirefire.io is a service that monitors your application and scales up/down Heroku dynos based on load.  There is an integration built in to MetaCI that allows you to automatically scale down your build dynos to 0 when no builds are running and scale up to 100 dynos (configurable through Hirefire) when builds are needed.  When all jobs complete, all dynos are shut down within a minute.  Heroku only bills for the dyno seconds used.  Scaling with Hirefire can both save you money and give you a lot more concurrency for whatever your budget is and thus is highly recommended.
+MetaCI can be configured to monitor its own build queue and scale its own Heroku dynos based on load. It will check the queue once a minute and add worker dynos when needed. Once all builds are complete, all worker dynos will be shut down. Heroku only bills for the dyno seconds used, so this scaling can save money while allowing for greater concurrency when desired.
 
-Configure Hirefire and then run `heroku config:set HIREFIRE_TOKEN=YOUR_TOKEN`
+To configure autoscaling:
+
+1. Set the METACI_MAX_WORKERS setting to the maximum number of dynos you'd like to scale up to.
+2. Set the METACI_WORKER_RESERVE setting to the number of dynos you'd like to reserve for high-priority builds. (Optional; defaults to 1.)
+3. Set up a Heroku user with access to this app, and create an authorization token using ``heroku authorizations:create``. Set the HEROKU_TOKEN setting to this authorization token.
+4. Set the HEROKU_APP_NAME setting to the name of the Heroku app.
+5. Add a RepeatableJob with Callable = ``metaci.build.autoscaling.autoscale``, Queue = ``short``, and Interval = ``1 minute``.
 
 
 Email Server
