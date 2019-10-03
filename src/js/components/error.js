@@ -1,5 +1,5 @@
 // @flow
-
+import get from 'lodash/get';
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 import Illustration from '@salesforce/design-system-react/components/illustration';
@@ -9,7 +9,10 @@ import { logError } from 'utils/logging';
 
 type Props = { children: React.Node };
 
-class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
+class ErrorBoundary extends React.Component<
+  Props,
+  { hasError: boolean, error?: any, info?: any },
+> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
@@ -17,7 +20,7 @@ class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
 
   /* istanbul ignore next */
   componentDidCatch(error: Error, info: {}) {
-    this.setState({ hasError: true });
+    this.setState({ hasError: true, error, info });
     logError(error, info);
   }
 
@@ -37,6 +40,14 @@ class ErrorBoundary extends React.Component<Props, { hasError: boolean }> {
                 scratch. Sorry about that.
                 <br />
               </Trans>
+              <p>
+                {get(this.state, 'error.message') && (
+                  <>
+                    The error was &ldquo;{get(this.state, 'error.message')}
+                    &rdquo;
+                  </>
+                )}
+              </p>
             </>
           }
         />

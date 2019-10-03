@@ -7,10 +7,11 @@ import { t } from 'i18next';
 import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
-import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 
 import { QueryParamHelpers } from './perfTableUtils';
 import type { ServerDataFetcher } from './perfPage';
+
+import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 
 type Props = {|
   fetchServerData: ServerDataFetcher,
@@ -25,6 +26,13 @@ const PerfDataTable = ({
   perfState,
   queryparams,
 }: Props) => {
+  if (perfState && perfState.status === 'ERROR') {
+    const message =
+      get(perfState, 'reason.reason.detail') ||
+      get(perfState, 'reason.error') ||
+      '';
+    throw new Error(message);
+  }
   /*
    * Extract the page from the server-generated URL and ensure it is
    * browser URL before fetching it.

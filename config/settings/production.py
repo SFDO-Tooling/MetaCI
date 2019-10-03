@@ -214,23 +214,15 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django.db.backends": {
-            "level": "ERROR",
-            "handlers": ["console_w_req"],
-            "propagate": False,
-        },
+        "django": {"level": "ERROR", "handlers": ["console_w_req"], "propagate": False},
         "raven": {"level": "DEBUG", "handlers": ["console_w_req"], "propagate": False},
-        "django.security.DisallowedHost": {
-            "level": "ERROR",
-            "handlers": ["console_w_req"],
-            "propagate": False,
-        },
         "log_request_id.middleware": {
             "handlers": ["console_w_req"],
             "level": "DEBUG",
             "propagate": False,
         },
         "rq.worker": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
+        "metaci": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
 
@@ -253,13 +245,18 @@ if SENTRY_DSN:
         "propagate": False,
     }
     LOGGING["root"]["handlers"].append("sentry")
-    LOGGING["loggers"]["django.security.DisallowedHost"]["handlers"].append("sentry")
+    LOGGING["loggers"]["django"]["handlers"].append("sentry")
 
 # Add the HireFire middleware for monitoring queue to scale dynos
 # See: https://hirefire.readthedocs.io/
 HIREFIRE_TOKEN = env("HIREFIRE_TOKEN", default=None)
 if HIREFIRE_TOKEN:
     HIREFIRE_PROCS = ["config.procs.WorkerProc"]
+
+HEROKU_TOKEN = env("HEROKU_TOKEN", default=None)
+HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
+if HEROKU_TOKEN and HEROKU_APP_NAME:
+    METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")

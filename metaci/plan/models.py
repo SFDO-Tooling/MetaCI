@@ -1,17 +1,17 @@
 from __future__ import unicode_literals
-import re
-import yaml
 
+import re
+
+import yaml
 from django.apps import apps
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
-from django.core.exceptions import ValidationError
 from guardian.shortcuts import get_objects_for_user
 
 from metaci.build.models import Build
 from metaci.repository.models import Branch, Repository
-
 
 TRIGGER_TYPES = (("manual", "Manual"), ("commit", "Commit"), ("tag", "Tag"))
 
@@ -33,6 +33,12 @@ DASHBOARD_CHOICES = (
     ("last", "Most Recent Build"),
     ("recent", "5 Most Recent Build"),
     ("branches", "Latest Builds by Branch"),
+)
+
+QUEUES = (
+    ("default", "default"),
+    ("medium", "medium priority"),
+    ("high", "high priority"),
 )
 
 
@@ -71,6 +77,7 @@ class Plan(models.Model):
     )
     trigger = models.CharField(max_length=8, choices=TRIGGER_TYPES)
     role = models.CharField(max_length=16, choices=BUILD_ROLES)
+    queue = models.CharField(max_length=16, choices=QUEUES, default="default")
     regex = models.CharField(max_length=255, null=True, blank=True)
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
