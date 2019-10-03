@@ -52,12 +52,15 @@ export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (
   });
 };
 
-export const perfREST_UI_Fetch = (): ThunkAction => (
+export const perfREST_UI_Fetch = (params?: {}): ThunkAction => (
   dispatch,
   _getState,
   { apiFetch },
 ) => {
-  const url = '/api/testmethod_perf_UI';
+  let url = '/api/testmethod_perf_UI';
+  if (params) {
+    url = `${url}?${queryString.stringify(params)}`;
+  }
   dispatch({ type: 'UI_DATA_LOADING', payload: url });
   apiFetch(url, {
     method: 'GET',

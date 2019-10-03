@@ -73,7 +73,7 @@ export const UnwrappedPerfPage = ({
     const pathParts = window.location.pathname.split('/');
     const repo = pathParts[pathParts.length - 2];
     queryparams.set({ repo });
-    doPerfREST_UI_Fetch();
+    doPerfREST_UI_Fetch({ repo });
   }, []);
 
   // Fetch the real data
