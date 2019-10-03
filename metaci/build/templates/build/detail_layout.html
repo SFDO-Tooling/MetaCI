@@ -42,7 +42,7 @@
       <p class="slds-text-body--regular slds-truncate" title="{{ build.get_status }}">
         <div
           class="slds-badge {% if build.get_status == 'fail' %} slds-theme--error {% elif build.get_status == 'error' %}slds-theme--offline{% elif build.get_status == 'success' %}slds-theme--success{% endif %}">
-          {{ build.get_status }}
+          {{ build.get_status }} {% if build.get_status == 'queued' %}({{ build.plan.queue }}){% endif %}
         </div>
       </p>
     </li>

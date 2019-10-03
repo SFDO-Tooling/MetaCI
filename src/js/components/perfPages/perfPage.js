@@ -32,7 +32,6 @@ export type ServerDataFetcher = (params?: {
   [string]: string | string[] | null | typeof undefined,
 }) => void;
 
-// TODO: Stronger typing in these
 type ReduxProps = {|
   perfState: PerfDataState,
   perfUIState: PerfData_UI_State,
@@ -130,7 +129,6 @@ export const UnwrappedPerfPage = ({
     </div>
   );
 };
-
 
 const select = (appState: AppState) => ({
   perfState: selectPerfState(appState),

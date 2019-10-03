@@ -151,7 +151,6 @@ class Build(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    priority = models.IntegerField(default=0)
     log = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
