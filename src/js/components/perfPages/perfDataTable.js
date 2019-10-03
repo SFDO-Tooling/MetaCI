@@ -7,10 +7,11 @@ import { t } from 'i18next';
 import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
-import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 
 import { QueryParamHelpers } from './perfTableUtils';
 import type { ServerDataFetcher } from './perfPage';
+
+import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
 
 type Props = {|
   fetchServerData: ServerDataFetcher,
