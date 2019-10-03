@@ -27,7 +27,6 @@ const FilterPicker = ({
   return (
     <Combobox
       id="combobox-inline-single"
-      placeholder={field_name}
       events={{
         onChange: (_event, { value }) => {
           setInputValue(value);
@@ -62,6 +61,7 @@ const FilterPicker = ({
         },
       }}
       labels={{
+        label: field_name[0].toUpperCase() + field_name.slice(1),
         placeholder: `Select ${field_name}`,
         placeholderReadOnly: `Select ${field_name}`,
       }}
