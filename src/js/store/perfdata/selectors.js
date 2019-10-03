@@ -23,7 +23,6 @@ export const selectPerfUIStatus = (appState: AppState): LoadingStatus =>
 export const selectPerfDataAPIUrl = (appState: AppState): string =>
   (appState.perfData && appState.perfData.url) || '';
 
-// TODO: Improve strong typing on these:
 export const selectTestMethodPerfUI = (
   appState: AppState,
 ): TestMethodPerfUI | null =>
