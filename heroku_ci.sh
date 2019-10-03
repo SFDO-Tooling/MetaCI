@@ -7,10 +7,10 @@ git reset --hard $HEROKU_TEST_RUN_COMMIT_VERSION
 export DJANGO_SETTINGS_MODULE=config.settings.test
 export COVERALLS_PARALLEL=true
 
-yarn pytest:check-coverage
+yarn pytest:report-coverage
 exit_status=$?
 
-yarn test:check-coverage
+yarn test:report-coverage
 exit_status = exit_status || $?
 
 curl -k "https://coveralls.io/webhook?repo_token=${COVERALLS_REPO_TOKEN}" -d "payload[build_num]=${HEROKU_TEST_RUN_ID}&payload[status]=done"
