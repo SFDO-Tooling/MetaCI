@@ -6,16 +6,15 @@ cd MetaCI_checkout
 git reset --hard $HEROKU_TEST_RUN_COMMIT_VERSION
 export DJANGO_SETTINGS_MODULE=config.settings.test
 export COVERALLS_PARALLEL=true
-
-yarn pytest:report-coverage
+coverage run $(which pytest) --tap-stream
 exit_status=$?
+coveralls
 
+yarn test:coverage
 yarn test:report-coverage
-exit_status = exit_status || $?
+exit_status=exit_status || $?
 
 curl -k "https://coveralls.io/webhook?repo_token=${COVERALLS_REPO_TOKEN}" -d "payload[build_num]=${HEROKU_TEST_RUN_ID}&payload[status]=done"
-
-#  coveralls
 if [ "$exit_status" != "0" ]; then
     exit $exit_status
 fi
