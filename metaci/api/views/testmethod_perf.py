@@ -99,12 +99,13 @@ class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
 def dynamicBuildFlowFilterSetBuilder(repo_name):
     class DynamicBuildFlowFilterSet(BuildFlowFilterSet):
         if repo_name:
-            relevant_branches = Branch.include_deleted.filter(repo__name=repo_name)
-            uniquified = {(branch.name, branch.name) for branch in relevant_branches}
+            branches = Branch.include_deleted \
+                .filter(repo__name=repo_name) \
+                .values_list("name", "name").order_by("name").distinct()
             branch = django_filters.rest_framework.ChoiceFilter(
                 field_name="rel_branch__name",
                 label="Branch Name",
-                choices=list(uniquified),
+                choices=list(branches),
             )
 
     return DynamicBuildFlowFilterSet
