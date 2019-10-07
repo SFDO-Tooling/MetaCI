@@ -111,7 +111,6 @@ export const UnwrappedPerfPage = ({
     <div key="perfContainerDiv">
       <PerfTableOptionsUI
         fetchServerData={fetchServerData}
-        uiAvailable={uiAvailable}
         testMethodPerfUI={testMethodPerfUI}
         queryparams={queryparams}
         key="thePerfAccordian"
