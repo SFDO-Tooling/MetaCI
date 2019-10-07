@@ -86,7 +86,8 @@ class LocalAutoscaler(Autoscaler):
                                 "rqworker",
                                 "high",
                                 "medium",
-                                "default" "--burst",
+                                "default",
+                                "--burst",
                             ]
                         )
                     )

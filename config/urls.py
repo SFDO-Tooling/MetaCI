@@ -5,14 +5,18 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.views.generic import TemplateView
 from django.views import defaults as default_views
+from django.views.generic import TemplateView
+
 from metaci import views as mbci_views
 from metaci.build import views as build_views
 from metaci.repository.views import github_push_webhook
 
 urlpatterns = [
-    # url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
+    url(
+        r"^robots\.txt$",
+        TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
+    ),
     url(r"^$", build_views.build_list, name="home"),
     url(
         r"^about/$",
