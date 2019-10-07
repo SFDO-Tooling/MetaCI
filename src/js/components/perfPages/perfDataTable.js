@@ -3,7 +3,7 @@ import * as React from 'react';
 import get from 'lodash/get';
 import zip from 'lodash/zip';
 import queryString from 'query-string';
-import { t } from 'i18next';
+import i18n from 'i18next';
 import Spinner from '@salesforce/design-system-react/components/spinner';
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
@@ -68,7 +68,7 @@ const PerfDataTable = ({
             className="slds-col slds-size--1-of-2"
             style={{ textAlign: 'left' }}
           >
-            {t('Showing {{fromnum}} to {{tonum}} of {{totalnum}}', {
+            {i18n.t('Showing {{fromnum}} to {{tonum}} of {{totalnum}}', {
               fromnum: (page * page_size).toString(),
               tonum: Math.min((page + 1) * page_size, count),
               totalnum: count.toString(),
@@ -135,7 +135,7 @@ const PerfDataTable = ({
       );
     });
 
-  const doSort = (sortColumn, ..._rest) => {
+  const doSort = sortColumn => {
     let sortProperty = sortColumn.property;
     const sortDirection = sortColumn.sortDirection;
 

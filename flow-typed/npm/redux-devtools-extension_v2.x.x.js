@@ -1,29 +1,30 @@
-// flow-typed signature: 263123e4b3d2cb666a60f721c2da5354
-// flow-typed version: e1af06321a/redux-devtools-extension_v2.x.x/flow_>=v0.47.x
+// flow-typed signature: da9e3a934faed5aec97160e69a2578c8
+// flow-typed version: 9931c6ffb0/redux-devtools-extension_v2.x.x/flow_>=v0.104.x
 
 import type { ActionCreator, StoreEnhancer } from 'redux';
 import typeof { compose } from 'redux';
 
 declare type $npm$ReduxDevtoolsExtension$DevToolsOptions = {
   name?: string,
-  actionCreators?: Array<ActionCreator<any>> | { [string]: ActionCreator<any> },
+  actionCreators?: Array<ActionCreator<any>> | { [string]: ActionCreator<any>, ... },
   latency?: number,
   maxAge?: number,
   serialize?: boolean | {
-    date?: boolean;
-    regex?: boolean;
-    undefined?: boolean;
-    error?: boolean;
-    symbol?: boolean;
-    map?: boolean;
-    set?: boolean;
-    function?: boolean | Function;
+    date?: boolean,
+    regex?: boolean,
+    undefined?: boolean,
+    error?: boolean,
+    symbol?: boolean,
+    map?: boolean,
+    set?: boolean,
+    function?: boolean | Function,
+    ...
   },
-  actionSanitizer?: <A: { type: $Subtype<string> }>(action: A, id: number) => A,
+  actionSanitizer?: <A: { type: string, ... }>(action: A, id: number) => A,
   stateSanitizer?: <S>(state: S, index: number) => S,
   actionsBlacklist?: string | string[],
   actionsWhitelist?: string | string[],
-  predicate?: <S, A: { type: $Subtype<string> }>(state: S, action: A) => boolean,
+  predicate?: <S, A: { type: string, ... }>(state: S, action: A) => boolean,
   shouldRecordChanges?: boolean,
   pauseActionType?: string,
   autoPause?: boolean,
@@ -40,8 +41,10 @@ declare type $npm$ReduxDevtoolsExtension$DevToolsOptions = {
     skip?: boolean,
     reorder?: boolean,
     dispatch?: boolean,
-    test?: boolean
-  }
+    test?: boolean,
+    ...
+  },
+  ...
 };
 
 declare function $npm$ReduxDevtoolsExtension$composeWithDevTools<A, B>(ab: A => B): A => B;

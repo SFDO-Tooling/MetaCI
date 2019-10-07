@@ -9,18 +9,28 @@ module.exports = {
       '@babel/preset-env',
       {
         modules: false,
+        corejs: '3',
         useBuiltIns: 'usage',
-        exclude: ['transform-regenerator'],
       },
     ],
   ],
   plugins: [
-    '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-object-rest-spread',
+    '@babel/plugin-proposal-class-properties',
   ],
   env: {
     test: {
-      presets: [...presets, '@babel/preset-env'],
+      presets: [
+        ...presets,
+        [
+          '@babel/preset-env',
+          {
+            targets: { node: 'current' },
+            corejs: '3',
+            useBuiltIns: 'usage',
+          },
+        ],
+      ],
     },
   },
 };

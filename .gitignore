@@ -33,6 +33,7 @@ pip-log.txt
 npm-debug.log*
 
 # Unit test / coverage reports
+/coverage
 .coverage
 .tox
 htmlcov

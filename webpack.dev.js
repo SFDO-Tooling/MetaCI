@@ -5,9 +5,9 @@
 process.env.NODE_ENV = 'development';
 
 const fs = require('fs');
-const path = require('path');
 
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const I18nextWebpackPlugin = require('i18next-scanner-webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const merge = require('webpack-merge');
@@ -36,7 +36,7 @@ module.exports = merge(common, {
     port: 4088,
   },
   plugins: [
-    new CleanWebpackPlugin(['dist/*.*']),
+    new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].css',
     }),

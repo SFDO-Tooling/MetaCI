@@ -11,7 +11,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { t } from 'i18next';
+import i18n from 'i18next';
 import actionSprite from '@salesforce-ux/design-system/assets/icons/action-sprite/svg/symbols.svg';
 import customSprite from '@salesforce-ux/design-system/assets/icons/custom-sprite/svg/symbols.svg';
 import doctypeSprite from '@salesforce-ux/design-system/assets/icons/doctype-sprite/svg/symbols.svg';
@@ -29,7 +29,7 @@ import { logError } from 'utils/logging';
 import { login } from 'store/user/actions';
 
 const App = () => (
-  <DocumentTitle title={t('Meta CI')}>
+  <DocumentTitle title={i18n.t('Meta CI')}>
     <div
       className="slds-grid
         slds-grid_vertical"
