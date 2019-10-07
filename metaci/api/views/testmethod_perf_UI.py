@@ -23,6 +23,12 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
         repo_name = request.query_params.get("repo", None)
         buildFlowFilterSetClass = dynamicBuildFlowFilterSetBuilder(repo_name=repo_name)
         buildflow_filters = self.collect_filter_defs(buildFlowFilterSetClass, [])
+        included_filters = [filter for filter in buildflow_filters.values()
+                            if filter['name'] != 'repo']
+        # repo is filtered here for two reasons. 
+        # 1. It didn't make a lot of sense in the UI.
+        # 2. When the repo changed, the branch-selector did not update automatically.
+        # If the repo-selector makes sense in some future UI, don't forget to fix #2.
         testmethodperf_filters = self.collect_filter_defs(
             TestMethodPerfFilterSet, buildflow_filters.keys()
         )
@@ -31,7 +37,7 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
         )
 
         json = {
-            "buildflow_filters": buildflow_filters.values(),
+            "buildflow_filters": included_filters,
             "testmethod_perf": {
                 "includable_fields": testmethodperf_filters["include_fields"][
                     "choices"

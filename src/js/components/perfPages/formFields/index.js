@@ -135,7 +135,7 @@ const spacerField = {
 
 export const AllFilters = ({ filters }: { filters: Field[] }) => {
   // Yes...this is gross. I'm sorry.
-  filters.splice(3, 0, spacerField);
+  filters.splice(2, 0, spacerField, spacerField);
   filters = filters.filter(x => x); // get rid of nulls
   return (
     <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
