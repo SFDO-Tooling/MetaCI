@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import type { ComponentType } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { t } from 'i18next';
+import i18n from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
 
@@ -101,7 +101,7 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
       <AccordionPanel
         id="perfPanelColumns"
         key="perfPanelColumns"
-        summary={t('Columns')}
+        summary={i18n.t('Columns')}
         expanded={perfPanelColumnsExpanded}
         onTogglePanel={() =>
           setPerfPanelColumnsExpanded(!perfPanelColumnsExpanded)
@@ -120,7 +120,8 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
         id="perfPanelFilters"
         key="perfPanelFilters"
         summary={
-          t('Filters') + (filterPanelCount > 0 ? ` (${filterPanelCount})` : '')
+          i18n.t('Filters') +
+          (filterPanelCount > 0 ? ` (${filterPanelCount})` : '')
         }
         expanded={perfPanelFiltersExpanded}
         onTogglePanel={() => {
@@ -133,7 +134,7 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
         id="perfPaneDates"
         key="perfPaneDates"
         summary={
-          t('Date Range') +
+          i18n.t('Date Range') +
           (dateRangeCount ? ` (${dateRangeCount.toString()})` : '')
         }
         expanded={perfPanelDatesExpanded}
@@ -154,7 +155,7 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
       <AccordionPanel
         id="perfPanelOptions"
         key="perfPanelOptions"
-        summary={t('Options')}
+        summary={i18n.t('Options')}
         expanded={perfPanelOptionsExpanded}
         onTogglePanel={() => {
           setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded);
@@ -164,7 +165,7 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
           <React.Fragment>
             <TextInput
               defaultValue={queryparams.get('page_size')}
-              label={t('Page Size')}
+              label={i18n.t('Page Size')}
               tooltip="Number of rows to fetch per page"
               onValueUpdate={(value: string) =>
                 fetchServerData({ page_size: value })

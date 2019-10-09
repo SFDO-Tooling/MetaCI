@@ -81,14 +81,12 @@ type UntypedFunc = Function; // the types would be quite complex.
 
 export const perfREST_API = ({
   dispatch,
-  _getState,
   apiFetch,
   prefix,
   url,
   checkValid,
 }: {
   dispatch: UntypedFunc,
-  _getState: UntypedFunc,
   apiFetch: UntypedFunc,
   prefix: string,
   url: string,
