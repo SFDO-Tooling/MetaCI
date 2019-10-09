@@ -19,7 +19,7 @@ const TextInput = ({ label, defaultValue, onValueUpdate, tooltip }: Props) => {
   );
 
   // store in state so debouncer can have internal history
-  const [debouncedChangeUrl, _] = useState(
+  const [debouncedChangeUrl] = useState(
     // wrap in obj to prevent magic useState behaviour
     { debouncedCallback },
   );
