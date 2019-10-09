@@ -57,19 +57,24 @@ export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (
   });
 };
 
-export const perfREST_UI_Fetch = (): ThunkAction => (
+export const perfREST_UI_Fetch = (params?: {}): ThunkAction => (
   dispatch,
   _getState,
   { apiFetch },
-) =>
-  perfREST_API({
+) => {
+  let url = testmethod_perf_UI_url;
+  if (params) {
+    url = `${url}?${queryString.stringify(params)}`;
+  }
+  return perfREST_API({
     dispatch,
     _getState,
     apiFetch,
     prefix: 'UI',
-    url: testmethod_perf_UI_url,
+    url,
     checkValid: assertUIData,
   });
+};
 
 // flowlint-next-line unclear-type:off
 type UntypedFunc = Function; // the types would be quite complex.
