@@ -289,7 +289,7 @@ class Build(models.Model):
         self._worker_id = self._worker_id or cache.get(self.worker_cache_key)
         return self._worker_id
 
-    def set_worker_id(self):
+    def cache_worker_id(self):
         """Look up and cache the DYNO environment variable"""
         self._worker_id = self._environment.get_worker_id_from_environment()
         cache.add(self.worker_cache_key, self._worker_id)
@@ -304,7 +304,7 @@ class Build(models.Model):
 
     def run(self):
         self.logger = init_logger(self)
-        self.set_worker_id()
+        self.cache_worker_id()
 
         self.logger.info(f"-- Building commit {self.commit} in worker {self.worker_id}")
         self.flush_log()
