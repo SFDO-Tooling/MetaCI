@@ -71,7 +71,7 @@ class HerokuWorkEnvironment(WorkEnvironment):
         return dyno_id
 
 
-def get_environment():
+def get_worker_environment():
     if os.environ.get("DYNO"):
         return HerokuWorkEnvironment()
     else:

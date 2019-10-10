@@ -34,7 +34,7 @@ from django.utils import timezone
 
 from metaci.build.tasks import set_github_status
 from metaci.build.utils import format_log, set_build_info
-from metaci.build.workenvironment import get_environment
+from metaci.build.workenvironment import get_worker_environment
 from metaci.cumulusci.config import MetaCIGlobalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
@@ -200,7 +200,7 @@ class Build(models.Model):
     objects = BuildQuerySet.as_manager()
 
     _worker_id = None
-    _environment = get_environment()
+    _environment = get_worker_environment()
 
     class Meta:
         ordering = ["-time_queue"]
