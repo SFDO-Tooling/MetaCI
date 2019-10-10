@@ -24,6 +24,7 @@ from cumulusci.utils import elementtree_parse_file
 from django.apps import apps
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -33,6 +34,7 @@ from django.utils import timezone
 
 from metaci.build.tasks import set_github_status
 from metaci.build.utils import format_log, set_build_info
+from metaci.build.workenvironment import get_environment
 from metaci.cumulusci.config import MetaCIGlobalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
@@ -197,6 +199,9 @@ class Build(models.Model):
 
     objects = BuildQuerySet.as_manager()
 
+    _worker_id = None
+    _environment = get_environment()
+
     class Meta:
         ordering = ["-time_queue"]
         permissions = (("search_builds", "Search Builds"),)
@@ -275,13 +280,33 @@ class Build(models.Model):
         build.status = status
         build.save()
 
+    @property
+    def worker_cache_key(self):
+        return f"metaci-build-worker-for-build-{self.pk}"
+
+    @property
+    def worker_id(self):
+        self._worker_id = self._worker_id or cache.get(self.worker_cache_key)
+        return self._worker_id
+
+    def set_worker_id(self):
+        """Look up and cache the DYNO environment variable"""
+        self._worker_id = self._environment.get_worker_id_from_environment()
+        cache.add(self.worker_cache_key, self._worker_id)
+
+    def stop_worker(self):
+        """Stop the worker associated with this build"""
+        self._environment.stop_worker(self.worker_id)
+
     def flush_log(self):
         for handler in self.logger.handlers:
             handler.stream.flush(force=True)
 
     def run(self):
         self.logger = init_logger(self)
-        self.logger.info("-- Building commit {}".format(self.commit))
+        self.set_worker_id()
+
+        self.logger.info(f"-- Building commit {self.commit} in worker {self.worker_id}")
         self.flush_log()
         build = self.current_rebuild if self.current_rebuild else self
         set_build_info(build, status="running", time_start=timezone.now())

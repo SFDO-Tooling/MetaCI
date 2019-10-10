@@ -1,12 +1,12 @@
 import logging
-import subprocess
 
 import django_rq
-import requests
 from cumulusci.core.utils import import_global
 from django.conf import settings
 from rq import Worker
 from rq.registry import StartedJobRegistry
+
+from metaci.build.workenvironment import HerokuWorkEnvironment, LocalWorkEnvironment
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +69,7 @@ class LocalAutoscaler(Autoscaler):
     processes = []
 
     def scale(self):
+        work_environment = LocalWorkEnvironment()
         if not self.active_builds:
             # Workers in burst mode will stop themselves once the queue is empty;
             # we just need to clear our references.
@@ -77,44 +78,23 @@ class LocalAutoscaler(Autoscaler):
             count = self.target_workers - self.count_workers()
             if count > 0:
                 logger.info(f"Starting {count} workers in burst mode")
-                for x in range(count):
-                    self.processes.append(
-                        subprocess.Popen(
-                            [
-                                "python",
-                                "./manage.py",
-                                "rqworker",
-                                "high",
-                                "medium",
-                                "default",
-                                "--burst",
-                            ]
-                        )
-                    )
+                self.processes.append(work_environment.scale_to(count))
 
 
 class HerokuAutoscaler(Autoscaler):
     """Scale using Heroku worker dynos."""
 
     def scale(self):
-        url = f"https://api.heroku.com/apps/{settings.HEROKU_APP_NAME}/formation/worker"
-        headers = {
-            "Accept": "application/vnd.heroku+json; version=3",
-            "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
-        }
+        work_environment = HerokuWorkEnvironment()
         # We should only scale down if there are no active builds,
         # because we don't know which worker will be stopped.
         active_workers = self.count_workers()
         if active_workers and not self.active_builds:
             logger.info(f"Scaling down to 0 workers")
-            resp = requests.patch(url, json={"quantity": 0}, headers=headers)
-            resp.raise_for_status()
+            work_environment.scale_to(0)
         elif self.target_workers > active_workers:
             logger.info(f"Scaling up to {self.target_workers} workers")
-            resp = requests.patch(
-                url, json={"quantity": self.target_workers}, headers=headers
-            )
-            resp.raise_for_status()
+            work_environment.scale_to(self.target_workers)
 
 
 get_autoscaler = import_global(settings.METACI_WORKER_AUTOSCALER)
