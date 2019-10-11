@@ -12,11 +12,10 @@ module.exports = {
   context: path.join(__dirname, 'src', 'js'),
   entry: {
     app: ['whatwg-fetch', './index', 'app.scss'],
-    raven: './raven',
   },
   resolve: {
     modules: ['src/js', 'src/sass', 'static', 'node_modules'],
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
   output: {
     publicPath: '/static/',
@@ -42,7 +41,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.(t|j)sx?$/,
         include: [
           path.join(__dirname, 'src/js'),
           path.join(__dirname, 'node_modules/@salesforce/design-system-react'),

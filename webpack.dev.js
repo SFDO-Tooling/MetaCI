@@ -21,6 +21,9 @@ module.exports = merge(common, {
     filename: '[name].js',
     path: path.join(__dirname, 'dist'),
   },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
   devtool: 'cheap-module-inline-source-map',
   devServer: {
     index: '',
