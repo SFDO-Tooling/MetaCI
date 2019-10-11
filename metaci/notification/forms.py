@@ -1,9 +1,6 @@
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Field
-from crispy_forms.layout import Fieldset
-from crispy_forms.layout import Layout
-from crispy_forms.layout import Submit
+from crispy_forms.layout import Field, Fieldset, Layout, Submit
 from django import forms
 
 
@@ -22,9 +19,9 @@ class AddNotificationForm(forms.ModelForm):
             ),
             Fieldset(
                 "Select the build statuses that should trigger a notification",
-                Field("on_success", css_class="slds-input"),
-                Field("on_fail", css_class="slds-input"),
-                Field("on_error", css_class="slds-input"),
+                Field("on_success"),
+                Field("on_fail"),
+                Field("on_error"),
                 css_class="slds-form-element",
             ),
             FormActions(
