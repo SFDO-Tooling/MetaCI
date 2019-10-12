@@ -17,7 +17,7 @@ const FilterPicker = ({
   field_name,
   currentValue,
   onSelect
-}: Props): ReactNode => {
+}: Props): JSX.Element => {
   const selected = currentValue ? choices.filter(choice => choice.id === currentValue) : [];
   const [inputValue, setInputValue] = useState('');
   const [selection, setSelection] = useState(selected);
