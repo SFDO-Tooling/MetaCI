@@ -33,7 +33,7 @@ export type UIDataAction = UIDataAvailableAction | UIDataLoadingAction | UIDataE
 
 /* eslint-disable no-use-before-define */
 
-export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (dispatch, _getState, {
+export const perfRESTFetch = (url: string, params?: {}) => (dispatch, _getState, {
   apiFetch
 }) => {
   if (params) {
@@ -41,7 +41,6 @@ export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (dispatc
   }
   return perfREST_API({
     dispatch,
-    _getState,
     apiFetch,
     prefix: 'PERF',
     url,
@@ -49,7 +48,7 @@ export const perfRESTFetch = (url: string, params?: {}): ThunkAction => (dispatc
   });
 };
 
-export const perfREST_UI_Fetch = (params?: {}): ThunkAction => (dispatch, _getState, {
+export const perfREST_UI_Fetch = (params?: {}) => (dispatch, _getState, {
   apiFetch
 }) => {
   let url = testmethod_perf_UI_url;
@@ -58,7 +57,6 @@ export const perfREST_UI_Fetch = (params?: {}): ThunkAction => (dispatch, _getSt
   }
   return perfREST_API({
     dispatch,
-    _getState,
     apiFetch,
     prefix: 'UI',
     url,
