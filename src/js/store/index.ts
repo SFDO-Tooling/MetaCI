@@ -8,7 +8,6 @@ export type AppState = {
   readonly perfDataUI: PerfData_UI_State;
 };
 
-type Action = {readonly type: string;};
 
 const reducer = combineReducers({
   perfData: perfDataReducer,
