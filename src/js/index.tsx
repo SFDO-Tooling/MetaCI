@@ -1,5 +1,3 @@
-// @flow
-
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import DocumentTitle from 'react-document-title';
