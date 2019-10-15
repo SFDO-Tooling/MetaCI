@@ -18,13 +18,15 @@ export class QueryParamHelpers {
   }
 
   // get a single value
-  get = (name: string): string | number | null => {
-    const rc = this.getAll()[name];
+  get = (name: string): string | null => {
+    const value = this.getAll()[name];
+    const value_checked = is(value, is.maybe(is.either(is.string, is.number)));
     try {
-      return is(rc, is.maybe(is.either(is.string, is.number)));
+      // if the value is not null, convert to a string
+      return value && value.toString();
     } catch (exception) {
       // eslint-disable-next-line no-console
-      console.log('UNKNOWN TYPE', name, rc, exception);
+      console.log('UNKNOWN TYPE', name, value, exception);
       throw exception;
     }
   };
