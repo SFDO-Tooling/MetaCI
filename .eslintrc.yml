@@ -23,7 +23,10 @@ rules:
   # TypeScript
   '@typescript-eslint/no-explicit-any': 0
   '@typescript-eslint/explicit-function-return-type': 0
-  "@typescript-eslint/camelcase": 0  # may want to tighten this sometime.
+  '@typescript-eslint/camelcase': 1  # may want to tighten this sometime.
+  '@typescript-eslint/prefer-interface': 1
+  '@typescript-eslint/explicit-member-accessibility': 1
+  '@typescript-eslint/no-use-before-define': 1
 
   # Import
   simple-import-sort/sort: 1

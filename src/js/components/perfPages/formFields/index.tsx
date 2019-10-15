@@ -1,7 +1,3 @@
-
-
-/* eslint-disable react/display-name */
-
 import is from "sarcastic";
 import React from "react";
 import { ReactNode, ReactElement } from "react";

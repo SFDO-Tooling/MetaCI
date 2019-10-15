@@ -1,5 +1,3 @@
-/* eslint-disable react/display-name */
-
 /* eslint-disable no-use-before-define */
 
 import React, { useState } from 'react';
@@ -30,7 +28,7 @@ import { QueryParamHelpers } from './perfTableUtils';
 
 type Props = {
   fetchServerData: (params?: {
-    [Key: string]: (string | Array<string>) | null;
+    [Key: string]: (string | string[]) | null;
   }) => void;
   queryparams: QueryParamHelpers;
   testMethodPerfUI: TestMethodPerfUI;
