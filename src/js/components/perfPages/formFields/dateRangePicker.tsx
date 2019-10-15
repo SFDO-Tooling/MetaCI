@@ -21,7 +21,7 @@ const DateRangePicker = ({
   endValue?: string | null;
   onChange: (arg0: string, arg1: string | typeof undefined) => void;
 }) => {
-  const localOnChange = (name, data: SLDSDateOption) => {
+  const localOnChange = (name: string, data: SLDSDateOption) => {
     if (data.formattedDate === '') {
       onChange(name, undefined);
     } else if (data.date.getFullYear() > 2015) {
@@ -48,7 +48,9 @@ const DateRangePicker = ({
     endValueOrNull = new Date(endValue);
   }
   return <React.Fragment>
-      <Datepicker key={`start${startDateKey}`} value={startValueOrNull} onChange={(_event: unknown, data) => {
+      <Datepicker key={`start${startDateKey}`} 
+                  value={startValueOrNull} 
+                  onChange={(_event: unknown, data: any) => {
       localOnChange(startName, data);
     }} />
       <Button iconCategory="action" variant="icon" iconName="remove" onClick={() => {
@@ -56,8 +58,10 @@ const DateRangePicker = ({
       onChange(startName, undefined);
     }} />
       &nbsp; - &nbsp;
-      <Datepicker key={`end${endDateKey}`} value={endValueOrNull} onChange={(_event: unknown, data) => {
-      localOnChange(endName, data);
+      <Datepicker key={`end${endDateKey}`} 
+                  value={endValueOrNull} 
+                  onChange={(_event: unknown, data: any) => {
+                  localOnChange(endName, data);
     }} />
       <Button iconCategory="action" variant="icon" iconName="remove" onClick={() => {
       onChange(endName, undefined);
