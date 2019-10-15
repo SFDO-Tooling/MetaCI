@@ -13,18 +13,18 @@ class ErrorBoundary extends React.Component<
   Props,
   { hasError: boolean; error?: any; info?: any }
 > {
-  constructor(props: Props) {
+  public constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
   }
 
   /* istanbul ignore next */
-  componentDidCatch(error: Error, info: {}) {
+  public componentDidCatch(error: Error, info: {}) {
     this.setState({ hasError: true, error, info });
     logError(error, info);
   }
 
-  render(): React.ReactNode {
+  public render(): React.ReactNode {
     if (this.state.hasError) {
       return (
         <EmptyIllustration
@@ -78,7 +78,7 @@ export const AuthError = ({ message }: { message: string }) => (
     <div>
       <video
         onEnded={evt => {
-          const medialement: HTMLMediaElement = evt.target;
+          const medialement = evt.target as HTMLMediaElement;
           medialement.load();
           medialement.play();
         }}
