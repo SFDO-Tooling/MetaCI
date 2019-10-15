@@ -1,6 +1,6 @@
 
 
-import React, { useState, ReactNode } from "react";
+import React, { useState } from "react";
 import Combobox from "@salesforce/design-system-react/components/combobox";
 import Icon from "@salesforce/design-system-react/components/icon";
 import comboboxFilterAndLimit from "@salesforce/design-system-react/components/combobox/filter";
@@ -27,12 +27,12 @@ const FilterPicker = ({
     }) => {
       setInputValue(value);
     },
-    onRequestRemoveSelectedOption: (_event, data) => {
+    onRequestRemoveSelectedOption: (_event: any, data: any) => {
       setInputValue('');
       setSelection(data.selection);
       onSelect('');
     },
-    onSelect: (_event, data) => {
+    onSelect: (_event:any, data:any) => {
       if (onSelect && data) {
         onSelect(data.selection[0].id);
       }
