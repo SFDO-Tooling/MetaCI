@@ -1,5 +1,3 @@
-// @flow
-
 import i18n_backend from 'i18next-xhr-backend';
 import i18n_detector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
@@ -11,7 +9,7 @@ import { logError } from 'utils/logging';
 // handlers, not in code executed immediately at runtime (before translations
 // are loaded).
 
-const init = (cb: () => void): void =>
+const init = (cb: (error?: string) => void): Promise<any> =>
   i18n
     .use(i18n_detector)
     .use(i18n_backend)
