@@ -42,12 +42,12 @@ const CharField = (filter: FilterDefinition, currentValue: string | null, fetchS
 
 const DecimalField = (filter: FilterDefinition, currentValue: string | null, fetchServerData): Field => {
   filter = is(filter, NumberFilterDefinitionShape);
-  const minValue: number | null | typeof undefined = filter.min;
-  const maxValue: number | null | typeof undefined = filter.max;
+  // const minValue: number | null | typeof undefined = filter.min;
+  // const maxValue: number | null | typeof undefined = filter.max;
   let step: number | null | typeof undefined = parseInt(filter.step, 10);
   step = isNaN(step) ? 1 : step;
 
-  // TODO: Test why this uses TextInput instead of Input.
+  // TODO: Test why this uses TextInput instead of Input. Can't use minValue with TextInput.
   return {
     name: filter.name,
     currentValue,
@@ -61,7 +61,7 @@ const FieldTypes = {
   DecimalField
 };
 
-export const createField = (filterDef: FilterDefinition, currentValue: string | null, onSubmit: () => typeof undefined) => {
+export const createField = (filterDef: FilterDefinition, currentValue: string | null, onSubmit: (value) => void) => {
   const fieldType = FieldTypes[filterDef.field_type];
   if (fieldType) {
     return fieldType(filterDef, currentValue, onSubmit);
