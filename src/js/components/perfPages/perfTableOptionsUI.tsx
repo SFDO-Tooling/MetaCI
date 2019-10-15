@@ -1,8 +1,9 @@
 /* eslint-disable react/display-name */
+
 /* eslint-disable no-use-before-define */
-// @flow
+
 import React, { useState } from 'react';
-import type { ComponentType } from 'react';
+import { ComponentType } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import i18n from 'i18next';
@@ -10,42 +11,49 @@ import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
 
 import { createField, AllFilters } from './formFields';
-import type { Field } from './formFields';
+import { Field } from './formFields';
 import TextInput from './formFields/textInput';
 import MultiPicker from './formFields/multiPicker';
 import DateRangePicker from './formFields/dateRangePicker';
 
 import { perfREST_UI_Fetch } from 'store/perfdata/actions';
-import type {
+import {
   FilterDefinition,
   TestMethodPerfUI,
 } from 'api/testmethod_perf_UI_JSON_schema';
-import type { AppState } from 'store';
+import { AppState } from 'store';
 import {
   selectPerfUIStatus,
   selectBuildflowFiltersUI,
 } from 'store/perfdata/selectors';
+import { QueryParamHelpers } from './perfTableUtils';
 
 type Props = {
   fetchServerData: (params?: {
-    [string]: ?(string | Array<string>),
-  }) => void,
-  queryparams: (name?: string) => string,
-  testMethodPerfUI: TestMethodPerfUI,
+    [Key: string]: (string | Array<string>) | null;
+  }) => void;
+  queryparams: QueryParamHelpers;
+  testMethodPerfUI: TestMethodPerfUI;
 };
 
 type ReduxProps = {
-  perfUIStatus: string,
-  buildflow_filters: FilterDefinition[],
+  perfUIStatus: string;
+  buildflow_filters: FilterDefinition[];
 };
 
 const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
-  fetchServerData /* A function to trigger fetch */,
-  queryparams /* A function to get queryparams or defaults */,
-  perfUIStatus /* Has data been loaded yet? */,
-  testMethodPerfUI /* UI Configuration data */,
-  buildflow_filters /* List of filters from server */,
-}: Props & ReduxProps) => {
+  fetchServerData,
+  /* A function to trigger fetch */
+  queryparams,
+  /* A function to get queryparams or defaults */
+  perfUIStatus,
+  /* Has data been loaded yet? */
+  testMethodPerfUI,
+  /* UI Configuration data */
+  buildflow_filters,
+}: /* List of filters from server */
+
+Props & ReduxProps) => {
   // is the UI data available? If so, populate the fields. If not,
   // just show the accordion.
   const uiAvailable = perfUIStatus === 'AVAILABLE';
@@ -74,8 +82,11 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
     );
     return relevant_filters
       .map(filterDef =>
-        createField(filterDef, queryparams.get(filterDef.name), value =>
-          fetchServerData({ [filterDef.name]: value }),
+        createField(
+          filterDef,
+          queryparams.get(filterDef.name) &&
+            String(queryparams.get(filterDef.name)),
+          value => fetchServerData({ [filterDef.name]: value }),
         ),
       )
       .filter(Boolean); // filter out nulls
@@ -164,7 +175,7 @@ const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
         {uiAvailable && (
           <React.Fragment>
             <TextInput
-              defaultValue={queryparams.get('page_size')}
+              defaultValue={queryparams.get('page_size')              }
               label={i18n.t('Page Size')}
               tooltip="Number of rows to fetch per page"
               onValueUpdate={(value: string) =>
@@ -188,7 +199,7 @@ const actions = {
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
 
-const PerfTableOptionsUIConnected: ComponentType<{}> = connect(
+const PerfTableOptionsUIConnected: any = connect(
   select,
   actions,
 )(PerfTableOptionsUI);
