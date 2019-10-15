@@ -7,6 +7,13 @@ declare module '@salesforce/design-system-react/components/*' {
   export default value;
 }
 
+declare module '@salesforce/design-system-react/components/combobox/filter' {
+  const filter: ({inputValue, limit, options, selection}:{inputValue:string, limit?: number, options?: any, selection?:any}) => any;
+
+  export default filter;
+}
+
+
 declare module '@salesforce/design-system-react/components/settings' {
   const settings: {
     setAssetsPaths: (path: string) => void;
