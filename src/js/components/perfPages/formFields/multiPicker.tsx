@@ -37,12 +37,9 @@ const MultiPicker = ({
   value="" variant="readonly" />;
 };
 
-const getSelectionListFromDefaultValue = (options, defaultValue) => {
+const getSelectionListFromDefaultValue = (options: any[], defaultValue) => {
   if (defaultValue !== null && defaultValue !== undefined) {
-    // this is for flow's benefit
-    const indexOf = defaultValue.indexOf.bind(defaultValue);
-
-    const included_options = options.filter(option => indexOf(option.id) >= 0);
+    const included_options = options.filter(option => defaultValue.indexOf(option.id) >= 0);
     return included_options;
   }
   return undefined;
