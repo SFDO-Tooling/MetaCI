@@ -9,9 +9,9 @@ export type UrlParams = {
 };
 
 // these HTTP methods do not require CSRF protection
-const csrfSafeMethod = method => /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+const csrfSafeMethod = (method: string) => /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
 
-const getResponse = (resp, errorStatus) => resp.text().then(text => {
+const getResponse = (resp: Response, errorStatus): Promise<any> => resp.text().then((text: string) => {
   try {
     text = JSON.parse(text);
   } catch (err) {} // swallow error
