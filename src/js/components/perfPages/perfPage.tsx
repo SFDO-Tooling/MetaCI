@@ -1,30 +1,29 @@
+import { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
+import ErrorBoundary from 'components/error';
+import get from 'lodash/get';
 import React, { useEffect } from 'react';
 import { ComponentType } from 'react';
-import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { RouteComponentProps } from 'react-router-dom';
-
-import DebugIcon from './debugIcon';
-import PerfTableOptionsUI from './perfTableOptionsUI';
-import PerfDataTable from './perfDataTable';
-import { QueryParamHelpers, addIds } from './perfTableUtils';
-
-import ErrorBoundary from 'components/error';
 import { AppState } from 'store';
+import { perfREST_UI_Fetch,perfRESTFetch } from 'store/perfdata/actions';
 import {
-  PerfDataState,
-  PerfData_UI_State,
   LoadingStatus,
+  PerfData_UI_State,
+  PerfDataState,
 } from 'store/perfdata/reducer';
-import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
-import { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 import {
   selectPerfState,
   selectPerfUIState,
   selectPerfUIStatus,
   selectTestMethodPerfUI,
 } from 'store/perfdata/selectors';
+
+import DebugIcon from './debugIcon';
+import PerfDataTable from './perfDataTable';
+import PerfTableOptionsUI from './perfTableOptionsUI';
+import { addIds,QueryParamHelpers } from './perfTableUtils';
 
 export type ServerDataFetcher = (params?: {
   [Key: string]: string | string[] | null | typeof undefined;
@@ -40,7 +39,7 @@ type ReduxProps = {
   // eslint-disable-next-line no-use-before-define
 } & typeof actions;
 
-type SelfProps = { default_columns: string[] };
+interface SelfProps { default_columns: string[] }
 
 export const UnwrappedPerfPage = ({
   doPerfRESTFetch,

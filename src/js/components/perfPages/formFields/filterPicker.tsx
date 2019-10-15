@@ -1,16 +1,16 @@
 
 
-import React, { useState } from "react";
 import Combobox from "@salesforce/design-system-react/components/combobox";
-import Icon from "@salesforce/design-system-react/components/icon";
 import comboboxFilterAndLimit from "@salesforce/design-system-react/components/combobox/filter";
+import Icon from "@salesforce/design-system-react/components/icon";
+import React, { useState } from "react";
 
-type Props = {
+interface Props {
   choices: {id: string;}[];
   field_name: string;
   currentValue?: string | null;
   onSelect: (id: string) => void;
-};
+}
 
 const FilterPicker = ({
   choices,

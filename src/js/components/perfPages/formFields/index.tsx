@@ -1,20 +1,19 @@
-import is from "sarcastic";
+import { FilterDefinition } from "api/testmethod_perf_UI_JSON_schema";
+import { NumberFilterDefinitionShape } from "api/testmethod_perf_UI_JSON_schema";
 import React from "react";
-import { ReactNode, ReactElement } from "react";
+import { ReactElement,ReactNode } from "react";
+import is from "sarcastic";
 
 import FilterPicker from "./filterPicker";
 import TextInput from "./textInput";
 
-import { FilterDefinition } from "api/testmethod_perf_UI_JSON_schema";
-import { NumberFilterDefinitionShape } from "api/testmethod_perf_UI_JSON_schema";
-
 // interface representing fields that can be shown on the screen.
-export type Field = {
+export interface Field {
   name: string;
   currentValue?: unknown;
   choices?: any[];
   render: () => any;
-};
+}
 
 const ChoiceField = (filter: FilterDefinition, currentValue: string | null, fetchServerData): Field => {
   const choices: string[][] = is(filter.choices, is.arrayOf(is.arrayOf(is.string)));

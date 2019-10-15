@@ -1,12 +1,12 @@
 
-import React, { useState } from "react";
-import Datepicker from "@salesforce/design-system-react/components/date-picker";
 import Button from "@salesforce/design-system-react/components/button";
+import Datepicker from "@salesforce/design-system-react/components/date-picker";
+import React, { useState } from "react";
 
-type SLDSDateOption = {
+interface SLDSDateOption {
   formattedDate: string;
   date: Date;
-};
+}
 
 const DateRangePicker = ({
   onChange,

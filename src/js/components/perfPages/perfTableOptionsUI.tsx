@@ -1,43 +1,42 @@
 /* eslint-disable no-use-before-define */
 
-import React, { useState } from 'react';
-import { ComponentType } from 'react';
-import get from 'lodash/get';
-import { connect } from 'react-redux';
-import i18n from 'i18next';
 import Accordion from '@salesforce/design-system-react/components/accordion';
 import AccordionPanel from '@salesforce/design-system-react/components/accordion/panel';
-
-import { createField, AllFilters } from './formFields';
-import { Field } from './formFields';
-import TextInput from './formFields/textInput';
-import MultiPicker from './formFields/multiPicker';
-import DateRangePicker from './formFields/dateRangePicker';
-
-import { perfREST_UI_Fetch } from 'store/perfdata/actions';
 import {
   FilterDefinition,
   TestMethodPerfUI,
 } from 'api/testmethod_perf_UI_JSON_schema';
+import i18n from 'i18next';
+import get from 'lodash/get';
+import React, { useState } from 'react';
+import { ComponentType } from 'react';
+import { connect } from 'react-redux';
 import { AppState } from 'store';
+import { perfREST_UI_Fetch } from 'store/perfdata/actions';
 import {
-  selectPerfUIStatus,
   selectBuildflowFiltersUI,
+  selectPerfUIStatus,
 } from 'store/perfdata/selectors';
+
+import { AllFilters,createField } from './formFields';
+import { Field } from './formFields';
+import DateRangePicker from './formFields/dateRangePicker';
+import MultiPicker from './formFields/multiPicker';
+import TextInput from './formFields/textInput';
 import { QueryParamHelpers } from './perfTableUtils';
 
-type Props = {
+interface Props {
   fetchServerData: (params?: {
     [Key: string]: (string | string[]) | null;
   }) => void;
   queryparams: QueryParamHelpers;
   testMethodPerfUI: TestMethodPerfUI;
-};
+}
 
-type ReduxProps = {
+interface ReduxProps {
   perfUIStatus: string;
   buildflow_filters: FilterDefinition[];
-};
+}
 
 const PerfTableOptionsUI: ComponentType<Props & ReduxProps> = ({
   fetchServerData,

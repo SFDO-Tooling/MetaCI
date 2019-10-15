@@ -1,17 +1,17 @@
 
-import * as React from "react";
 import Combobox from "@salesforce/design-system-react/components/combobox";
+import * as React from "react";
 
-type Props = {
+interface Props {
   onChange: (arg0: string[]) => void;
   choices: [string, string][];
   defaultValue?: string[] | null;
-};
+}
 
-type SLDSChoiceOption = {
+interface SLDSChoiceOption {
   id: string;
   label: string;
-};
+}
 
 type Options = SLDSChoiceOption[];
 

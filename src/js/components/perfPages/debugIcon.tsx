@@ -1,15 +1,14 @@
-import * as React from "react";
-import { connect } from "react-redux";
 import Icon from "@salesforce/design-system-react/components/icon";
+import * as React from "react";
 import { ComponentType } from "react";
-
-import { selectDebugStatus, selectPerfDataAPIUrl } from "store/perfdata/selectors";
+import { connect } from "react-redux";
 import { AppState } from "store";
+import { selectDebugStatus, selectPerfDataAPIUrl } from "store/perfdata/selectors";
 
-type ReduxProps = {
+interface ReduxProps {
   debugStatus: boolean;
   apiURL: string;
-};
+}
 
 const UnwrappedDebugIcon = ({
   debugStatus,

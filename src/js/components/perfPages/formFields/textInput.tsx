@@ -1,15 +1,15 @@
 
-import React, { useState } from "react";
-import debounce from "lodash/debounce";
 import Input from "@salesforce/design-system-react/components/input";
 import Tooltip from "@salesforce/design-system-react/components/tooltip";
+import debounce from "lodash/debounce";
+import React, { useState } from "react";
 
-type Props = {
+interface Props {
   label?: string | null;
   defaultValue?: string | null;
   onValueUpdate: (arg0: string) => void;
   tooltip?: string | null;
-};
+}
 
 const TextInput = ({
   label,
