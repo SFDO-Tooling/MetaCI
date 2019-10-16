@@ -1,32 +1,30 @@
-// @flow
+import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
+import BrandBand from '@salesforce/design-system-react/components/brand-band';
+import Illustration from '@salesforce/design-system-react/components/illustration';
+import svgPath from 'images/broken.svg';
 import get from 'lodash/get';
 import * as React from 'react';
 import { Trans } from 'react-i18next';
-import Illustration from '@salesforce/design-system-react/components/illustration';
-import BrandBand from '@salesforce/design-system-react/components/brand-band';
-import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
-
-import svgPath from 'images/broken.svg';
 import { logError } from 'utils/logging';
 
-type Props = { children: React.Node };
+interface Props { children: React.ReactNode }
 
 class ErrorBoundary extends React.Component<
   Props,
-  { hasError: boolean, error?: any, info?: any },
+  { hasError: boolean; error?: any; info?: any }
 > {
-  constructor(props: Props) {
+  public constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
   }
 
   /* istanbul ignore next */
-  componentDidCatch(error: Error, info: {}) {
+  public componentDidCatch(error: Error, info: {}) {
     this.setState({ hasError: true, error, info });
     logError(error, info);
   }
 
-  render(): React.Node {
+  public render(): React.ReactNode {
     if (this.state.hasError) {
       return (
         <EmptyIllustration
@@ -80,8 +78,9 @@ export const AuthError = ({ message }: { message: string }) => (
     <div>
       <video
         onEnded={evt => {
-          evt.target.load();
-          evt.target.play();
+          const medialement = evt.target as HTMLMediaElement;
+          medialement.load();
+          medialement.play();
         }}
         loop
         autoPlay
@@ -98,7 +97,7 @@ export const AuthError = ({ message }: { message: string }) => (
   </BrandBand>
 );
 
-const EmptyIllustration = ({ message }: { message: React.Node }) => (
+const EmptyIllustration = ({ message }: { message: React.ReactNode }) => (
   <Illustration
     heading="Yikes! An error occurred!  :("
     messageBody={message}
