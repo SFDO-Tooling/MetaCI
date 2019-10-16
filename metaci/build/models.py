@@ -280,7 +280,7 @@ class Build(models.Model):
             handler.stream.flush(force=True)
 
     @property
-    def worker_id():
+    def worker_id(self):
         return os.environ.get("DYNO")
 
     def run(self):
