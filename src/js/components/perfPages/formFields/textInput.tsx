@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 interface Props {
   label?: string | null;
   defaultValue?: string | null;
-  onValueUpdate: (arg0: string) => void;
+  onValueUpdate: (value: string) => void;
   tooltip?: string | null;
 }
 

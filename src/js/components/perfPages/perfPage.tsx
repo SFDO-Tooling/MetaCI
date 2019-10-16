@@ -34,7 +34,7 @@ type ReduxProps = {
   perfUIState: PerfData_UI_State;
   perfUIStatus: LoadingStatus;
   testMethodPerfUI: TestMethodPerfUI;
-  doPerfRESTFetch: (arg0: {}) => null;
+  doPerfRESTFetch: (params: {}) => null;
   doPerfREST_UI_Fetch: typeof perfREST_UI_Fetch;
   // eslint-disable-next-line no-use-before-define
 } & typeof actions;

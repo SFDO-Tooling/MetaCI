@@ -18,7 +18,7 @@ const DateRangePicker = ({
   endName: string,
   startValue?: string | null,
   endValue?: string | null,
-  onChange: (arg0: string, arg1: string | typeof undefined) => void,
+  onChange: (name: string, format: string | typeof undefined) => void,
 }) => {
   const localOnChange = (name: string, data: SLDSDateOption) => {
     if (data.formattedDate === '') {
