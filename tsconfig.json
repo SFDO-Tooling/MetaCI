@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "sourceMap": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "src/*"],
+      "@/*": ["src/js/*"],
+      "#/*": ["static/images/*"]
+    }
+  },
+  "include": ["src/js/**/*.ts", "src/js/**/*.tsx"],
+  "exclude": ["node_modules"]
+}
