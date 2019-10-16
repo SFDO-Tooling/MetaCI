@@ -5,8 +5,8 @@
 process.env.NODE_ENV = 'development';
 
 const fs = require('fs');
-
 const path = require('path');
+
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const I18nextWebpackPlugin = require('i18next-scanner-webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
