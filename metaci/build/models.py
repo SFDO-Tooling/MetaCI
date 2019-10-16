@@ -279,9 +279,14 @@ class Build(models.Model):
         for handler in self.logger.handlers:
             handler.stream.flush(force=True)
 
+    @property
+    def worker_id():
+        return os.environ.get("DYNO")
+
     def run(self):
         self.logger = init_logger(self)
-        self.logger.info("-- Building commit {}".format(self.commit))
+        worker_str = f"in {self.worker_id}" if self.worker_id else ""
+        self.logger.info(f"-- Building commit {self.commit} {worker_str}")
         self.flush_log()
         build = self.current_rebuild if self.current_rebuild else self
         set_build_info(build, status="running", time_start=timezone.now())
