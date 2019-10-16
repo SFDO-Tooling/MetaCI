@@ -98,7 +98,8 @@ class TestBuild:
         org.delete_org.assert_not_called()
         detach_logger(build)
 
-    def test_noop_worker_id(self):
+    @mock.patch.dict(os.environ, clear=True)
+    def test_no_worker_id(self):
         build = BuildFactory()
         assert not build.worker_id
 
