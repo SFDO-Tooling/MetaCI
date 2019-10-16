@@ -1,13 +1,11 @@
 import { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 import ErrorBoundary from 'components/error';
 import get from 'lodash/get';
-import React, { useEffect } from 'react';
-import { ComponentType } from 'react';
+import React, { ComponentType, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { AppState } from 'store';
-import { perfREST_UI_Fetch,perfRESTFetch } from 'store/perfdata/actions';
+import { perfREST_UI_Fetch, perfRESTFetch } from 'store/perfdata/actions';
 import {
   LoadingStatus,
   PerfData_UI_State,
@@ -23,7 +21,7 @@ import {
 import DebugIcon from './debugIcon';
 import PerfDataTable from './perfDataTable';
 import PerfTableOptionsUI from './perfTableOptionsUI';
-import { addIds,QueryParamHelpers } from './perfTableUtils';
+import { addIds, QueryParamHelpers } from './perfTableUtils';
 
 export type ServerDataFetcher = (params?: {
   [Key: string]: string | string[] | null | typeof undefined;
@@ -39,7 +37,9 @@ type ReduxProps = {
   // eslint-disable-next-line no-use-before-define
 } & typeof actions;
 
-interface SelfProps { default_columns: string[] }
+interface SelfProps {
+  default_columns: string[];
+}
 
 export const UnwrappedPerfPage = ({
   doPerfRESTFetch,
@@ -74,14 +74,14 @@ export const UnwrappedPerfPage = ({
     const repo = pathParts[pathParts.length - 2];
     queryparams.set({ repo });
     doPerfREST_UI_Fetch({ repo });
-  }, []);
+  }, [doPerfREST_UI_Fetch, queryparams]);
 
   // Fetch the real data
   useEffect(() => {
     if (uiAvailable) {
       doPerfRESTFetch({ ...queryparams.getAll() });
     }
-  }, [uiAvailable]);
+  }, [doPerfRESTFetch, queryparams, uiAvailable]);
 
   let results: {}[];
   if (
@@ -94,7 +94,7 @@ export const UnwrappedPerfPage = ({
     results = [];
   }
 
-  const fetchServerData: ServerDataFetcher = params => {
+  const fetchServerData: ServerDataFetcher = (params) => {
     // its okay to pass null or undefined because query-string has reasonable
     // and useful interpretations of both of them.
     const page = (params && params.page) || 1;

@@ -14,11 +14,11 @@ const DateRangePicker = ({
   startValue,
   endValue,
 }: {
-  startName: string,
-  endName: string,
-  startValue?: string | null,
-  endValue?: string | null,
-  onChange: (name: string, format: string | typeof undefined) => void,
+  startName: string;
+  endName: string;
+  startValue?: string | null;
+  endValue?: string | null;
+  onChange: (name: string, format: string | typeof undefined) => void;
 }) => {
   const localOnChange = (name: string, data: SLDSDateOption) => {
     if (data.formattedDate === '') {

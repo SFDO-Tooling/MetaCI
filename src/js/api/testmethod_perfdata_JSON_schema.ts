@@ -1,4 +1,4 @@
-import is, { AssertionType } from "sarcastic";
+import is, { AssertionType } from 'sarcastic';
 
 const PerfDataShape = is.shape({
   count: is.number,
@@ -9,5 +9,5 @@ const PerfDataShape = is.shape({
 
 export type PerfData = AssertionType<typeof PerfDataShape>;
 
-export const assertPerfData = (data: unknown, context?: string): PerfData => 
+export const assertPerfData = (data: unknown, context?: string): PerfData =>
   is(data, PerfDataShape, context || 'PerfData from server: ');

@@ -61,7 +61,7 @@ export class QueryParamHelpers {
  * @param {*} rows hashes from database
  */
 export const addIds = (
-  rows: Array<{
+  rows: {
     [key: string]: unknown;
-  }>,
+  }[],
 ): {}[] => rows.map((row, index) => ({ ...row, id: index.toString() }));

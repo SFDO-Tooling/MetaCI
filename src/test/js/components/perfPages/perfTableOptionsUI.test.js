@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { renderWithRedux, storeWithApi } from '../../utils';
-
 import testmethod_perf_UI_data from '../../api/testmethod_perf_UI.json';
 
 import { QueryParamHelpers } from 'components/perfPages/perfTableUtils';

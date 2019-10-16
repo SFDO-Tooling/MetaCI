@@ -1,49 +1,49 @@
+import { PerfDataAction, UIDataAction } from 'store/perfdata/actions';
+
 import { UIData } from '../../api/testmethod_perf_UI_JSON_schema';
 import { PerfData as P } from '../../api/testmethod_perfdata_JSON_schema';
-
-import { PerfDataAction, UIDataAction } from 'store/perfdata/actions';
 
 export type PerfData = P;
 
 export type LoadingStatus = 'LOADING' | 'AVAILABLE' | 'ERROR';
 
-export type PerfDataLoading = {
-  status: 'LOADING',
-  perfdata: PerfData | null,
-  url: string,
-};
+export interface PerfDataLoading {
+  status: 'LOADING';
+  perfdata: PerfData | null;
+  url: string;
+}
 
-export type PerfDataAvailable = {
-  status: 'AVAILABLE',
-  perfdata: PerfData,
-  url: string,
-};
+export interface PerfDataAvailable {
+  status: 'AVAILABLE';
+  perfdata: PerfData;
+  url: string;
+}
 
-export type PerfDataError = {
-  status: 'ERROR',
-  perfdata: PerfData | null,
-  reason: string,
-  url: string,
-};
+export interface PerfDataError {
+  status: 'ERROR';
+  perfdata: PerfData | null;
+  reason: string;
+  url: string;
+}
 
-export type UIDataLoading = {
-  status: 'LOADING',
-  url: string,
-  uidata?: UIData,
-};
+export interface UIDataLoading {
+  status: 'LOADING';
+  url: string;
+  uidata?: UIData;
+}
 
-export type UIDataAvailable = {
-  status: 'AVAILABLE',
-  uidata: UIData,
-  url: string,
-};
+export interface UIDataAvailable {
+  status: 'AVAILABLE';
+  uidata: UIData;
+  url: string;
+}
 
-export type UIDataError = {
-  status: 'ERROR',
-  reason: string,
-  uidata?: UIData,
-  url: string,
-};
+export interface UIDataError {
+  status: 'ERROR';
+  reason: string;
+  uidata?: UIData;
+  url: string;
+}
 
 export type PerfDataState = PerfDataAvailable | PerfDataLoading | PerfDataError;
 

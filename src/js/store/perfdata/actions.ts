@@ -1,31 +1,38 @@
-import queryString from 'query-string';
-
-import { PerfData } from 'store/perfdata/reducer';
-import { UIData } from 'api/testmethod_perf_UI_JSON_schema';
+import { assertUIData, UIData } from 'api/testmethod_perf_UI_JSON_schema';
 import { assertPerfData } from 'api/testmethod_perfdata_JSON_schema';
-import { assertUIData } from 'api/testmethod_perf_UI_JSON_schema';
-import { ThunkDispatch } from 'redux-thunk';
+import queryString from 'query-string';
 import { AnyAction } from 'redux';
+import { ThunkDispatch } from 'redux-thunk';
+import { PerfData } from 'store/perfdata/reducer';
 
 export const testmethod_perfdata_url = '/api/testmethod_perf';
 export const testmethod_perf_UI_url = '/api/testmethod_perf_UI';
 
-type PerfDataAvailableAction = {
+interface PerfDataAvailableAction {
   type: 'PERF_DATA_AVAILABLE';
   payload: PerfData;
-};
-type PerfDataLoadingAction = {
+}
+interface PerfDataLoadingAction {
   type: 'PERF_DATA_LOADING';
   payload: { url: string };
-};
-type PerfDataError = { type: 'PERF_DATA_ERROR'; payload: string };
+}
+interface PerfDataError {
+  type: 'PERF_DATA_ERROR';
+  payload: string;
+}
 
-type UIDataAvailableAction = { type: 'UI_DATA_AVAILABLE'; payload: UIData };
-type UIDataLoadingAction = {
+interface UIDataAvailableAction {
+  type: 'UI_DATA_AVAILABLE';
+  payload: UIData;
+}
+interface UIDataLoadingAction {
   type: 'UI_DATA_LOADING';
   payload: { url: string };
-};
-type UIDataError = { type: 'UI_DATA_ERROR'; payload: string };
+}
+interface UIDataError {
+  type: 'UI_DATA_ERROR';
+  payload: string;
+}
 
 export type PerfDataAction =
   | PerfDataAvailableAction

@@ -1,10 +1,9 @@
 import cookies from 'js-cookie';
-
 import { logError } from 'utils/logging';
 
-export type UrlParams = {
+export interface UrlParams {
   [key: string]: string | number | boolean;
-};
+}
 
 // these HTTP methods do not require CSRF protection
 const csrfSafeMethod = (method: string) =>
@@ -25,7 +24,7 @@ const getResponse = (resp: Response, errorStatus): Promise<any> =>
     })
     .catch(
       /* istanbul ignore next */
-      err => {
+      (err) => {
         logError(err);
         throw err;
       },
@@ -45,7 +44,7 @@ const getApiFetch = () => (
 
   return fetch(url, options)
     .then(
-      response => {
+      (response) => {
         if (response.ok) {
           return getResponse(response, null);
         }
@@ -59,12 +58,12 @@ const getApiFetch = () => (
         error.response = response;
         throw error;
       },
-      err => {
+      (err) => {
         logError(err);
         throw err;
       },
     )
-    .catch(err => {
+    .catch((err) => {
       logError(err);
       throw err;
     });

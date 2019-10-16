@@ -9,9 +9,9 @@ import {
 } from 'store/perfdata/selectors';
 
 interface ReduxProps {
-  debugStatus: boolean,
-  apiURL: string,
-};
+  debugStatus: boolean;
+  apiURL: string;
+}
 
 const UnwrappedDebugIcon = ({ debugStatus, apiURL }: ReduxProps) =>
   debugStatus ? (

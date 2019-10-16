@@ -1,7 +1,8 @@
-import { FilterDefinition } from 'api/testmethod_perf_UI_JSON_schema';
-import { NumberFilterDefinitionShape } from 'api/testmethod_perf_UI_JSON_schema';
-import React from 'react';
+import { FilterDefinition , NumberFilterDefinitionShape } from 'api/testmethod_perf_UI_JSON_schema';
+
 import { ReactElement, ReactNode } from 'react';
+import React from 'react';
+
 import is from 'sarcastic';
 
 import FilterPicker from './filterPicker';
@@ -24,7 +25,7 @@ const ChoiceField = (
     filter.choices,
     is.arrayOf(is.arrayOf(is.string)),
   );
-  const choices_as_objs = choices.map(pair => ({
+  const choices_as_objs = choices.map((pair) => ({
     id: pair[0],
     label: pair[1],
   }));
@@ -130,10 +131,10 @@ const spacerField = {
 export const AllFilters = ({ filters }: { filters: Field[] }) => {
   // Yes...this is gross. I'm sorry.
   filters.splice(2, 0, spacerField, spacerField);
-  filters = filters.filter(x => x); // get rid of nulls
+  filters = filters.filter((x) => x); // get rid of nulls
   return (
     <div key="filterGrid" className="slds-grid slds-wrap slds-gutters">
-      {filters.map(filter => (
+      {filters.map((filter) => (
         <div key={filter.name} className="slds-col slds-size_3-of-12">
           {filter.render()}
         </div>

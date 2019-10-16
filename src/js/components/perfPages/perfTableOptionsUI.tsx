@@ -8,8 +8,7 @@ import {
 } from 'api/testmethod_perf_UI_JSON_schema';
 import i18n from 'i18next';
 import get from 'lodash/get';
-import React, { useState } from 'react';
-import { ComponentType } from 'react';
+import React, { ComponentType, useState } from 'react';
 import { connect } from 'react-redux';
 import { AppState } from 'store';
 import { perfREST_UI_Fetch } from 'store/perfdata/actions';
@@ -18,8 +17,7 @@ import {
   selectPerfUIStatus,
 } from 'store/perfdata/selectors';
 
-import { AllFilters, createField } from './formFields';
-import { Field } from './formFields';
+import { AllFilters, createField, Field } from './formFields';
 import DateRangePicker from './formFields/dateRangePicker';
 import MultiPicker from './formFields/multiPicker';
 import TextInput from './formFields/textInput';
@@ -74,16 +72,16 @@ Props & ReduxProps) => {
   const gatherFilters = (perfdataUIstate: typeof testMethodPerfUI): Field[] => {
     const testmethod_perf_filters = perfdataUIstate.filters;
     const all_filters = [...buildflow_filters, ...testmethod_perf_filters];
-    const relevant_filters = all_filters.filter(filter =>
+    const relevant_filters = all_filters.filter((filter) =>
       ['ChoiceField', 'CharField', 'DecimalField'].includes(filter.field_type),
     );
     return relevant_filters
-      .map(filterDef =>
+      .map((filterDef) =>
         createField(
           filterDef,
           queryparams.get(filterDef.name) &&
             String(queryparams.get(filterDef.name)),
-          value => fetchServerData({ [filterDef.name]: value }),
+          (value) => fetchServerData({ [filterDef.name]: value }),
         ),
       )
       .filter(Boolean); // filter out nulls
@@ -95,14 +93,14 @@ Props & ReduxProps) => {
 
   const exclude = ['o', 'include_fields'];
   const filterPanelFilters = filters.filter(
-    filter => !exclude.includes(filter.name),
+    (filter) => !exclude.includes(filter.name),
   );
-  const filterPanelCount = filterPanelFilters.filter(f => f.currentValue)
+  const filterPanelCount = filterPanelFilters.filter((f) => f.currentValue)
     .length;
   const dateRangeCount: number = [
     queryparams.get('daterange_after'),
     queryparams.get('daterange_before'),
-  ].filter(x => x).length;
+  ].filter((x) => x).length;
 
   return (
     <Accordion key="perfUIMainAccordion">
@@ -120,7 +118,7 @@ Props & ReduxProps) => {
             key="PerfDataTableFieldPicker"
             choices={get(testMethodPerfUI, 'includable_fields')}
             defaultValue={queryparams.getList('include_fields')}
-            onChange={data => fetchServerData({ include_fields: data })}
+            onChange={(data) => fetchServerData({ include_fields: data })}
           />
         )}
       </AccordionPanel>

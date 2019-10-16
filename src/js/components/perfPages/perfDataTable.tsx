@@ -95,8 +95,8 @@ const PerfDataTable = ({
 
   const columns = (): [string, string][] => {
     if (items.length > 0) {
-      const columnIds = Object.keys(items[0]).filter(item => item !== 'id');
-      const columnPairs: [string, string][] = columnIds.map(id => [id, id]);
+      const columnIds = Object.keys(items[0]).filter((item) => item !== 'id');
+      const columnPairs: [string, string][] = columnIds.map((id) => [id, id]);
       return columnPairs;
     }
     // these are really just for looks. If there are no items, they
@@ -133,7 +133,7 @@ const PerfDataTable = ({
       );
     });
 
-  const doSort = sortColumn => {
+  const doSort = (sortColumn) => {
     let sortProperty = sortColumn.property;
     const sortDirection = sortColumn.sortDirection;
 
@@ -162,8 +162,8 @@ const PerfDataTable = ({
 };
 
 interface SpinnerProps {
-  status: LoadingStatus,
-};
+  status: LoadingStatus;
+}
 
 const PerfDataTableSpinner = ({ status }: SpinnerProps) => {
   if (status === 'LOADING') {

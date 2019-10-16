@@ -7,7 +7,9 @@ import * as React from 'react';
 import { Trans } from 'react-i18next';
 import { logError } from 'utils/logging';
 
-interface Props { children: React.ReactNode }
+interface Props {
+  children: React.ReactNode;
+}
 
 class ErrorBoundary extends React.Component<
   Props,
@@ -77,7 +79,7 @@ export const AuthError = ({ message }: { message: string }) => (
     </div>
     <div>
       <video
-        onEnded={evt => {
+        onEnded={(evt) => {
           const medialement = evt.target as HTMLMediaElement;
           medialement.load();
           medialement.play();
