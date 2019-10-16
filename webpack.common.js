@@ -12,7 +12,6 @@ module.exports = {
   context: path.join(__dirname, 'src', 'js'),
   entry: {
     app: ['whatwg-fetch', './index', 'app.scss'],
-    raven: './raven',
   },
   resolve: {
     modules: ['src/js', 'src/sass', 'static', 'node_modules'],
@@ -27,7 +26,7 @@ module.exports = {
       cacheGroups: {
         vendor: {
           name: 'vendors',
-          test: /[\\/]node_modules[\\/](?!raven-js)/,
+          test: /[\\/]node_modules[\\/]/,
           chunks: 'all',
         },
         styles: {

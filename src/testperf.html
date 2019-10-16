@@ -20,17 +20,6 @@
         <!-- JavaScript -->
         <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.runtime.entry %>"></script>
         <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.vendors.entry %>"></script>
-        <!--
-        {% if GLOBALS.SENTRY_DSN_PUBLIC %}
-          <!-- Insert Raven JS - ->
-          <script id="js-raven-setup" type="application/json">
-            {
-              "dsn": "{{ GLOBALS.SENTRY_DSN_PUBLIC }}"
-            }
-          </script>
-          <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.raven.entry %>"></script>
-        {% endif %}
-        -->
         <script type="text/javascript" charset="utf-8">
         </script>
         <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.app.entry %>"></script>
