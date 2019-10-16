@@ -4,13 +4,7 @@ export const logError = (
   message: string | Error | Response,
   data: { [string]: mixed } = {},
 ) => {
-  if (window.Raven && window.Raven.isSetup()) {
-    if (message instanceof Error) {
-      window.Raven.captureException(message, data);
-    } else {
-      window.Raven.captureMessage(message, data);
-    }
-  }
+  // Raven/Sentry is disabled for now. This is where it would go.
   window.console.error(message, data);
 };
 
