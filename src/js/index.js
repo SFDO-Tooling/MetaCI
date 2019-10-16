@@ -26,7 +26,6 @@ import PerfPage from 'components/perfPages/perfPage';
 import getApiFetch from 'api/api_fetch';
 import reducer from 'store';
 import { logError } from 'utils/logging';
-import { login } from 'store/user/actions';
 
 const App = () => (
   <DocumentTitle title={i18n.t('Meta CI')}>
@@ -82,22 +81,6 @@ init_i18n(() => {
       logError(err);
     }
     window.GLOBALS = GLOBALS;
-
-    // Get logged-in/out status
-    const userString = el.getAttribute('data-user');
-    if (userString) {
-      let user;
-      try {
-        user = JSON.parse(userString);
-      } catch (err) {
-        // swallow error
-      }
-      if (user) {
-        // Login
-        appStore.dispatch(login(user));
-      }
-    }
-    el.removeAttribute('data-user');
 
     // Set App element (used for react-SLDS modals)
     settings.setAppElement(el);
