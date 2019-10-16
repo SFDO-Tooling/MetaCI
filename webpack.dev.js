@@ -83,7 +83,7 @@ module.exports = merge(common, {
               done(err);
             } else {
               const options = {
-                presets: ['@babel/preset-flow'],
+                presets: ['@babel/preset-typescript'],
                 plugins: [
                   '@babel/plugin-syntax-jsx',
                   '@babel/plugin-proposal-class-properties',
