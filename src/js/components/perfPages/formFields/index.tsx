@@ -1,26 +1,23 @@
-// @flow
-/* eslint-disable react/display-name */
-
-import is from 'sarcastic';
+import { FilterDefinition } from 'api/testmethod_perf_UI_JSON_schema';
+import { NumberFilterDefinitionShape } from 'api/testmethod_perf_UI_JSON_schema';
 import React from 'react';
-import type { Node } from 'react';
+import { ReactElement, ReactNode } from 'react';
+import is from 'sarcastic';
 
 import FilterPicker from './filterPicker';
 import TextInput from './textInput';
 
-import type { FilterDefinition } from 'api/testmethod_perf_UI_JSON_schema';
-import { NumberFilterDefinitionShape } from 'api/testmethod_perf_UI_JSON_schema';
-
 // interface representing fields that can be shown on the screen.
-export type Field = {
-  name: string,
-  currentValue?: mixed,
-  render: () => Node,
-};
+export interface Field {
+  name: string;
+  currentValue?: unknown;
+  choices?: any[];
+  render: () => any;
+}
 
 const ChoiceField = (
   filter: FilterDefinition,
-  currentValue?: string | null,
+  currentValue: string | null,
   fetchServerData,
 ): Field => {
   const choices: string[][] = is(
@@ -49,7 +46,7 @@ const ChoiceField = (
 
 const CharField = (
   filter: FilterDefinition,
-  currentValue?: string | null,
+  currentValue: string | null,
   fetchServerData,
 ): Field => ({
   name: filter.name,
@@ -66,15 +63,16 @@ const CharField = (
 
 const DecimalField = (
   filter: FilterDefinition,
-  currentValue?: string | null,
+  currentValue: string | null,
   fetchServerData,
 ): Field => {
   filter = is(filter, NumberFilterDefinitionShape);
-  const minValue: number | null | typeof undefined = filter.min;
-  const maxValue: number | null | typeof undefined = filter.max;
+  // const minValue: number | null | typeof undefined = filter.min;
+  // const maxValue: number | null | typeof undefined = filter.max;
   let step: number | null | typeof undefined = parseInt(filter.step, 10);
   step = isNaN(step) ? 1 : step;
 
+  // TODO: Test why this uses TextInput instead of Input. Can't use minValue with TextInput.
   return {
     name: filter.name,
     currentValue,
@@ -83,10 +81,6 @@ const DecimalField = (
         defaultValue={currentValue}
         label={filter.label}
         tooltip={filter.description}
-        minValue={minValue === null ? undefined : minValue}
-        maxValue={maxValue === null ? undefined : maxValue}
-        variant="counter"
-        step={step}
         onValueUpdate={fetchServerData}
       />
     ),
@@ -101,8 +95,8 @@ const FieldTypes = {
 
 export const createField = (
   filterDef: FilterDefinition,
-  currentValue?: string | null,
-  onSubmit: () => typeof undefined,
+  currentValue: string | null,
+  onSubmit: (value) => void,
 ) => {
   const fieldType = FieldTypes[filterDef.field_type];
   if (fieldType) {

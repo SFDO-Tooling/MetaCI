@@ -1,17 +1,14 @@
-// @flow
-
-import * as React from 'react';
-import { connect } from 'react-redux';
 import Icon from '@salesforce/design-system-react/components/icon';
-import type { ComponentType } from 'react';
-
+import * as React from 'react';
+import { ComponentType } from 'react';
+import { connect } from 'react-redux';
+import { AppState } from 'store';
 import {
   selectDebugStatus,
   selectPerfDataAPIUrl,
 } from 'store/perfdata/selectors';
-import type { AppState } from 'store';
 
-type ReduxProps = {
+interface ReduxProps {
   debugStatus: boolean,
   apiURL: string,
 };

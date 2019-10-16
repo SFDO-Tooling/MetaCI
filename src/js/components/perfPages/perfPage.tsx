@@ -1,26 +1,18 @@
-// @flow
-
-import React, { useEffect } from 'react';
-import type { ComponentType } from 'react';
+import { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
+import ErrorBoundary from 'components/error';
 import get from 'lodash/get';
+import React, { useEffect } from 'react';
+import { ComponentType } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import type { Match, RouterHistory } from 'react-router-dom';
-
-import DebugIcon from './debugIcon';
-import PerfTableOptionsUI from './perfTableOptionsUI';
-import PerfDataTable from './perfDataTable';
-import { QueryParamHelpers, addIds } from './perfTableUtils';
-
-import ErrorBoundary from 'components/error';
-import type { AppState } from 'store';
-import type {
-  PerfDataState,
-  PerfData_UI_State,
+import { RouteComponentProps } from 'react-router-dom';
+import { AppState } from 'store';
+import { perfREST_UI_Fetch,perfRESTFetch } from 'store/perfdata/actions';
+import {
   LoadingStatus,
+  PerfData_UI_State,
+  PerfDataState,
 } from 'store/perfdata/reducer';
-import { perfRESTFetch, perfREST_UI_Fetch } from 'store/perfdata/actions';
-import type { TestMethodPerfUI } from 'api/testmethod_perf_UI_JSON_schema';
 import {
   selectPerfState,
   selectPerfUIState,
@@ -28,23 +20,26 @@ import {
   selectTestMethodPerfUI,
 } from 'store/perfdata/selectors';
 
+import DebugIcon from './debugIcon';
+import PerfDataTable from './perfDataTable';
+import PerfTableOptionsUI from './perfTableOptionsUI';
+import { addIds,QueryParamHelpers } from './perfTableUtils';
+
 export type ServerDataFetcher = (params?: {
-  [string]: string | string[] | null | typeof undefined,
+  [Key: string]: string | string[] | null | typeof undefined;
 }) => void;
 
-type ReduxProps = {|
-  perfState: PerfDataState,
-  perfUIState: PerfData_UI_State,
-  perfUIStatus: LoadingStatus,
-  testMethodPerfUI: TestMethodPerfUI,
-  doPerfRESTFetch: ({}) => null,
-  doPerfREST_UI_Fetch: typeof perfREST_UI_Fetch,
+type ReduxProps = {
+  perfState: PerfDataState;
+  perfUIState: PerfData_UI_State;
+  perfUIStatus: LoadingStatus;
+  testMethodPerfUI: TestMethodPerfUI;
+  doPerfRESTFetch: (arg0: {}) => null;
+  doPerfREST_UI_Fetch: typeof perfREST_UI_Fetch;
   // eslint-disable-next-line no-use-before-define
-|} & typeof actions;
+} & typeof actions;
 
-export type RouterProps = {| match: Match, history: RouterHistory |};
-
-type SelfProps = { default_columns: string[] };
+interface SelfProps { default_columns: string[] }
 
 export const UnwrappedPerfPage = ({
   doPerfRESTFetch,
@@ -53,7 +48,7 @@ export const UnwrappedPerfPage = ({
   perfUIState,
   testMethodPerfUI,
   perfUIStatus,
-}: ReduxProps & RouterProps & SelfProps) => {
+}: ReduxProps & RouteComponentProps & SelfProps) => {
   const uiAvailable = perfUIStatus === 'AVAILABLE';
   const queryparams = new QueryParamHelpers(
     get(testMethodPerfUI, 'defaults', {}),
@@ -88,7 +83,7 @@ export const UnwrappedPerfPage = ({
     }
   }, [uiAvailable]);
 
-  let results;
+  let results: {}[];
   if (
     perfState &&
     perfState.perfdata &&
@@ -103,7 +98,11 @@ export const UnwrappedPerfPage = ({
     // its okay to pass null or undefined because query-string has reasonable
     // and useful interpretations of both of them.
     const page = (params && params.page) || 1;
-    queryparams.set({ ...queryparams.getAll(), ...params, page });
+    queryparams.set({
+      ...queryparams.getAll(),
+      ...params,
+      page: page.toString(),
+    });
     doPerfRESTFetch(queryparams.getAll());
   };
 

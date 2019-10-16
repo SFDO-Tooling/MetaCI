@@ -1,12 +1,11 @@
-// @flow
-import React, { useState } from 'react';
-import Datepicker from '@salesforce/design-system-react/components/date-picker';
 import Button from '@salesforce/design-system-react/components/button';
+import Datepicker from '@salesforce/design-system-react/components/date-picker';
+import React, { useState } from 'react';
 
-type SLDSDateOption = {
-  formattedDate: string,
-  date: Date,
-};
+interface SLDSDateOption {
+  formattedDate: string;
+  date: Date;
+}
 
 const DateRangePicker = ({
   onChange,
@@ -19,9 +18,9 @@ const DateRangePicker = ({
   endName: string,
   startValue?: string | null,
   endValue?: string | null,
-  onChange: (string, string | typeof undefined) => void,
+  onChange: (arg0: string, arg1: string | typeof undefined) => void,
 }) => {
-  const localOnChange = (name, data: SLDSDateOption) => {
+  const localOnChange = (name: string, data: SLDSDateOption) => {
     if (data.formattedDate === '') {
       onChange(name, undefined);
     } else if (data.date.getFullYear() > 2015) {
@@ -52,7 +51,7 @@ const DateRangePicker = ({
       <Datepicker
         key={`start${startDateKey}`}
         value={startValueOrNull}
-        onChange={(_event: mixed, data) => {
+        onChange={(_event: unknown, data: any) => {
           localOnChange(startName, data);
         }}
       />
@@ -69,7 +68,7 @@ const DateRangePicker = ({
       <Datepicker
         key={`end${endDateKey}`}
         value={endValueOrNull}
-        onChange={(_event: mixed, data) => {
+        onChange={(_event: unknown, data: any) => {
           localOnChange(endName, data);
         }}
       />

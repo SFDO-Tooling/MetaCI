@@ -26,7 +26,7 @@ module.exports = {
       cacheGroups: {
         vendor: {
           name: 'vendors',
-          test: /[\\/]node_modules[\\/]/,
+          test: /[\\/]node_modules[\\/](?!raven-js)/,
           chunks: 'all',
         },
         styles: {

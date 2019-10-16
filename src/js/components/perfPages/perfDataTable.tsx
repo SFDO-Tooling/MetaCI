@@ -1,24 +1,22 @@
-// @flow
-import * as React from 'react';
+import DataTable from '@salesforce/design-system-react/components/data-table';
+import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
+import Spinner from '@salesforce/design-system-react/components/spinner';
+import i18n from 'i18next';
 import get from 'lodash/get';
 import zip from 'lodash/zip';
 import queryString from 'query-string';
-import i18n from 'i18next';
-import Spinner from '@salesforce/design-system-react/components/spinner';
-import DataTable from '@salesforce/design-system-react/components/data-table';
-import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
+import * as React from 'react';
+import { LoadingStatus, PerfDataState } from 'store/perfdata/reducer';
 
+import { ServerDataFetcher } from './perfPage';
 import { QueryParamHelpers } from './perfTableUtils';
-import type { ServerDataFetcher } from './perfPage';
 
-import type { PerfDataState, LoadingStatus } from 'store/perfdata/reducer';
-
-type Props = {|
-  fetchServerData: ServerDataFetcher,
-  queryparams: QueryParamHelpers,
-  perfState: PerfDataState,
-  items: {}[],
-|};
+interface Props {
+  fetchServerData: ServerDataFetcher;
+  queryparams: QueryParamHelpers;
+  perfState: PerfDataState;
+  items: {}[];
+}
 
 const PerfDataTable = ({
   fetchServerData,
@@ -50,11 +48,11 @@ const PerfDataTable = ({
     }
   };
 
-  const page = parseInt(queryparams.get('page') || '1', 10) - 1;
+  const page = parseInt(String(queryparams.get('page') || '1'), 10) - 1;
   const custom_page_size = queryparams.get('page_size');
   const count = get(perfState, 'perfdata.count') || -1;
   const page_size = custom_page_size // flowlint-line sketchy-null-number:off
-    ? parseInt(custom_page_size, 10)
+    ? parseInt(String(custom_page_size), 10)
     : get(perfState, 'perfdata.results.length') || null;
   const previousPage: string = get(perfState, 'perfdata.previous') || '';
   const nextPage: string = get(perfState, 'perfdata.next') || '';
@@ -95,10 +93,10 @@ const PerfDataTable = ({
     </div>
   );
 
-  const columns = () => {
+  const columns = (): [string, string][] => {
     if (items.length > 0) {
       const columnIds = Object.keys(items[0]).filter(item => item !== 'id');
-      const columnPairs = columnIds.map(id => [id, id]);
+      const columnPairs: [string, string][] = columnIds.map(id => [id, id]);
       return columnPairs;
     }
     // these are really just for looks. If there are no items, they
@@ -111,8 +109,8 @@ const PerfDataTable = ({
   };
 
   const perfDataColumns = () =>
-    columns().map(([name, label]) => {
-      let isSorted: boolean = false;
+    columns().map(([name, label]: [string, string]) => {
+      let isSorted = false;
       let sortDirection: string | null = null;
 
       if (queryparams.get('o') === name) {
@@ -144,10 +142,11 @@ const PerfDataTable = ({
     }
     fetchServerData({ o: sortProperty, page: '1' });
   };
+  const perfStatus = perfState ? perfState.status : 'LOADING';
   return (
     <div key="perfContainerDiv">
       <div style={{ position: 'relative' }}>
-        <PerfDataTableSpinner status={perfState && perfState.status} />
+        <PerfDataTableSpinner status={perfStatus} />
         <DataTable
           items={items}
           fixedLayout={true}
@@ -162,7 +161,7 @@ const PerfDataTable = ({
   );
 };
 
-type SpinnerProps = {
+interface SpinnerProps {
   status: LoadingStatus,
 };
 

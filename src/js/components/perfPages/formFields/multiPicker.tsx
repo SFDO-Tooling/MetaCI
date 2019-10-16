@@ -1,17 +1,16 @@
-// @flow
-import * as React from 'react';
 import Combobox from '@salesforce/design-system-react/components/combobox';
+import * as React from 'react';
 
-type Props = {
-  onChange: (string[]) => void,
-  choices: [string, string][],
-  defaultValue?: string[] | null,
-};
+interface Props {
+  onChange: (data: string[]) => void;
+  choices: [string, string][];
+  defaultValue?: string[] | null;
+}
 
-type SLDSChoiceOption = {
-  id: string,
-  label: string,
-};
+interface SLDSChoiceOption {
+  id: string;
+  label: string;
+}
 
 type Options = SLDSChoiceOption[];
 
@@ -29,10 +28,10 @@ const MultiPicker = ({ onChange, choices, defaultValue }: Props) => {
       id="combobox-readonly-multiple"
       events={{
         onRequestRemoveSelectedOption: (
-          _event: mixed,
+          _event: unknown,
           data: { selection: Options },
         ) => onUpdate(data.selection),
-        onSelect: (_event: mixed, data: { selection: Options }) =>
+        onSelect: (_event: unknown, data: { selection: Options }) =>
           onUpdate(data.selection),
       }}
       labels={{
@@ -47,12 +46,11 @@ const MultiPicker = ({ onChange, choices, defaultValue }: Props) => {
   );
 };
 
-const getSelectionListFromDefaultValue = (options, defaultValue) => {
+const getSelectionListFromDefaultValue = (options: any[], defaultValue) => {
   if (defaultValue !== null && defaultValue !== undefined) {
-    // this is for flow's benefit
-    const indexOf = defaultValue.indexOf.bind(defaultValue);
-
-    const included_options = options.filter(option => indexOf(option.id) >= 0);
+    const included_options = options.filter(
+      option => defaultValue.indexOf(option.id) >= 0,
+    );
     return included_options;
   }
   return undefined;

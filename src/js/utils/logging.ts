@@ -1,5 +1,4 @@
 
-
 export const logError = (message: string | Error | Response, data: {
   [Key: string]: unknown;
 } = {}) => {

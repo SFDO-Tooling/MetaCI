@@ -1,15 +1,14 @@
-// @flow
-import React, { useState } from 'react';
-import debounce from 'lodash/debounce';
 import Input from '@salesforce/design-system-react/components/input';
 import Tooltip from '@salesforce/design-system-react/components/tooltip';
+import debounce from 'lodash/debounce';
+import React, { useState } from 'react';
 
-type Props = {
-  label?: string | null,
-  defaultValue?: string | null,
-  onValueUpdate: string => void,
-  tooltip?: string | null,
-};
+interface Props {
+  label?: string | null;
+  defaultValue?: string | null;
+  onValueUpdate: (arg0: string) => void;
+  tooltip?: string | null;
+}
 
 const TextInput = ({ label, defaultValue, onValueUpdate, tooltip }: Props) => {
   // debounce to reduce redraws while typing

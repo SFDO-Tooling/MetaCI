@@ -1,5 +1,3 @@
-
-
 import { AppState } from "store";
 import { PerfDataState, PerfData_UI_State, LoadingStatus } from "store/perfdata/reducer";
 import { TestMethodPerfUI, FilterDefinition } from "api/testmethod_perf_UI_JSON_schema";

@@ -1,23 +1,22 @@
-// @flow
-
 import cookies from 'js-cookie';
 
 import { logError } from 'utils/logging';
 
-export type UrlParams = { [string]: string | number | boolean };
+export type UrlParams = {
+  [key: string]: string | number | boolean;
+};
 
 // these HTTP methods do not require CSRF protection
-const csrfSafeMethod = method => /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+const csrfSafeMethod = (method: string) =>
+  /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
 
-const getResponse = (resp, errorStatus) =>
+const getResponse = (resp: Response, errorStatus): Promise<any> =>
   resp
     .text()
-    .then(text => {
+    .then((text: string) => {
       try {
         text = JSON.parse(text);
-      } catch (err) {
-        // swallow error
-      }
+      } catch (err) {} // swallow error
       // flowlint-next-line sketchy-null-number:off
       if (errorStatus) {
         return { error: errorStatus, reason: text };
@@ -32,7 +31,12 @@ const getResponse = (resp, errorStatus) =>
       },
     );
 
-const getApiFetch = () => (url: string, opts: { [string]: mixed } = {}) => {
+const getApiFetch = () => (
+  url: string,
+  opts: {
+    [key: string]: any;
+  } = {},
+) => {
   const options = Object.assign({}, { headers: {} }, opts);
   const method = options.method || 'GET';
   if (!csrfSafeMethod(method)) {
@@ -43,13 +47,15 @@ const getApiFetch = () => (url: string, opts: { [string]: mixed } = {}) => {
     .then(
       response => {
         if (response.ok) {
-          return getResponse(response);
+          return getResponse(response, null);
         }
         if (response.status >= 400 && response.status) {
           logError(response);
           return getResponse(response, response.status);
         }
-        const error = (new Error(response.statusText): { [string]: mixed });
+        const error = new Error(response.statusText) as {
+          [key: string]: any;
+        };
         error.response = response;
         throw error;
       },

@@ -1,24 +1,21 @@
-// @flow
-
-import React, { useState } from 'react';
-import type { Node } from 'react';
 import Combobox from '@salesforce/design-system-react/components/combobox';
-import Icon from '@salesforce/design-system-react/components/icon';
 import comboboxFilterAndLimit from '@salesforce/design-system-react/components/combobox/filter';
+import Icon from '@salesforce/design-system-react/components/icon';
+import React, { useState } from 'react';
 
-type Props = {
-  choices: { id: string }[],
-  field_name: string,
-  currentValue?: string | null,
-  onSelect: mixed => void,
-};
+interface Props {
+  choices: { id: string }[];
+  field_name: string;
+  currentValue?: string | null;
+  onSelect: (id: string) => void;
+}
 
 const FilterPicker = ({
   choices,
   field_name,
   currentValue,
   onSelect,
-}: Props): Node => {
+}: Props): JSX.Element => {
   const selected = currentValue
     ? choices.filter(choice => choice.id === currentValue)
     : [];
@@ -31,28 +28,12 @@ const FilterPicker = ({
         onChange: (_event, { value }) => {
           setInputValue(value);
         },
-        onRequestRemoveSelectedOption: (_event, data) => {
+        onRequestRemoveSelectedOption: (_event: any, data: any) => {
           setInputValue('');
           setSelection(data.selection);
-          onSelect();
+          onSelect('');
         },
-        onSubmit: (_event, { value }) => {
-          setInputValue('');
-          setSelection([
-            ...selection,
-            {
-              label: value,
-              icon: (
-                <Icon
-                  assistiveText={{ label: 'Account' }}
-                  category="standard"
-                  name="account"
-                />
-              ),
-            },
-          ]);
-        },
-        onSelect: (_event, data) => {
+        onSelect: (_event: any, data: any) => {
           if (onSelect && data) {
             onSelect(data.selection[0].id);
           }

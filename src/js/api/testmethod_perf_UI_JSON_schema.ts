@@ -1,6 +1,4 @@
-// @flow
-
-import is, { type AssertionType } from 'sarcastic';
+import is, { AssertionType } from 'sarcastic';
 
 const filterDefCommon = {
   name: is.string,
@@ -41,8 +39,8 @@ export type UIData = AssertionType<typeof UIDataShape>;
 export type FilterDefinition = AssertionType<typeof FilterDefinitionShape>;
 export type TestMethodPerfUI = AssertionType<typeof TestMethodPerfUIShape>;
 export type NumberFilterDefinition = AssertionType<
-  typeof NumberFilterDefinitionShape,
+  typeof NumberFilterDefinitionShape
 >;
 
-export const assertUIData = (data: mixed, context?: string): UIData =>
+export const assertUIData = (data: unknown, context?: string): UIData =>
   is(data, UIDataShape, context || 'UIData from server: ');
