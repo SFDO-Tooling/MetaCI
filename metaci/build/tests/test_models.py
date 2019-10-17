@@ -1,3 +1,5 @@
+import os
+from unittest import mock
 from unittest.mock import Mock
 
 import pytest
@@ -95,6 +97,16 @@ class TestBuild:
         build.delete_org(org_config)
         org.delete_org.assert_not_called()
         detach_logger(build)
+
+    @mock.patch.dict(os.environ, clear=True)
+    def test_no_worker_id(self):
+        build = BuildFactory()
+        assert not build.worker_id
+
+    @mock.patch.dict(os.environ, {"DYNO": "faker.1"})
+    def test_dyno_worker_id(self):
+        build = BuildFactory()
+        assert build.worker_id == "faker.1"
 
 
 def detach_logger(model):
