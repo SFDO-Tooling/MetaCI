@@ -80,14 +80,14 @@ export const UnwrappedPerfPage = ({
     const repo = pathParts[pathParts.length - 2];
     queryparams.set({ repo });
     doPerfREST_UI_Fetch({ repo });
-  }, [doPerfREST_UI_Fetch, queryparams]);
+  }, []);
 
   // Fetch the real data
   useEffect(() => {
     if (uiAvailable) {
       doPerfRESTFetch({ ...queryparams.getAll() });
     }
-  }, [doPerfRESTFetch, queryparams, uiAvailable]);
+  }, [uiAvailable]);
 
   let results: {}[];
   if (
