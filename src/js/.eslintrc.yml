@@ -1,11 +1,33 @@
 # http://eslint.org/docs/rules/
+# copied from https://raw.githubusercontent.com/SFDO-Tooling/MetaShare/master/src/js/.eslintrc.yml
 
+parser: '@typescript-eslint/parser'
 parserOptions:
+  sourceType: module
   ecmaFeatures:
     impliedStrict: true
     jsx: true
-  sourceType: module
+  project: ./tsconfig.json
 env:
   browser: true
   commonjs: true
   node: false
+plugins:
+  - simple-import-sort
+  - '@typescript-eslint'
+extends:
+  - plugin:@typescript-eslint/eslint-recommended
+  - plugin:@typescript-eslint/recommended
+  - prettier/@typescript-eslint
+rules:
+  # TypeScript
+  '@typescript-eslint/no-explicit-any': 0
+  '@typescript-eslint/explicit-function-return-type': 0
+  '@typescript-eslint/camelcase': 0  # may want to tighten this sometime.
+  '@typescript-eslint/prefer-interface': 1
+  '@typescript-eslint/explicit-member-accessibility': 1
+  '@typescript-eslint/no-use-before-define': 1
+
+  # Import
+  simple-import-sort/sort: 1
+  import/order: 0

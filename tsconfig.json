@@ -2,11 +2,11 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "strict": true,
+    // "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    // "noImplicitAny": true,
+    // "strictNullChecks": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -17,7 +17,7 @@
     "sourceMap": true,
     "noEmit": true,
     "isolatedModules": true,
-    "baseUrl": ".",
+    "baseUrl": "src/js",
     "paths": {
       "*": ["*", "src/*"],
       "@/*": ["src/js/*"],
