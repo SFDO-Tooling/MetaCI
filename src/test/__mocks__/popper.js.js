@@ -1,3 +1,4 @@
+/* eslint-disable */
 import PopperJs from 'popper.js';
 
 export default class Popper {

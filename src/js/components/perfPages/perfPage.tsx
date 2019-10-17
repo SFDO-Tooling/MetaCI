@@ -27,6 +27,12 @@ export type ServerDataFetcher = (params?: {
   [Key: string]: string | string[] | null | typeof undefined;
 }) => void;
 
+const actions = {
+  doPerfRESTFetch: (queryparts: {}) =>
+    perfRESTFetch('/api/testmethod_perf?', queryparts),
+  doPerfREST_UI_Fetch: perfREST_UI_Fetch,
+};
+
 type ReduxProps = {
   perfState: PerfDataState;
   perfUIState: PerfData_UI_State;
@@ -135,12 +141,6 @@ const select = (appState: AppState) => ({
   perfUIStatus: selectPerfUIStatus(appState),
   perfUIState: selectPerfUIState(appState),
 });
-
-const actions = {
-  doPerfRESTFetch: (queryparts: {}) =>
-    perfRESTFetch('/api/testmethod_perf?', queryparts),
-  doPerfREST_UI_Fetch: perfREST_UI_Fetch,
-};
 
 const WrappedPerfPage: ComponentType<{}> = withRouter(
   connect(

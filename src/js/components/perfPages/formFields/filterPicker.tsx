@@ -1,6 +1,5 @@
 import Combobox from '@salesforce/design-system-react/components/combobox';
 import comboboxFilterAndLimit from '@salesforce/design-system-react/components/combobox/filter';
-import Icon from '@salesforce/design-system-react/components/icon';
 import React, { useState } from 'react';
 
 interface Props {

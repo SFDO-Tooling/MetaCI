@@ -1,6 +1,5 @@
 import Icon from '@salesforce/design-system-react/components/icon';
-import * as React from 'react';
-import { ComponentType } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { AppState } from 'store';
 import {
@@ -31,7 +30,7 @@ const select = (appState: AppState) => ({
   apiURL: selectPerfDataAPIUrl(appState),
 });
 
-const DebugIcon: ComponentType<{}> = connect(
+const DebugIcon: React.ComponentType<{}> = connect(
   select,
   null,
 )(UnwrappedDebugIcon);

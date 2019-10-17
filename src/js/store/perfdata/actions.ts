@@ -45,6 +45,40 @@ export type UIDataAction =
 
 type ReduxDispatch = ThunkDispatch<{}, {}, AnyAction>;
 
+export const perfREST_API = ({
+  dispatch,
+  apiFetch,
+  prefix,
+  url,
+  checkValid,
+}: {
+  dispatch: ReduxDispatch;
+  apiFetch: UntypedFunc;
+  prefix: string;
+  url: string;
+  checkValid: UntypedFunc;
+}) => {
+  dispatch({ type: `${prefix}_DATA_LOADING`, payload: { url } });
+  return apiFetch(url, { method: 'GET' }).then((payload: any) => {
+    try {
+      if (!payload) {
+        throw new Error('No payload');
+      }
+      if (payload.error) {
+        throw new Error(`Server error: ${payload.error}`);
+      }
+      const checkedPayload = checkValid(payload);
+      return dispatch({
+        type: `${prefix}_DATA_AVAILABLE`,
+        payload: checkedPayload,
+      });
+    } catch (e) {
+      dispatch({ type: `${prefix}_DATA_ERROR`, e });
+      throw e;
+    }
+  });
+};
+
 /* eslint-disable no-use-before-define */
 
 export const perfRESTFetch = (url: string, params?: {}) => (
@@ -84,37 +118,3 @@ export const perfREST_UI_Fetch = (params?: {}) => (
 
 // flowlint-next-line unclear-type:off
 type UntypedFunc = Function; // the types would be quite complex.
-
-export const perfREST_API = ({
-  dispatch,
-  apiFetch,
-  prefix,
-  url,
-  checkValid,
-}: {
-  dispatch: ReduxDispatch;
-  apiFetch: UntypedFunc;
-  prefix: string;
-  url: string;
-  checkValid: UntypedFunc;
-}) => {
-  dispatch({ type: `${prefix}_DATA_LOADING`, payload: { url } });
-  return apiFetch(url, { method: 'GET' }).then((payload: any) => {
-    try {
-      if (!payload) {
-        throw new Error('No payload');
-      }
-      if (payload.error) {
-        throw new Error(`Server error: ${payload.error}`);
-      }
-      const checkedPayload = checkValid(payload);
-      return dispatch({
-        type: `${prefix}_DATA_AVAILABLE`,
-        payload: checkedPayload,
-      });
-    } catch (e) {
-      dispatch({ type: `${prefix}_DATA_ERROR`, e });
-      throw e;
-    }
-  });
-};

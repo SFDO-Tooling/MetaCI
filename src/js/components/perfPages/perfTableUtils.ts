@@ -5,22 +5,25 @@ import is from 'sarcastic';
 // it is designed to have default parameters as state. Also, its fairly
 // strongly typed.
 export class QueryParamHelpers {
-  default_params: {
+  private default_params: {
     [Key: string]: unknown;
   };
 
-  constructor(default_params: { [Key: string]: unknown }) {
+  public constructor(default_params: { [Key: string]: unknown }) {
     this.default_params = default_params;
     this.get = this.get.bind(this); // Javascript grossness!
   }
 
   // get a single value
-  get = (name: string): string | null => {
+  public get = (name: string): string | null => {
     const value = this.getAll()[name];
-    const value_checked = is(value, is.maybe(is.either(is.string, is.number)));
     try {
+      const value_checked = is(
+        value,
+        is.maybe(is.either(is.string, is.number)),
+      );
       // if the value is not null, convert to a string
-      return value && value.toString();
+      return value_checked && value_checked.toString();
     } catch (exception) {
       // eslint-disable-next-line no-console
       console.log('UNKNOWN TYPE', name, value, exception);
@@ -29,7 +32,7 @@ export class QueryParamHelpers {
   };
 
   // get a list of strings
-  getList = (name: string): string[] | typeof undefined => {
+  public getList = (name: string): string[] | typeof undefined => {
     const rc = this.getAll()[name];
     if (Array.isArray(rc)) {
       return rc;
@@ -40,7 +43,7 @@ export class QueryParamHelpers {
   };
 
   // get everything including default values in one object
-  getAll = (): {
+  public getAll = (): {
     [Key: string]: unknown;
   } => ({
     ...this.default_params,
@@ -48,7 +51,7 @@ export class QueryParamHelpers {
   });
 
   // set a value. Does not merge list-like values. It overwrites them.
-  set = (newQueryParts: {
+  public set = (newQueryParts: {
     [Key: string]: string | string[] | null | typeof undefined;
   }) => {
     const qs = queryString.stringify({ ...this.getAll(), ...newQueryParts });

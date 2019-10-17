@@ -14,6 +14,16 @@ interface SLDSChoiceOption {
 
 type Options = SLDSChoiceOption[];
 
+const getSelectionListFromDefaultValue = (options: any[], defaultValue) => {
+  if (defaultValue !== null && defaultValue !== undefined) {
+    const included_options = options.filter(
+      (option) => defaultValue.indexOf(option.id) >= 0,
+    );
+    return included_options;
+  }
+  return undefined;
+};
+
 const MultiPicker = ({ onChange, choices, defaultValue }: Props) => {
   console.assert(choices && choices.length, 'Choices is empty', choices); // eslint-disable-line no-console
   const options = choices.map((pair) => ({ id: pair[0], label: pair[1] }));
@@ -44,16 +54,6 @@ const MultiPicker = ({ onChange, choices, defaultValue }: Props) => {
       variant="readonly"
     />
   );
-};
-
-const getSelectionListFromDefaultValue = (options: any[], defaultValue) => {
-  if (defaultValue !== null && defaultValue !== undefined) {
-    const included_options = options.filter(
-      (option) => defaultValue.indexOf(option.id) >= 0,
-    );
-    return included_options;
-  }
-  return undefined;
 };
 
 export default MultiPicker;

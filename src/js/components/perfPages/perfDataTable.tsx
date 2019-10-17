@@ -60,7 +60,8 @@ const PerfDataTable = ({
   /* https://appexchange.salesforce.com/listingDetail?listingId=a0N3A00000E9TBZUA3 */
   const PerfDataTableFooter = () => (
     <div className="slds-card__footer slds-grid">
-      {items.length > 0 && perfState && Boolean(perfState.perfdata) && (
+      {/* eslint-disable-next-line react/prop-types */
+      items.length > 0 && perfState && Boolean(perfState.perfdata) && (
         <>
           <div
             className="slds-col slds-size--1-of-2"

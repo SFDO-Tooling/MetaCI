@@ -2,7 +2,7 @@ import {
   FilterDefinition,
   NumberFilterDefinitionShape,
 } from 'api/testmethod_perf_UI_JSON_schema';
-import React, { ReactElement, ReactNode } from 'react';
+import React from 'react';
 import is from 'sarcastic';
 
 import FilterPicker from './filterPicker';
@@ -25,19 +25,20 @@ const ChoiceField = (
     filter.choices,
     is.arrayOf(is.arrayOf(is.string)),
   );
-  const choices_as_objs = choices.map((pair) => ({
+  const choicesAsObjs = choices.map((pair) => ({
     id: pair[0],
     label: pair[1],
   }));
   return {
     name: filter.name,
-    choices: choices_as_objs,
+    choices: choicesAsObjs,
     currentValue,
+    // eslint-disable-next-line react/display-name
     render: () => (
       <FilterPicker
         key={filter.name}
         field_name={filter.name}
-        choices={choices_as_objs}
+        choices={choicesAsObjs}
         currentValue={currentValue}
         onSelect={fetchServerData}
       />
@@ -52,6 +53,7 @@ const CharField = (
 ): Field => ({
   name: filter.name,
   currentValue,
+  // eslint-disable-next-line react/display-name
   render: () => (
     <TextInput
       defaultValue={currentValue}
@@ -70,6 +72,8 @@ const DecimalField = (
   filter = is(filter, NumberFilterDefinitionShape);
   // const minValue: number | null | typeof undefined = filter.min;
   // const maxValue: number | null | typeof undefined = filter.max;
+  // linter bug?
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let step: number | null | typeof undefined = parseInt(filter.step, 10);
   step = isNaN(step) ? 1 : step;
 
@@ -77,6 +81,7 @@ const DecimalField = (
   return {
     name: filter.name,
     currentValue,
+    // eslint-disable-next-line react/display-name
     render: () => (
       <TextInput
         defaultValue={currentValue}
@@ -125,7 +130,7 @@ export const createField = (
 const spacerField = {
   name: 'Blank "field" to space things out',
   currentValue: '',
-  render: () => <span />,
+  render: () => <span />, // eslint-disable-line react/display-name
 };
 
 export const AllFilters = ({ filters }: { filters: Field[] }) => {

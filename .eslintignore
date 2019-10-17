@@ -20,3 +20,4 @@ node_modules/
 requirements/
 staticfiles/
 venv/
+src/test/__mocks__/
