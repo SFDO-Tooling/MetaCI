@@ -1,8 +1,8 @@
-import { FilterDefinition , NumberFilterDefinitionShape } from 'api/testmethod_perf_UI_JSON_schema';
-
-import { ReactElement, ReactNode } from 'react';
-import React from 'react';
-
+import {
+  FilterDefinition,
+  NumberFilterDefinitionShape,
+} from 'api/testmethod_perf_UI_JSON_schema';
+import React, { ReactElement, ReactNode } from 'react';
 import is from 'sarcastic';
 
 import FilterPicker from './filterPicker';
