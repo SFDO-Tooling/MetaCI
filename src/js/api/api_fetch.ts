@@ -15,7 +15,9 @@ const getResponse = (resp: Response, errorStatus): Promise<any> =>
     .then((text: string) => {
       try {
         text = JSON.parse(text);
-      } catch (err) {} // swallow error
+      } catch (err) {
+        errorStatus = errorStatus || String(err);
+      } // swallow error
       // flowlint-next-line sketchy-null-number:off
       if (errorStatus) {
         return { error: errorStatus, reason: text };
