@@ -71,23 +71,27 @@ export const UnwrappedPerfPage = ({
     throw new Error(message);
   }
 
+  // for effects that only run once.
+  const useMount = (f) => useEffect(f, []);
+
   // Fetch the UI data
-  useEffect(() => {
+  useMount(() => {
     /* Special case for getting repo name from URL
      * path into query params with other filters
      */
     const pathParts = window.location.pathname.split('/');
     const repo = pathParts[pathParts.length - 2];
-    queryparams.set({ repo });
+    const urlparams = new QueryParamHelpers({}); // no defaults yet
+    urlparams.set({ repo });
     doPerfREST_UI_Fetch({ repo });
-  }, []);
+  });
 
   // Fetch the real data
   useEffect(() => {
     if (uiAvailable) {
       doPerfRESTFetch({ ...queryparams.getAll() });
     }
-  }, [uiAvailable]);
+  }, [uiAvailable, doPerfRESTFetch, queryparams]);
 
   let results: {}[];
   if (
