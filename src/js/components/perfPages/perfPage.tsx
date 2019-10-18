@@ -89,9 +89,9 @@ export const UnwrappedPerfPage = ({
   // Fetch the real data
   useEffect(() => {
     if (uiAvailable) {
-        const urlparams = new QueryParamHelpers(
-          get(testMethodPerfUI, 'defaults', {}),
-        );
+      const urlparams = new QueryParamHelpers(
+        get(testMethodPerfUI, 'defaults', {}),
+      );
       doPerfRESTFetch({ ...urlparams.getAll() });
     }
   }, [uiAvailable, doPerfRESTFetch, testMethodPerfUI]);
