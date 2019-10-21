@@ -255,7 +255,8 @@ if HIREFIRE_TOKEN:
 
 HEROKU_TOKEN = env("HEROKU_TOKEN", default=None)
 HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
-if HEROKU_TOKEN and HEROKU_APP_NAME:
+WORKER_DYNO_NAME = env("WORKER_DYNO_NAME", default="worker")
+if HEROKU_TOKEN and HEROKU_APP_NAME and WORKER_DYNO_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
 
 # Custom Admin URL, use {% url 'admin:index' %}
