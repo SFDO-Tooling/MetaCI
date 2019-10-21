@@ -151,7 +151,7 @@
   "lint-staged": {
     "*.js": [
       "prettier --write",
-      "eslint",
+      "eslint '*.js' src/js src/test --ext .js,.ts,.jsx,.tsx --fix",
       "git add"
     ],
     "*.scss": [

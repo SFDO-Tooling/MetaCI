@@ -10,9 +10,9 @@ beforeAll(() => {
     salesforce_custom_login: () => '/accounts/salesforce-custom/login/',
     product_list: () => '/api/products/',
     version_list: () => '/api/versions/',
-    plan_preflight: id => `/api/plans/${id}/preflight/`,
+    plan_preflight: (id) => `/api/plans/${id}/preflight/`,
     job_list: () => '/api/jobs/',
-    job_detail: id => `/api/jobs/${id}/`,
+    job_detail: (id) => `/api/jobs/${id}/`,
     org_list: () => '/api/org/',
     user: () => '/api/user/',
   };

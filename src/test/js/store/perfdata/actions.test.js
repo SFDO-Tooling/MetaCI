@@ -19,7 +19,7 @@ describe('perfRESTFetch', () => {
     );
     expect.assertions(1);
     return store.dispatch(actions.perfRESTFetch(url)).then(() => {
-      const action_list = store.getActions().map(a => a.type);
+      const action_list = store.getActions().map((a) => a.type);
       expect(action_list).toEqual(['PERF_DATA_LOADING', 'PERF_DATA_AVAILABLE']);
       assertPerfData(store.getActions()[1].payload);
     });
@@ -28,7 +28,7 @@ describe('perfRESTFetch', () => {
     const store = storeWithApi({});
     fetchMock.getOnce(`begin:${actions.testmethod_perfdata_url}`, {});
     expect.assertions(1);
-    return store.dispatch(actions.perfRESTFetch(url)).catch(reason => {
+    return store.dispatch(actions.perfRESTFetch(url)).catch((reason) => {
       expect(reason).toHaveProperty('message');
     });
   });
@@ -37,7 +37,7 @@ describe('perfRESTFetch', () => {
     const store = storeWithApi({});
     fetchMock.getOnce(`begin:${actions.testmethod_perfdata_url}`, 200);
     expect.assertions(1);
-    return store.dispatch(actions.perfRESTFetch(url)).catch(reason => {
+    return store.dispatch(actions.perfRESTFetch(url)).catch((reason) => {
       expect(reason).toHaveProperty('message');
     });
   });
@@ -46,7 +46,7 @@ describe('perfRESTFetch', () => {
     const store = storeWithApi({});
     fetchMock.getOnce(`begin:${actions.testmethod_perfdata_url}`, 500);
     expect.assertions(1);
-    return store.dispatch(actions.perfRESTFetch(url)).catch(reason => {
+    return store.dispatch(actions.perfRESTFetch(url)).catch((reason) => {
       expect(reason).toHaveProperty('message');
     });
   });
@@ -54,7 +54,7 @@ describe('perfRESTFetch', () => {
     const store = storeWithApi({});
     fetchMock.getOnce(`begin:${actions.testmethod_perfdata_url}`, 100);
     expect.assertions(1);
-    return store.dispatch(actions.perfRESTFetch(url)).catch(reason => {
+    return store.dispatch(actions.perfRESTFetch(url)).catch((reason) => {
       expect(reason).toHaveProperty('message');
     });
   });
@@ -64,7 +64,7 @@ describe('perfRESTFetch', () => {
       throw new Error('my error');
     });
     expect.assertions(1);
-    return store.dispatch(actions.perfRESTFetch(url)).catch(reason => {
+    return store.dispatch(actions.perfRESTFetch(url)).catch((reason) => {
       expect(reason).toHaveProperty('message');
     });
   });
@@ -75,7 +75,7 @@ describe('perfRESTFetch', () => {
       error: 'oops',
     });
     expect.assertions(1);
-    return store.dispatch(actions.perfRESTFetch(url)).catch(reason => {
+    return store.dispatch(actions.perfRESTFetch(url)).catch((reason) => {
       expect(reason).toHaveProperty('message');
     });
   });
@@ -90,7 +90,7 @@ describe('perfRESTFetch_UI', () => {
     );
     expect.assertions(1);
     return store.dispatch(actions.perfREST_UI_Fetch()).then(() => {
-      const action_list = store.getActions().map(a => a.type);
+      const action_list = store.getActions().map((a) => a.type);
       expect(action_list).toEqual(['UI_DATA_LOADING', 'UI_DATA_AVAILABLE']);
       assertUIData(store.getActions()[1].payload);
     });
