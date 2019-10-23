@@ -17,6 +17,10 @@ class RobotImporterTestCase(TestCase):
         path = PurePath(__file__).parent / "robot_with_nested_suites.xml"
         robot_importer.import_robot_test_results(buildflow, path)
         assert models.TestResult.objects.all(), "Test results should have been created"
+        assert (
+            str(models.TestResult.objects.first().method.testclass)
+            == "Robot1/Api/Nested/Cumulusci/Base"
+        )
 
     def test_basic_parsing(self):
         buildflow = BuildFlowFactory()
