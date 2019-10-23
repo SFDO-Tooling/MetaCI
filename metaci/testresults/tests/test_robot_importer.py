@@ -29,6 +29,8 @@ class RobotImporterTestCase(TestCase):
         buildflow = BuildFlowFactory()
         path = PurePath(__file__).parent / "robot_with_setup_teardown.xml"
         robot_importer.import_robot_test_results(buildflow, path)
-        # TODO:
-        # res = 14.002
-        # assert models.TestResult.objects.filter(method__name="FakeTestResult2")[0].duration == res
+        res = 14.002
+        assert (
+            models.TestResult.objects.filter(method__name="FakeTestResult2")[0].duration
+            == res
+        )
