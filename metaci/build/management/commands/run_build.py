@@ -17,7 +17,7 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = "Runs a build directly."
+    help = "Runs a build from the command line (on local computer)."
 
     def add_arguments(self, parser):
         parser.add_argument("repo_name", type=str)
