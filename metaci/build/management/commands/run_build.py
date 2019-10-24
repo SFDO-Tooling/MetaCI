@@ -1,13 +1,13 @@
 import os
 
 from django.conf import settings
-from django.contrib.auth import get_user_model, lock_org
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db.models import signals
 
 from metaci.build import handlers
 from metaci.build.models import Build
-from metaci.build.tasks import run_build, scratch_org_limits
+from metaci.build.tasks import lock_org, run_build, scratch_org_limits
 from metaci.cumulusci.models import Org
 from metaci.plan.models import Plan, PlanRepository
 from metaci.repository.models import Branch, Repository
@@ -37,7 +37,7 @@ class Command(BaseCommand):
         **options,
     ):
         repo = Repository.objects.get(name=repo_name)
-        branch = Branch.objects.get(name=branch_name)
+        branch = Branch.objects.get(repo=repo, name=branch_name)
         plan = Plan.objects.get(name=plan_name)
         user = (
             User.objects.filter(username=username_or_email).first()
@@ -59,7 +59,7 @@ class Command(BaseCommand):
         )
         if build.org.scratch:
             assert (
-                scratch_org_limits().remaining < settings.SCRATCH_ORG_RESERVE
+                scratch_org_limits().remaining > settings.SCRATCH_ORG_RESERVE
             ), "Not enough scratch orgs"
         else:
             status = lock_org(build.org, build.pk)
