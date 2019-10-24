@@ -17,7 +17,7 @@ automatically log into the target Salesforce org.</doc>
 </arguments>
 <status status="PASS" starttime="20191023 09:38:43.701" endtime="20191023 09:38:43.701"></status>
 </kw>
-<status status="PASS" starttime="20191023 09:38:43.699" endtime="20191023 09:38:43.701" critical="yes"></status>
+<status status="PASS" starttime="20191023 09:38:43.500" endtime="20191023 09:38:43.75" critical="yes"></status>
 </test>
 <test id="s1-s1-s1-t2" name="Test Login Url">
 <kw name="Login Url" library="cumulusci.robotframework.CumulusCI">

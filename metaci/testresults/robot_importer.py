@@ -1,7 +1,7 @@
 import os
 import re
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from cumulusci.utils import elementtree_parse_file
 from django.core.files.base import ContentFile
@@ -104,17 +104,15 @@ def parse_robot_output(path):
     return get_robot_tests(root, root)
 
 
-def get_robot_tests(root, elem, parents=[]):
+def get_robot_tests(root, elem, parents=()):
     tests = []
-    has_children = False
+    has_children_suites = False
     for child in elem:
         if child.tag == "suite":
-            has_children = True
-            parents.append(child)
-            tests += get_robot_tests(root, child, list(parents))
-            parents = parents[:-1]
+            has_children_suites = True
+            tests += get_robot_tests(root, child, parents + (child,))
 
-    if not has_children:
+    if not has_children_suites:
         suite_file = elem.attrib["source"].replace(os.getcwd(), "")
         setup = elem.find("kw[@type='setup']")
         teardown = elem.find("kw[@type='teardown']")
@@ -128,27 +126,45 @@ def get_robot_tests(root, elem, parents=[]):
             "screenshots": find_screenshots(setup) + find_screenshots(teardown),
         }
         for test in elem.iter("test"):
-            status = test.find("status")
-            test_info = {
-                "suite": suite,
-                "name": test.attrib["name"],
-                "elem": test,
-                "status": "Pass" if status.attrib["status"] == "PASS" else "Fail",
-                "screenshots": [],
-            }
-            start = datetime.strptime(status.attrib["starttime"], "%Y%m%d %H:%M:%S.%f")
-            end = datetime.strptime(status.attrib["endtime"], "%Y%m%d %H:%M:%S.%f")
-            delta = end - start
-
-            # Process screenshots
-            test_info["screenshots"] = find_screenshots(test)
-            test_info["duration"] = float(
-                "{}.{}".format(delta.seconds, delta.microseconds)
-            )
-            test_info["xml"] = render_robot_test_xml(root, test_info)
-            tests.append(test_info)
+            tests.append(parse_test(test, suite, root))
 
     return tests
+
+
+def _parse_robot_time(timestring):
+    return datetime.strptime(timestring, "%Y%m%d %H:%M:%S.%f")
+
+
+def _robot_duration(status_element):
+    start = _parse_robot_time(status_element.attrib["starttime"])
+    end = _parse_robot_time(status_element.attrib["endtime"])
+    return end - start
+
+
+def parse_test(test, suite, root):
+    status = test.find("status")
+    setup = test.find("kw[@type='setup']")
+    teardown = test.find("kw[@type='teardown']")
+    zero = timedelta(seconds=0)
+    setup_time = _robot_duration(setup.find("status")) if setup else zero
+    teardown_time = _robot_duration(teardown.find("status")) if teardown else zero
+
+    test_info = {
+        "suite": suite,
+        "name": test.attrib["name"],
+        "elem": test,
+        "status": "Pass" if status.attrib["status"] == "PASS" else "Fail",
+        "screenshots": [],
+    }
+    delta = _robot_duration(status)
+    duration = delta - (setup_time + teardown_time)
+
+    # Process screenshots
+    test_info["screenshots"] = find_screenshots(test)
+    test_info["duration"] = duration.total_seconds()
+
+    test_info["xml"] = render_robot_test_xml(root, test_info)
+    return test_info
 
 
 def find_screenshots(root):
