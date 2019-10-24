@@ -1,5 +1,6 @@
-from django.utils.crypto import get_random_string
 import itertools
+
+from django.utils.crypto import get_random_string
 
 
 def is_attr_equal(o1, o2, attrs):
@@ -23,3 +24,18 @@ def split_seq(iterable, size):
     while item:
         yield item
         item = list(itertools.islice(it, size))
+
+
+def temp_disconnect_signal(signal, receiver, sender, dispatch_uid=None):
+    """Temporary disconnect a signal"""
+    kwargs = {
+        "receiver": receiver,
+        "sender": sender,
+        "dispatch_uid": dispatch_uid,
+        "weak": False,
+    }
+    signal.disconnect(**kwargs)
+    try:
+        yield
+    finally:
+        signal.connect(**kwargs)
