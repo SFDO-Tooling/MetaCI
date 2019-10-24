@@ -1,4 +1,5 @@
 import itertools
+from contextlib import contextmanager
 
 from django.utils.crypto import get_random_string
 
@@ -26,14 +27,10 @@ def split_seq(iterable, size):
         item = list(itertools.islice(it, size))
 
 
+@contextmanager
 def temp_disconnect_signal(signal, receiver, sender, dispatch_uid=None):
     """Temporary disconnect a signal"""
-    kwargs = {
-        "receiver": receiver,
-        "sender": sender,
-        "dispatch_uid": dispatch_uid,
-        "weak": False,
-    }
+    kwargs = {"receiver": receiver, "sender": sender, "dispatch_uid": dispatch_uid}
     signal.disconnect(**kwargs)
     try:
         yield
