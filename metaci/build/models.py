@@ -36,7 +36,8 @@ from metaci.build.utils import format_log, set_build_info
 from metaci.cumulusci.config import MetaCIGlobalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
-from metaci.testresults.importer import import_robot_test_results, import_test_results
+from metaci.testresults.importer import import_test_results
+from metaci.testresults.robot_importer import import_robot_test_results
 from metaci.utils import generate_hash
 
 BUILD_STATUSES = (

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 3.1.2 (Python 3.7.3 on darwin)" generated="20190805 08:58:20.362" rpa="false">
+<suite id="s1" name="Robot1" source="/Users/pprescod/code/Cumulus/robot/Cumulus/perftests/BDI_Tests_Indirect.robot">
+<test id="s1-t1" name="FakeTestResult">
+<kw name="Run Process" library="Process">
+<doc>Runs a process and waits for it to complete.</doc>
+<arguments>
+<arg>rm</arg>
+<arg>/tmp/stdout.txt</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<msg timestamp="20190805 08:58:20.404" level="INFO">Starting process:
+rm /tmp/stdout.txt</msg>
+<msg timestamp="20190805 08:58:20.420" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20190805 08:58:20.421" level="INFO">Process completed.</msg>
+<msg timestamp="20190805 08:58:20.422" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20190805 08:58:20.404" endtime="20190805 08:58:20.422"></status>
+</kw>
+<kw name="Run Process" library="Process">
+<doc>Runs a process and waits for it to complete.</doc>
+<arguments>
+<arg>cci</arg>
+<arg>task</arg>
+<arg>run</arg>
+<arg>performance_tests_CO</arg>
+<arg>stdout=/tmp/stdout.txt</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<msg timestamp="20190805 08:58:20.424" level="INFO">Starting process:
+cci task run performance_tests_CO</msg>
+<msg timestamp="20190805 08:58:20.443" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20190805 08:59:31.639" level="INFO">Process completed.</msg>
+<msg timestamp="20190805 08:59:31.640" level="INFO">${result} = &lt;result object with rc 1&gt;</msg>
+<status status="PASS" starttime="20190805 08:58:20.423" endtime="20190805 08:59:31.640"></status>
+</kw>
+<status status="PASS" starttime="20190805 08:58:20.001" endtime="20190805 08:59:31.009" critical="yes"></status>
+</test>
+<status status="PASS" starttime="20190805 08:58:20.363" endtime="20190805 08:59:31.642"></status>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0">Critical Tests</stat>
+<stat pass="1" fail="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="1" fail="0" id="s1" name="BDI Tests Indirect">BDI Tests Indirect</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
