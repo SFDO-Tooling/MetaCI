@@ -30,9 +30,9 @@ class Command(BaseCommand):
         self,
         repo_name,
         branch_name,
+        commit,
         plan_name,
         username_or_email,
-        commit,
         *args,
         **options,
     ):
