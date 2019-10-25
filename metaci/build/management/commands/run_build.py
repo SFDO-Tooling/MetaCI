@@ -3,15 +3,12 @@ import os
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from django.db.models import signals
 
-from metaci.build import handlers
 from metaci.build.models import Build
 from metaci.build.tasks import lock_org, run_build, scratch_org_limits
 from metaci.cumulusci.models import Org
 from metaci.plan.models import Plan, PlanRepository
 from metaci.repository.models import Branch, Repository
-from metaci.utils import temp_disconnect_signal
 
 User = get_user_model()
 
@@ -53,7 +50,7 @@ class Command(BaseCommand):
             branch=branch,
             planrepo=planrepo,
             commit=commit,
-            build_type="manual",
+            build_type="manual-command",
             user=user,
             org=Org.objects.get(name=plan.org, repo=repo),
         )
@@ -68,7 +65,4 @@ class Command(BaseCommand):
 
         dyno = os.environ["DYNO"]
         print(f"Running build {build.pk} in {dyno}")
-        with temp_disconnect_signal(
-            signal=signals.post_save, receiver=handlers.queue_build, sender=Build
-        ):
-            run_build(build.pk)
+        run_build(build.pk)
