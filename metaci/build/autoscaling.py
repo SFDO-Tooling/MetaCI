@@ -97,7 +97,8 @@ class HerokuAutoscaler(Autoscaler):
     """Scale using Heroku worker dynos."""
 
     def scale(self):
-        url = f"https://api.heroku.com/apps/{settings.HEROKU_APP_NAME}/formation/worker"
+        worker_type = "worker"
+        url = f"https://api.heroku.com/apps/{settings.HEROKU_APP_NAME}/formation/{worker_type}"
         headers = {
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
@@ -114,7 +115,22 @@ class HerokuAutoscaler(Autoscaler):
             resp = requests.patch(
                 url, json={"quantity": self.target_workers}, headers=headers
             )
+            if resp.json() and resp.json().get("id") == "cannot_update_above_limit":
+                limit = resp.json()["limit"]
+                resp = self.scale_max(url, headers, worker_type, limit)
+
             resp.raise_for_status()
+
+    def scale_max(self, url, headers, worker_type, limit):
+        base_url, _ = url.rsplit("/", 1)
+        dyno_types = requests.get(base_url, headers=headers).json()
+        used_by_others = sum(
+            x["quantity"] for x in dyno_types if x["type"] != worker_type
+        )
+        target_workers = limit - used_by_others
+        assert target_workers >= 0
+
+        return requests.patch(url, json={"quantity": target_workers}, headers=headers)
 
 
 get_autoscaler = import_global(settings.METACI_WORKER_AUTOSCALER)
