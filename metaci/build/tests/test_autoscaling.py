@@ -1,11 +1,14 @@
+import json
 from unittest import mock
 
 import responses
 
-from metaci.build.autoscaling import autoscale
-from metaci.build.autoscaling import Autoscaler
-from metaci.build.autoscaling import HerokuAutoscaler
-from metaci.build.autoscaling import LocalAutoscaler
+from metaci.build.autoscaling import (
+    Autoscaler,
+    HerokuAutoscaler,
+    LocalAutoscaler,
+    autoscale,
+)
 
 
 class TestAutoscaler:
@@ -68,7 +71,10 @@ class TestHerokuAutoscaler:
     @responses.activate
     def test_scale__up(self):
         responses.add(
-            "PATCH", "https://api.heroku.com/apps/testapp/formation/worker", status=200
+            "PATCH",
+            "https://api.heroku.com/apps/testapp/formation/worker",
+            status=200,
+            json={},
         )
 
         autoscaler = HerokuAutoscaler()
@@ -79,10 +85,50 @@ class TestHerokuAutoscaler:
     @responses.activate
     def test_scale__down(self):
         responses.add(
-            "PATCH", "https://api.heroku.com/apps/testapp/formation/worker", status=200
+            "PATCH",
+            "https://api.heroku.com/apps/testapp/formation/worker",
+            status=200,
+            json={},
         )
 
         autoscaler = HerokuAutoscaler()
         autoscaler.active_builds = 0
+        autoscaler.count_workers = mock.Mock(return_value=1)
+        autoscaler.scale()
+
+    @responses.activate
+    def test_scale__overask(self):
+        def request_callback(request):
+            data = json.loads(request.body)
+            if data["quantity"] > 98:
+                return (
+                    422,
+                    {},
+                    json.dumps({"limit": 100, "id": "cannot_update_above_limit"}),
+                )
+            else:
+                return (200, {}, '{"id":"passport"}')
+
+        responses.add_callback(
+            "PATCH",
+            "https://api.heroku.com/apps/testapp/formation/worker",
+            callback=request_callback,
+        )
+        responses.add(
+            "GET",
+            "https://api.heroku.com/apps/testapp/formation",
+            status=200,
+            json=[
+                {"quantity": 5, "type": "worker"},
+                {"quantity": 1, "type": "worker_short"},
+                {"quantity": 0, "type": "dev_worker"},
+                {"quantity": 0, "type": "release"},
+                {"quantity": 1, "type": "web"},
+            ],
+        )
+
+        autoscaler = HerokuAutoscaler()
+        autoscaler.active_builds = 3
+        autoscaler.target_workers = 100
         autoscaler.count_workers = mock.Mock(return_value=1)
         autoscaler.scale()
