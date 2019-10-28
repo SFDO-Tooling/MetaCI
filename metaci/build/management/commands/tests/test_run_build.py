@@ -21,13 +21,10 @@ from metaci.conftest import (
 @mock.patch("metaci.build.management.commands.run_build.run_build")
 @pytest.mark.django_db
 class TestRunBuild(TestCase):
-    # def test_run_build_scratch(self, run_build):
-    #     self._testrun_build(run_build, True)
-
     def test_run_build_persistent(self, run_build, scratch_org_limits):
         self._testrun_build(run_build, scratch_org_limits, False)
 
-    def test_run_build_persistent_(self, run_build, scratch_org_limits):
+    def test_run_build_scratch(self, run_build, scratch_org_limits):
         self._testrun_build(run_build, scratch_org_limits, True)
 
     def _testrun_build(self, run_build, scratch_org_limits, org_is_scratch):
