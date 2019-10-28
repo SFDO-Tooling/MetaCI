@@ -1,5 +1,6 @@
-from django.utils.crypto import get_random_string
 import itertools
+
+from django.utils.crypto import get_random_string
 
 
 def is_attr_equal(o1, o2, attrs):
