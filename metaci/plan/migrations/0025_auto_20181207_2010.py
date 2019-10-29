@@ -6,13 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plan', '0024_plan_role_and_trigger'),
+        ("plan", "0024_plan_role_and_trigger"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='plan',
-            name='role',
-            field=models.CharField(choices=[('beta_release', 'Beta Release'), ('beta_test', 'Beta Test'), ('deploy', 'Deployment'), ('feature', 'Feature Test'), ('feature_robot', 'Feature Test Robot'), ('other', 'Other'), ('qa', 'QA Org'), ('release_deploy', 'Release Deploy'), ('release', 'Release'), ('release_test', 'Release Test'), ('scratch', 'Scratch Org')], max_length=16),
+            model_name="plan",
+            name="role",
+            field=models.CharField(
+                choices=[
+                    ("beta_release", "Beta Release"),
+                    ("beta_test", "Beta Test"),
+                    ("deploy", "Deployment"),
+                    ("feature", "Feature Test"),
+                    ("feature_robot", "Feature Test Robot"),
+                    ("other", "Other"),
+                    ("qa", "QA Org"),
+                    ("release_deploy", "Release Deploy"),
+                    ("release", "Release"),
+                    ("release_test", "Release Test"),
+                    ("scratch", "Scratch Org"),
+                ],
+                max_length=16,
+            ),
         ),
     ]

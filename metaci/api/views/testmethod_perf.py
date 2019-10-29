@@ -1,20 +1,16 @@
-from django.db.models import FloatField, BigIntegerField
-from django.db.models.functions import Cast
-
-from django.db.models import F, Sum
+from datetime import datetime, timedelta
 
 import django_filters.rest_framework
-from django_filters.widgets import DateRangeWidget
-
-from rest_framework import generics, exceptions, viewsets, pagination, permissions
-
-from metaci.testresults.models import TestResultPerfWeeklySummary, FieldType
-from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
-from metaci.repository.models import Repository, Branch
-from metaci.plan.models import Plan
-
 from django.db import connection
-from datetime import datetime, timedelta
+from django.db.models import BigIntegerField, F, FloatField, Sum
+from django.db.models.functions import Cast
+from django_filters.widgets import DateRangeWidget
+from rest_framework import exceptions, generics, pagination, permissions, viewsets
+
+from metaci.api.serializers.simple_dict_serializer import SimpleDictSerializer
+from metaci.plan.models import Plan
+from metaci.repository.models import Branch, Repository
+from metaci.testresults.models import FieldType, TestResultPerfWeeklySummary
 
 thirty_days_ago = datetime.now() - timedelta(days=30)
 
@@ -99,9 +95,12 @@ class BuildFlowFilterSet(django_filters.rest_framework.FilterSet):
 def dynamicBuildFlowFilterSetBuilder(repo_name):
     class DynamicBuildFlowFilterSet(BuildFlowFilterSet):
         if repo_name:
-            branches = Branch.include_deleted \
-                .filter(repo__name=repo_name) \
-                .values_list("name", "name").order_by("name").distinct()
+            branches = (
+                Branch.include_deleted.filter(repo__name=repo_name)
+                .values_list("name", "name")
+                .order_by("name")
+                .distinct()
+            )
             branch = django_filters.rest_framework.ChoiceFilter(
                 field_name="rel_branch__name",
                 label="Branch Name",

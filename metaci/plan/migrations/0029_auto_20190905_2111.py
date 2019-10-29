@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plan', '0028_plan_schedule_job'),
+        ("plan", "0028_plan_schedule_job"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='plan',
-            name='keep_org_on_error',
+            model_name="plan",
+            name="keep_org_on_error",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='plan',
-            name='keep_org_on_fail',
+            model_name="plan",
+            name="keep_org_on_fail",
             field=models.BooleanField(default=False),
         ),
     ]
