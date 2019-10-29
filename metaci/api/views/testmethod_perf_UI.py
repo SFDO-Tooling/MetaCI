@@ -1,11 +1,10 @@
 from django.conf import settings
-
-from rest_framework import viewsets, response, permissions
+from rest_framework import permissions, response, viewsets
 
 from metaci.api.views.testmethod_perf import (
-    dynamicBuildFlowFilterSetBuilder,
-    TestMethodPerfFilterSet,
     DEFAULTS,
+    TestMethodPerfFilterSet,
+    dynamicBuildFlowFilterSetBuilder,
 )
 from metaci.api.views.testresults import TestMethodResultFilterSet
 
@@ -23,9 +22,10 @@ class TestMethodPerfUIApiView(viewsets.ViewSet):
         repo_name = request.query_params.get("repo", None)
         buildFlowFilterSetClass = dynamicBuildFlowFilterSetBuilder(repo_name=repo_name)
         buildflow_filters = self.collect_filter_defs(buildFlowFilterSetClass, [])
-        included_filters = [filter for filter in buildflow_filters.values()
-                            if filter['name'] != 'repo']
-        # repo is filtered here for two reasons. 
+        included_filters = [
+            filter for filter in buildflow_filters.values() if filter["name"] != "repo"
+        ]
+        # repo is filtered here for two reasons.
         # 1. It didn't make a lot of sense in the UI.
         # 2. When the repo changed, the branch-selector did not update automatically.
         # If the repo-selector makes sense in some future UI, don't forget to fix #2.

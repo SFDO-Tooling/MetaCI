@@ -6,18 +6,36 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('testresults', '0008_merge_20180911_1915'),
+        ("testresults", "0008_merge_20180911_1915"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='testclass',
-            name='test_type',
-            field=models.CharField(choices=[('Apex', 'Apex'), ('JUnit', 'JUnit'), ('Robot', 'Robot'), ('Other', 'Other')], db_index=True, max_length=32),
+            model_name="testclass",
+            name="test_type",
+            field=models.CharField(
+                choices=[
+                    ("Apex", "Apex"),
+                    ("JUnit", "JUnit"),
+                    ("Robot", "Robot"),
+                    ("Other", "Other"),
+                ],
+                db_index=True,
+                max_length=32,
+            ),
         ),
         migrations.AlterField(
-            model_name='testresult',
-            name='outcome',
-            field=models.CharField(choices=[('Pass', 'Pass'), ('CompileFail', 'CompileFail'), ('Fail', 'Fail'), ('Skip', 'Skip')], db_index=True, max_length=16),
+            model_name="testresult",
+            name="outcome",
+            field=models.CharField(
+                choices=[
+                    ("Pass", "Pass"),
+                    ("CompileFail", "CompileFail"),
+                    ("Fail", "Fail"),
+                    ("Skip", "Skip"),
+                ],
+                db_index=True,
+                max_length=16,
+            ),
         ),
     ]
