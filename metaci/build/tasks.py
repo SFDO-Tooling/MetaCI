@@ -88,6 +88,10 @@ def start_build(build, lock_id=None):
     return result
 
 
+def lock_org(org, build_id):
+    return cache.add(org.lock_id, f"build-{build_id}", timeout=BUILD_TIMEOUT)
+
+
 @django_rq.job("short", timeout=60)
 def check_queued_build(build_id):
     reset_database_connection()
@@ -128,9 +132,7 @@ def check_queued_build(build_id):
         )
     else:
         # For persistent orgs, use the cache to lock the org
-        status = cache.add(
-            org.lock_id, "build-{}".format(build_id), timeout=BUILD_TIMEOUT
-        )
+        status = lock_org(org, build_id)
 
         if status is True:
             # Lock successful, run the build
