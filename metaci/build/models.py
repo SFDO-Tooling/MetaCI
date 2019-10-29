@@ -195,6 +195,7 @@ class Build(models.Model):
         "release.Release", on_delete=models.SET_NULL, null=True, blank=True
     )
     org_note = models.CharField(max_length=255, default="", blank=True, null=True)
+    salesforce_release = models.CharField(max_length=5, blank=True, null=True)
 
     objects = BuildQuerySet.as_manager()
 
@@ -314,7 +315,7 @@ class Build(models.Model):
             sentry_environment = "metaci"
             project_config.config["sentry_environment"] = sentry_environment
 
-            # Look up the org
+            # Look up or spin up the org
             org_config = self.get_org(project_config)
 
         except Exception as e:
@@ -323,6 +324,11 @@ class Build(models.Model):
             self.delete_build_dir()
             self.flush_log()
             return
+
+        try:
+            self.salesforce_release = org_config.latest_api_version
+        except BaseException as e:
+            self.logger.warn(f"Could not retrieve salesforce release number: {e}")
 
         # Run flows
         try:
