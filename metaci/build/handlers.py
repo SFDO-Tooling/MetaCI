@@ -1,19 +1,16 @@
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils import timezone
 
-from metaci.build.models import Build
-from metaci.build.models import Rebuild
-from metaci.build.tasks import check_queued_build
-from metaci.build.tasks import set_github_status
+from metaci.build.models import Build, Rebuild
+from metaci.build.tasks import check_queued_build, set_github_status
 
 
 @receiver(post_save, sender=Build)
 def queue_build(sender, **kwargs):
-    build = kwargs['instance']
-    created = kwargs['created']
-    if not created:
+    build = kwargs["instance"]
+    created = kwargs["created"]
+    if not created or build.build_type == "manual-command":
         return
 
     # Queue the pending status task
@@ -30,8 +27,8 @@ def queue_build(sender, **kwargs):
 
 @receiver(post_save, sender=Rebuild)
 def queue_rebuild(sender, **kwargs):
-    rebuild = kwargs['instance']
-    created = kwargs['created']
+    rebuild = kwargs["instance"]
+    created = kwargs["created"]
 
     if not created:
         return

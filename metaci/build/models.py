@@ -67,6 +67,7 @@ BUILD_TYPES = (
     ("auto", "Auto"),
     ("scheduled", "Scheduled"),
     ("legacy", "Legacy - Probably Automatic"),
+    ("manual-command", "Created from command line"),
 )
 RELEASE_REL_TYPES = (
     ("test", "Release Test"),
