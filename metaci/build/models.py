@@ -328,7 +328,7 @@ class Build(models.Model):
 
         try:
             self.org_api_version = org_config.latest_api_version
-        except BaseException as e:
+        except Exception as e:
             self.logger.warn(f"Could not retrieve salesforce API version: {e}")
 
         # Run flows
