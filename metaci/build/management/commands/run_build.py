@@ -63,6 +63,9 @@ class Command(BaseCommand):
 
             assert status, "Could not lock org"
 
-        dyno = os.environ["DYNO"]
-        print(f"Running build {build.pk} in {dyno}")
+        dyno = os.environ.get("DYNO")
+        if dyno:
+            print(f"Running build {build.pk} in {dyno}")
+        else:
+            print(f"Running build {build.pk}")
         run_build(build.pk)
