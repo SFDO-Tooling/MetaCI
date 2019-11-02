@@ -10,11 +10,10 @@ import zipfile
 from glob import iglob
 from io import BytesIO
 
-from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG, FlowConfig
+from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
 from cumulusci.core.exceptions import (
     ApexTestException,
     BrowserTestFailure,
-    FlowNotFoundError,
     RobotTestFailure,
     ScratchOrgException,
 )
@@ -625,10 +624,7 @@ class BuildFlow(models.Model):
         # the repo
         sys.path.append(project_config.repo_root)
 
-        flow = getattr(project_config, "flows__{}".format(self.flow))
-        if not flow:
-            raise FlowNotFoundError("Flow not found: {}".format(self.flow))
-        flow_config = FlowConfig(flow)
+        flow_config = project_config.get_flow(self.flow)
 
         callbacks = None
         if settings.METACI_FLOW_CALLBACK_ENABLED:
