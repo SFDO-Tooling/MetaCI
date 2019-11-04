@@ -36,7 +36,7 @@ So, what does this thing actually do?
 * Integration with Hirefire.io provides automatic scaling up and down for worker dynos based on pending builds in the queue.  Hirefire checks every minute and makes the appropriate scaling action meaning scaling up to 25 concurrent builds takes at most one minute.
 * Creating a commit or tag triggered Plan automatically creates the webhooks on the repo in Github
 * Github webhooks trigger builds for any active matching Plans
-* Simple concurrency logic: If the target org is persistent, attempt to get a lock to the org.  If a lock is obtained, run the build.  If not, reattempt the lock until abtained.  If the build runs against a scratch org, run concurrently.
+* Simple concurrency logic: If the target org is persistent, attempt to get a lock to the org.  If a lock is obtained, run the build.  If not, reattempt the lock until obtained.  If the build runs against a scratch org, run concurrently.
 * Each build Plan that has a value in its `context` field gets its own Github Commit Status set for Pending, InProgress, Success, and Fail/Error status.
 * Support for private Repositories and Plans which hide builds from non-staff users
 * Github OAuth login
