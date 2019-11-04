@@ -255,6 +255,7 @@ if HIREFIRE_TOKEN:
 
 HEROKU_TOKEN = env("HEROKU_TOKEN", default=None)
 HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
+WORKER_DYNO_NAME = env("WORKER_DYNO_NAME", default=None) or "worker"
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
 

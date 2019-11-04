@@ -96,9 +96,11 @@ class LocalAutoscaler(Autoscaler):
 class HerokuAutoscaler(Autoscaler):
     """Scale using Heroku worker dynos."""
 
+    API_ROOT = "https://api.heroku.com/apps"
+
     def scale(self):
-        worker_type = "worker"
-        url = f"https://api.heroku.com/apps/{settings.HEROKU_APP_NAME}/formation/{worker_type}"
+        worker_type = settings.WORKER_DYNO_NAME
+        url = f"{self.API_ROOT}/{settings.HEROKU_APP_NAME}/formation/{worker_type}"
         headers = {
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
