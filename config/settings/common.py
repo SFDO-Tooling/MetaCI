@@ -357,6 +357,7 @@ METACI_MAX_WORKERS = env.int("METACI_MAX_WORKERS", 3)
 # How many worker slots to reserve for high-priority jobs.
 # Should be less than METACI_MAX_WORKERS
 METACI_WORKER_RESERVE = env.int("METACI_WORKER_RESERVE", 1)
+WORKER_DYNO_NAME = env("WORKER_DYNO_NAME", default=None) or "worker"
 
 # Django REST Framework
 REST_FRAMEWORK = {
