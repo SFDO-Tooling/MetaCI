@@ -140,7 +140,16 @@ MANAGERS = ADMINS
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///metaci")}
+# DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///metaci")}
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "HOST": "db",
+        "PORT": 5432,
+    }
+}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 
@@ -299,7 +308,7 @@ LOGIN_URL = "account_login"
 AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
 
 # django-rq
-REDIS_URL = env("REDIS_URL", default="redis://localhost:6379")
+REDIS_URL = env("REDIS_URL", default="redis://redis:6379")
 REDIS_URL += "/0"
 RQ_QUEUES = {
     "default": {
