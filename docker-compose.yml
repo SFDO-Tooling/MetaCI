@@ -5,10 +5,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # command: python manage.py runserver 0.0.0.0:8000
-    command: python /app/manage.py metaci_rqworker high medium default short --worker-class metaci.build.worker.RequeueingWorker
-    command: python /app/manage.py migrate
-    command: python /app/manage.py runserver 0.0.0.0:8000
+    #command: python manage.py runserver 0.0.0.0:8000
+    # command: python /app/manage.py metaci_rqworker high medium default short --worker-class metaci.build.worker.RequeueingWorker
+   
+    command: |
+      bash -c 'while !</dev/tcp/db/5432; do sleep 1; done;
+      sleep 1
+      python /app/manage.py migrate && yarn serve 0.0.0.0:8000'
+
     # command: python /app/manage.py migrate
 
     volumes:
