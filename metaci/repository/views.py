@@ -202,15 +202,7 @@ def is_tag(ref):
 
 
 def get_or_create_branch(push, repo):
-    branch_ref = push.get("ref")
-    if not branch_ref:
-        return HttpResponse("No branch found")
-
-    branch_name = None
-    if branch_ref.startswith("refs/heads/"):
-        branch_name = branch_ref.replace("refs/heads/", "")
-    elif branch_ref.startswith(TAG_BRANCH_PREFIX):
-        branch_name = branch_ref.replace(TAG_BRANCH_PREFIX, "tag: ")
+    branch_name = get_branch_name_from_payload(push)
 
     if branch_name:
         branch, _ = Branch.objects.get_or_create(repo=repo, name=branch_name)
@@ -220,6 +212,19 @@ def get_or_create_branch(push, repo):
             branch.save()
 
     return branch
+
+
+def get_branch_name_from_payload(push):
+    branch_ref = push.get("ref")
+    if not branch_ref:
+        return HttpResponse("No branch found")
+
+    branch_name = None
+    if branch_ref.startswith("refs/heads/"):
+        branch_name = branch_ref.replace("refs/heads/", "")
+    elif branch_ref.startswith(TAG_BRANCH_PREFIX):
+        branch_name = branch_ref.replace(TAG_BRANCH_PREFIX, "tag: ")
+    return branch_name
 
 
 def get_release_if_applicable(push, repo):
