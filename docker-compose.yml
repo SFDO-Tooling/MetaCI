@@ -5,16 +5,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    #command: python manage.py runserver 0.0.0.0:8000
-    # command: python /app/manage.py metaci_rqworker high medium default short --worker-class metaci.build.worker.RequeueingWorker
-   
     command: |
       bash -c 'while !</dev/tcp/db/5432; do sleep 1; done;
       sleep 1
-      python /app/manage.py migrate && yarn serve 0.0.0.0:8000'
-
-    # command: python /app/manage.py migrate
-
+      python /app/manage.py migrate && yarn serve'
     volumes:
       - .:/app
     ports:
@@ -52,11 +46,9 @@ services:
     image: postgres:10.6
     user: postgres
     restart: always
-    # ports: 
-    #   - "5432:5432"
-
+    ports: 
+    - "5432:5432"
   redis:
-
     image: 'redis:5'
     ports:
       - '6379:6379'

@@ -1,39 +1,33 @@
 FROM python:3
-
+RUN apt-get update
+RUN apt-get -y install npm
+RUN npm install
+RUN apt-get remove cmdtest
+RUN apt-get remove yarn
+RUN npm install -gy yarn
+# RUN npm uninstall node
+# RUN npm install node@10.16.3
 # Ensure console output looks familiar
 ENV PYTHONUNBUFFERED 1
-
-
-
 # Don't write .pyc files
 ENV PYTHONDONTWRITEBYTECODE 1
-# ENV GITHUB_WEBHOOK_SECRET "password"
-# ENV CONNECTED_APP_CLIENT_ID 123
 ENV REDIS_URL "redis://localhost:6379"
-
 ENV DJANGO_SETTINGS_MODULE config.settings.local
-RUN pip install --no-cache --upgrade pip
-
-
-# ENV DATABASE_URL postgres://errors_db@db:5432/errors_db
-# ENV POSTGRES_USER "postgres"
-# ENV POSTGRES_PASSWORD ""
-RUN mkdir /app
-COPY . /app/
-COPY ./requirements /app/requirements
-RUN pip install --no-cache -r /app/requirements/local.txt
-
-COPY ./package.json /app/package.json
-COPY ./yarn.lock /app/yarn.lock
-
-RUN apt-get update 
-RUN apt-get install --assume-yes yarn
-# === Actually run things:
-# WORKDIR /app
-# RUN yarn install --check-files
-
-
 ENV DATABASE_URL postgres://metaci@db:5432/metaci
 ENV DJANGO_HASHID_SALT 'sample hashid salt'
 ENV DJANGO_SECRET_KEY 'sample secret key'
 ENV DJANGO_SETTINGS_MODULE config.settings.production
+RUN mkdir /app
+COPY . /app/
+COPY ./requirements /requirements
+COPY ./package.json /app/package.json
+COPY ./yarn.lock /app/yarn.lock
+WORKDIR /app
+RUN yarn install
+RUN pip install --no-cache --upgrade pip
+RUN pip install --no-cache -r /requirements/local.txt
+
+
+
+
+
