@@ -126,7 +126,7 @@ MAILGUN_API_KEY = env("MAILGUN_API_KEY", default=None)
 ANYMAIL = {}
 ANYMAIL["MAILGUN_API_KEY"] = MAILGUN_API_KEY
 
-EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
