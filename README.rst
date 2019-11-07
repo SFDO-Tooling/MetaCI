@@ -169,7 +169,7 @@ To view messages that are sent by your application, open your browser and go to 
 
 The email server will exit when you exit the Grunt task on the CLI with Ctrl+C.
 
-In Production, set up Sendgrid as a Heroku addon.
+In Production, set up Mailgun as a Heroku addon.
 
 Sentry
 ^^^^^^
