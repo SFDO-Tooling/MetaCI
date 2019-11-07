@@ -122,9 +122,9 @@ SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 
 # Anymail with Sendgrid
 INSTALLED_APPS += ("anymail",)
-SENDGRID_API_KEY = env("SENDGRID_API_KEY", default=None)
+MAILGUN_API_KEY = env("MAILGUN_API_KEY", default=None)
 ANYMAIL = {}
-ANYMAIL["SENDGRID_API_KEY"] = SENDGRID_API_KEY
+ANYMAIL["MAILGUN_API_KEY"] = MAILGUN_API_KEY
 
 EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
 
