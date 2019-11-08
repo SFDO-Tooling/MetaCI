@@ -161,12 +161,44 @@ def github_push_webhook(request):
     except Repository.DoesNotExist:
         return HttpResponse("Not listening for this repository")
 
+    branch_name = get_branch_name_from_payload(push, repo)
+
+    if not branch_name:
+        return HttpResponse("No branch found")
+
     branch = get_or_create_branch(push, repo)
     release = get_release_if_applicable(push, repo)
-
     create_builds(push, repo, branch, release)
 
     return HttpResponse("OK")
+
+
+def get_repository(push_payload):
+    repo_id = push_payload["repository"]["id"]
+    return Repository.objects.get(github_id=repo_id)
+
+
+def get_branch_name_from_payload(push):
+    branch_ref = push.get("ref")
+    if not branch_ref:
+        return None
+
+    branch_name = None
+    if branch_ref.startswith("refs/heads/"):
+        branch_name = branch_ref.replace("refs/heads/", "")
+    elif branch_ref.startswith(TAG_BRANCH_PREFIX):
+        branch_name = branch_ref.replace(TAG_BRANCH_PREFIX, "tag: ")
+    return branch_name
+
+
+def get_or_create_branch(branch_name, repo):
+    branch, _ = Branch.objects.get_or_create(repo=repo, name=branch_name)
+    if branch.is_removed:
+        # resurrect the soft deleted branch
+        branch.is_removed = False
+        branch.save()
+
+    return branch
 
 
 def create_builds(push, repo, branch, release):
@@ -191,40 +223,9 @@ def create_builds(push, repo, branch, release):
             build.save()
 
 
-def get_repository(push_payload):
-    repo_id = push_payload["repository"]["id"]
-    return Repository.objects.get(github_id=repo_id)
-
-
 def is_tag(ref):
     """Returns true if ref corresponds to a tag. False otherwise"""
     return True if ref.startswith(TAG_BRANCH_PREFIX) else False
-
-
-def get_or_create_branch(push, repo):
-    branch_name = get_branch_name_from_payload(push)
-
-    if branch_name:
-        branch, _ = Branch.objects.get_or_create(repo=repo, name=branch_name)
-        if branch.is_removed:
-            # resurrect the soft deleted branch
-            branch.is_removed = False
-            branch.save()
-
-    return branch
-
-
-def get_branch_name_from_payload(push):
-    branch_ref = push.get("ref")
-    if not branch_ref:
-        return HttpResponse("No branch found")
-
-    branch_name = None
-    if branch_ref.startswith("refs/heads/"):
-        branch_name = branch_ref.replace("refs/heads/", "")
-    elif branch_ref.startswith(TAG_BRANCH_PREFIX):
-        branch_name = branch_ref.replace(TAG_BRANCH_PREFIX, "tag: ")
-    return branch_name
 
 
 def get_release_if_applicable(push, repo):
