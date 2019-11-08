@@ -3,7 +3,7 @@
 Production Configurations
 
 - Use Amazon's S3 for storing static files and uploaded media
-- Use Sengrid to send emails
+- Use Mailgun to send emails
 - Use Redis for cache
 
 - Use sentry for error logging
@@ -120,7 +120,7 @@ DEFAULT_FROM_EMAIL = env(
 EMAIL_SUBJECT_PREFIX = env("DJANGO_EMAIL_SUBJECT_PREFIX", default="[metaci] ")
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 
-# Anymail with Sendgrid
+# Anymail with Mailgun
 INSTALLED_APPS += ("anymail",)
 MAILGUN_API_KEY = env("MAILGUN_API_KEY", default=None)
 ANYMAIL = {}
