@@ -110,6 +110,7 @@ HIREFIRE_PROCS = ["config.procs.WorkerProc"]
 HIREFIRE_TOKEN = env("HIREFIRE_TOKEN", default="localtest")
 
 METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.LocalAutoscaler"
+ALLOWED_HOSTS = ["0.0.0.0"]
 
 # Site URL
 SITE_URL = env("SITE_URL", default="http://localhost:8000")

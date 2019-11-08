@@ -34,8 +34,7 @@
     "reselect": "^4.0.0",
     "run-p": "^0.0.0",
     "sarcastic": "^1.5.0",
-    "whatwg-fetch": "^3.0.0",
-    "yarn": "^1.19.1"
+    "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
