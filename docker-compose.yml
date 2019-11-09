@@ -1,5 +1,4 @@
 version: "3"
-
 services:
   web:
     build:
@@ -8,7 +7,10 @@ services:
     command: |
       bash -c 'while !</dev/tcp/db/5432; do sleep 1; done;
       sleep 1
-      python /app/manage.py migrate && python /app/manage.py runserver 0.0.0.0:8000'
+      python /app/manage.py migrate \
+      && python /app/manage.py runserver 0.0.0.0:8000 \
+      && python /app/manage.py rqscheduler --queue short \
+      && python /app/manage.py metaci_rqworker short'
     ports:
       - "8000:8000"
       - "4088:4088"
@@ -18,29 +20,10 @@ services:
     links:
       - db
       - redis
+    env_file:
+      - config/settings/.env
     environment:
-      - DJANGO_SETTINGS_MODULE
-      - DJANGO_SECRET_KEY
-      - DJANGO_HASHID_SALT
-      - DJANGO_ADMIN_URL
-      - GITHUB_USERNAME
-      - GITHUB_PASSWORD
-      - GITHUB_APP_ID
-      - GITHUB_APP_KEY
-      - GITHUB_WEBHOOK_SECRET
-      - SFDX_CLIENT_ID
-      - SFDX_HUB_KEY
-      - SFDX_HUB_USERNAME
-      - CONNECTED_APP_CLIENT_ID
-      - CONNECTED_APP_CLIENT_SECRET
-      - CONNECTED_APP_CALLBACK_URL
       - REDIS_URL
-
-      # - DJANGO_AWS_ACCESS_KEY_ID
-      # - DJANGO_AWS_SECRET_ACCESS_KEY
-      # - DJANGO_AWS_STORAGE_BUCKET_NAME
-      # - DJANGO_SERVER_EMAIL
-      # - DJANGO_SENTRY_DSN
   db:
     image: postgres:10.6
     user: postgres
