@@ -18,7 +18,7 @@
     "i18next-xhr-backend": "^3.2.0",
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.15",
-    "node": "10.15.2",
+    "node": "10.16.3",
     "query-string": "^6.8.3",
     "react": "^16.10.2",
     "react-document-title": "^2.0.3",
@@ -111,7 +111,7 @@
     "espree": "6.0.0"
   },
   "engines": {
-    "node": "^10.15.2",
+    "node": "^10.16.3",
     "yarn": "1.19.1"
   },
   "scripts": {
