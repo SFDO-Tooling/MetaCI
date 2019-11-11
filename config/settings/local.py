@@ -115,8 +115,10 @@ ALLOWED_HOSTS = [
     "127.0.0.1:8000",
     "127.0.0.1:8080",
     "localhost",
+    "0.0.0.0:8000",
     "localhost:8000",
     "localhost:8080",
+    "0.0.0.0",
 ]
 
 # Site URL
