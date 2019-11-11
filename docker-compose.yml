@@ -9,7 +9,8 @@ services:
       bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done;
       sleep 1
       python /app/manage.py migrate && python /app/manage.py runserver 0.0.0.0:8000 \
-      & webpack-dev-server --config webpack.dev.js & python manage.py metaci_rqworker short & python manage.py rqscheduler --queue short'
+      & ./node_modules/.bin/webpack-dev-server --config webpack.dev.js \
+      & python manage.py metaci_rqworker short & python manage.py rqscheduler --queue short'
     ports:
       - "8000:8000"
     depends_on:
