@@ -95,7 +95,7 @@
     "sass-loader": "^8.0.0",
     "stylelint": "^11.0.0",
     "stylelint-config-recommended-scss": "^4.0.0",
-    "stylelint-scss": "^3.11.1",
+    "stylelint-scss": "^3.12.1",
     "typescript": "^3.6.3",
     "url-loader": "^2.2.0",
     "webpack": "^4.41.0",
