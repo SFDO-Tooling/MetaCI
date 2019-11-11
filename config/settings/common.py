@@ -360,7 +360,8 @@ METACI_WORKER_RESERVE = env.int("METACI_WORKER_RESERVE", 1)
 WORKER_DYNO_NAME = env("WORKER_DYNO_NAME", default=None) or "worker"
 
 # Queues that the given app will has
-HEROKU_APP_QUEUES = env("HEROKU_APP_QUEUES", default=("high", "medium", "default"))
+queues = env.list("HEROKU_APP_QUEUES", default=["high", "medium", "default"])
+HEROKU_APP_QUEUES = set(queues)
 
 # Django REST Framework
 REST_FRAMEWORK = {
