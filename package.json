@@ -13,7 +13,7 @@
     "@salesforce/lwc-jest": "^0.5.4",
     "@sentry/browser": "^5.5.0",
     "del": "^5.1.0",
-    "i18next": "^17.0.18",
+    "i18next": "^19.0.0",
     "i18next-browser-languagedetector": "^4.0.0",
     "i18next-xhr-backend": "^3.2.0",
     "js-cookie": "^2.2.1",
