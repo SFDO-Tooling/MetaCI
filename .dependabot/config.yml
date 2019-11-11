@@ -16,3 +16,7 @@ update_configs:
           # No published source tarbal for 0.74.3
           dependency_name: 'simple-salesforce'
           version_requirement: '0.74.3'
+          
+  - package_manager: 'javascript'
+    directory: '/'
+    update_schedule: 'weekly'
