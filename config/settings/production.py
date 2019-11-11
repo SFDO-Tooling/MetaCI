@@ -257,9 +257,7 @@ HEROKU_TOKEN = env("HEROKU_TOKEN", default=None)
 HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
 
 # Determine which app we're running in
-if HEROKU_TOKEN and HEROKU_APP_NAME.startswith("metaci-robot"):
-    METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuRobotAutoscaler"
-elif HEROKU_TOKEN and HEROKU_APP_NAME:
+if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
 
 
