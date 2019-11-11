@@ -17,7 +17,8 @@ class Autoscaler(object):
     active_builds = 0
     target_workers = 0
 
-    def __init__(self, queues=("high", "medium", "default")):
+    def __init__(self):
+        queues = settings.HEROKU_APP_QUEUES
         self.queues = [django_rq.get_queue(name) for name in queues]
 
     def measure(self):
@@ -141,16 +142,6 @@ class HerokuAutoscaler(Autoscaler):
         assert target_workers >= 0
 
         return requests.patch(url, json={"quantity": target_workers}, headers=headers)
-
-
-class HerokuRobotAutoscaler(HerokuAutoscaler):
-    """Autoscaler for Heroku App that runs Robot test builds.
-
-    Single queue where robot builds are placed.
-    """
-
-    def __init__(self, queues=("robot")):
-        super().__init__(queues)
 
 
 get_autoscaler = import_global(settings.METACI_WORKER_AUTOSCALER)
