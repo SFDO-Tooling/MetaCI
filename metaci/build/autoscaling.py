@@ -99,9 +99,9 @@ class HerokuAutoscaler(Autoscaler):
     API_ROOT = "https://api.heroku.com/apps"
 
     def scale(self):
-        worker_type = settings.WORKER_DYNO_NAME
-        url = f"{self.API_ROOT}/{settings.HEROKU_APP_NAME}/formation/{worker_type}"
-        headers = {
+        self.worker_type = settings.WORKER_DYNO_NAME
+        self.url = f"{self.API_ROOT}/{settings.HEROKU_APP_NAME}/formation/{worker_type}"
+        self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
         }
@@ -109,19 +109,27 @@ class HerokuAutoscaler(Autoscaler):
         # because we don't know which worker will be stopped.
         active_workers = self.count_workers()
         if active_workers and not self.active_builds:
-            logger.info(f"Scaling down to 0 workers")
-            resp = requests.patch(url, json={"quantity": 0}, headers=headers)
-            resp.raise_for_status()
+            scale_down(num_workers=0)
         elif self.target_workers > active_workers:
-            logger.info(f"Scaling up to {self.target_workers} workers")
-            resp = requests.patch(
-                url, json={"quantity": self.target_workers}, headers=headers
-            )
-            if resp.json() and resp.json().get("id") == "cannot_update_above_limit":
-                limit = resp.json()["limit"]
-                resp = self.scale_max(url, headers, worker_type, limit)
+            scale_up(num_workers=self.target_workers)
 
-            resp.raise_for_status()
+    def scale_down(self, num_workers):
+        logger.info(f"Scaling down to {num_workers} workers")
+        resp = requests.patch(
+            self.url, json={"quantity": num_workers}, headers=self.headers
+        )
+        resp.raise_for_status()
+
+    def scale_up(self, url, headers, worker_type, num_workers):
+        logger.info(f"Scaling up to {self.target_workers} workers")
+        resp = requests.patch(
+            self.url, json={"quantity": self.target_workers}, headers=self.headers
+        )
+        if resp.json() and resp.json().get("id") == "cannot_update_above_limit":
+            limit = resp.json()["limit"]
+            resp = self.scale_max(self.url, self.headers, self.worker_type, limit)
+
+        resp.raise_for_status()
 
     def scale_max(self, url, headers, worker_type, limit):
         base_url, _ = url.rsplit("/", 1)
@@ -133,6 +141,16 @@ class HerokuAutoscaler(Autoscaler):
         assert target_workers >= 0
 
         return requests.patch(url, json={"quantity": target_workers}, headers=headers)
+
+
+class HerokuRobotAutoscaler(HerokuAutoscaler):
+    """Autoscaler for Heroku App that runs Robot test builds.
+
+    Single queue where robot builds are placed.
+    """
+
+    def __init__(self, queues=("robot")):
+        super().__init__(queues)
 
 
 get_autoscaler = import_global(settings.METACI_WORKER_AUTOSCALER)
