@@ -255,7 +255,6 @@ if HIREFIRE_TOKEN:
 
 HEROKU_TOKEN = env("HEROKU_TOKEN", default=None)
 HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
-HEROKU_APP_QUEUES = env("HEROKU_APP_QUEUES", default=("high", "medium", "default"))
 
 # Determine which app we're running in
 if HEROKU_TOKEN and HEROKU_APP_NAME.startswith("metaci-robot"):

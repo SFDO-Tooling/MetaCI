@@ -101,7 +101,9 @@ class HerokuAutoscaler(Autoscaler):
 
     def scale(self):
         self.worker_type = settings.WORKER_DYNO_NAME
-        self.url = f"{self.API_ROOT}/{settings.HEROKU_APP_NAME}/formation/{worker_type}"
+        self.url = (
+            f"{self.API_ROOT}/{settings.HEROKU_APP_NAME}/formation/{self.worker_type}"
+        )
         self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
@@ -110,18 +112,18 @@ class HerokuAutoscaler(Autoscaler):
         # because we don't know which worker will be stopped.
         active_workers = self.count_workers()
         if active_workers and not self.active_builds:
-            scale_down(num_workers=0)
+            self._scale_down(num_workers=0)
         elif self.target_workers > active_workers:
-            scale_up(num_workers=self.target_workers)
+            self._scale_up(num_workers=self.target_workers)
 
-    def scale_down(self, num_workers):
+    def _scale_down(self, num_workers):
         logger.info(f"Scaling down to {num_workers} workers")
         resp = requests.patch(
             self.url, json={"quantity": num_workers}, headers=self.headers
         )
         resp.raise_for_status()
 
-    def scale_up(self, url, headers, worker_type, num_workers):
+    def _scale_up(self, num_workers):
         logger.info(f"Scaling up to {self.target_workers} workers")
         resp = requests.patch(
             self.url, json={"quantity": self.target_workers}, headers=self.headers

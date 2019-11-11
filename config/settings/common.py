@@ -359,6 +359,9 @@ METACI_MAX_WORKERS = env.int("METACI_MAX_WORKERS", 3)
 METACI_WORKER_RESERVE = env.int("METACI_WORKER_RESERVE", 1)
 WORKER_DYNO_NAME = env("WORKER_DYNO_NAME", default=None) or "worker"
 
+# Queues that the given app will has
+HEROKU_APP_QUEUES = env("HEROKU_APP_QUEUES", default=("high", "medium", "default"))
+
 # Django REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
