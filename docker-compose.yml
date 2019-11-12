@@ -6,11 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile
     command: |
-      bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done;
+      /bin/bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done;
       sleep 1
-      /usr/local/bin/python /app/manage.py migrate && /usr/local/bin/python /app/manage.py runserver 0.0.0.0:8000 \
+      python /app/manage.py migrate && python /app/manage.py runserver 0.0.0.0:8000 \
       & ./node_modules/.bin/webpack-dev-server --config /app/webpack.dev.js \
-      & /usr/local/bin/python /app/manage.py metaci_rqworker short & /usr/local/bin/python /app/manage.py rqscheduler --queue short'
+      & python /app/manage.py metaci_rqworker short & python /app/manage.py rqscheduler --queue short'
     ports:
       - "8000:8000"
     depends_on:

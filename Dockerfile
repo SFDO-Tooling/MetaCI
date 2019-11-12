@@ -1,3 +1,4 @@
+# FROM oddbirds/pyjs
 FROM python:3
 ENV NODE_VERSION 10.16.3
 RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" \
@@ -37,39 +38,6 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" \
   && rm "node-v$NODE_VERSION-linux-$ARCH.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
   && ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
-ENV YARN_VERSION 1.19.1
-RUN set -ex \
-  && for key in \
-    6A010C5166006599AA17F08146C2130DFD2497F5 \
-  ; do \
-    gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-    gpg --batch --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-    gpg --batch --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
-  done \
-  && curl -fsSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
-  && curl -fsSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc" \
-  && gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
-  && mkdir -p /opt \
-  && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ \
-  && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
-  && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
-  && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
-
-
-RUN mkdir /app
-COPY . /app/
-COPY ./requirements /requirements
-COPY ./package.json /app/package.json
-COPY ./yarn.lock /app/yarn.lock
-WORKDIR /app
-RUN apt-get clean
-RUN yarn install
-RUN pip install --no-cache --upgrade pip
-RUN pip install --no-cache -r /requirements/local.txt
-
-# RUN npm uninstall node
-# RUN npm install node@10.16.3
-# Ensure console output looks familiar
 ENV PYTHONUNBUFFERED 1
 # Don't write .pyc files
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -78,4 +46,25 @@ ENV DJANGO_SETTINGS_MODULE config.settings.local
 ENV DATABASE_URL postgres://metaci@db:5432/metaci
 ENV DJANGO_HASHID_SALT 'sample hashid salt'
 ENV DJANGO_SECRET_KEY 'sample secret key'
-# ENV DJANGO_SETTINGS_MODULE config.settings.production
+
+RUN mkdir /app
+
+COPY ./requirements /requirements
+COPY ./package.json /app/package.json
+COPY ./yarn.lock /app/yarn.lock
+COPY . /app/
+
+
+RUN chmod +x ./app/get_node.sh
+RUN /bin/sh /app/get_node.sh
+
+RUN chmod +x ./app/get_yarn.sh
+RUN /bin/sh /app/get_yarn.sh
+
+WORKDIR /app
+RUN apt-get clean
+RUN yarn install
+RUN pip install --no-cache --upgrade pip
+RUN pip install --no-cache -r /requirements/local.txt
+
+
