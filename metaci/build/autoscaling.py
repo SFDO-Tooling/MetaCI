@@ -99,7 +99,7 @@ class HerokuAutoscaler(Autoscaler):
 
     API_ROOT = "https://api.heroku.com/apps"
 
-    def scale(self):
+    def __init__(self):
         self.worker_type = settings.WORKER_DYNO_NAME
         self.url = (
             f"{self.API_ROOT}/{settings.HEROKU_APP_NAME}/formation/{self.worker_type}"
@@ -108,6 +108,8 @@ class HerokuAutoscaler(Autoscaler):
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
         }
+
+    def scale(self):
         # We should only scale down if there are no active builds,
         # because we don't know which worker will be stopped.
         active_workers = self.count_workers()
