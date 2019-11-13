@@ -39,7 +39,6 @@ QUEUES = (
     ("default", "default"),
     ("medium", "medium priority"),
     ("high", "high priority"),
-    ("robot", "robot tests"),
 )
 
 
