@@ -153,7 +153,6 @@ def validate_github_webhook(request):
 @require_POST
 def github_push_webhook(request):
     validate_github_webhook(request)
-
     push = json.loads(request.body)
 
     try:
@@ -161,7 +160,7 @@ def github_push_webhook(request):
     except Repository.DoesNotExist:
         return HttpResponse("Not listening for this repository")
 
-    branch_name = get_branch_name_from_payload(push, repo)
+    branch_name = get_branch_name_from_payload(push)
 
     if not branch_name:
         return HttpResponse("No branch found")
@@ -173,8 +172,8 @@ def github_push_webhook(request):
     return HttpResponse("OK")
 
 
-def get_repository(push_payload):
-    repo_id = push_payload["repository"]["id"]
+def get_repository(push):
+    repo_id = push["repository"]["id"]
     return Repository.objects.get(github_id=repo_id)
 
 
