@@ -322,6 +322,11 @@ RQ_QUEUES = {
         "DEFAULT_TIMEOUT": 500,
         "AUTOCOMMIT": False,
     },
+    "robot": {
+        "USE_REDIS_CACHE": "default",
+        "DEFAULT_TIMEOUT": 500,
+        "AUTOCOMMIT": False,
+    },
 }
 
 # Site URL
