@@ -109,10 +109,7 @@
     "eslint": "~6.1.0",
     "espree": "6.0.0"
   },
-  "engines": {
-    "node": "^10.16.3",
-    "yarn": "1.19.1"
-  },
+  "engines": {},
   "scripts": {
     "webpack:serve": "webpack-dev-server --config webpack.dev.js",
     "django:serve": "python manage.py runserver",
