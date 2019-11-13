@@ -1,6 +1,17 @@
 version: "3"
 
 services:
+
+  postgres:
+    image: postgres:10.6
+    user: postgres
+    restart: always
+    ports: 
+    - "5432:5432"
+  redis:
+    image: 'redis:5'
+    ports:
+      - '6379:6379'
   web:
     build:
       context: .
@@ -28,13 +39,5 @@ services:
       # - DJANGO_AWS_STORAGE_BUCKET_NAME
       # - DJANGO_SERVER_EMAIL
       # - DJANGO_SENTRY_DSN
-  postgres:
-    image: postgres:10.6
-    user: postgres
-    restart: always
-    ports: 
-    - "5432:5432"
-  redis:
-    image: 'redis:5'
-    ports:
-      - '6379:6379'
+    volumes:
+      - .:/app

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NODE_VERSION=10.16.3
+#NODE_VERSION=10.16.3
 ARCH=
 dpkgArch="$(dpkg --print-architecture)"
 case "${dpkgArch##*-}" in \
