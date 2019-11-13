@@ -308,7 +308,7 @@ LOGIN_URL = "account_login"
 AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
 
 # django-rq
-REDIS_URL = env("REDIS_URL", default="redis://redis:6379")
+REDIS_URL = env("REDIS_URL", default="redis://localhost:6379")
 REDIS_URL += "/0"
 RQ_QUEUES = {
     "default": {

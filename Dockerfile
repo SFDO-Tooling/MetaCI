@@ -1,4 +1,6 @@
-FROM python:3
+FROM python:3.8
+
+ARG BUILD_ENV=development
 ENV PYTHONUNBUFFERED 1
 # Don't write .pyc files
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -23,9 +25,12 @@ RUN chmod +x ./app/get_yarn.sh
 RUN /bin/sh /app/get_yarn.sh
 
 WORKDIR /app
-RUN apt-get clean
+
 RUN yarn install
 RUN pip install --no-cache --upgrade pip
 RUN pip install --no-cache -r /requirements/local.txt
 
+# Avoid building prod assets in development
+RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn serve ; else mkdir -p dist/prod ; fi
+RUN python /app/manage.py collectstatic --noinput
 
