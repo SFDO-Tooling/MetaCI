@@ -17,9 +17,9 @@ class Autoscaler(object):
     active_builds = 0
     target_workers = 0
 
-    def __init__(self):
-        queues = settings.HEROKU_APP_QUEUES
-        self.queues = [django_rq.get_queue(name) for name in queues]
+    def __init__(self, config):
+        """config is a dict that has an entry for queues"""
+        self.queues = [django_rq.get_queue(name) for name in config["queues"]]
 
     def measure(self):
         # Check how many builds are active (queued or started)
@@ -99,15 +99,17 @@ class HerokuAutoscaler(Autoscaler):
 
     API_ROOT = "https://api.heroku.com/apps"
 
-    def __init__(self):
-        self.worker_type = settings.WORKER_DYNO_NAME
+    def __init__(self, config):
+        """config is a dict which has entries for: app_name, worker_type, and queues."""
+
         self.url = (
-            f"{self.API_ROOT}/{settings.HEROKU_APP_NAME}/formation/{self.worker_type}"
+            f"{self.API_ROOT}/{config['app_name']}/formation/{config['worker_type']}"
         )
         self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
         }
+        super().__init__(config)
 
     def scale(self):
         # We should only scale down if there are no active builds,
@@ -119,14 +121,16 @@ class HerokuAutoscaler(Autoscaler):
             self._scale_up(num_workers=self.target_workers)
 
     def _scale_down(self, num_workers):
-        logger.info(f"Scaling down to {num_workers} workers")
+        logger.info(f"Scaling app ({self.app_name}) down to {num_workers} workers")
         resp = requests.patch(
             self.url, json={"quantity": num_workers}, headers=self.headers
         )
         resp.raise_for_status()
 
     def _scale_up(self, num_workers):
-        logger.info(f"Scaling up to {self.target_workers} workers")
+        logger.info(
+            f"Scaling app ({self.app_name}) up to {self.target_workers} workers"
+        )
         resp = requests.patch(
             self.url, json={"quantity": self.target_workers}, headers=self.headers
         )
@@ -148,7 +152,10 @@ class HerokuAutoscaler(Autoscaler):
         return requests.patch(url, json={"quantity": target_workers}, headers=headers)
 
 
-get_autoscaler = import_global(settings.METACI_WORKER_AUTOSCALER)
+def get_autoscaler(app_name):
+    """Fetches the appropriate autoscaler given the app name"""
+    autoscaler_class = import_global(settings.METACI_WORKER_AUTOSCALER)
+    return autoscaler_class(settings.AUTOSCALERS[app_name])
 
 
 @django_rq.job("short")
@@ -157,7 +164,10 @@ def autoscale():
 
     This is meant to run frequently as a RepeatableJob.
     """
-    autoscaler = get_autoscaler()
-    autoscaler.measure()
-    autoscaler.scale()
-    return autoscaler.target_workers
+    scaling_info = {}
+    for app_name in settings.METACI_APPS:
+        autoscaler = get_autoscaler(app_name)
+        autoscaler.measure()
+        autoscaler.scale()
+        scaling_info[autoscaler.app_name] = autoscaler.target_workers
+    return scaling_info

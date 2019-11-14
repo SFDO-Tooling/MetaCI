@@ -256,9 +256,23 @@ if HIREFIRE_TOKEN:
 HEROKU_TOKEN = env("HEROKU_TOKEN", default=None)
 HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
 
-# Determine which app we're running in
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
+
+METACI_APPS = ["metaci-stg", "metaci-robot-stg"]
+
+AUTOSCALERS = {
+    "metaci-stg": {
+        "app_name": "metaci-stg",
+        "worker_type": "worker",
+        "queues": ["default", "medium", "high"],
+    },
+    "metaci-robot-stg": {
+        "app_name": "metaci-robot-stg",
+        "worker_type": "worker",
+        "queues": ["robot"],
+    },
+}
 
 
 # Custom Admin URL, use {% url 'admin:index' %}
