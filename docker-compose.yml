@@ -2,11 +2,13 @@ version: "3"
 
 services:
   postgres:
+    # environment:
+    #   - POSTGRES_DB=metaci
     image: postgres:10.6
-    user: postgres
-    restart: always
     ports: 
     - "5432:5432"
+    restart: always
+    user: postgres
   redis:
     image: 'redis:5'
     ports:

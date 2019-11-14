@@ -28,18 +28,47 @@ create a virtualenv (once you have `virtualenvwrapper`_ installed locally)::
     setvirtualenvproject
 
 Running MetaCI In Docker:
-    This section assumes you have downloaded `docker` and `docker-compose`
+
+    This section assumes you have downloaded `docker` and `docker-compose`.
+        To get docker please visit: https://hub.docker.com/?overlay=onboarding 
+        and follow the installation instructions to download docker if needed: 
+
+            To verify you have successfully installed docker type:
+
+                `docker -v`  
+
+            You should see something like the following):
+
+                `Docker version 19.03.4, build 9013bf5`
+
+          To get docker please visit: https://docs.docker.com/v17.09/compose/install/
+          and follow the installation instructions to download docker-compose if needed:
+            To verify you have successfully installed docker type:
+
+                `docker-compose -v`  
+
+            You should see something like the following):
+
+                `docker-compose version 1.16.1, build 6d1ac219`
+
     To configure and run your environment you must run 2 commands in the root directory of MetaCI:
-            docker-compose build
-            docker-compose up -d or docker-compose up (for debug mode)
+
+            `docker-compose build
+            docker-compose up -d` 
+            or docker-compose up (for debug mode
+            )
         
-        To destroy your container and create a fresh one enter the following command:
-            *Note this will destroy anything that is in the virtual environment*
+    To destroy your container and create a fresh one enter the following command:
+        * Note this will destroy anything that is in the virtual environment *
 
             docker-compose down
 
     If you would like to populate your instance of MetaCI with test data enter the following command:
+    
         docker-compose exec web bash './setup_test.sh'
+
+    **** IF YOU HAVE COMPLETED THIS SECTION THEN THE REST OF ****
+    *** THIS FILE WHILE INFORMATIVE IS NOT REQUIRED FOR SETUP ***
 
 Install Python requirements::
 

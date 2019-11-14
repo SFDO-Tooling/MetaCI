@@ -33,7 +33,7 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV REDIS_URL "redis://redis:6379"
 ENV DJANGO_SETTINGS_MODULE config.settings.local
-ENV DATABASE_URL postgres://metaci@db:5432/metaci
+ENV DATABASE_URL postgres://metaci@postgres:5432/metaci
 ENV DJANGO_HASHID_SALT 'sample hashid salt'
 ENV DJANGO_SECRET_KEY 'sample secret key'
 
