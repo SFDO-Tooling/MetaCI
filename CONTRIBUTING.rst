@@ -30,13 +30,16 @@ create a virtualenv (once you have `virtualenvwrapper`_ installed locally)::
 Running MetaCI In Docker:
     This section assumes you have downloaded `docker` and `docker-compose`
     To configure and run your environment you must run 2 commands in the root directory of MetaCI:
-        - `docker-compose build`
-        - `docker-compose up -d` or `docker-compose up` (for debug mode)
+            docker-compose build
+            docker-compose up -d or docker-compose up (for debug mode)
         
         To destroy your container and create a fresh one enter the following command:
             *Note this will destroy anything that is in the virtual environment*
-        - docker-compose down
-        
+
+            docker-compose down
+
+    If you would like to populate your instance of MetaCI with test data enter the following command:
+        docker-compose exec web bash './setup_test.sh'
 
 Install Python requirements::
 
