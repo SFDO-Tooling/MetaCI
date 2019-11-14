@@ -27,6 +27,17 @@ create a virtualenv (once you have `virtualenvwrapper`_ installed locally)::
     mkvirtualenv metaci --python=$(which python3.7)
     setvirtualenvproject
 
+Running MetaCI In Docker:
+    This section assumes you have downloaded `docker` and `docker-compose`
+    To configure and run your environment you must run 2 commands in the root directory of MetaCI:
+        - `docker-compose build`
+        - `docker-compose up -d` or `docker-compose up` (for debug mode)
+        
+        To destroy your container and create a fresh one enter the following command:
+            *Note this will destroy anything that is in the virtual environment*
+        - docker-compose down
+        
+
 Install Python requirements::
 
     pip install -r requirements/local.txt
