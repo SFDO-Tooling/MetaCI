@@ -269,7 +269,7 @@ AUTOSCALERS = {
     },
     "metaci-robot-stg": {
         "app_name": "metaci-robot-stg",
-        "worker_type": "worker",
+        "worker_type": "robot",
         "queues": ["robot"],
     },
 }
