@@ -102,9 +102,9 @@ class HerokuAutoscaler(Autoscaler):
     def __init__(self, config):
         """config is a dict which has entries for: app_name, worker_type, and queues."""
 
-        self.url = (
-            f"{self.API_ROOT}/{config['app_name']}/formation/{config['worker_type']}"
-        )
+        self.app_name = config["app_name"]
+        self.worker_type = config["worker_type"]
+        self.url = f"{self.API_ROOT}/{config['app_name']}/formation/{self.worker_type}"
         self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
