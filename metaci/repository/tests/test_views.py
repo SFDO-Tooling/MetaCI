@@ -45,14 +45,6 @@ class TestGithubPushWebHook(TestCase):
         TestResultFactory(build_flow=public_bff, method__name="Public2")
 
     @pytest.mark.django_db
-    @pytest.mark.skip
-    def test_repo_list(self):
-        request = mock.Mock(user="")
-        views.repo_list(request, owner=True)
-
-        assert True
-
-    @pytest.mark.django_db
     def test_repo_detail(self):
         response = Client().get(reverse("repo-detail"))
         assert response.status_code == 200
