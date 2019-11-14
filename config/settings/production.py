@@ -13,6 +13,7 @@ Production Configurations
 from __future__ import absolute_import, unicode_literals
 
 from .common import *  # noqa
+import json
 
 # from django.utils import six
 
@@ -259,21 +260,9 @@ HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
 
-METACI_APPS = ["metaci-stg", "metaci-robot-stg"]
-
-AUTOSCALERS = {
-    "metaci-stg": {
-        "app_name": "metaci-stg",
-        "worker_type": "worker",
-        "queues": ["default", "medium", "high"],
-    },
-    "metaci-robot-stg": {
-        "app_name": "metaci-robot-stg",
-        "worker_type": "robot_worker",
-        "queues": ["robot"],
-    },
-}
-
+METACI_APPS = env("METACI_APPS", default=None)
+# Autoscalers are defined per METACI_APP
+AUTOSCALERS = json.loads(env("AUTOSCALERS", default=None))
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")

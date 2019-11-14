@@ -121,7 +121,9 @@ class HerokuAutoscaler(Autoscaler):
             self._scale_up(num_workers=self.target_workers)
 
     def _scale_down(self, num_workers):
-        logger.info(f"Scaling app ({self.app_name}) down to {num_workers} workers")
+        logger.info(
+            f"Scaling app ({self.app_name}) down to {num_workers} workers of type: {self.worker_type}"
+        )
         resp = requests.patch(
             self.url, json={"quantity": num_workers}, headers=self.headers
         )
@@ -169,5 +171,6 @@ def autoscale():
         autoscaler = get_autoscaler(app_name)
         autoscaler.measure()
         autoscaler.scale()
-        scaling_info[autoscaler.app_name] = autoscaler.target_workers
+        scaling_info[app_name] = autoscaler.target_workers
+
     return scaling_info

@@ -81,3 +81,14 @@ CONNECTED_APP_CALLBACK_URL = "http://localhost/callback"
 
 HEROKU_TOKEN = "BOGUS"
 HEROKU_APP_NAME = "testapp"
+
+METACI_APPS = ["test-app"]
+METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.LocalAutoscaler"
+
+AUTOSCALERS = {
+    "test-app": {
+        "app_name": "test-app",
+        "worker-type": "worker",
+        "queues": ["default", "medium", "high"],
+    }
+}
