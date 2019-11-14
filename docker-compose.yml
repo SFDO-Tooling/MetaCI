@@ -1,7 +1,6 @@
 version: "3"
 
 services:
-
   postgres:
     image: postgres:10.6
     user: postgres
@@ -16,12 +15,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+       
     command: |
       /bin/bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done;
-      sleep 1
-      python /app/manage.py migrate && python /app/manage.py runserver 0.0.0.0:8000 \
+      sleep 1;
+      python /app/manage.py migrate \
+      && python /app/manage.py runserver 0.0.0.0:8000 \
       & ./node_modules/.bin/webpack-dev-server --config /app/webpack.dev.js \
-      & python /app/manage.py metaci_rqworker short & python /app/manage.py rqscheduler --queue short'
+      & python /app/manage.py metaci_rqworker short \
+      & python /app/manage.py rqscheduler --queue short'
     ports:
       - "8000:8000"
     depends_on:
@@ -32,12 +34,5 @@ services:
       - redis
     env_file:
       - config/settings/.env
-    environment:
-      - REDIS_URL=redis://redis:6379
-      # - DJANGO_AWS_ACCESS_KEY_ID
-      # - DJANGO_AWS_SECRET_ACCESS_KEY
-      # - DJANGO_AWS_STORAGE_BUCKET_NAME
-      # - DJANGO_SERVER_EMAIL
-      # - DJANGO_SENTRY_DSN
     volumes:
       - .:/app
