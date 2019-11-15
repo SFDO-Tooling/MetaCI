@@ -1,5 +1,6 @@
 import json
 from unittest import mock
+from unittest.mock import patch
 
 import pytest
 from django.test import Client, TestCase
@@ -233,8 +234,8 @@ class TestRepositoryViews(TestCase):
         assert response.status_code == 200
 
     @pytest.mark.django_db
-    @mock.patch("metaci.repository.views.hmac")
-    def test_validate_github_webhook__invalid_request(self, hmac):
+    @patch("metaci.repository.views.hmac")
+    def test_validate_github_webhook__valid_request(self, hmac):
         request = RequestFactory()
         request.META = {"HTTP_X_HUB_SIGNATURE": "key=value"}
         request.body = None
@@ -247,8 +248,45 @@ class TestRepositoryViews(TestCase):
             views.validate_github_webhook(request)
         except:
             exception_raised = True
-
         assert not exception_raised
+
+        hmac.compare_digest.return_value = False
+        with pytest.raises(PermissionDenied):
+            views.validate_github_webhook(request)
+
+    @pytest.mark.django_db
+    @mock.patch("metaci.repository.views.validate_github_webhook")
+    def test_github_push_webhook__repo_not_tracked(self, validate):
+        self.client.force_login(self.user)
+        url = reverse("github_push_webhook")
+        push_data = {
+            "repository": {"id": "does_not_exist"},
+            "ref": "refs/heads/feature-branch-1",
+            "head_commit": "aR4Zd84F1i3No8",
+        }
+
+        response = self.client.post(
+            url, data=json.dumps(push_data), content_type="application/json"
+        )
+
+        assert response.content == b"Not listening for this repository"
+
+    @pytest.mark.django_db
+    @mock.patch("metaci.repository.views.validate_github_webhook")
+    def test_github_push_webhook__no_branch_found(self, validate):
+        self.client.force_login(self.user)
+        url = reverse("github_push_webhook")
+        push_data = {
+            "repository": {"id": self.repo.github_id},
+            "ref": f"refs/heads/{self.branch.name}",
+            "head_commit": "aR4Zd84F1i3No8",
+        }
+
+        response = self.client.post(
+            url, data=json.dumps(push_data), content_type="application/json"
+        )
+        assert response.status_code == 200
+        assert response.content == b"OK"
 
     @pytest.mark.django_db
     def test_get_repository(self):
