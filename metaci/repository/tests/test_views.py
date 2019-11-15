@@ -4,9 +4,10 @@ from unittest import mock
 from django.test import TestCase, Client
 from django.test.client import RequestFactory
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 
 from metaci.repository import views
-from metaci.plan.models import Plan
+from metaci.plan.models import Plan, PlanRepository
 from metaci.build.models import Build
 from metaci.repository.models import Repository
 
@@ -18,58 +19,224 @@ from metaci.conftest import (
     BuildFlowFactory,
     TestResultFactory,
     PlanRepositoryFactory,
+    UserFactory,
     StaffSuperuserFactory,
 )
 
 
-class TestGithubPushWebHook(TestCase):
+class TestRepositoryViews(TestCase):
     @classmethod
     def setUpClass(cls):
-        p1 = PlanFactory(name="Plan1")
-        p2 = PlanFactory(name="Plan2")
-        r1 = RepositoryFactory(name="PublicRepo")
-        r2 = RepositoryFactory(name="PrivateRepo")
-        public_pr = PlanRepositoryFactory(plan=p1, repo=r1)
-        # assign_perm("plan.view_builds", Group.objects.get(name="Public"), public_pr)
-        pr2 = PlanRepositoryFactory(plan=p2, repo=r2)
-        BranchFactory(name="Branch1", repo=r1)
-        BranchFactory(name="Branch2", repo=r2)
-        private_build = BuildFactory(repo=r2, plan=p2, planrepo=pr2)
-        private_bff = BuildFlowFactory(build=private_build)
-        public_build = BuildFactory(repo=r2, plan=p2, planrepo=pr2)
-        public_bff = BuildFlowFactory(build=public_build)
-        BuildFlowFactory(flow="Flow2")
-        TestResultFactory(build_flow=private_bff, method__name="Private1")
-        TestResultFactory(build_flow=private_bff, method__name="Private2")
-        TestResultFactory(build_flow=public_bff, method__name="Public1")
-        TestResultFactory(build_flow=public_bff, method__name="Public2")
+        cls.client = Client()
+        cls.superuser = StaffSuperuserFactory()
+        cls.user = UserFactory()
+        cls.plan = PlanFactory(name="Plan1")
+        cls.repo = RepositoryFactory(name="PublicRepo")
+        cls.planrepo = PlanRepositoryFactory(plan=cls.plan, repo=cls.repo)
+        cls.branch = BranchFactory(name="test-branch", repo=cls.repo)
+        super(TestRepositoryViews, cls).setUpClass()
 
     @pytest.mark.django_db
-    def test_repo_detail(self):
-        response = Client().get(reverse("repo-detail"))
+    def test_repo_list(self):
+        self.client.force_login(self.superuser)
+        url = reverse("repo_list")
+
+        response = self.client.get(url)
         assert response.status_code == 200
 
     @pytest.mark.django_db
-    @pytest.mark.skip
-    @mock.patch("metaci.repository.views.validate_github_webhook")
-    def test_github_push_webhook(self, validate_webhook):
-        plane_repo = PlanRepositoryFactory()
-
-        body = {"ref": "refs/heads/test-branch", "repository": {"id": repo.github_id}}
-        webhook_request = RequestFactory().post(
-            "/webhook/github/push", json.dumps(body), content_type="application/json"
+    def test_repo_detail__as_superuser(self):
+        self.client.force_login(self.superuser)
+        url = reverse(
+            "repo_detail", kwargs={"owner": self.repo.owner, "name": self.repo.name}
         )
 
-        response = views.github_push_webhook(webhook_request)
-        assert response is not None
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_repo_detail__as_user(self):
+        self.client.force_login(self.user)
+        url = reverse(
+            "repo_detail", kwargs={"owner": self.repo.owner, "name": self.repo.name}
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 404  # no permissions
+
+        assign_perm("plan.view_builds", self.user, self.planrepo)
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_repo_branches__as_superuser(self):
+        self.client.force_login(self.superuser)
+        url = reverse(
+            "repo_branches", kwargs={"owner": self.repo.owner, "name": self.repo.name}
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_repo_branches__as_user(self):
+        self.client.force_login(self.user)
+        url = reverse(
+            "repo_branches", kwargs={"owner": self.repo.owner, "name": self.repo.name}
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 404  # no permissions
+
+        assign_perm("plan.view_builds", self.user, self.planrepo)
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_repo_plans__as_superuser(self):
+        self.client.force_login(self.superuser)
+        url = reverse(
+            "repo_plans", kwargs={"owner": self.repo.owner, "name": self.repo.name}
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_repo_plans__as_user(self):
+        self.client.force_login(self.user)
+        url = reverse(
+            "repo_plans", kwargs={"owner": self.repo.owner, "name": self.repo.name}
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 404  # no permissions
+
+        assign_perm("plan.view_builds", self.user, self.planrepo)
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_repo_orgs__as_superuser(self):
+        self.client.force_login(self.superuser)
+        url = reverse(
+            "repo_orgs", kwargs={"owner": self.repo.owner, "name": self.repo.name}
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_repo_orgs__as_user(self):
+        self.client.force_login(self.user)
+        url = reverse(
+            "repo_orgs", kwargs={"owner": self.repo.owner, "name": self.repo.name}
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 404  # no permissions
+
+        assign_perm("plan.org_login", self.user, self.planrepo)
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_repo_perf__as_superuser(self):
+        self.client.force_login(self.superuser)
+        url = reverse(
+            "repo_perf", kwargs={"owner": self.repo.owner, "name": self.repo.name}
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_repo_perf__as_user(self):
+        self.client.force_login(self.user)
+        url = reverse(
+            "repo_perf", kwargs={"owner": self.repo.owner, "name": self.repo.name}
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 404  # no permissions
+
+        assign_perm("plan.view_builds", self.user, self.planrepo)
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_branch_detail__as_superuser(self):
+        self.client.force_login(self.superuser)
+        url = reverse(
+            "branch_detail",
+            kwargs={
+                "owner": self.repo.owner,
+                "name": self.repo.name,
+                "branch": self.branch.name,
+            },
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_branch_detail__as_user(self):
+        self.client.force_login(self.user)
+        url = reverse(
+            "branch_detail",
+            kwargs={
+                "owner": self.repo.owner,
+                "name": self.repo.name,
+                "branch": self.branch.name,
+            },
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 404  # no permissions
+
+        assign_perm("plan.view_builds", self.user, self.planrepo)
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_commit_detail__as_superuser(self):
+        self.client.force_login(self.superuser)
+        url = reverse(
+            "commit_detail",
+            kwargs={"owner": self.repo.owner, "name": self.repo.name, "sha": "abc123"},
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_commit_detail__as_user(self):
+        self.client.force_login(self.user)
+        url = reverse(
+            "commit_detail",
+            kwargs={"owner": self.repo.owner, "name": self.repo.name, "sha": "abc123"},
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 404  # no permissions
+
+        assign_perm("plan.view_builds", self.user, self.planrepo)
+
+        response = self.client.get(url)
+        assert response.status_code == 200
 
     @pytest.mark.django_db
     def test_get_repository(self):
-        repo = RepositoryFactory(name="TestRepo")
-        push_payload = {"repository": {"id": repo.github_id}}
+        push_payload = {"repository": {"id": self.repo.github_id}}
 
         actual = views.get_repository(push_payload)
-        assert actual.github_id == repo.github_id
+        assert actual.github_id == self.repo.github_id
 
     def test_get_branch_name_from_payload__no_ref(self):
         payload = {"not_ref": "12345"}
@@ -145,16 +312,3 @@ class TestGithubPushWebHook(TestCase):
 
         tag_name = views.get_tag_name_from_ref(test_ref)
         assert tag_name == tagged_release
-
-    @pytest.mark.django_db
-    def test_create_builds(self):
-        plan_repo = PlanRepositoryFactory()
-        repo = Repository.objects.get(pk=1)
-        plan = Plan.objects.get(pk=1)
-        plan.active = True
-        plan.trigger = "tag"
-        plan.save()
-
-        assert Build.objects.all().count() == 0
-        views.create_builds(mock.Mock(), repo, "test-branch", mock.Mock())
-        # assert Build.objects.all().count() == 1
