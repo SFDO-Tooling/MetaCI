@@ -1,0 +1,7 @@
+.git
+.cache
+node_modules
+.dockerignore
+.eslintignore
+*.env
+.env

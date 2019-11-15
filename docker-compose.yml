@@ -2,13 +2,13 @@ version: "3"
 
 services:
   postgres:
-    # environment:
-    #   - POSTGRES_DB=metaci
+    environment:
+      - POSTGRES_USER=metaci
+      - POSTGRES_DB=metaci
     image: postgres:10.6
     ports: 
     - "5432:5432"
     restart: always
-    user: postgres
   redis:
     image: 'redis:5'
     ports:
@@ -17,21 +17,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-       
     command: |
-      /bin/bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done;
-      sleep 1;
-      python /app/manage.py migrate \
-      && python /app/manage.py runserver 0.0.0.0:8000 \
-      & ./node_modules/.bin/webpack-dev-server --config /app/webpack.dev.js \
-      & python /app/manage.py metaci_rqworker short \
-      & python /app/manage.py rqscheduler --queue short'
+      /bin/bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; \
+        sleep 1; /app/start_server.sh'
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
-      - redis
-    links:
       - postgres
       - redis
     env_file:
