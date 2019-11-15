@@ -27,5 +27,7 @@ services:
       - redis
     env_file:
       - config/settings/.env
+    environment:
+      - BUILD_ENV=development
     volumes:
       - .:/app
