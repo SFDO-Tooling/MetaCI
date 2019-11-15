@@ -4,6 +4,7 @@ from unittest import mock
 import pytest
 from django.test import Client, TestCase
 from django.test.client import RequestFactory
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 
@@ -39,7 +40,7 @@ class TestRepositoryViews(TestCase):
     @pytest.mark.django_db
     def test_repo_list(self):
         self.client.force_login(self.superuser)
-        url = reverse("repo_list")
+        url = reverse("repo_list", kwargs={"owner": self.repo.owner})
 
         response = self.client.get(url)
         assert response.status_code == 200
@@ -230,6 +231,24 @@ class TestRepositoryViews(TestCase):
 
         response = self.client.get(url)
         assert response.status_code == 200
+
+    @pytest.mark.django_db
+    @mock.patch("metaci.repository.views.hmac")
+    def test_validate_github_webhook__invalid_request(self, hmac):
+        request = RequestFactory()
+        request.META = {"HTTP_X_HUB_SIGNATURE": "key=value"}
+        request.body = None
+
+        hmac.new.return_value = mock.Mock()
+        hmac.compare_digest.return_value = True
+
+        exception_raised = False
+        try:
+            views.validate_github_webhook(request)
+        except:
+            exception_raised = True
+
+        assert not exception_raised
 
     @pytest.mark.django_db
     def test_get_repository(self):
