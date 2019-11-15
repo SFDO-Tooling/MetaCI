@@ -1,27 +1,27 @@
 import json
-import pytest
 from unittest import mock
-from django.test import TestCase, Client
+
+import pytest
+from django.test import Client, TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 
-from metaci.repository import views
-from metaci.plan.models import Plan, PlanRepository
 from metaci.build.models import Build
-from metaci.repository.models import Repository
-
 from metaci.conftest import (
-    RepositoryFactory,
     BranchFactory,
-    PlanFactory,
     BuildFactory,
     BuildFlowFactory,
-    TestResultFactory,
+    PlanFactory,
     PlanRepositoryFactory,
-    UserFactory,
+    RepositoryFactory,
     StaffSuperuserFactory,
+    TestResultFactory,
+    UserFactory,
 )
+from metaci.plan.models import Plan, PlanRepository
+from metaci.repository import views
+from metaci.repository.models import Repository
 
 
 class TestRepositoryViews(TestCase):
