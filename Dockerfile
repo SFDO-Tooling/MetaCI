@@ -26,7 +26,7 @@ WORKDIR /app
 RUN yarn install
 
 COPY . /app
-RUN chmod +x /app/setup_test.sh
+RUN chmod +x /app/start_server.sh
 
 ENV PYTHONUNBUFFERED 1
 # Don't write .pyc files
