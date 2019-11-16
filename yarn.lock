@@ -2520,7 +2520,7 @@ async@1.5.2:
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
   integrity sha1-7GphrlZIDAw8skHJVhjiCJL5Zyo=
 
-async@^2.6.2:
+async@^2.5.0, async@^2.6.2:
   version "2.6.3"
   resolved "https://registry.yarnpkg.com/async/-/async-2.6.3.tgz#d72625e2344a3656e3a3ad4fa749fa83299d82ff"
   integrity sha512-zflvls11DCy+dQWzTW2dzuilv8Z5X/pjfmZOWba6TNIVDm+2UDaJmXSOXlasHKfNBs8oo3M0aT50fDEWfKZjXg==
@@ -4713,6 +4713,11 @@ dir-glob@^3.0.1:
   integrity sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==
   dependencies:
     path-type "^4.0.0"
+
+dirname@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/dirname/-/dirname-0.1.0.tgz#5213b3fb96b83e10105c816523900c4c21edb4bf"
+  integrity sha1-UhOz+5a4PhAQXIFlI5AMTCHttL8=
 
 dns-equal@^1.0.0:
   version "1.0.0"
@@ -9031,6 +9036,11 @@ node-sass@^4.12.0:
     stdout-stream "^1.4.0"
     "true-case-path" "^1.0.2"
 
+nodejs@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/nodejs/-/nodejs-0.0.0.tgz#4722fa2e18ac4eb73a42ae16d01e3584a12b7531"
+  integrity sha1-RyL6LhisTrc6Qq4W0B41hKErdTE=
+
 "nopt@2 || 3":
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/nopt/-/nopt-3.0.6.tgz#c6465dbf08abcd4db359317f79ac68a646b28ff9"
@@ -11106,6 +11116,13 @@ readdirp@~3.2.0:
   dependencies:
     picomatch "^2.0.4"
 
+readlink@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/readlink/-/readlink-2.0.1.tgz#fa49774f082c3d847f31d1e65924a2f4d237800f"
+  integrity sha512-x6SstzralQQNDHy3aA9Sh5udcg/rxcyl7X7gKl7dhql2tmVsd9pDYzI5+1lrLfProMKXZlWb62s8J2uAmcoTgA==
+  dependencies:
+    async "^2.5.0"
+
 realpath-native@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/realpath-native/-/realpath-native-1.1.0.tgz#2003294fea23fb0672f2476ebe22fcf498a2d65c"
@@ -11778,6 +11795,11 @@ scss-tokenizer@^0.2.3:
   dependencies:
     js-base64 "^2.1.8"
     source-map "^0.4.2"
+
+sed@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/sed/-/sed-0.0.1.tgz#09b99e40f348d07035c7e98e777b3463ea678c67"
+  integrity sha512-eWy0FQtXOs4obQFKRO0AnXNM7SrY18UOtdBRCjYRYRrUBnA5j7/Ky/tsf1XLhw+JioIxoYLdOYNI5Ts6bjkpkg==
 
 select-hose@^2.0.0:
   version "2.0.0"

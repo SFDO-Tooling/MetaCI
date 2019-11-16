@@ -5,9 +5,10 @@ services:
     environment:
       - POSTGRES_USER=metaci
       - POSTGRES_DB=metaci
+      - POSTGRES_PASSWORD=
     image: postgres:10.6
     ports: 
-    - "5432:5432"
+    - "5432:5432/tcp"
     restart: always
   redis:
     image: 'redis:5'
@@ -18,8 +19,8 @@ services:
       context: .
       dockerfile: Dockerfile
     command: |
-      /bin/bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; \
-        sleep 1; /app/start_server.sh'
+        /bin/bash -c 'while !</dev/tcp/postgres/5432; do /bin/sleep 1; done; \
+        /bin/sleep 1; /bin/sh /app/start_server.sh'
     ports:
       - "8000:8000"
     depends_on:
@@ -29,5 +30,6 @@ services:
       - config/settings/.env
     environment:
       - BUILD_ENV=development
+      - DATABASE_URL=postgres://metaci@postgres:5432/metaci
     volumes:
       - .:/app
