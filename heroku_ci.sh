@@ -13,6 +13,8 @@ export COVERALLS_PARALLEL=true
 export CIRCLECI=true
 export CIRCLE_BUILD_NUM=$HEROKU_TEST_RUN_ID
 
+yarn prod # make webpack run?
+
 # Run Python tests
 coverage run $(which pytest) --tap-stream
 exit_status=$?
