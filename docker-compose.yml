@@ -27,7 +27,7 @@ services:
       - postgres
       - redis
     env_file:
-      - config/settings/.env
+      - .env
     environment:
       - BUILD_ENV=development
       - DATABASE_URL=postgres://metaci@postgres:5432/metaci
