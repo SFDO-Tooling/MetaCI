@@ -36,10 +36,16 @@ class TestRepositoryViews(TestCase):
         cls.repo = RepositoryFactory(name="PublicRepo")
         cls.planrepo = PlanRepositoryFactory(plan=cls.plan, repo=cls.repo)
         cls.branch = BranchFactory(name="test-branch", repo=cls.repo)
+        cls.build = BuildFactory(
+            branch=cls.branch, repo=cls.repo, plan=cls.plan, planrepo=cls.planrepo
+        )
         super(TestRepositoryViews, cls).setUpTestData()
 
     @pytest.mark.django_db
     def test_repo_list(self):
+        self.plan.dashboard = "last"
+        self.plan.save()
+
         self.client.force_login(self.superuser)
         url = reverse("repo_list")
 
