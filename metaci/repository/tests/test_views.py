@@ -28,7 +28,7 @@ from metaci.repository.models import Repository
 
 class TestRepositoryViews(TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpTestData(cls):
         cls.client = Client()
         cls.superuser = StaffSuperuserFactory()
         cls.user = UserFactory()
@@ -36,12 +36,12 @@ class TestRepositoryViews(TestCase):
         cls.repo = RepositoryFactory(name="PublicRepo")
         cls.planrepo = PlanRepositoryFactory(plan=cls.plan, repo=cls.repo)
         cls.branch = BranchFactory(name="test-branch", repo=cls.repo)
-        super(TestRepositoryViews, cls).setUpClass()
+        super(TestRepositoryViews, cls).setUpTestData()
 
     @pytest.mark.django_db
     def test_repo_list(self):
         self.client.force_login(self.superuser)
-        url = reverse("repo_list", kwargs={"owner": self.repo.owner})
+        url = reverse("repo_list")
 
         response = self.client.get(url)
         assert response.status_code == 200
@@ -260,7 +260,7 @@ class TestRepositoryViews(TestCase):
         self.client.force_login(self.user)
         url = reverse("github_push_webhook")
         push_data = {
-            "repository": {"id": "does_not_exist"},
+            "repository": {"id": 1234567890},
             "ref": "refs/heads/feature-branch-1",
             "head_commit": "aR4Zd84F1i3No8",
         }
