@@ -3,9 +3,9 @@ from unittest import mock
 from unittest.mock import patch
 
 import pytest
+from django.core.exceptions import PermissionDenied
 from django.test import Client, TestCase
 from django.test.client import RequestFactory
-from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 
@@ -33,6 +33,8 @@ class TestRepositoryViews(TestCase):
         cls.superuser = StaffSuperuserFactory()
         cls.user = UserFactory()
         cls.plan = PlanFactory(name="Plan1")
+        cls.plan.dashboard = "last"
+        cls.plan.save()
         cls.repo = RepositoryFactory(name="PublicRepo")
         cls.planrepo = PlanRepositoryFactory(plan=cls.plan, repo=cls.repo)
         cls.branch = BranchFactory(name="test-branch", repo=cls.repo)
@@ -43,9 +45,6 @@ class TestRepositoryViews(TestCase):
 
     @pytest.mark.django_db
     def test_repo_list(self):
-        self.plan.dashboard = "last"
-        self.plan.save()
-
         self.client.force_login(self.superuser)
         url = reverse("repo_list")
 
@@ -284,7 +283,6 @@ class TestRepositoryViews(TestCase):
         url = reverse("github_push_webhook")
         push_data = {
             "repository": {"id": self.repo.github_id},
-            "ref": f"refs/heads/{self.branch.name}",
             "head_commit": "aR4Zd84F1i3No8",
         }
 
@@ -292,7 +290,7 @@ class TestRepositoryViews(TestCase):
             url, data=json.dumps(push_data), content_type="application/json"
         )
         assert response.status_code == 200
-        assert response.content == b"OK"
+        assert response.content == b"No branch found"
 
     @pytest.mark.django_db
     def test_get_repository(self):
