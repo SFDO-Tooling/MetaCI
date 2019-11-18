@@ -34,6 +34,8 @@ class TestRepositoryViews(TestCase):
         cls.user = UserFactory()
         cls.plan = PlanFactory(name="Plan1")
         cls.plan.dashboard = "last"
+        cls.plan.trigger = "tag"
+        cls.plan.regex = "beta"
         cls.plan.save()
         cls.repo = RepositoryFactory(name="PublicRepo")
         cls.planrepo = PlanRepositoryFactory(plan=cls.plan, repo=cls.repo)
@@ -291,6 +293,23 @@ class TestRepositoryViews(TestCase):
         )
         assert response.status_code == 200
         assert response.content == b"No branch found"
+
+    @pytest.mark.django_db
+    @mock.patch("metaci.repository.views.validate_github_webhook")
+    def test_github_push_webhook(self, validate):
+        self.client.force_login(self.user)
+        url = reverse("github_push_webhook")
+        push_data = {
+            "repository": {"id": self.repo.github_id},
+            "ref": "refs/tags/beta",
+            "head_commit": {"id": "aR4Zd84F1i3No8"},
+        }
+
+        response = self.client.post(
+            url, data=json.dumps(push_data), content_type="application/json"
+        )
+        assert response.status_code == 200
+        assert response.content == b"OK"
 
     @pytest.mark.django_db
     def test_get_repository(self):
