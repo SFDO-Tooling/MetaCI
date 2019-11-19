@@ -330,6 +330,11 @@ RQ_QUEUES = {
         "DEFAULT_TIMEOUT": 500,
         "AUTOCOMMIT": False,
     },
+    "robot": {
+        "USE_REDIS_CACHE": "default",
+        "DEFAULT_TIMEOUT": 7200,
+        "AUTOCOMMIT": False,
+    },
 }
 
 # Site URL
@@ -366,6 +371,7 @@ METACI_MAX_WORKERS = env.int("METACI_MAX_WORKERS", 3)
 # Should be less than METACI_MAX_WORKERS
 METACI_WORKER_RESERVE = env.int("METACI_WORKER_RESERVE", 1)
 WORKER_DYNO_NAME = env("WORKER_DYNO_NAME", default=None) or "worker"
+
 
 # Django REST Framework
 REST_FRAMEWORK = {
