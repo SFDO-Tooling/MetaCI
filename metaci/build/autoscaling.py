@@ -20,6 +20,8 @@ class Autoscaler(object):
     def __init__(self, config):
         """config is a dict that has an entry for queues"""
         self.queues = [django_rq.get_queue(name) for name in config["queues"]]
+        self.max_workers = config["max_workers"]
+        self.worker_reserve = config["worker_reserve"]
 
     def measure(self):
         # Check how many builds are active (queued or started)
@@ -33,10 +35,10 @@ class Autoscaler(object):
 
         # Allocate as many high-priority builds as possible to reserve workers,
         # then the remainder to standard workers
-        reserve_workers = min(high_priority_builds, settings.METACI_WORKER_RESERVE)
+        reserve_workers = min(high_priority_builds, self.worker_reserve)
         other_workers = min(
             self.active_builds - reserve_workers,
-            settings.METACI_MAX_WORKERS - settings.METACI_WORKER_RESERVE,
+            self.max_workers - self.worker_reserve,
         )
         self.target_workers = reserve_workers + other_workers
 

@@ -270,6 +270,8 @@ if not AUTOSCALERS and HEROKU_APP_NAME:
         HEROKU_APP_NAME: {
             "app_name": HEROKU_APP_NAME,
             "worker_type": WORKER_DYNO_NAME,
+            "max_workers": METACI_MAX_WORKERS,
+            "worker_reserve": METACI_WORKER_RESERVE,
             "queues": ["default", "medium", "high"],
         }
     }

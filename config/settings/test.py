@@ -86,7 +86,9 @@ METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.LocalAutoscaler"
 AUTOSCALERS = {
     "test-app": {
         "app_name": "test-app",
-        "worker-type": "worker",
+        "worker_type": "worker",
+        "max_workers": 2,
+        "worker_reserve": 1,
         "queues": ["default", "medium", "high"],
     }
 }
