@@ -9,6 +9,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 
+from metaci.repository.models import Branch
 from metaci.build.models import Build
 from metaci.conftest import (
     BranchFactory,
@@ -296,7 +297,7 @@ class TestRepositoryViews(TestCase):
 
     @pytest.mark.django_db
     @mock.patch("metaci.repository.views.validate_github_webhook")
-    def test_github_push_webhook(self, validate):
+    def test_github_push_webhook__with_tag(self, validate):
         self.client.force_login(self.user)
         url = reverse("github_push_webhook")
         push_data = {
@@ -310,6 +311,25 @@ class TestRepositoryViews(TestCase):
         )
         assert response.status_code == 200
         assert response.content == b"OK"
+
+    @pytest.mark.django_db
+    @mock.patch("metaci.repository.views.validate_github_webhook")
+    def test_github_push_webhook__with_branch(self, validate):
+        self.client.force_login(self.user)
+        url = reverse("github_push_webhook")
+        branch_name = "feature-branch-1"
+        push_data = {
+            "repository": {"id": self.repo.github_id},
+            "ref": f"refs/heads/{branch_name}",
+            "head_commit": {"id": "aR4Zd84F1i3No8"},
+        }
+
+        response = self.client.post(
+            url, data=json.dumps(push_data), content_type="application/json"
+        )
+        assert response.status_code == 200
+        assert response.content == b"OK"
+        assert Branch.objects.filter(name=branch_name).count() == 1
 
     @pytest.mark.django_db
     def test_get_repository(self):
