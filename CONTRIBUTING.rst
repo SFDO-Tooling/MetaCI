@@ -30,6 +30,9 @@ create a virtualenv (once you have `virtualenvwrapper`_ installed locally)::
 Running MetaCI In Docker:
 
     This section assumes you have downloaded `docker` and `docker-compose`.
+    Additionally it assumes you have a `.env` file in the root directory of this 
+    project, a template of variables needed can be found under `env.example`.
+
         To get docker please visit: https://hub.docker.com/?overlay=onboarding 
         and follow the installation instructions to download docker if needed: 
 
@@ -54,9 +57,7 @@ Running MetaCI In Docker:
     To configure and run your environment you must run 2 commands in the root directory of MetaCI:
 
             `docker-compose build
-            docker-compose up -d` 
-            or docker-compose up (for debug mode
-            )
+             docker-compose up -d` or docker-compose up (for debug mode)
         
     To destroy your container and create a fresh one enter the following command:
         * Note this will destroy anything that is in the virtual environment *
