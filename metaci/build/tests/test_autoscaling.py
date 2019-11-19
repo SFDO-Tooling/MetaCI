@@ -11,32 +11,33 @@ from metaci.build.autoscaling import (
     autoscale,
     get_autoscaler,
 )
+from metaci.exceptions import ConfigError
 
 
 @pytest.fixture
 def non_scaler_config():
-    return {"queues": ["default", "medium", "high"]}
+    return {
+        "max_workers": 5,
+        "worker_reserve": 1,
+        "queues": ["default", "medium", "high"],
+    }
 
 
 @pytest.fixture
-def scaler_config():
-    return {
-        "app_name": "test-app",
-        "worker_type": "worker",
-        "queues": ["default", "medium", "high"],
-    }
+def scaler_config(non_scaler_config):
+    return {"app_name": "test-app", "worker_type": "worker", **non_scaler_config}
 
 
 class TestAutoscaler:
     @mock.patch("django_rq.get_queue")
     @mock.patch("metaci.build.autoscaling.Autoscaler.count_builds")
-    def test_measure(self, count_builds, get_queue):
+    def test_measure(self, count_builds, get_queue, non_scaler_config):
         high_priority_queue = mock.Mock()
         high_priority_queue.name = "high"
         get_queue.side_effect = [high_priority_queue, mock.Mock(), mock.Mock()]
         count_builds.side_effect = [1, 0, 2]
 
-        autoscaler = Autoscaler(config={"queues": ["default", "medium", "high"]})
+        autoscaler = Autoscaler(config=non_scaler_config)
         autoscaler.measure()
         assert autoscaler.active_builds == 3
         assert autoscaler.target_workers == 3
@@ -150,7 +151,35 @@ class TestHerokuAutoscaler:
         autoscaler.scale()
 
 
-def test_get_autoscaler():
-    """In test context autoscaler is set to metaci.build.autoscaling.LocalAutoscaler"""
-    autoscaler_class = get_autoscaler("test-app")
-    assert isinstance(autoscaler_class, LocalAutoscaler)
+class TestAutoscalerConfig:
+    def test_get_autoscaler(self):
+        """In test context autoscaler is set to metaci.build.autoscaling.LocalAutoscaler"""
+        autoscaler_class = get_autoscaler("test-app")
+        assert isinstance(autoscaler_class, LocalAutoscaler)
+
+    def test_autoscaler_config_error(self):
+        """Coverage for each possible config error"""
+        config = {}
+        with pytest.raises(ConfigError):
+            Autoscaler(config)
+
+        config["queues"] = ["default", "medium", "high"]
+        with pytest.raises(ConfigError):
+            Autoscaler(config)
+
+        config["max_workers"] = 5
+        with pytest.raises(ConfigError):
+            Autoscaler(config)
+
+        config["worker_reserve"] = 1
+        Autoscaler(config)
+
+        with pytest.raises(ConfigError):
+            HerokuAutoscaler(config)
+
+        config["app_name"] = "test-app"
+        with pytest.raises(ConfigError):
+            HerokuAutoscaler(config)
+
+        config["worker_type"] = "worker"
+        HerokuAutoscaler(config)

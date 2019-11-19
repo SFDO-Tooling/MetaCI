@@ -8,6 +8,8 @@ from django.conf import settings
 from rq import Worker
 from rq.registry import StartedJobRegistry
 
+from metaci.exceptions import ConfigError
+
 logger = logging.getLogger(__name__)
 
 
@@ -19,8 +21,22 @@ class Autoscaler(object):
 
     def __init__(self, config):
         """config is a dict that has an entry for queues"""
+        if "queues" not in config:
+            raise ConfigError(
+                f"'queues' not present in autoscaler config:\nFound: {config}"
+            )
         self.queues = [django_rq.get_queue(name) for name in config["queues"]]
+
+        if "max_workers" not in config:
+            raise ConfigError(
+                f"'max_workers' not present in autoscaler config:\nFound: {config}"
+            )
         self.max_workers = config["max_workers"]
+
+        if "worker_reserve" not in config:
+            raise ConfigError(
+                f"'worker_reserve' not present in autoscaler config:\nFound: {config}"
+            )
         self.worker_reserve = config["worker_reserve"]
 
     def measure(self):
@@ -104,7 +120,16 @@ class HerokuAutoscaler(Autoscaler):
     def __init__(self, config):
         """config is a dict which has entries for: app_name, worker_type, and queues."""
 
+        if "app_name" not in config:
+            raise ConfigError(
+                f"'app_name' not present in autoscaler config:\nFound: {config}"
+            )
         self.app_name = config["app_name"]
+
+        if "worker_type" not in config:
+            raise ConfigError(
+                f"'worker_type' not present in autoscaler config:\nFound: {config}"
+            )
         self.worker_type = config["worker_type"]
         self.url = f"{self.API_ROOT}/{config['app_name']}/formation/{self.worker_type}"
         self.headers = {
