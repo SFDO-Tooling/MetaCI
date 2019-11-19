@@ -124,13 +124,7 @@ CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET")
 CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL")
 
 
-AUTOSCALERS = {
-    "local-app": {
-        "app_name": "local-app",
-        "worker_type": "worker",
-        "queues": ["default", "medium", "high", "robot"],
-    }
-}
+AUTOSCALERS = {"local-app": {"queues": ["default", "medium", "high", "robot"],}}
 
 # SFDX Credentials
 SFDX_CLIENT_ID = env("SFDX_CLIENT_ID")
