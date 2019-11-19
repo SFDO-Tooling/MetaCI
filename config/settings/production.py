@@ -12,6 +12,8 @@ Production Configurations
 """
 from __future__ import absolute_import, unicode_literals
 
+import json
+
 from .common import *  # noqa
 
 # from django.utils import six
@@ -255,8 +257,26 @@ if HIREFIRE_TOKEN:
 
 HEROKU_TOKEN = env("HEROKU_TOKEN", default=None)
 HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
+
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
+
+# Autoscalers are defined per METACI_APP
+AUTOSCALERS = json.loads(env("AUTOSCALERS", default="{}"))
+
+if not AUTOSCALERS and HEROKU_APP_NAME:
+    # backwards compatability
+    AUTOSCALERS = {
+        HEROKU_APP_NAME: {
+            "app_name": HEROKU_APP_NAME,
+            "worker_type": WORKER_DYNO_NAME,
+            "max_workers": METACI_MAX_WORKERS,
+            "worker_reserve": METACI_WORKER_RESERVE,
+            "queues": ["default", "medium", "high"],
+        }
+    }
+else:
+    AUTOSCALERS = {}
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")

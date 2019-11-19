@@ -7,7 +7,6 @@ Test settings
 
 from .common import *  # noqa
 
-
 # DEBUG
 # ------------------------------------------------------------------------------
 # Turn debug off so tests run faster
@@ -48,6 +47,7 @@ RQ_QUEUES = {
     "high": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
     "medium": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
     "short": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 500, "AUTOCOMMIT": False},
+    "robot": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
 }
 
 
@@ -80,3 +80,15 @@ CONNECTED_APP_CALLBACK_URL = "http://localhost/callback"
 
 HEROKU_TOKEN = "BOGUS"
 HEROKU_APP_NAME = "testapp"
+
+METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.LocalAutoscaler"
+
+AUTOSCALERS = {
+    "test-app": {
+        "app_name": "test-app",
+        "worker_type": "worker",
+        "max_workers": 2,
+        "worker_reserve": 1,
+        "queues": ["default", "medium", "high"],
+    }
+}
