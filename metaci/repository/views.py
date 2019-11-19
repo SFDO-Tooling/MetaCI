@@ -165,7 +165,7 @@ def github_push_webhook(request):
     if not branch_name:
         return HttpResponse("No branch found")
 
-    branch = get_or_create_branch(push, repo)
+    branch = get_or_create_branch(branch_name, repo)
     release = get_release_if_applicable(push, repo)
     create_builds(push, repo, branch, release)
 
