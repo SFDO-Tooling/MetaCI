@@ -12,8 +12,9 @@ Production Configurations
 """
 from __future__ import absolute_import, unicode_literals
 
-from .common import *  # noqa
 import json
+
+from .common import *  # noqa
 
 # from django.utils import six
 
@@ -260,15 +261,19 @@ HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
 
-DEFAULT_AUTOSCALERS = {
-    "mrbelvedereci": {
-        "app_name": "mrbelvedereci",
-        "worker_type": "worker",
-        "queues": ["default", "medium", "high"],
-    }
-}
 # Autoscalers are defined per METACI_APP
-AUTOSCALERS = json.loads(env("AUTOSCALERS", default=DEFAULT_AUTOSCALERS))
+AUTOSCALERS = json.loads(env("AUTOSCALERS", default={}))
+
+if not AUTOSCALERS:
+    # backwards compatability
+    HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
+    AUTOSCALERS = {
+        HEROKU_APP_NAME: {
+            "app_name": HEROKU_APP_NAME,
+            "worker_type": "worker",
+            "queues": ["default", "medium", "high"],
+        }
+    }
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")

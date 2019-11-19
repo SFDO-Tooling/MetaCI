@@ -7,7 +7,6 @@ Test settings
 
 from .common import *  # noqa
 
-
 # DEBUG
 # ------------------------------------------------------------------------------
 # Turn debug off so tests run faster
