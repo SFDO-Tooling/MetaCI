@@ -167,7 +167,7 @@ def autoscale():
     This is meant to run frequently as a RepeatableJob.
     """
     scaling_info = {}
-    for app_name in settings.METACI_APPS:
+    for app_name in settings.AUTOSCALERS.keys():
         autoscaler = get_autoscaler(app_name)
         autoscaler.measure()
         autoscaler.scale()

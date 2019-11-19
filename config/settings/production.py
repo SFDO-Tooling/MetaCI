@@ -260,9 +260,15 @@ HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
 
-METACI_APPS = env("METACI_APPS", default=None)
+DEFAULT_AUTOSCALERS = {
+    "mrbelvedereci": {
+        "app_name": "mrbelvedereci",
+        "worker_type": "worker",
+        "queues": ["default", "medium", "high"],
+    }
+}
 # Autoscalers are defined per METACI_APP
-AUTOSCALERS = json.loads(env("AUTOSCALERS", default=None))
+AUTOSCALERS = json.loads(env("AUTOSCALERS", default=DEFAULT_AUTOSCALERS))
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")
