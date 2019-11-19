@@ -1,8 +1,9 @@
-import os
 import json
+import os
+from unittest import mock
+
 import pytest
 import responses
-from unittest import mock
 
 from metaci.build.autoscaling import (
     Autoscaler,
