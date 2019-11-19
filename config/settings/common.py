@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
+import os
 from ipaddress import IPv4Network
 from typing import List
 
@@ -170,13 +171,20 @@ USE_TZ = True
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#templates
+if os.path.exists(str(ROOT_DIR.path("dist", "prod"))):
+    TEMPLATE_DIRS = [
+        str(ROOT_DIR.path("dist", "prod")),
+        str(APPS_DIR.path("templates")),
+    ]
+else:
+    TEMPLATE_DIRS = [str(ROOT_DIR.path("dist")), str(APPS_DIR.path("templates"))]
 TEMPLATES = [
     {
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
         # This gets overridden in settings.production:
-        "DIRS": [str(ROOT_DIR.path("dist")), str(APPS_DIR.path("templates"))],
+        "DIRS": TEMPLATE_DIRS,
         "OPTIONS": {
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
             "debug": DEBUG,
