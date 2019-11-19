@@ -13,7 +13,7 @@ export GIT_BRANCH=$HEROKU_TEST_RUN_BRANCH
 export GIT_ID=$HEROKU_TEST_RUN_COMMIT_VERSION
 
 # Run Python tests
-coverage run $(which pytest) --tap-stream
+coverage run $(which pytest) metaci --tap-stream
 exit_status=$?
 coveralls
 
