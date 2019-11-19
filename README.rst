@@ -140,7 +140,7 @@ Click the bell icon at the top to view the My Notifications page (/notifications
 Automatic Scaling
 -----------------
 
-MetaCI can be configured to monitor its own build queue and scale its own Heroku dynos based on load. It will check the queue once a minute and add worker dynos when needed. Once all builds are complete, all worker dynos will be shut down. Heroku only bills for the dyno seconds used, so this scaling can save money while allowing for greater concurrency when desired.
+MetaCI can be configured to monitor its own build queue and scale its own Heroku dynos based on load in multiple Heroku Apps. It will check the queue once a minute and add worker dynos when needed. Once all builds are complete, all worker dynos will be shut down. Heroku only bills for the dyno seconds used, so this scaling can save money while allowing for greater concurrency when desired.
 
 To configure autoscaling:
 
@@ -148,7 +148,11 @@ To configure autoscaling:
 2. Set the METACI_WORKER_RESERVE setting to the number of dynos you'd like to reserve for high-priority builds. (Optional; defaults to 1.)
 3. Set up a Heroku user with access to this app, and create an authorization token using ``heroku authorizations:create``. Set the HEROKU_TOKEN setting to this authorization token.
 4. Set the HEROKU_APP_NAME setting to the name of the Heroku app.
-5. Add a RepeatableJob with Callable = ``metaci.build.autoscaling.autoscale``, Queue = ``short``, and Interval = ``1 minute``.
+5. Set the AUTOSCALERS setting as a dict in the following format: {'app_name : {'app_name': name, 'worker_type': type, 'queues': [list of queues]}}. You may list more than one Heroku app in the in AUTOSCALERS setting.
+    1. app_name - The name of the Heroku App.
+    2. queues - a list of redis queues to monitor
+    3. worker_type - The name of the worker dynos allocated for the given queues.
+6. Add a RepeatableJob with Callable = ``metaci.build.autoscaling.autoscale``, Queue = ``short``, and Interval = ``1 minute``.
 
 
 Email Server
