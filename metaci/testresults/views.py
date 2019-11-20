@@ -171,9 +171,35 @@ def test_result_robot(request, result_id):
 
         source = mkstemp()[1]
         log = mkstemp(".html")[1]
+        rebot_options = {"log": log, "output": None, "report": None}
+        if result.robot_task:
+            # Copy subset of robot task options that affect the log
+            # W-
+            options_to_copy = (
+                "name",
+                "doc",
+                "metadata",
+                "settag",
+                "critical",
+                "noncritical",
+                "logtitle",
+                "suitestatlevel",
+                "tagstatinclude",
+                "tagstatexclude",
+                "tagstatcombine",
+                "tagdoc",
+                "tagstatlink",
+                "removekeywords",
+                "flattenkeywords",
+            )
+            options = result.robot_task.options.get("options", {})
+            rebot_options.update(
+                {k: options[k] for k in options_to_copy if k in options}
+            )
+
         with open(source, "w") as f:
             f.write(robot_xml)
-        rebot(source, log=log, output=None, report=None)
+        rebot(source, **rebot_options)
         with open(log, "r") as f:
             log_html = f.read()
         os.remove(source)
