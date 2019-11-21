@@ -141,17 +141,7 @@ MANAGERS = ADMINS
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///metaci")}
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql_psycopg2",
-#         "NAME": "postgres",
-#         "USER": "postgres",
-#         "HOST": "postgres",
-#         "PORT": 5432,
-#     }
-# }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
-
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -174,7 +164,6 @@ USE_I18N = True
 USE_L10N = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
-USE_TZ = True
 
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -346,6 +335,7 @@ GITHUB_WEBHOOK_SECRET = None
 CONNECTED_APP_CLIENT_ID = None
 CONNECTED_APP_CLIENT_SECRET = None
 CONNECTED_APP_CALLBACK_URL = None
+
 SFDX_CLIENT_ID = None
 SFDX_HUB_KEY = None
 SFDX_HUB_USERNAME = None
