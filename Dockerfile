@@ -12,10 +12,13 @@ ENV YARN_VERSION 1.19.1
 # installing yarn
 COPY ./utility/install_yarn.sh /app/utility/install_yarn.sh
 RUN /bin/sh /app/utility/install_yarn.sh
+# # installing sfdx
+COPY ./utility/install_sfdx.sh /app/utility/install_sfdx.sh
+RUN /bin/sh /app/utility/install_sfdx.sh
 # installing python related dependencies with pip
-COPY ./requirements /requirements
+COPY ./requirements /app/requirements
 RUN pip install --no-cache --upgrade pip
-RUN if [ "${BUILD_ENV}" = "production" ] ; then pip install --no-cache -r /requirements/production.txt ; else pip install --no-cache -r /requirements/local.txt ; fi
+RUN if [ "${BUILD_ENV}" = "production" ] ; then pip install --no-cache -r /app/requirements/production.txt ; else pip install --no-cache -r /app/requirements/local.txt ; fi
 COPY ./package.json /app/package.json
 COPY ./yarn.lock /app/yarn.lock
 WORKDIR /app
