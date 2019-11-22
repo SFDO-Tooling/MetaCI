@@ -1,9 +1,14 @@
 #!/bin/bash
 # This script runs the tests on Heroku CI
 
+# Pretend this is a git repo so that coveralls can find git info
 git clone -b "$HEROKU_TEST_RUN_BRANCH" --single-branch https://github.com/SFDO-Tooling/MetaCI MetaCI_checkout 
 cd MetaCI_checkout
 git reset --hard $HEROKU_TEST_RUN_COMMIT_VERSION
+cd ..
+mv MetaCI_checkout/.git ./
+rm -rf MetaCI_checkout
+
 export DJANGO_SETTINGS_MODULE=config.settings.test
 
 # Enable coveralls parallel mode so we can report for both Python & JS
@@ -14,7 +19,7 @@ export CIRCLECI=true
 export CIRCLE_BUILD_NUM=$HEROKU_TEST_RUN_ID
 
 # Run Python tests
-coverage run $(which pytest) --tap-stream
+coverage run $(which pytest) metaci --tap-stream
 exit_status=$?
 coveralls
 

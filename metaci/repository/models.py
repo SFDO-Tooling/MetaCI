@@ -6,6 +6,7 @@ from django.apps import apps
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
+from model_utils.managers import SoftDeletableManager
 from model_utils.models import SoftDeletableModel
 
 from metaci.cumulusci.keychain import GitHubSettingsKeychain
@@ -63,11 +64,17 @@ class Repository(models.Model):
             return None
 
 
+class BranchManager(SoftDeletableManager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("repo")
+
+
 class Branch(SoftDeletableModel):
     name = models.CharField(max_length=255)
     repo = models.ForeignKey(
         Repository, related_name="branches", on_delete=models.CASCADE
     )
+    objects = BranchManager()
     include_deleted = models.QuerySet.as_manager()
 
     class Meta:

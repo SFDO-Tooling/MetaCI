@@ -8,6 +8,8 @@ from django.conf import settings
 from rq import Worker
 from rq.registry import StartedJobRegistry
 
+from metaci.exceptions import ConfigError
+
 logger = logging.getLogger(__name__)
 
 
@@ -17,8 +19,25 @@ class Autoscaler(object):
     active_builds = 0
     target_workers = 0
 
-    def __init__(self, queues=("high", "medium", "default")):
-        self.queues = [django_rq.get_queue(name) for name in queues]
+    def __init__(self, config):
+        """config is a dict that has an entry for queues"""
+        if "queues" not in config:
+            raise ConfigError(
+                f"'queues' not present in autoscaler config:\nFound: {config}"
+            )
+        self.queues = [django_rq.get_queue(name) for name in config["queues"]]
+
+        if "max_workers" not in config:
+            raise ConfigError(
+                f"'max_workers' not present in autoscaler config:\nFound: {config}"
+            )
+        self.max_workers = config["max_workers"]
+
+        if "worker_reserve" not in config:
+            raise ConfigError(
+                f"'worker_reserve' not present in autoscaler config:\nFound: {config}"
+            )
+        self.worker_reserve = config["worker_reserve"]
 
     def measure(self):
         # Check how many builds are active (queued or started)
@@ -32,10 +51,10 @@ class Autoscaler(object):
 
         # Allocate as many high-priority builds as possible to reserve workers,
         # then the remainder to standard workers
-        reserve_workers = min(high_priority_builds, settings.METACI_WORKER_RESERVE)
+        reserve_workers = min(high_priority_builds, self.worker_reserve)
         other_workers = min(
             self.active_builds - reserve_workers,
-            settings.METACI_MAX_WORKERS - settings.METACI_WORKER_RESERVE,
+            self.max_workers - self.worker_reserve,
         )
         self.target_workers = reserve_workers + other_workers
 
@@ -96,30 +115,59 @@ class LocalAutoscaler(Autoscaler):
 class HerokuAutoscaler(Autoscaler):
     """Scale using Heroku worker dynos."""
 
-    def scale(self):
-        worker_type = "worker"
-        url = f"https://api.heroku.com/apps/{settings.HEROKU_APP_NAME}/formation/{worker_type}"
-        headers = {
+    API_ROOT = "https://api.heroku.com/apps"
+
+    def __init__(self, config):
+        """config is a dict which has entries for: app_name, worker_type, and queues."""
+
+        if "app_name" not in config:
+            raise ConfigError(
+                f"'app_name' not present in autoscaler config:\nFound: {config}"
+            )
+        self.app_name = config["app_name"]
+
+        if "worker_type" not in config:
+            raise ConfigError(
+                f"'worker_type' not present in autoscaler config:\nFound: {config}"
+            )
+        self.worker_type = config["worker_type"]
+        self.url = f"{self.API_ROOT}/{config['app_name']}/formation/{self.worker_type}"
+        self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
         }
+        super().__init__(config)
+
+    def scale(self):
         # We should only scale down if there are no active builds,
         # because we don't know which worker will be stopped.
         active_workers = self.count_workers()
         if active_workers and not self.active_builds:
-            logger.info(f"Scaling down to 0 workers")
-            resp = requests.patch(url, json={"quantity": 0}, headers=headers)
-            resp.raise_for_status()
+            self._scale_down(num_workers=0)
         elif self.target_workers > active_workers:
-            logger.info(f"Scaling up to {self.target_workers} workers")
-            resp = requests.patch(
-                url, json={"quantity": self.target_workers}, headers=headers
-            )
-            if resp.json() and resp.json().get("id") == "cannot_update_above_limit":
-                limit = resp.json()["limit"]
-                resp = self.scale_max(url, headers, worker_type, limit)
+            self._scale_up(num_workers=self.target_workers)
 
-            resp.raise_for_status()
+    def _scale_down(self, num_workers):
+        logger.info(
+            f"Scaling app ({self.app_name}) down to {num_workers} workers of type: {self.worker_type}"
+        )
+        resp = requests.patch(
+            self.url, json={"quantity": num_workers}, headers=self.headers
+        )
+        resp.raise_for_status()
+
+    def _scale_up(self, num_workers):
+        logger.info(
+            f"Scaling app ({self.app_name}) up to {self.target_workers} workers"
+        )
+        resp = requests.patch(
+            self.url, json={"quantity": self.target_workers}, headers=self.headers
+        )
+        if resp.json() and resp.json().get("id") == "cannot_update_above_limit":
+            limit = resp.json()["limit"]
+            resp = self.scale_max(self.url, self.headers, self.worker_type, limit)
+
+        resp.raise_for_status()
 
     def scale_max(self, url, headers, worker_type, limit):
         base_url, _ = url.rsplit("/", 1)
@@ -133,7 +181,10 @@ class HerokuAutoscaler(Autoscaler):
         return requests.patch(url, json={"quantity": target_workers}, headers=headers)
 
 
-get_autoscaler = import_global(settings.METACI_WORKER_AUTOSCALER)
+def get_autoscaler(app_name):
+    """Fetches the appropriate autoscaler given the app name"""
+    autoscaler_class = import_global(settings.METACI_WORKER_AUTOSCALER)
+    return autoscaler_class(settings.AUTOSCALERS[app_name])
 
 
 @django_rq.job("short")
@@ -142,7 +193,11 @@ def autoscale():
 
     This is meant to run frequently as a RepeatableJob.
     """
-    autoscaler = get_autoscaler()
-    autoscaler.measure()
-    autoscaler.scale()
-    return autoscaler.target_workers
+    scaling_info = {}
+    for app_name in settings.AUTOSCALERS.keys():
+        autoscaler = get_autoscaler(app_name)
+        autoscaler.measure()
+        autoscaler.scale()
+        scaling_info[app_name] = autoscaler.target_workers
+
+    return scaling_info

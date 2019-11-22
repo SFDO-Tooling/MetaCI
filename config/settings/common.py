@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
+import os
 from ipaddress import IPv4Network
 from typing import List
 
@@ -168,13 +169,20 @@ USE_L10N = True
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#templates
+if os.path.exists(str(ROOT_DIR.path("dist", "prod"))):
+    TEMPLATE_DIRS = [
+        str(ROOT_DIR.path("dist", "prod")),
+        str(APPS_DIR.path("templates")),
+    ]
+else:
+    TEMPLATE_DIRS = [str(ROOT_DIR.path("dist")), str(APPS_DIR.path("templates"))]
 TEMPLATES = [
     {
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
         # This gets overridden in settings.production:
-        "DIRS": [str(ROOT_DIR.path("dist")), str(APPS_DIR.path("templates"))],
+        "DIRS": TEMPLATE_DIRS,
         "OPTIONS": {
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
             "debug": DEBUG,
@@ -320,6 +328,11 @@ RQ_QUEUES = {
         "DEFAULT_TIMEOUT": 500,
         "AUTOCOMMIT": False,
     },
+    "robot": {
+        "USE_REDIS_CACHE": "default",
+        "DEFAULT_TIMEOUT": 7200,
+        "AUTOCOMMIT": False,
+    },
 }
 
 # Site URL
@@ -356,6 +369,8 @@ METACI_MAX_WORKERS = env.int("METACI_MAX_WORKERS", 3)
 # How many worker slots to reserve for high-priority jobs.
 # Should be less than METACI_MAX_WORKERS
 METACI_WORKER_RESERVE = env.int("METACI_WORKER_RESERVE", 1)
+WORKER_DYNO_NAME = env("WORKER_DYNO_NAME", default=None) or "worker"
+
 
 # Django REST Framework
 REST_FRAMEWORK = {
