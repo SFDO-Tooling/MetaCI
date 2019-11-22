@@ -9,24 +9,6 @@ Cloning the project
     git clone git@github.com:SFDO-Tooling/MetaCI
     cd MetaCI
 
-Making a virtual env
---------------------
-
-MetaCI development requires Python v3.7. If ``which python3.7`` returns a
-non-empty path, it's already installed and you can continue to the next step. If
-it returns nothing, then install Python v3.7 using ``brew install python``, or
-from `Python.org`_.
-
-.. _Python.org: https://www.python.org/downloads/
-
-There are a variety of tools that let you set up environment variables
-temporarily for a particular "environment" or directory. We use
-`virtualenvwrapper`_. Assuming you're in the repo root, do the following to
-create a virtualenv (once you have `virtualenvwrapper`_ installed locally)::
-
-    mkvirtualenv metaci --python=$(which python3.7)
-    setvirtualenvproject
-
 Running MetaCI In Docker:
 
     This section assumes you have downloaded `docker` and `docker-compose`.
@@ -68,8 +50,26 @@ Running MetaCI In Docker:
     
         docker-compose exec web bash './setup_test.sh'
 
-    **** IF YOU HAVE COMPLETED THIS SECTION THEN THE REST OF ****
-    *** THIS FILE WHILE INFORMATIVE IS NOT REQUIRED FOR SETUP ***
+    *********************** IF YOU HAVE COMPLETED THIS SECTION THEN THE REST OF *************************
+    *********************** THIS FILE WHILE INFORMATIVE IS NOT REQUIRED FOR SETUP ***********************
+
+Making a virtual env
+--------------------
+
+MetaCI development requires Python v3.7. If ``which python3.7`` returns a
+non-empty path, it's already installed and you can continue to the next step. If
+it returns nothing, then install Python v3.7 using ``brew install python``, or
+from `Python.org`_.
+
+.. _Python.org: https://www.python.org/downloads/
+
+There are a variety of tools that let you set up environment variables
+temporarily for a particular "environment" or directory. We use
+`virtualenvwrapper`_. Assuming you're in the repo root, do the following to
+create a virtualenv (once you have `virtualenvwrapper`_ installed locally)::
+
+    mkvirtualenv metaci --python=$(which python3.7)
+    setvirtualenvproject
 
 Install Python requirements::
 
