@@ -8,9 +8,10 @@ if [ "${BUILD_ENV}" = "development" ] ; then
     echo "CREATING ADMIN USER FOR TESTING PURPOSES..."
     echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@salesforce.com', 'password')" | python manage.py shell
 fi
-echo $SFDX_HUB_USERNAME
+# creating for authorization
 echo $SFDX_HUB_KEY > /app/sfdx_hub.key
-echo $(cat /app/sfdx_hub.key)
+# authorizing sfdx via jwt key authorization
 sfdx force:auth:jwt:grant -u $SFDX_HUB_USERNAME -f /app/sfdx_hub.key -i $SFDX_CLIENT_ID --setdefaultdevhubusername
+# starting server and webpack
 yarn serve
 echo "ALL DONE!"
