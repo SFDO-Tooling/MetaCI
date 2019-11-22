@@ -143,7 +143,7 @@ AUTOSCALERS = {
 
 # SFDX Credentials
 SFDX_CLIENT_ID = env("SFDX_CLIENT_ID", default=None)
-SFDX_HUB_KEY = env("SFDX_HUB_KEY", default=None)
+SFDX_HUB_KEY = env("SFDX_HUB_KEY", default="").replace(r"\n", "\n")
 SFDX_HUB_USERNAME = env("SFDX_HUB_USERNAME", default=None)
 
 SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=False)
