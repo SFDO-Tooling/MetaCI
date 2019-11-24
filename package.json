@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@salesforce-ux/design-system": "^2.10.2",
-    "@salesforce/design-system-react": "^0.10.14",
+    "@salesforce/design-system-react": "^0.10.15",
     "@salesforce/lwc-jest": "^0.6.1",
     "@sentry/browser": "^5.9.1",
     "del": "^5.1.0",
