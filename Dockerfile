@@ -37,4 +37,5 @@ ENV DJANGO_SECRET_KEY 'sample secret key'
 RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
 RUN python /app/manage.py collectstatic --noinput
 # adding for Heroku
+CMD python /app/manage.py populate_db;
 CMD ["/app/utility/start_server.sh"]
