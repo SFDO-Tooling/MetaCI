@@ -1,4 +1,4 @@
-setuptools==41.6.0
+setuptools==42.0.0
 
 
 # Django
@@ -10,7 +10,7 @@ whitenoise==4.1.4
 
 
 # Forms
-django-crispy-forms==1.8.0
+django-crispy-forms==1.8.1
 django_filter==2.2.0
 
 # Models
@@ -69,8 +69,8 @@ django-log-request-id==1.4.0
 psycopg2-binary==2.8.4
 
 # django-storages for S3
-boto3==1.10.19
-django-storages==1.7.2
+boto3==1.10.26
+django-storages==1.8
 
 # JSON web token
 PyJWT==1.7.1
