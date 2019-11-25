@@ -1,6 +1,6 @@
 FROM python:3.8
 
-ARG BUILD_ENV=development
+ARG BUILD_ENV
 RUN mkdir /app
 # declaring necessary node and yarn versions
 ENV NODE_VERSION 10.16.3

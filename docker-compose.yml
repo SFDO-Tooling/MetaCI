@@ -6,6 +6,8 @@ services:
       - POSTGRES_USER=metaci
       - POSTGRES_DB=metaci
       - POSTGRES_PASSWORD=
+    volumes:
+      - ./postgres:/var/lib/postgresql/data:delegated
     image: postgres:10.6
     ports: 
     - "5432:5432/tcp"
@@ -17,6 +19,8 @@ services:
   web:
     build:
       context: .
+      args:
+        - BUILD_ENV=development
       dockerfile: Dockerfile
     command: |
         /bin/bash -c 'while !</dev/tcp/postgres/5432; do /bin/sleep 1; done; \
@@ -30,6 +34,5 @@ services:
       - .env
     environment:
       - BUILD_ENV=development
-      - DATABASE_URL=postgres://metaci@postgres:5432/metaci
     volumes:
       - .:/app
