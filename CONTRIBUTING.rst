@@ -10,6 +10,7 @@ Cloning the project
     cd MetaCI
 
 Running MetaCI In Docker:
+------------------------
 
 This section assumes you have downloaded `docker` and `docker-compose`.
 Additionally it assumes you have a `.env` file in the root directory of this 
