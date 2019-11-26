@@ -12,7 +12,9 @@ Cloning the project
 Running MetaCI In Docker:
 ------------------------
 
-## To run MetaCI on Docker there are 3 major steps necessary:
+To run MetaCI on Docker there are 3 major steps necessary:
+----------------------------------------------------------
+----------------------------------------------------------
 
 - .env File Creation and Variable Declaration
 
