@@ -12,12 +12,17 @@ Cloning the project
 Running MetaCI In Docker:
 ------------------------
 
-This section assumes you have downloaded `docker` and `docker-compose`.
-Additionally it assumes you have a `.env` file in the root directory of this 
-project, a template of variables needed can be found under `env.example`.
+## To run MetaCI on Docker there are 3 major steps necessary:
 
-.env file declaration
----------------------
+- .env File Creation and Variable Declaration
+
+- Building Your Docker Containers
+
+- Running Your Docker Containers
+
+
+.env File Creation and Variable Declaration
+-------------------------------------------
 *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
 (REQUIRED TO RUN LOCALLY, bare minimum)
 
@@ -101,8 +106,8 @@ https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-a-connected-ap
                         due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
 
 
-Docker installation:
---------------------
+Docker and Docker-Compose Installation:
+--------------------------------------
     To get docker please visit: https://hub.docker.com/?overlay=onboarding 
     and follow the installation instructions to download docker if needed: 
 
@@ -123,6 +128,11 @@ Docker installation:
         You should see something like the following):
 
             `docker-compose version 1.16.1, build 6d1ac219`
+
+
+This section assumes you have downloaded `docker` and `docker-compose`.
+Additionally it assumes you have a `.env` file in the root directory of this 
+project, a template of variables needed can be found under `env.example`.
 
 
 To configure and run your environment you must run 2 commands in the root directory of MetaCI
