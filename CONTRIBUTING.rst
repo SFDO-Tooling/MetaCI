@@ -23,6 +23,9 @@ Running MetaCI In Docker:
 
 .env File Creation and Variable Declaration
 -------------------------------------------
+
+*Please begin by making a copy of env.example and renaming it .env in your root project directory*
+
 *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
 (REQUIRED TO RUN LOCALLY, bare minimum)
 
