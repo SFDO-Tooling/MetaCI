@@ -103,17 +103,15 @@ https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-a-connected-ap
     - DJANGO_SENTRY_DSN
 
 (OTHER VARIABLES SET BY DEFAULT FOR YOU)
-- BUILD_ENV: Environment variable used to determine what dependencies and scripts to run when installing dependencies 
-            and populating databases, currently set in docker-compose.yml web service environment variable
+- BUILD_ENV: Environment variable used to determine what dependencies and scripts to run when installing dependencies and populating databases, currently set in docker-compose.yml web service environment variable
 
 - NODE_VERSION: Environment variable used to set node version for download, this variable is set in the Dockerfile
 
 - YARN_VERSION: Environment variable used to set yarn version for download, this variable is set in the Dockerfile
 
-- PYTHONUNBUFFERED: Environment variable set in Dockerfile used to not write .pyc files to Docker container
+- PYTHONUNBUFFERED: nvironment variable set in Dockerfile used to not write .pyc files to Docker container
 
-- POSTGRES_USER: Environment variable set in the docker-compose.yml file under the postgres service, represents database user.
-                This value has already been configured for you unless you decide to reconfigure it.
+- POSTGRES_USER: Environment variable set in the docker-compose.yml file under the postgres service, represents database user. This value has already been configured for you unless you decide to reconfigure it.
 
 - POSTGRES_PASSWORD: Environment variable set in the docker-compose.yml file under the postgres service, represents database password.
                     This database is configured with no password for development purposes so leave as is unless changing for 
