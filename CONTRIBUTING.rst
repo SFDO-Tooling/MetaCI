@@ -11,9 +11,9 @@ Cloning the project
 
 Running MetaCI In Docker:
 
-    This section assumes you have downloaded `docker` and `docker-compose`.
-    Additionally it assumes you have a `.env` file in the root directory of this 
-    project, a template of variables needed can be found under `env.example`.
+This section assumes you have downloaded `docker` and `docker-compose`.
+Additionally it assumes you have a `.env` file in the root directory of this 
+project, a template of variables needed can be found under `env.example`.
 
 .env file declaration
 ---------------------
