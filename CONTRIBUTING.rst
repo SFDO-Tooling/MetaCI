@@ -18,7 +18,7 @@ To verify you have successfully installed docker type:
 
 ``docker -v``
 
-You should see something like the following):
+You should see something like the following:
 
 
 To get docker please visit: https://docs.docker.com/v17.09/compose/install/
@@ -56,15 +56,19 @@ To run MetaCI on Docker there are 3 major steps necessary:
 *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
 (REQUIRED TO RUN LOCALLY, bare minimum)
 
-- DJANGO_SECRET_KEY: This represents the secret key for the django web application, for local testing, arbritary strings such as the one given in the env.example will suffice. Otherwise use your production secret key.
+- DJANGO_SECRET_KEY: 
+This represents the secret key for the django web application, for local testing, arbritary strings such as the one given in the env.example will suffice. Otherwise use your production secret key.
 
-- GITHUB_USERNAME:      This represents the username of either the tester or service account configured for MetaCI
+- GITHUB_USERNAME:     
+This represents the username of either the tester or service account configured for MetaCI
 
-- GITHUB_PASSWORD:      This represents the password or personal access token a user must have to access their account a personal access token will be used when Multi Factor Authentication is enabled.
+- GITHUB_PASSWORD:      
+This represents the password or personal access token a user must have to access their account a personal access token will be used when Multi Factor Authentication is enabled.
 
 If you need to generate a personal access token please visit the following: https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
-- SFDX_CLIENT_ID:       This tells sfdx the client id of the connected app to use for connecting to the Dev Hub to create scratch orgs (so it's only needed for running plans that use a scratch org). For SFDO staff it's easiest to use an existing connected app, so its best to ask another team member. External users setting up MetaCI will need to create their own connected app, which they can do in the Dev Hub org. You can adapt these instructions https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-manually but there is a difference for MetaCI: because it's connecting to the org non-interactively, the connected app needs to be set up to use the JWT oauth flow. That means when creating the connected app the user needs to check the "Use Digital Signatures" box and upload a certificate. If you are a member of SFDO please visit the following quip link https://salesforce.quip.com/sm9bA3R6GwiK, and look under section 5 of SFDX Command Line Tool Setup & Install
+- SFDX_CLIENT_ID:       
+This tells sfdx the client id of the connected app to use for connecting to the Dev Hub to create scratch orgs (so it's only needed for running plans that use a scratch org). For SFDO staff it's easiest to use an existing connected app, so its best to ask another team member. External users setting up MetaCI will need to create their own connected app, which they can do in the Dev Hub org. You can adapt these instructions https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-manually but there is a difference for MetaCI: because it's connecting to the org non-interactively, the connected app needs to be set up to use the JWT oauth flow. That means when creating the connected app the user needs to check the "Use Digital Signatures" box and upload a certificate. If you are a member of SFDO please visit the following quip link https://salesforce.quip.com/sm9bA3R6GwiK, and look under section 5 of SFDX Command Line Tool Setup & Install
 
 - SFDX_HUB_KEY:          SFDX_HUB_KEY is the private key that was used to create the certificate. Shared through last pass. In the form of a pem key. Called `SFDX Hub Org Key` n Release Engineering folder.
 
@@ -113,9 +117,8 @@ https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-a-connected-ap
 
 - POSTGRES_USER: Environment variable set in the docker-compose.yml file under the postgres service, represents database user. This value has already been configured for you unless you decide to reconfigure it.
 
-- POSTGRES_PASSWORD: Environment variable set in the docker-compose.yml file under the postgres service, represents database password.
-                    This database is configured with no password for development purposes so leave as is unless changing for 
-                    production purposes.
+- POSTGRES_PASSWORD: 
+Environment variable set in the docker-compose.yml file under the postgres service, represents database password.This database is configured with no password for development purposes so leave as is unless changing for production purposes.
 
 - POSTGRES_DB: Environment variable set in the docker-compose.yml file under the postgres service, represents database.
                 This variable has already been set to the proper value `metaci` for the user.
