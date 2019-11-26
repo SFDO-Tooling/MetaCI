@@ -15,8 +15,8 @@ Running MetaCI In Docker:
     Additionally it assumes you have a `.env` file in the root directory of this 
     project, a template of variables needed can be found under `env.example`.
 
-    .env file declaration
-    ---------------------
+.env file declaration
+---------------------
     *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
     (REQUIRED TO RUN LOCALLY, bare minimum)
 
