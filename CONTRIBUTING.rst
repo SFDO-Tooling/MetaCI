@@ -14,13 +14,12 @@ Running MetaCI In Docker:
 
 To run MetaCI on Docker there are 3 major steps necessary:
 ----------------------------------------------------------
-----------------------------------------------------------
 
-- .env File Creation and Variable Declaration
+- .. _.env File Creation and Variable Declaration: https://github.com/SFDO-Tooling/MetaCI/blob/feature/docker/CONTRIBUTING.rst#env-file-creation-and-variable-declaration
 
-- Building Your Docker Containers
+- .. _Building Your Docker Containers: 
 
-- Running Your Docker Containers
+- .. _Running Your Docker Containers: 
 
 
 .env File Creation and Variable Declaration
@@ -139,7 +138,8 @@ This section assumes you have downloaded `docker` and `docker-compose`.
 Additionally it assumes you have a `.env` file in the root directory of this 
 project, a template of variables needed can be found under `env.example`.
 
-
+Building Your Docker Containers:
+-------------------------------
 To configure and run your environment you must run 2 commands in the root directory of MetaCI
 Note that docker-compose build will take some significant time to build the first time but will
 be much faster for subsequent builds. It is also important to note that once you bring up the web application
