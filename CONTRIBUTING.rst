@@ -11,26 +11,26 @@ Cloning the project
 
 Docker and Docker-Compose Installation:
 --------------------------------------
-    To get docker please visit: https://hub.docker.com/?overlay=onboarding 
-    and follow the installation instructions to download docker if needed: 
+To get docker please visit: https://hub.docker.com/?overlay=onboarding 
+and follow the installation instructions to download docker if needed: 
 
-        To verify you have successfully installed docker type:
+To verify you have successfully installed docker type:
 
-            `docker -v`  
+`docker -v`  
 
-        You should see something like the following):
+You should see something like the following):
 
-            `Docker version 19.03.4, build 9013bf5`
+`Docker version 19.03.4, build 9013bf5`
 
-        To get docker please visit: https://docs.docker.com/v17.09/compose/install/
-        and follow the installation instructions to download docker-compose if needed:
-        To verify you have successfully installed docker type:
+To get docker please visit: https://docs.docker.com/v17.09/compose/install/
+and follow the installation instructions to download docker-compose if needed:
+To verify you have successfully installed docker type:
 
-            `docker-compose -v`  
+`docker-compose -v`  
 
-        You should see something like the following):
+You should see something like the following):
 
-            `docker-compose version 1.16.1, build 6d1ac219`
+`docker-compose version 1.16.1, build 6d1ac219`
 
 
 Running MetaCI In Docker:
