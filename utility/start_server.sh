@@ -14,7 +14,7 @@ if [ "${BUILD_ENV}" = "development" ] ; then
         python /app/manage.py metaci_scheduled_jobs;
     else
         # Redirect stdout from echo command to stderr.
-        echo "Admin user has already been created!"
+        echo "Admin user has already been created."
     fi
 fi
 # creating for authorization
