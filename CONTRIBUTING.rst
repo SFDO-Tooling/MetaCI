@@ -9,9 +9,6 @@ Cloning the project
     git clone git@github.com:SFDO-Tooling/MetaCI
     cd MetaCI
 
-Running MetaCI In Docker:
-------------------------
-
 Docker and Docker-Compose Installation:
 --------------------------------------
     To get docker please visit: https://hub.docker.com/?overlay=onboarding 
@@ -35,6 +32,9 @@ Docker and Docker-Compose Installation:
 
             `docker-compose version 1.16.1, build 6d1ac219`
 
+
+Running MetaCI In Docker:
+------------------------
 
 To run MetaCI on Docker there are 3 major steps necessary:
 ----------------------------------------------------------
