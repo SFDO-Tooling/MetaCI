@@ -63,15 +63,19 @@ Variables Required Locally
 ---------------------------------
 
 DJANGO_SECRET_KEY: 
-    This represents the secret key for the django web application, for local testing, arbritary strings such as the one given in the env.example will suffice. Otherwise use your production secret key.
+    This represents the secret key for the django web application, for local testing, 
+    arbritary strings such as the one given in the env.example will suffice. 
+    Otherwise use your production secret key.
 
 GITHUB_USERNAME:     
     This represents the username of either the tester or service account configured for MetaCI
 
 GITHUB_PASSWORD:      
-    This represents the password or personal access token a user must have to access their account a personal access token will be used when Multi Factor Authentication is enabled.
+    This represents the password or personal access token a user must have to access 
+    their account a personal access token will be used when Multi Factor Authentication is enabled.
 
-If you need to generate a personal access token please visit the following: https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
+If you need to generate a personal access token please visit the following: 
+https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
 SFDX_CLIENT_ID:       
     This tells sfdx the client id of the connected app to use for connecting to the Dev Hub to create scratch orgs (so it's only needed for running plans that use a scratch org). For SFDO staff it's easiest to use an existing connected app, so its best to ask another team member. External users setting up MetaCI will need to create their own connected app, which they can do in the Dev Hub org. You can adapt these instructions https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-manually but there is a difference for MetaCI: because it's connecting to the org non-interactively, the connected app needs to be set up to use the JWT oauth flow. That means when creating the connected app the user needs to check the "Use Digital Signatures" box and upload a certificate. If you are a member of SFDO please visit the following quip link https://salesforce.quip.com/sm9bA3R6GwiK, and look under section 5 of SFDX Command Line Tool Setup & Install
@@ -218,7 +222,7 @@ To start your virtual containers run the following command:
 To bring your virtual containers up for the first time run the following command:
 ::
 
-    docker-compose start
+    docker-compose up -d
 
 To bring your virtual containers down run the following command:
 *The docker-compose down command will stop your containers, 
@@ -242,9 +246,17 @@ To view all running services run the following command:
     docker-compose ps
 
 If you'd like to test something out manually in that test environment for any reason you can run the following:
-    
+In order to run relevant management commands like `manage.py makemigrations`, or if you'd like to test 
+something out manually in that test environment for any reason you can run the following:
+
 ::
 
     docker-compose exec web bash
 
 After this you will be inside of a linux commandline, and are free to test around in your container.
+
+Or you could directly run a command like this:
+::
+    
+    docker-compose exec web python manage.py makemigrations
+
