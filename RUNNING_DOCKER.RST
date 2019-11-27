@@ -58,7 +58,7 @@ To run MetaCI on Docker there are 3 major steps necessary:
 *Please begin by making a copy of env.example and renaming it .env in your root project directory*
 
 *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
-
+=================================
 VARIABLES REQUIRED TO RUN LOCALLY
 =================================
 
