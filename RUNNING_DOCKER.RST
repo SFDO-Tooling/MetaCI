@@ -58,8 +58,9 @@ To run MetaCI on Docker there are 3 major steps necessary:
 *Please begin by making a copy of env.example and renaming it .env in your root project directory*
 
 *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
-(REQUIRED TO RUN LOCALLY, bare minimum)
-
+---------------------------------
+VARIABLES REQUIRED TO RUN LOCALLY
+---------------------------------
 DJANGO_SECRET_KEY: 
     This represents the secret key for the django web application, for local testing, arbritary strings such as the one given in the env.example will suffice. Otherwise use your production secret key.
 
@@ -110,16 +111,19 @@ https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-a-connected-ap
 Once done, confirm with the aformentioned command to ensure you are properly configured 
 with regards to the connected_app variables.
 
-(REQUIRED FOR PRODUCTION include REQUIRED LOCAL VARIABLES as well for PRODUCTION)
-    - GITHUB_WEBHOOK_SECRET
-    - DJANGO_AWS_ACCESS_KEY_ID
+--------------------------------------------
+PRODUCTION VARIABLES
+--------------------------------------------
+
+GITHUB_WEBHOOK_SECRET
+DJANGO_AWS_ACCESS_KEY_ID
     - DJANGO_AWS_SECRET_ACCESS_KEY
     - DJANGO_AWS_STORAGE_BUCKET_NAME
     - DJANGO_SERVER_EMAIL
     - DJANGO_SENTRY_DSN
-
-(OTHER VARIABLES SET BY DEFAULT FOR YOU)
-
+---------------------------------------
+OTHER VARIABLES (MOST PRESET FOR USER)
+---------------------------------------
 BUILD_ENV: 
     Environment variable used to determine what dependencies and scripts to run when installing dependencies and populating databases, currently set in docker-compose.yml web service environment variable
 
