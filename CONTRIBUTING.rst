@@ -1,4 +1,6 @@
 
+MetaCI on Docker
+----------------
 
 MetaCI can be setup using either docker virtual containers or on your local machine.
 To set yourself up using docker please see the following file `RUNNING_DOCKER.rst`_.
