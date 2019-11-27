@@ -37,7 +37,7 @@ You should see something like the following):
 
 
 Running MetaCI In Docker:
-------------------------
+=========================
 
 To run MetaCI on Docker there are 3 major steps necessary:
 ----------------------------------------------------------
