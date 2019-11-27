@@ -120,6 +120,7 @@ with regards to the connected_app variables.
     - DJANGO_SENTRY_DSN
 
 (OTHER VARIABLES SET BY DEFAULT FOR YOU)
+
 BUILD_ENV: 
     Environment variable used to determine what dependencies and scripts to run when installing dependencies and populating databases, currently set in docker-compose.yml web service environment variable
 
