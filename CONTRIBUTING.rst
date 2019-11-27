@@ -12,4 +12,5 @@ MetaCI on local machine
 =======================
 
 As mentioned earlier MetaCI can be configured locally. To achieve this follow the instructions provided in `RUNNING.rst`_
+
 .. _RUNNING.rst: https://github.com/SFDO-Tooling/MetaCI/blob/feature/docker/RUNNING.RST
