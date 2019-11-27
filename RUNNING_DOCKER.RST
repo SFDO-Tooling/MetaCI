@@ -12,7 +12,8 @@ Cloning the project
 Docker and Docker-Compose Installation:
 --------------------------------------
 To download and install docker please visit: https://hub.docker.com/?overlay=onboarding 
-and follow the installation instructions to download docker if needed: 
+and follow the installation instructions to download docker if needed.
+
 
 To verify you have successfully installed docker type:
 
@@ -22,10 +23,11 @@ To verify you have successfully installed docker type:
 
 You should see something like the following:
 
+``Docker version 19.03.4, build 9013bf5``
 
 To download and install docker-compose please visit: https://docs.docker.com/v17.09/compose/install/
 and follow the installation instructions to download docker-compose if needed:
-To verify you have successfully installed docker type:
+To verify you have successfully installed docker-compose type:
 
 ::
 
@@ -56,8 +58,6 @@ To run MetaCI on Docker there are 3 major steps necessary:
 -------------------------------------------
 
 *Please begin by making a copy of env.example and renaming it .env in your root project directory*
-
-*WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
 
 Variables Required Locally
 ---------------------------------
@@ -137,7 +137,9 @@ Other Variables (some preset for user)
 --------------------------------------
 
 BUILD_ENV: 
-    Environment variable used to determine what dependencies and scripts to run when installing dependencies and populating databases, currently set in docker-compose.yml web service environment variable
+    Environment variable used to determine what dependencies and scripts to run when 
+    installing dependencies and populating databases, currently set in docker-compose.yml
+    web service environment variable
 
 NODE_VERSION: 
     Environment variable used to set node version for download, this variable is set in the Dockerfile
@@ -149,13 +151,19 @@ PYTHONUNBUFFERED:
     Environment variable set in Dockerfile used to not write .pyc files to Docker container
 
 POSTGRES_USER: 
-    Environment variable set in the docker-compose.yml file under the postgres service, represents database user. This value has already been configured for you unless you decide to reconfigure it.
+    Environment variable set in the docker-compose.yml file under the postgres service, 
+    represents database user. This value has already been configured for you unless 
+    you decide to reconfigure it.
 
 POSTGRES_PASSWORD: 
-    Environment variable set in the docker-compose.yml file under the postgres service, represents database password.This database is configured with no password for development purposes so leave as is unless changing for production purposes.
+    Environment variable set in the docker-compose.yml file under the postgres service,
+    represents database password.This database is configured with no password for 
+    development purposes so leave as is unless changing for production purposes.
 
 POSTGRES_DB:
-    Environment variable set in the docker-compose.yml file under the postgres service, represents database. This variable has already been set to the proper value `metaci` for the user.
+    Environment variable set in the docker-compose.yml file under the postgres service,
+    represents database. This variable has already been set to the proper 
+    value `metaci` for the user.
        
 DATABASE_URL:
     Environment variable set in Dockerfile. Represents the full path of database url.
@@ -164,10 +172,14 @@ REDIS_URL:
     This represents the url to the location where the redis server, configured for Meta CI. Set in Dockerfile.
 
 DJANGO_HASHID_SALT: 
-    This represents the hashid salt for the django application, currently set to arbritary string due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
+    This represents the hashid salt for the django application, currently set to 
+    arbritary string due to non production defaults, can be overridden 
+    in docker-compose.yml. Currently set in Dockerfile.
 
 DJANGO_SECRET_KEY: 
-    This represents the key for the django application, currently set to arbritary string due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
+    This represents the key for the django application, currently set to arbritary
+    string due to non production defaults, can be overridden in docker-compose.yml.
+    Currently set in Dockerfile.
 
 Building Your Docker Containers:
 -------------------------------
@@ -178,8 +190,8 @@ project, a template of variables needed can be found under ``env.example``.
 
 To configure and run your environment you must run 2 commands in the root directory of MetaCI
 Note that docker-compose build will take some significant time to build the first time but will
-be much faster for subsequent builds. It is also important to note that once you bring up the web application
-it will take roughly 60 seconds to fully compile. 
+be much faster for subsequent builds. It is also important to note that once you bring 
+up the web application it will take roughly 60 seconds to fully compile. 
 
 ::
     
