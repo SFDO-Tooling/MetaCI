@@ -125,14 +125,14 @@ https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-a-connected-ap
 - POSTGRES_PASSWORD: 
     Environment variable set in the docker-compose.yml file under the postgres service, represents database password.This database is configured with no password for development purposes so leave as is unless changing for production purposes.
 
-- POSTGRES_DB:
+POSTGRES_DB:
     Environment variable set in the docker-compose.yml file under the postgres service, represents database. This variable has already been set to the proper value `metaci` for the user.
 
                     
-- DATABASE_URL:
+DATABASE_URL:
     Environment variable set in Dockerfile. Represents the full path of database url.
 
-- REDIS_URL: 
+REDIS_URL: 
     This represents the url to the location where the redis server, configured for Meta CI. Set in Dockerfile.
 
 - DJANGO_HASHID_SALT: 
