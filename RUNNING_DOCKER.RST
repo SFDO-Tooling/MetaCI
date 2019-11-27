@@ -181,8 +181,12 @@ If you would like to populate your instance of MetaCI with test data simply set 
 After that visit ``localhost:8000/admin/login`` and login with the credentials
 
 username
+::
+
     admin
 password
+::
+
     password
 
 From here you should be able to run builds. However note that this default account will not be created 
@@ -205,6 +209,7 @@ To destroy your container enter the following commands:
 To view all running services run the following command:
 
 ::
+    
     docker-compose ps
 
 If you'd like to test something out manually in that test environment for any reason you can run the following:
