@@ -188,19 +188,40 @@ password
 From here you should be able to run builds. However note that this default account will not be created 
 when BUILD_ENV is set to production
 
+
+Docker Commands
+---------------
+
+To stop your virtual containers run the following command:
+The docker-compose stop command will stop your containers, but it won’t remove them.
+::
+
+    docker-compose stop
+
+To start your virtual containers run the following command:
+::
+
+    docker-compose start
+
+To bring your virtual containers up for the first time run the following command:
+::
+
+    docker-compose start
+
 To bring your virtual containers down run the following command:
-        
+*The docker-compose down command will stop your containers, 
+xbut also removes the stopped containers as well as any networks that were created.*
 ::
 
     docker-compose down
     
-To destroy your container enter the following commands
+Removes stopped service containers. To remove your stopped containers enter the following commands
 *Note this will destroy anything that is in the virtual environment, however the database data will persist
 ::
 
-    docker-compose down
-    docker-compose down
-(yes this was written twice intentionally)
+    docker-compose rm
+
+(then enter ``y`` when prompted)
 
 To view all running services run the following command:
 
