@@ -59,7 +59,7 @@ To run MetaCI on Docker there are 3 major steps necessary:
 
 *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
 
-VARIABLES REQUIRED TO RUN LOCALLY
+Variables Required Locally
 ---------------------------------
 
 DJANGO_SECRET_KEY: 
@@ -112,7 +112,7 @@ Once done, confirm with the aformentioned command to ensure you are properly con
 with regards to the connected_app variables.
 
 
-PRODUCTION VARIABLES
+Production Variables
 --------------------
 
 GITHUB_WEBHOOK_SECRET
@@ -129,7 +129,7 @@ DJANGO_SENTRY_DSN
     definition here
 
 
-OTHER VARIABLES (MOST PRESET FOR USER)
+Other Variables (some preset for user)
 --------------------------------------
 
 BUILD_ENV: 
