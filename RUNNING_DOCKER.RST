@@ -76,13 +76,28 @@ If you need to generate a personal access token please visit the following:
 https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
 SFDX_CLIENT_ID:       
-    This tells sfdx the client id of the connected app to use for connecting to the Dev Hub to create scratch orgs (so it's only needed for running plans that use a scratch org). For SFDO staff it's easiest to use an existing connected app, so its best to ask another team member. External users setting up MetaCI will need to create their own connected app, which they can do in the Dev Hub org. You can adapt these instructions https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-manually but there is a difference for MetaCI: because it's connecting to the org non-interactively, the connected app needs to be set up to use the JWT oauth flow. That means when creating the connected app the user needs to check the "Use Digital Signatures" box and upload a certificate. If you are a member of SFDO please visit the following quip link https://salesforce.quip.com/sm9bA3R6GwiK, and look under section 5 of SFDX Command Line Tool Setup & Install
+    This tells sfdx the client id of the connected app to use for connecting to 
+    the Dev Hub to create scratch orgs (so it's only needed for running plans that use a scratch org). 
+    For SFDO staff it's easiest to use an existing connected app, so its best to ask another team member. 
+    External users setting up MetaCI will need to create their own connected app, 
+    which they can do in the Dev Hub org. 
+    You can adapt these instructions https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-manually 
+    but there is a difference for MetaCI: because it's connecting to the org non-interactively, 
+    the connected app needs to be set up to use the JWT oauth flow. 
+    That means when creating the connected app the user needs to check the "Use Digital Signatures" 
+    box and upload a certificate. If you are a member of SFDO please visit the following
+    quip link https://salesforce.quip.com/sm9bA3R6GwiK, and look under section 5 of SFDX
+    Command Line Tool Setup & Install
 
 SFDX_HUB_KEY:          
-    SFDX_HUB_KEY is the private key that was used to create the certificate. Shared through last pass. In the form of a pem key. Called `SFDX Hub Org Key` n Release Engineering folder.
+    SFDX_HUB_KEY is the private key that was used to create the certificate.
+    Shared through last pass. In the form of a pem key. 
+    Called `SFDX Hub Org Key` n Release Engineering folder.
     
 FORMATTING SFDX_HUB_KEY in .env
-    IMPORTANT to format on a single line, escaping each newline in the key with ``\n`` character otherwise the variable will not be read correctly. Must look like the following example and CANNOT BE IN QUOTES:
+    IMPORTANT to format on a single line, escaping each newline in the key with ``\n``
+    character otherwise the variable will not be read correctly. Must look like the 
+    following example and CANNOT BE IN QUOTES:
 
 ::
 
@@ -197,14 +212,17 @@ up the web application it will take roughly 60 seconds to fully compile.
 
 Running Your Docker Containers:
 -------------------------------
+If you would like to populate your instance of MetaCI with test data simply 
+set the BUILD_ENV variable to development in the docker-compose.yml file. Then run
+the following command:
 ::
 
     docker-compose up -d 
     or 
     docker-compose up (for debug mode)
 
-If you would like to populate your instance of MetaCI with test data simply set the BUILD_ENV variable to development.
-After that visit ``localhost:8000/admin/login`` and login with the following credentials:
+After running this command which will take a couple minutes on startup visit ``localhost:8000/admin/login``
+ and login with the following credentials:
 
 username
     ``admin``
@@ -213,7 +231,6 @@ password
 
 From here you should be able to run builds. However note that this default account will not be created 
 when BUILD_ENV is set to production
-
 
 Docker Commands
 ---------------
