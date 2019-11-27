@@ -16,7 +16,9 @@ and follow the installation instructions to download docker if needed:
 
 To verify you have successfully installed docker type:
 
-``docker -v``
+::
+    
+    docker -v
 
 You should see something like the following:
 
@@ -25,7 +27,9 @@ To get docker please visit: https://docs.docker.com/v17.09/compose/install/
 and follow the installation instructions to download docker-compose if needed:
 To verify you have successfully installed docker type:
 
-``docker-compose -v``  
+``
+docker-compose -v
+``  
 
 You should see something like the following):
 
