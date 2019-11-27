@@ -59,8 +59,6 @@ To run MetaCI on Docker there are 3 major steps necessary:
 
 *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
 
-
-=================================
 VARIABLES REQUIRED TO RUN LOCALLY
 =================================
 
