@@ -35,7 +35,6 @@ You should see something like the following):
 
 ``docker-compose version 1.16.1, build 6d1ac219``
 
-
 Running MetaCI In Docker:
 =========================
 
@@ -64,6 +63,21 @@ DJANGO_SECRET_KEY:
     This represents the secret key for the django web application, for local testing, 
     arbritary strings such as the one given in the env.example will suffice. 
     Otherwise use your production secret key.
+
+POSTGRES_USER: 
+    Environment variable set in the docker-compose.yml file under the postgres service, 
+    represents database user. This value has already been configured for you unless 
+    you decide to reconfigure it.
+
+POSTGRES_PASSWORD: 
+    Environment variable set in the docker-compose.yml file under the postgres service,
+    represents database password.This database is configured with no password for 
+    development purposes so leave as is unless changing for production purposes.
+
+POSTGRES_DB:
+    Environment variable set in the docker-compose.yml file under the postgres service,
+    represents database. This variable has already been set to the proper 
+    value `metaci` for the user.
 
 GITHUB_USERNAME:     
     This represents the username of either the tester or service account configured for MetaCI
@@ -162,21 +176,6 @@ YARN_VERSION:
 
 PYTHONUNBUFFERED: 
     Environment variable set in Dockerfile used to not write .pyc files to Docker container
-
-POSTGRES_USER: 
-    Environment variable set in the docker-compose.yml file under the postgres service, 
-    represents database user. This value has already been configured for you unless 
-    you decide to reconfigure it.
-
-POSTGRES_PASSWORD: 
-    Environment variable set in the docker-compose.yml file under the postgres service,
-    represents database password.This database is configured with no password for 
-    development purposes so leave as is unless changing for production purposes.
-
-POSTGRES_DB:
-    Environment variable set in the docker-compose.yml file under the postgres service,
-    represents database. This variable has already been set to the proper 
-    value `metaci` for the user.
        
 DATABASE_URL:
     Environment variable set in Dockerfile. Represents the full path of database url.
@@ -213,8 +212,8 @@ up the web application it will take roughly 60 seconds to fully compile.
 Running Your Docker Containers:
 -------------------------------
 If you would like to populate your instance of MetaCI with test data simply 
-set the BUILD_ENV variable to development in the docker-compose.yml file. Then run
-the following command:
+set DJANGO_SETTINGS_MODULE to config.settings.local in the ``.env`` docker-compose.yml file. 
+Then run the following command:
 ::
 
     docker-compose up -d 

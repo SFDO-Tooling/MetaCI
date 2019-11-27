@@ -2,10 +2,8 @@ version: "3"
 
 services:
   postgres:
-    environment:
-      - POSTGRES_USER=metaci
-      - POSTGRES_DB=metaci
-      - POSTGRES_PASSWORD=
+    env_file:
+      - .env
     volumes:
       - ./postgres:/var/lib/postgresql/data:delegated
     image: postgres:10.6
@@ -32,7 +30,5 @@ services:
       - redis
     env_file:
       - .env
-    environment:
-      - BUILD_ENV=development
     volumes:
       - .:/app

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#NODE_VERSION=10.16.3
+# NEED TO SET NODE_VERSION ENVIRONMENT VARIABLE if not set already
 ARCH=
 dpkgArch="$(dpkg --print-architecture)"
 case "${dpkgArch##*-}" in \
