@@ -59,7 +59,6 @@ To run MetaCI on Docker there are 3 major steps necessary:
 
 *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
 
----------------------------------
 VARIABLES REQUIRED TO RUN LOCALLY
 ---------------------------------
 
@@ -112,7 +111,7 @@ https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-a-connected-ap
 Once done, confirm with the aformentioned command to ensure you are properly configured 
 with regards to the connected_app variables.
 
---------------------
+
 PRODUCTION VARIABLES
 --------------------
 
@@ -129,7 +128,7 @@ DJANGO_SERVER_EMAIL
 DJANGO_SENTRY_DSN
     definition here
 
---------------------------------------
+
 OTHER VARIABLES (MOST PRESET FOR USER)
 --------------------------------------
 
