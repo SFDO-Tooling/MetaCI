@@ -181,13 +181,9 @@ If you would like to populate your instance of MetaCI with test data simply set 
 After that visit ``localhost:8000/admin/login`` and login with the credentials
 
 username
-::
-
-    admin
+    ``admin``
 password
-::
-
-    password
+    ``password``
 
 From here you should be able to run builds. However note that this default account will not be created 
 when BUILD_ENV is set to production
@@ -199,7 +195,7 @@ To bring your virtual containers down run the following command:
     docker-compose down
     
 To destroy your container enter the following commands
-*Note this will destroy anything that is in the virtual environment, however the database data will persist*: 
+*Note this will destroy anything that is in the virtual environment, however the database data will persist
 ::
 
     docker-compose down
