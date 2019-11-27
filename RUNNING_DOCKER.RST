@@ -198,8 +198,8 @@ To bring your virtual containers down run the following command:
 
     docker-compose down
     
-To destroy your container enter the following commands:
-* Note this will destroy anything that is in the virtual environment, however the database data will persist *
+To destroy your container enter the following commands
+*Note this will destroy anything that is in the virtual environment, however the database data will persist*: 
 ::
 
     docker-compose down
