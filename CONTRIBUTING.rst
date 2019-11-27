@@ -130,8 +130,7 @@ Environment variable set in the docker-compose.yml file under the postgres servi
 - DJANGO_HASHID_SALT: This represents the hashid salt for the django application, currently set to arbritary string
                     due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
 
-- DJANGO_SECRET_KEY: This represents the key for the django application, currently set to arbritary string
-                    due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
+- DJANGO_SECRET_KEY: This represents the key for the django application, currently set to arbritary string due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
 
 
 This section assumes you have downloaded ``docker`` and ``docker-compose``.
