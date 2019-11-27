@@ -58,6 +58,7 @@ To run MetaCI on Docker there are 3 major steps necessary:
 *Please begin by making a copy of env.example and renaming it .env in your root project directory*
 
 *WHERE TO GET EACH VARIABLE and FORMAT NEEDED*
+
 ---------------------------------
 VARIABLES REQUIRED TO RUN LOCALLY
 ---------------------------------
@@ -111,9 +112,9 @@ https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-a-connected-ap
 Once done, confirm with the aformentioned command to ensure you are properly configured 
 with regards to the connected_app variables.
 
---------------------------------------------
+--------------------
 PRODUCTION VARIABLES
---------------------------------------------
+--------------------
 
 GITHUB_WEBHOOK_SECRET
     definition here
@@ -128,9 +129,9 @@ DJANGO_SERVER_EMAIL
 DJANGO_SENTRY_DSN
     definition here
 
----------------------------------------
+--------------------------------------
 OTHER VARIABLES (MOST PRESET FOR USER)
----------------------------------------
+--------------------------------------
 
 BUILD_ENV: 
     Environment variable used to determine what dependencies and scripts to run when installing dependencies and populating databases, currently set in docker-compose.yml web service environment variable
