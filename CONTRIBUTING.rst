@@ -107,30 +107,39 @@ https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-a-connected-ap
     - DJANGO_SENTRY_DSN
 
 (OTHER VARIABLES SET BY DEFAULT FOR YOU)
-- BUILD_ENV: Environment variable used to determine what dependencies and scripts to run when installing dependencies and populating databases, currently set in docker-compose.yml web service environment variable
+- BUILD_ENV: 
+    Environment variable used to determine what dependencies and scripts to run when installing dependencies and populating databases, currently set in docker-compose.yml web service environment variable
 
-- NODE_VERSION: Environment variable used to set node version for download, this variable is set in the Dockerfile
+- NODE_VERSION: 
+    Environment variable used to set node version for download, this variable is set in the Dockerfile
 
-- YARN_VERSION: Environment variable used to set yarn version for download, this variable is set in the Dockerfile
+- YARN_VERSION: 
+    Environment variable used to set yarn version for download, this variable is set in the Dockerfile
 
-- PYTHONUNBUFFERED: nvironment variable set in Dockerfile used to not write .pyc files to Docker container
+- PYTHONUNBUFFERED: 
+    Environment variable set in Dockerfile used to not write .pyc files to Docker container
 
-- POSTGRES_USER: Environment variable set in the docker-compose.yml file under the postgres service, represents database user. This value has already been configured for you unless you decide to reconfigure it.
+- POSTGRES_USER: 
+    Environment variable set in the docker-compose.yml file under the postgres service, represents database user. This value has already been configured for you unless you decide to reconfigure it.
 
 - POSTGRES_PASSWORD: 
-Environment variable set in the docker-compose.yml file under the postgres service, represents database password.This database is configured with no password for development purposes so leave as is unless changing for production purposes.
+    Environment variable set in the docker-compose.yml file under the postgres service, represents database password.This database is configured with no password for development purposes so leave as is unless changing for production purposes.
 
-- POSTGRES_DB:                  Environment variable set in the docker-compose.yml file under the postgres service, represents database. This variable has already been set to the proper value `metaci` for the user.
+- POSTGRES_DB:
+    Environment variable set in the docker-compose.yml file under the postgres service, represents database. This variable has already been set to the proper value `metaci` for the user.
 
                     
-- DATABASE_URL:     Environment variable set in Dockerfile. Represents the full path of database url.
+- DATABASE_URL:
+    Environment variable set in Dockerfile. Represents the full path of database url.
 
-- REDIS_URL: This represents the url to the location where the redis server, configured for Meta CI. Set in Dockerfile.
+- REDIS_URL: 
+    This represents the url to the location where the redis server, configured for Meta CI. Set in Dockerfile.
 
-- DJANGO_HASHID_SALT: This represents the hashid salt for the django application, currently set to arbritary string
-                    due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
+- DJANGO_HASHID_SALT: 
+    This represents the hashid salt for the django application, currently set to arbritary string due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
 
-- DJANGO_SECRET_KEY: This represents the key for the django application, currently set to arbritary string due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
+- DJANGO_SECRET_KEY: 
+    This represents the key for the django application, currently set to arbritary string due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
 
 
 This section assumes you have downloaded ``docker`` and ``docker-compose``.
