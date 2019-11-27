@@ -76,7 +76,8 @@ SFDX_CLIENT_ID:
 
 SFDX_HUB_KEY:          
     SFDX_HUB_KEY is the private key that was used to create the certificate. Shared through last pass. In the form of a pem key. Called `SFDX Hub Org Key` n Release Engineering folder.
-    FORMAT(SFDX_HUB_KEY)
+    
+FORMATTING SFDX_HUB_KEY in .env
     IMPORTANT to format on a single line, escaping each newline in the key with \n character otherwise the variable will not be read correctly. Must look like the following example and CANNOT BE IN QUOTES:
 
 ::
