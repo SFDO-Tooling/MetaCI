@@ -138,8 +138,7 @@ POSTGRES_PASSWORD:
 
 POSTGRES_DB:
     Environment variable set in the docker-compose.yml file under the postgres service, represents database. This variable has already been set to the proper value `metaci` for the user.
-
-                    
+       
 DATABASE_URL:
     Environment variable set in Dockerfile. Represents the full path of database url.
 
@@ -152,13 +151,12 @@ DJANGO_HASHID_SALT:
 DJANGO_SECRET_KEY: 
     This represents the key for the django application, currently set to arbritary string due to non production defaults, can be overridden in docker-compose.yml. Currently set in Dockerfile.
 
-
-This section assumes you have downloaded ``docker`` and ``docker-compose``.
-Additionally it assumes you have a ``.env`` file in the root directory of this 
-project, a template of variables needed can be found under ``env.example``.
-
 Building Your Docker Containers:
 -------------------------------
+
+This next section assumes you have downloaded ``docker`` and ``docker-compose``.
+Additionally it assumes you have a ``.env`` file in the root directory of this 
+project, a template of variables needed can be found under ``env.example``.
 
 To configure and run your environment you must run 2 commands in the root directory of MetaCI
 Note that docker-compose build will take some significant time to build the first time but will
