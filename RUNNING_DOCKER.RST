@@ -194,7 +194,7 @@ Running Your Docker Containers:
     docker-compose up (for debug mode)
 
 If you would like to populate your instance of MetaCI with test data simply set the BUILD_ENV variable to development.
-After that visit ``localhost:8000/admin/login`` and login with the credentials
+After that visit ``localhost:8000/admin/login`` and login with the following credentials:
 
 username
     ``admin``
