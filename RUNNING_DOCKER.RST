@@ -13,8 +13,6 @@ Docker and Docker-Compose Installation:
 --------------------------------------
 To download and install docker please visit: https://hub.docker.com/?overlay=onboarding 
 and follow the installation instructions to download docker if needed.
-
-
 To verify you have successfully installed docker type:
 
 ::
@@ -26,7 +24,7 @@ You should see something like the following:
 ``Docker version 19.03.4, build 9013bf5``
 
 To download and install docker-compose please visit: https://docs.docker.com/v17.09/compose/install/
-and follow the installation instructions to download docker-compose if needed:
+and follow the installation instructions to download docker-compose if needed.
 To verify you have successfully installed docker-compose type:
 
 ::
