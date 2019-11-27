@@ -116,11 +116,17 @@ PRODUCTION VARIABLES
 --------------------------------------------
 
 GITHUB_WEBHOOK_SECRET
+    definition here
 DJANGO_AWS_ACCESS_KEY_ID
+    definition here
 DJANGO_AWS_SECRET_ACCESS_KEY
+    definition here
 DJANGO_AWS_STORAGE_BUCKET_NAME
+    definition here
 DJANGO_SERVER_EMAIL
+    definition here
 DJANGO_SENTRY_DSN
+    definition here
 ---------------------------------------
 OTHER VARIABLES (MOST PRESET FOR USER)
 ---------------------------------------
