@@ -163,17 +163,24 @@ Note that docker-compose build will take some significant time to build the firs
 be much faster for subsequent builds. It is also important to note that once you bring up the web application
 it will take roughly 60 seconds to fully compile. 
 
-``docker-compose build``
+::
+    
+    docker-compose build
 
 Running Your Docker Containers:
 -------------------------------
-``docker-compose up -d`` or ``docker-compose up`` (for debug mode)
+::
+    docker-compose up -d 
+    or 
+    docker-compose up (for debug mode)
 
 If you would like to populate your instance of MetaCI with test data simply set the BUILD_ENV variable to development.
 After that visit ``localhost:8000/admin/login`` and login with the credentials
 
-username: admin
-password: password
+username
+    admin
+password
+    password
 
 From here you should be able to run builds. However note that this default account will not be created 
 when BUILD_ENV is set to production
