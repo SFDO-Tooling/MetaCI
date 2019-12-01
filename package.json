@@ -81,7 +81,7 @@
     "i18next-scanner-webpack": "^0.4.3",
     "jest": "^24.9.0",
     "jest-junit": "^9.0.0",
-    "lint-staged": "^9.4.3",
+    "lint-staged": "^9.5.0",
     "mini-css-extract-plugin": "^0.8.0",
     "node-fetch": "^2.6.0",
     "node-sass": "^4.13.0",
