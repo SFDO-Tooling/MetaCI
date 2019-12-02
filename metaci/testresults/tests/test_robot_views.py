@@ -40,7 +40,7 @@ class TestResultRobotView(BaseRobotResultsTestCase):
 
         task = FlowTaskFactory()
         test_result = TestResultFactory(
-            robot_xml=self._get_xml("robot_1.xml"), robot_task=task
+            robot_xml=self._get_xml("robot_1.xml"), task=task
         )
 
         self.client.force_login(self.user)
@@ -84,7 +84,7 @@ class TestResultRobotView(BaseRobotResultsTestCase):
 
         task = FlowTaskFactory(options={"options": task_options})
         test_result = TestResultFactory(
-            robot_xml=self._get_xml("robot_1.xml"), robot_task=task
+            robot_xml=self._get_xml("robot_1.xml"), task=task
         )
 
         url = reverse("test_result_robot", kwargs={"result_id": test_result.id})
@@ -99,7 +99,7 @@ class TestResultRobotView(BaseRobotResultsTestCase):
         """Verify the test_result_robot view works even in the absense of robot options"""
         task = FlowTaskFactory(options={})
         test_result = TestResultFactory(
-            robot_xml=self._get_xml("robot_1.xml"), robot_task=task
+            robot_xml=self._get_xml("robot_1.xml"), task=task
         )
 
         # use superuser here to avoid the hassle of setting

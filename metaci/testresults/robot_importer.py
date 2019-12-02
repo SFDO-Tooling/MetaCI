@@ -85,7 +85,7 @@ def import_robot_test_results(build_flow, path):
             outcome=result["status"],
             source_file=result["suite"]["file"],
             robot_xml=result["xml"],
-            robot_task=robot_task,
+            task=robot_task,
         )
         testresult.save()
 

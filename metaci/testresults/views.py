@@ -172,7 +172,7 @@ def test_result_robot(request, result_id):
         source = mkstemp()[1]
         log = mkstemp(".html")[1]
         rebot_options = {"log": log, "output": None, "report": None}
-        if result.robot_task:
+        if result.task:
             # Copy subset of robot task options that affect the log
             # W-
             options_to_copy = (
@@ -192,7 +192,7 @@ def test_result_robot(request, result_id):
                 "removekeywords",
                 "flattenkeywords",
             )
-            options = result.robot_task.options.get("options", {})
+            options = result.task.options.get("options", {})
             rebot_options.update(
                 {k: options[k] for k in options_to_copy if k in options}
             )

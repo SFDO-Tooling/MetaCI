@@ -49,7 +49,7 @@ class RobotImporterTestCase(TestCase):
         assert duration == correct
 
     def test_robot_task_attribute(self):
-        """verify that the robot_task attribute of a TestResult has been
+        """verify that the task attribute of a TestResult has been
         set for a robot test result
 
         The importer uses the timestamp of the output file to figure
@@ -78,5 +78,5 @@ class RobotImporterTestCase(TestCase):
 
         robot_importer.import_robot_test_results(buildflow, path)
         for result in models.TestResult.objects.all():
-            assert result.robot_task is not None
-            assert result.robot_task.stepnum == "2."
+            assert result.task is not None
+            assert result.task.stepnum == "2."

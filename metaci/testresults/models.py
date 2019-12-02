@@ -113,10 +113,12 @@ class TestResult(models.Model):
     method = models.ForeignKey(
         TestMethod, related_name="test_results", on_delete=models.CASCADE
     )
-    # The robot_task field is used to reconstitute the test log,
+    # The task field is used to reconstitute the test log,
     # because the task has a list of options used by robot when the
     # test was run (e.g. noncritical, tagstatlink, etc)
-    robot_task = models.ForeignKey(
+
+    # NOTE: This field is currently only populated for robot tasks
+    task = models.ForeignKey(
         "build.FlowTask",
         related_name="test_results",
         on_delete=models.SET_NULL,
