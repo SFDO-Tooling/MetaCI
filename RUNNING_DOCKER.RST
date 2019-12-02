@@ -286,3 +286,81 @@ Or you could directly run a command like this:
     
     docker-compose exec web python manage.py makemigrations
 
+Docker development using VS Code
+--------------------------------
+
+Because front-end and back-end dependencies are installed in a Docker container
+instead of locally, text editors that rely on locally-installed packages (e.g.
+for code formatting/linting on save) need access to the running Docker
+container. `VS Code`_ supports this using the `Remote Development`_ extension
+pack.
+
+Once you have the extension pack installed, when you open the MetaShare folder
+in VS Code, you will be prompted to "Reopen in Container". Doing so will
+effectively run ``docker-compose up`` and reload your window, now running inside
+the Docker container. If you do not see the prompt, run the "Remote-Containers:
+Open Folder in Container..." command from the VS Code Command Palette to start
+the Docker container.
+
+A number of project-specific VS Code extensions will be automatically installed
+for you within the Docker container. See `.devcontainer/devcontainer.json
+<.devcontainer/devcontainer.json>`_ and `.devcontainer/docker-compose.dev.yml
+<.devcontainer/docker-compose.dev.yml>`_ for Docker-specific VS Code settings.
+
+The first build will take a number of minutes, but subsequent builds will be
+significantly faster.
+
+Similarly to the behavior of ``docker-compose up``, VS Code automatically runs
+database migrations and starts the development server/watcher. To run any local commands, 
+open an `integrated terminal`_ in VS Code (``Ctrl-```) and use any of the development
+commands (this terminal runs inside the Docker container and can run all the commands that can be run in
+RUNNING.RST and CONTRIBUTING.RST)::
+
+    $ python manage.py migrate  # run database migrations
+    $ yarn serve  # start the development server/watcher
+
+For any commands, when using the VS Code integrated terminal inside the
+Docker container, omit any ``docker-compose run --rm web...`` prefix, e.g.::
+
+    $ python manage.py promote_superuser <your email>
+    $ yarn test:js
+    $ python manage.py truncate_data
+    $ python manage.py populate_data
+
+``yarn serve`` is run for you on connection to container. You can view the running app at
+`<http://localhost:8080/>`_ in your browser.
+
+For more detailed instructions and options, see the `VS Code documentation`_.
+
+.. _VS Code: https://code.visualstudio.com/
+.. _Remote Development: https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack
+.. _integrated terminal: https://code.visualstudio.com/docs/editor/integrated-terminal
+.. _VS Code documentation: https://code.visualstudio.com/docs/remote/containers
+
+Internationalization
+--------------------
+
+To build and compile ``.mo`` and ``.po`` files for the backend, run::
+
+   $ python manage.py makemessages --locale <locale>
+   $ python manage.py compilemessages
+
+These commands require the `GNU gettext toolset`_ (``brew install gettext``).
+
+For the front-end, translation JSON files are served from
+``locales/<language>/`` directories, and the `user language is auto-detected at
+runtime`_.
+
+During development, strings are parsed automatically from the JS, and an English
+translation file is auto-generated to ``locales_dev/en/translation.json`` on
+every build (``yarn build`` or ``yarn serve``). When this file changes,
+translations must be copied over to the ``locales/en/translation.json`` file in
+order to have any effect.
+
+Strings with dynamic content (i.e. known only at runtime) cannot be
+automatically parsed, but will log errors while the app is running if they're
+missing from the served translation files. To resolve, add the missing key:value
+translations to ``locales/<language>/translation.json``.
+
+.. _GNU gettext toolset: https://www.gnu.org/software/gettext/
+.. _user language is auto-detected at runtime: https://github.com/i18next/i18next-browser-languageDetector

@@ -20,6 +20,13 @@ To achieve this follow the instructions provided in `RUNNING.rst`_.
 Development Tasks
 -----------------
 
+To run these tests with docker first run the following commands, if you are not using docker,
+simply execute the commands in your project's root directory:
+::
+    docker-compose up -d
+    docker-compose exec web bash
+
+
 - ``yarn serve``: starts development server (with watcher) at
   `<http://localhost:8080/>`_ (assets are served from ``dist/`` dir)
 - ``yarn pytest``: run Python tests
