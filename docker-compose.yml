@@ -21,7 +21,7 @@ services:
         - BUILD_ENV=development
       dockerfile: Dockerfile
     command: |
-        /bin/bash -c 'while !</dev/tcp/postgres/5432; do /bin/sleep 1; done; \
+        /bin/bash -c 'while !</dev/tcp/postgres/5432; do echo "Waiting for postgres databaseto start..."; /bin/sleep 1; done; \
         /bin/sleep 1; /bin/sh /app/utility/start_server.sh;'
     ports:
       - "8000:8000"

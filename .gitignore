@@ -95,3 +95,6 @@ dump.rdb
 requirements/node*
 requirements/yarn*
 /node
+
+# postgres database
+postgres/
