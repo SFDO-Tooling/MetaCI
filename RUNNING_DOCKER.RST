@@ -339,9 +339,12 @@ For more detailed instructions and options, see the `VS Code documentation`_.
 
 Internationalization
 --------------------
+To run this in a docker container first run the following commands, 
+::
+    docker-compose up -d
+    docker-compose exec web bash
 
 To build and compile ``.mo`` and ``.po`` files for the backend, run::
-
    $ python manage.py makemessages --locale <locale>
    $ python manage.py compilemessages
 
