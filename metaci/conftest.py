@@ -219,5 +219,5 @@ class FlowTaskFactory(factory.django.DjangoModelFactory):
         model = FlowTask
 
     build_flow = factory.SubFactory(BuildFlowFactory)
-    stepnum = factory.Sequence(lambda n: f"{n}.")
+    stepnum = factory.Sequence(lambda n: f"{n}")
     path = factory.Sequence(lambda n: f"flow_1.task_{n}")

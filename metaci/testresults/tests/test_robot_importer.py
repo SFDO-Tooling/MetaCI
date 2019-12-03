@@ -79,4 +79,4 @@ class RobotImporterTestCase(TestCase):
         robot_importer.import_robot_test_results(buildflow, path)
         for result in models.TestResult.objects.all():
             assert result.task is not None
-            assert result.task.stepnum == "2."
+            assert result.task.stepnum == "2"
