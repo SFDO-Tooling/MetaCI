@@ -171,14 +171,61 @@ def test_result_robot(request, result_id):
 
         source = mkstemp()[1]
         log = mkstemp(".html")[1]
+        rebot_options = {"log": log, "output": None, "report": None}
+        if result.task:
+            # Copy subset of robot task options that affect the log
+            options_to_copy = (
+                "name",
+                "doc",
+                "metadata",
+                "settag",
+                "critical",
+                "noncritical",
+                "logtitle",
+                "suitestatlevel",
+                "tagstatinclude",
+                "tagstatexclude",
+                "tagstatcombine",
+                "tagdoc",
+                "tagstatlink",
+                "removekeywords",
+                "flattenkeywords",
+            )
+            options = result.task.options.get("options", {})
+            rebot_options.update(
+                {k: options[k] for k in options_to_copy if k in options}
+            )
+
         with open(source, "w") as f:
             f.write(robot_xml)
-        rebot(source, log=log, output=None, report=None)
+        rebot(source, **rebot_options)
         with open(log, "r") as f:
             log_html = f.read()
+        log_html = patch_html(log_html)
         os.remove(source)
         os.remove(log)
     return HttpResponse(log_html)
+
+
+def patch_html(html):
+    """Patch anchor elements to specify the target attribute
+
+    The links created by the tagstatlink option will fail to
+    open when viewed within a frame. Even if that weren't the
+    case, I don't think we want them to open up in the frame
+    inside a metaci test result page.
+
+    This adds `target=_top` to the generated links.
+    """
+    # Yeah, I know patching HTML is fraught with peril. The robot
+    # code to generate the logs is pretty stable, so I think
+    # this is a reasonably safe way to do it. It results in a
+    # much better experience for our users.
+    html = html.replace(
+        r'<span>[<a href="{{html $value.url}}" title="{{html $value.url}}">',
+        r'<span>[<a href="{{html $value.url}}" title="{{html $value.url}}" target="_top">',
+    )
+    return html
 
 
 def test_method_peek(request, method_id):
