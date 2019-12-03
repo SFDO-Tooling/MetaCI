@@ -59,11 +59,6 @@ To run MetaCI on Docker there are 3 major steps necessary:
 Variables Required Locally
 ---------------------------------
 
-DJANGO_SECRET_KEY: 
-    This represents the secret key for the django web application, for local testing, 
-    arbritary strings such as the one given in the env.example will suffice. 
-    Otherwise use your production secret key.
-
 POSTGRES_USER: 
     Environment variable set in the docker-compose.yml file under the postgres service, 
     represents database user. This value has already been configured for you unless 
@@ -189,10 +184,11 @@ DJANGO_HASHID_SALT:
     in docker-compose.yml. Currently set in Dockerfile.
 
 DJANGO_SECRET_KEY: 
-    This represents the key for the django application, currently set to arbritary
+    This represents the key for the django web application, currently set to arbritary
     string due to non production defaults, can be overridden in docker-compose.yml.
-    Currently set in Dockerfile.
-
+    Currently set in Dockerfile. For local testing, arbritary strings such as the one given 
+    in the env.example will suffice. Otherwise use your production secret key.
+    
 Building Your Docker Containers:
 -------------------------------
 
