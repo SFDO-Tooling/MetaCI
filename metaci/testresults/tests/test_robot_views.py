@@ -111,3 +111,32 @@ class TestResultRobotView(BaseRobotResultsTestCase):
         assert response.status_code == 200
         (args, kwargs) = mock_rebot.call_args
         self.assertTupleEqual(tuple(kwargs.keys()), ("log", "output", "report"))
+
+    def test_patched_tagstat_links(self):
+        """Verify that the target attribute is in some of the links
+
+        The generated html uses javascript functions to generate
+        links.  This searches for the template used in one of those
+        functions to make sure the anchor element has the target
+        attribute.
+
+        """
+        task = FlowTaskFactory(
+            options={
+                "options": {"tagstatlink": "w-*:http://example.com?id=%1:work item"}
+            }
+        )
+        test_result = TestResultFactory(
+            robot_xml=self._get_xml("robot_1.xml"), task=task
+        )
+        self.client.force_login(self.superuser)
+        url = reverse("test_result_robot", kwargs={"result_id": test_result.id})
+        response = self.client.get(url)
+
+        self.longMessage = False  # without this, the entire html ends up on stdout.
+        expected = r'<span>[<a href="{{html $value.url}}" title="{{html $value.url}}" target="_top">'
+        self.assertIn(
+            expected,
+            str(response.content),
+            "didn't find 'target=top' attribute in generated html links",
+        )

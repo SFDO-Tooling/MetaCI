@@ -37,6 +37,9 @@ cci task run performance_tests_CO</msg>
 <msg timestamp="20190805 08:59:31.640" level="INFO">${result} = &lt;result object with rc 1&gt;</msg>
 <status status="PASS" starttime="20190805 08:58:20.423" endtime="20190805 08:59:31.640"></status>
 </kw>
+<tags>
+<tag>w-123456</tag>
+</tags>
 <status status="PASS" starttime="20190805 08:58:20.001" endtime="20190805 08:59:31.009" critical="yes"></status>
 </test>
 <status status="PASS" starttime="20190805 08:58:20.363" endtime="20190805 08:59:31.642"></status>
