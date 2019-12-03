@@ -18,6 +18,9 @@ from metaci.build.models import Build
 from metaci.build.utils import view_queryset
 
 
+TAG_BRANCH_PREFIX = "refs/tags/"
+
+
 def repo_list(request, owner=None):
     repos = Repository.objects.for_user(request.user)
 
@@ -150,46 +153,54 @@ def validate_github_webhook(request):
 @require_POST
 def github_push_webhook(request):
     validate_github_webhook(request)
-
     push = json.loads(request.body)
-    repo_id = push["repository"]["id"]
+
     try:
-        repo = Repository.objects.get(github_id=repo_id)
+        repo = get_repository(push)
     except Repository.DoesNotExist:
         return HttpResponse("Not listening for this repository")
 
+    branch_name = get_branch_name_from_payload(push)
+
+    if not branch_name:
+        return HttpResponse("No branch found")
+
+    branch = get_or_create_branch(branch_name, repo)
+    release = get_release_if_applicable(push, repo)
+    create_builds(push, repo, branch, release)
+
+    return HttpResponse("OK")
+
+
+def get_repository(push):
+    repo_id = push["repository"]["id"]
+    return Repository.objects.get(github_id=repo_id)
+
+
+def get_branch_name_from_payload(push):
     branch_ref = push.get("ref")
     if not branch_ref:
-        return HttpResponse("No branch found")
+        return None
 
     branch_name = None
     if branch_ref.startswith("refs/heads/"):
         branch_name = branch_ref.replace("refs/heads/", "")
-    elif branch_ref.startswith("refs/tags/"):
-        branch_name = branch_ref.replace("refs/tags/", "tag: ")
+    elif branch_ref.startswith(TAG_BRANCH_PREFIX):
+        branch_name = branch_ref.replace(TAG_BRANCH_PREFIX, "tag: ")
+    return branch_name
 
-    if branch_name:
-        branch, created = Branch.objects.get_or_create(repo=repo, name=branch_name)
-        if branch.is_removed:
-            # resurrect the soft deleted branch
-            branch.is_removed = False
-            branch.save()
 
-    release = None
-    # Check if the event was triggered by a tag
-    if push["ref"].startswith("refs/tags/") and repo.release_tag_regex:
-        tag = push["ref"][len("refs/tags/") :]
-        # Check the tag against regex
-        if re.match(repo.release_tag_regex, tag) and push["head_commit"]:
-            release, _ = Release.objects.get_or_create(
-                repo=repo,
-                git_tag=tag,
-                defaults={
-                    "created_from_commit": push["head_commit"]["id"],
-                    "status": "draft",
-                },
-            )
+def get_or_create_branch(branch_name, repo):
+    branch, _ = Branch.objects.get_or_create(repo=repo, name=branch_name)
+    if branch.is_removed:
+        # resurrect the soft deleted branch
+        branch.is_removed = False
+        branch.save()
 
+    return branch
+
+
+def create_builds(push, repo, branch, release):
     for pr in repo.planrepository_set.should_run().filter(
         plan__trigger__in=["commit", "tag"]
     ):
@@ -210,4 +221,35 @@ def github_push_webhook(request):
                 build.release_relationship_type = "test"
             build.save()
 
-    return HttpResponse("OK")
+
+def is_tag(ref):
+    """Returns true if ref corresponds to a tag. False otherwise"""
+    return True if ref.startswith(TAG_BRANCH_PREFIX) else False
+
+
+def get_release_if_applicable(push, repo):
+    """Gets the corresponding release if 'ref' references a release tag"""
+    release = None
+    if is_tag(push["ref"]) and repo.release_tag_regex:
+        tag = get_tag_name_from_ref(push["ref"])
+        if tag_is_release(tag, repo) and push["head_commit"]:
+            release = get_or_create_release(push, tag, repo)
+    return release
+
+
+def get_or_create_release(push, tag, repo):
+    release, _ = Release.objects.get_or_create(
+        repo=repo,
+        git_tag=tag,
+        defaults={"created_from_commit": push["head_commit"]["id"], "status": "draft",},
+    )
+    return release
+
+
+def tag_is_release(tag, repo):
+    return re.match(repo.release_tag_regex, tag)
+
+
+def get_tag_name_from_ref(ref):
+    return ref[len(TAG_BRANCH_PREFIX) :]
+

@@ -1,10 +1,12 @@
 import os
+import pathlib
 import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 
 from cumulusci.utils import elementtree_parse_file
 from django.core.files.base import ContentFile
+from django.utils import timezone
 
 from metaci.testresults.models import TestClass, TestMethod, TestResult, TestResultAsset
 
@@ -12,6 +14,20 @@ from metaci.testresults.models import TestClass, TestMethod, TestResult, TestRes
 def import_robot_test_results(build_flow, path):
     # import is here to avoid import cycle
     from metaci.build.models import BuildFlowAsset
+
+    path = pathlib.Path(path)
+
+    # find the robot task that generated the log file so
+    # that we can access the task options when rendering
+    # the log file
+    mtime = timezone.make_aware(
+        datetime.fromtimestamp(path.stat().st_mtime), timezone.get_current_timezone()
+    )
+    robot_task = None
+    for task in build_flow.tasks.order_by("-time_end"):
+        if task.time_start <= mtime <= task.time_end:
+            robot_task = task
+            break
 
     classes = {}
     methods = {}
@@ -69,6 +85,7 @@ def import_robot_test_results(build_flow, path):
             outcome=result["status"],
             source_file=result["suite"]["file"],
             robot_xml=result["xml"],
+            task=robot_task,
         )
         testresult.save()
 

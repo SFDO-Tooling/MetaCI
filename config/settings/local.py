@@ -123,6 +123,14 @@ CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID")
 CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET")
 CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL")
 
+AUTOSCALERS = {
+    "local-app": {
+        "max_workers": METACI_MAX_WORKERS or 1,
+        "worker_reserve": METACI_WORKER_RESERVE or 0,
+        "queues": ["default", "medium", "high", "robot"],
+    }
+}
+
 # SFDX Credentials
 SFDX_CLIENT_ID = env("SFDX_CLIENT_ID")
 SFDX_HUB_KEY = env("SFDX_HUB_KEY")
