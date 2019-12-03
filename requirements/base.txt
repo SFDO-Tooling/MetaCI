@@ -87,3 +87,4 @@ django-postgres-stats==1.0.0
 # Let Javascript refer to Django URLs by name
 django-js-reverse==0.9.1
 
+flask==1.1.1
