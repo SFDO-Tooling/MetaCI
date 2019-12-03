@@ -252,7 +252,7 @@ To bring your virtual containers up for the first time run the following command
 
 To bring your virtual containers down run the following command:
 *The docker-compose down command will stop your containers, 
-xbut also removes the stopped containers as well as any networks that were created.*
+but also removes the stopped containers as well as any networks that were created.*
 ::
 
     docker-compose down
