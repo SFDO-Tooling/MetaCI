@@ -118,7 +118,7 @@
 			},
 			"[python]": {
 				"editor.rulers": [
-					88
+					80
 				]
 			},
 			"files.exclude": {
