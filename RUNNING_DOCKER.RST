@@ -74,12 +74,24 @@ POSTGRES_DB:
     represents database. This variable has already been set to the proper 
     value `metaci` for the user.
 
+MetaCI needs a connection to the GitHub API to fetch repositories and create releases. 
+This can be set up using a personal GitHub account by setting GITHUB_USERNAME and GITHUB_PASSWORD, 
+or using a GitHub App by setting GITHUB_APP_ID and GITHUB_APP_KEY.
+
 GITHUB_USERNAME:     
     This represents the username of either the tester or service account configured for MetaCI
 
 GITHUB_PASSWORD:      
     This represents the password or personal access token a user must have to access 
     their account a personal access token will be used when Multi Factor Authentication is enabled.
+
+or
+
+GITHUB_APP_ID:
+    This represents the app id of your github app allowing you to authenticate your machine with github.
+
+GITHUB_APP_KEY:
+    This represents the private key used for authentication for github applications.
 
 If you need to generate a personal access token please visit the following: 
 https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
