@@ -41,14 +41,13 @@ Running MetaCI In Docker:
 To run MetaCI on Docker there are 3 major steps necessary:
 ----------------------------------------------------------
 
-- `.env File Creation and Variable Declaration`_
-.. _.env File Creation and Variable Declaration: https://github.com/SFDO-Tooling/MetaCI/blob/feature/docker/CONTRIBUTING.rst#env-file-creation-and-variable-declaration
-
+- `.env File Creation and Variable Declaration`_:
+__ .env File Creation and Variable Declaration_
 - `Building Your Docker Containers`_
 .. _Building Your Docker Containers: https://github.com/SFDO-Tooling/MetaCI/blob/feature/docker/CONTRIBUTING.rst#building-your-docker-containers
 
 - `Running Your Docker Containers`_:
-__Running Your Docker Containers_
+__ Running Your Docker Containers_
 
 .env File Creation and Variable Declaration
 -------------------------------------------
