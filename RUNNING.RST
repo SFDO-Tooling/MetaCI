@@ -12,9 +12,9 @@ Cloning the project
 Making a virtual env
 --------------------
 
-MetaCI development requires Python v3.7. If ``which python3.7`` returns a
+MetaCI development requires Python v3.8. If ``which python3.8`` returns a
 non-empty path, it's already installed and you can continue to the next step. If
-it returns nothing, then install Python v3.7 using ``brew install python``, or
+it returns nothing, then install Python v3.8 using ``brew install python``, or
 from `Python.org`_.
 
 .. _Python.org: https://www.python.org/downloads/
@@ -24,7 +24,7 @@ temporarily for a particular "environment" or directory. We use
 `virtualenvwrapper`_. Assuming you're in the repo root, do the following to
 create a virtualenv (once you have `virtualenvwrapper`_ installed locally)::
 
-    mkvirtualenv metaci --python=$(which python3.7)
+    mkvirtualenv metaci --python=$(which python3.8)
     setvirtualenvproject
 
 Install Python requirements::
