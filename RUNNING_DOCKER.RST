@@ -86,17 +86,16 @@ https://help.github.com/en/articles/creating-a-personal-access-token-for-the-com
 
 SFDX_CLIENT_ID:       
     This tells sfdx the client id of the connected app to use for connecting to 
-    the Dev Hub to create scratch orgs (so it's only needed for running plans that use a scratch org). 
-    For SFDO staff it's easiest to use an existing connected app, so its best to ask another team member. 
+    the Dev Hub to create scratch orgs (so it's only needed for running plans that use a scratch org).
+    If you are a member of SFDO please reach out to Release Engineering for help acquiring the proper SFDX_CLIENT_ID. 
+    For SFDO release engineering staff it's easiest to use an existing connected app, so its best to ask another team member. 
     External users setting up MetaCI will need to create their own connected app, 
     which they can do in the Dev Hub org. 
     You can adapt these instructions https://cumulusci.readthedocs.io/en/latest/tutorial.html#creating-manually 
     but there is a difference for MetaCI: because it's connecting to the org non-interactively, 
     the connected app needs to be set up to use the JWT oauth flow. 
     That means when creating the connected app the user needs to check the "Use Digital Signatures" 
-    box and upload a certificate. If you are a member of SFDO please visit the following
-    quip link https://salesforce.quip.com/sm9bA3R6GwiK, and look under section 5 of SFDX
-    Command Line Tool Setup & Install
+    box and upload a certificate. 
 
 SFDX_HUB_KEY:          
     SFDX_HUB_KEY is the private key that was used to create the certificate.
