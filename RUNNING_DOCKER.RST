@@ -157,6 +157,9 @@ DJANGO_SENTRY_DSN
 
 Other Variables (some preset for user)
 --------------------------------------
+DJANGO_SECRET_KEY: 
+    This represents the secret key for the django web application and is used to sign session cookies;, 
+    arbritary strings such as the one given in the env.example are used. 
 
 BUILD_ENV: 
     Docker argument variable used to determine what dependencies and scripts to run when 
