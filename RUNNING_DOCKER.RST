@@ -47,9 +47,8 @@ To run MetaCI on Docker there are 3 major steps necessary:
 - `Building Your Docker Containers`_
 .. _Building Your Docker Containers: https://github.com/SFDO-Tooling/MetaCI/blob/feature/docker/CONTRIBUTING.rst#building-your-docker-containers
 
-- `Running Your Docker Containers`_
-.. _Running Your Docker Containers: https://github.com/SFDO-Tooling/MetaCI/blob/feature/docker/CONTRIBUTING.rst#running-your-docker-containers
-
+- `Running Your Docker Containers`_:
+__Running Your Docker Containers_
 
 .env File Creation and Variable Declaration
 -------------------------------------------
@@ -83,12 +82,13 @@ GITHUB_USERNAME:
 
 GITHUB_PASSWORD:      
     This represents the password or personal access token a user must have to access 
-    their account a personal access token will be used when Multi Factor Authentication is enabled.
+    their account a `personal access token` will be used when Multi Factor Authentication is enabled.
 
 or
 
 GITHUB_APP_ID:
-    This represents the app id of your github app allowing you to authenticate your machine with github.
+    This represents the app id of your github app allowing you to authenticate your machine
+    with github.
 
 GITHUB_APP_KEY:
     This represents the private key used for authentication for github applications.
