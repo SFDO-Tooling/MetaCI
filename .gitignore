@@ -100,4 +100,3 @@ requirements/yarn*
 postgres/
 # safeguarding secrets
 sfdx_hub.key
-/app/sfdx_hub.key
