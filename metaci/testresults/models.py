@@ -1,25 +1,22 @@
 from __future__ import unicode_literals
 
-import os
-import logging
 import datetime
+import logging
+import os
 from collections import OrderedDict, namedtuple
-from dateutil.tz import gettz
 
+from dateutil.tz import gettz
+from django.apps import apps
 from django.db import models
-from django.db.models import F, Value, Avg, Count, Q, StdDev, FloatField
+from django.db.models import Avg, Count, F, FloatField, Q, StdDev, Value
 from django.db.models.functions import Cast
 from django.urls import reverse
 from django.utils import timezone
-from django.apps import apps
-
-from postgres_stats.aggregates import Percentile
-
-from metaci.testresults.choices import OUTCOME_CHOICES
-from metaci.testresults.choices import TEST_TYPE_CHOICES
 
 from metaci.build import models as build_models
+from metaci.testresults.choices import OUTCOME_CHOICES, TEST_TYPE_CHOICES
 from metaci.utils import split_seq
+from postgres_stats.aggregates import Percentile
 
 
 class TestClass(models.Model):
@@ -115,6 +112,20 @@ class TestResult(models.Model):
     )
     method = models.ForeignKey(
         TestMethod, related_name="test_results", on_delete=models.CASCADE
+    )
+    # The task field is used to reconstitute the test log,
+    # because the task has a list of options used by robot when the
+    # test was run (e.g. noncritical, tagstatlink, etc)
+
+    # NOTE: This field is currently only populated for robot tasks
+    task = models.ForeignKey(
+        "build.FlowTask",
+        related_name="test_results",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
+        help_text="Task which generated the original output.xml file",
     )
     duration = models.FloatField(null=True, blank=True, db_index=True)
     outcome = models.CharField(max_length=16, choices=OUTCOME_CHOICES, db_index=True)
