@@ -1,21 +1,26 @@
+import datetime
+import numbers
+import random
+
 import factory
 import factory.fuzzy
 
-import numbers
-import random
-import datetime
-
-
+from metaci.build.models import (
+    BUILD_FLOW_STATUSES,
+    BUILD_STATUSES,
+    Build,
+    BuildFlow,
+    FlowTask,
+)
+from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.plan.models import Plan, PlanRepository, PlanSchedule
+from metaci.repository.models import Branch, Repository
 from metaci.testresults.models import (
-    TestResult,
-    TestMethod,
     TestClass,
+    TestMethod,
+    TestResult,
     TestResultPerfWeeklySummary,
 )
-from metaci.build.models import BuildFlow, Build, BUILD_STATUSES, BUILD_FLOW_STATUSES
-from metaci.cumulusci.models import Org, ScratchOrgInstance
-from metaci.repository.models import Branch, Repository
 from metaci.users.models import User
 
 BUILD_STATUS_NAMES = (
@@ -207,3 +212,12 @@ class PlanScheduleFactory(factory.django.DjangoModelFactory):
 
     branch = factory.SubFactory(BranchFactory)
     plan = factory.SubFactory(PlanFactory)
+
+
+class FlowTaskFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FlowTask
+
+    build_flow = factory.SubFactory(BuildFlowFactory)
+    stepnum = factory.Sequence(lambda n: f"{n}")
+    path = factory.Sequence(lambda n: f"flow_1.task_{n}")
