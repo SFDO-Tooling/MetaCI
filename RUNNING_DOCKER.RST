@@ -210,7 +210,7 @@ MetaCI's docker container comes out of the box with development test
 data and the creation of a default admin user.
 
 If you would like to disable this functionality please add a `DJANGO_SETTINGS_MODULE` environment variable
-in the web service section of the docker-compose file from its default value (set in Dockerfile) from
+in the web service section of the docker-compose file to set it from its default value (set in Dockerfile) from
 `config.settings.local` to `config.settings.production`.
 For examples of how to do this please see `setting docker-compose environment variables`_.
 

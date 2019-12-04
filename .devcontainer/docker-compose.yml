@@ -7,7 +7,8 @@ services:
       - vscode-server:/root/.vscode-server:cached
       - /var/run/docker.sock:/var/run/docker.sock:cached
     # Override command to prevent container crashing if webpack build exits
-    command: sleep infinity
+    command: /bin/bash -c 'while !</dev/tcp/postgres/5432; do echo "Waiting for postgres databaseto start..."; /bin/sleep 1; done; \
+        /bin/sleep 1; /bin/sh /app/utility/start_server.sh;'
 
 volumes:
   vscode-server: {}
