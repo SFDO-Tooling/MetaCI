@@ -78,22 +78,10 @@ def build_flow_tests(request, build_id, flow):
                 "value": getattr(result, column),
                 "status": "active",
             }
-            percent = None
-            if column.find("percent") != -1:
-                percent = column_data["value"]
-            elif column.find("used") != -1:
-                percent = getattr(result, column.replace("_used", "_percent"))
+            set_percent_data(result, column, column_data)
 
-            if percent is not None:
-                if percent < 50:
-                    column_data["status"] = "success"
-                elif percent < 70:
-                    column_data["status"] = "info"
-                elif percent < 80:
-                    column_data["status"] = "warning"
-                else:
-                    column_data["status"] = "danger"
             result_data["columns"].append(column_data)
+
         current_class_results.append(result_data)
         last_class = result.method.testclass
 
@@ -107,6 +95,24 @@ def build_flow_tests(request, build_id, flow):
     data["columns"] = columns
 
     return render(request, "testresults/build_flow_tests.html", data)
+
+
+def set_percent_data(result, column, column_data):
+    percent = None
+    if column.find("percent") != -1:
+        percent = column_data["value"]
+    elif column.find("used") != -1:
+        percent = getattr(result, column.replace("_used", "_percent"))
+
+    if percent is not None:
+        if percent < 50:
+            column_data["status"] = "success"
+        elif percent < 70:
+            column_data["status"] = "info"
+        elif percent < 80:
+            column_data["status"] = "warning"
+        else:
+            column_data["status"] = "danger"
 
 
 def test_result_detail(request, result_id):
@@ -178,7 +184,9 @@ def test_result_robot(request, result_id):
             log_html = f.read()
         os.remove(source)
         os.remove(log)
-    return HttpResponse(log_html)
+        return HttpResponse(log_html)
+    else:
+        return HttpResponse(f"No robot_xml available in test result: {result}")
 
 
 def test_method_peek(request, method_id):
