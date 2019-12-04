@@ -159,7 +159,7 @@ Other Variables (some preset for user)
 --------------------------------------
 
 BUILD_ENV: 
-    Environment variable used to determine what dependencies and scripts to run when 
+    Docker argument variable used to determine what dependencies and scripts to run when 
     installing dependencies and populating databases, currently set in docker-compose.yml
     web service environment variable
 
