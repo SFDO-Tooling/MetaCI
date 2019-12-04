@@ -116,7 +116,8 @@ SFDX_HUB_USERNAME:
     This represents the username used to login to your sfdx hub account
 
 CONNECTED_APP_CLIENT_ID:
-    This represents the client id of the packaging org that MetaCI is running builds on
+    This represents the client id of the connected app that MetaCI will use for authenticating to any persistent org. 
+    It's fine to use the same connected app that is being used for SFDX_CLIENT_ID and SFDX_HUB_KEY.
 
 CONNECTED_APP_CLIENT_SECRET: 
     This represents the secret of the packaging org configured for MetaCI
