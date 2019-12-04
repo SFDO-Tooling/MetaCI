@@ -122,7 +122,7 @@ CONNECTED_APP_CLIENT_SECRET:
     This represents the secret of the packaging org configured for MetaCI
 
 CONNECTED_APP_CALLBACK_URL:
-    This represents the packaging org's callback url 
+    The connected app's callback url 
 
 To acquire the connected_app variables if you are already properly configured with cci:
 
