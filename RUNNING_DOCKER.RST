@@ -113,16 +113,16 @@ FORMATTING SFDX_HUB_KEY in .env
     SFDX_HUB_KEY=-----BEGIN RSA PRIVATE KEY-----\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nv4fU8l7TeYVQVvSdWJmN3sBZ4bnG3GSu1u6viGQwxulxtJrLnclEgL2Tq0npRn/x\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nDMG9uoYPD4X0rkKz/4PI2jcO4NgkWfTiQY0yEDQNM31Sfcw5lNSeKHrrnG7fHx3q\nu9fb7GxWMi74LBlMVlseREzfYRyUI7ukPZNgdvAGbp3TI0ITAQTbTzKPR4FdyZbm\nysuDXZuQpbifXxBKPVVYHxbdEYkabK4FKeB1cNRI72T0jt+r6DqFTjfpJHs/FjEo\nq86HWtHWGh1AYaIi5LBMLQ1tNEcSNvvZW49AsUISqJRFwFvwubBhLh36DaucM4aI\nWPLQUeUCgYEA37+Qy6o3vvfwj0pJ4Ecqo5FRZkxBbUmVTdr1RVPAFxRchsKzsvx4\nWKRDkmIlvf/vpaB4cUsYDZVOd1qGXciFQODk+FfLbOCDbcR1qv87YL/tKNRO/sox\nBt3yS6vyCokn48Ycaqs+tYcHC2O0Vaye/VvwwUSQMLLVdGR84N2hzX8CgYEA3S15\ndqEiWI8a27EX4AD4q9avNJJCwkO5B9/YBnZBpy1DcFSozP5JfgoH1ilK4tmiXjZO\n3Y+oTcKRUKOSQPjv8obTt3N3xtdabWMW6sH31kOfiKOmDg2lw/UjYQ+xO5FBE/Pi\nOR4XRbhSe04dJ+U2Gik38f/WtgA9h53YOeAJ5UMCgYA2kFLRN+tsSK6DYwxtAy3k\nwZVmKwZxjlY4rELP60KW3kJKIsULywHWLAjGc+TcVsOsUlvM1RFCjryZ4puN106X\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nDtfenYxFW9Iqj58oCzDuUJGWkA4lolYMkcbvEhE2fhOTNH9UdFyhC6WDQuaFnr1x\nbC4LAoGAbzqfS4vF+kloxneGdWJnAiibvEEUWVmMZ4GMF0a7w0x2l+jwiGT2Kt8P\nC5VdZvMMktzfTHynq6j6BfnSYCBJFNp1EbwZksGtEnT4ggCdIVNY+N1wVeok1vp/\n17/R87a1O62MeA5gBeGdpoMof/XrFVUdb/kSXyNt8miUeLOez/M=\n-----END RSA PRIVATE KEY-----
 
 SFDX_HUB_USERNAME: 
-    The username used to login to your Dev Hub org
+    This represents the username used to login to your sfdx hub account
 
 CONNECTED_APP_CLIENT_ID:
     This represents the client id of the packaging org that MetaCI is running builds on
 
 CONNECTED_APP_CLIENT_SECRET: 
-    The client secret of the connected app used for authenticating to persistent orgs.
+    This represents the secret of the packaging org configured for MetaCI
 
 CONNECTED_APP_CALLBACK_URL:
-    The connected app's callback url 
+    This represents the packaging org's callback url 
 
 To acquire the connected_app variables if you are already properly configured with cci:
 
@@ -160,7 +160,7 @@ Other Variables (some preset for user)
 DJANGO_SECRET_KEY: 
     This represents the secret key for the django web application and is used to sign session cookies;, 
     arbritary strings such as the one given in the env.example are used. Important this variable is 
-    not copied from another Django site. 
+    not copied from another Django site.
 
 BUILD_ENV: 
     Docker argument variable used to determine what dependencies and scripts to run when 
