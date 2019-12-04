@@ -100,5 +100,4 @@ requirements/yarn*
 postgres/
 # safeguarding secrets
 sfdx_hub.key
-
-utility/start_server.sh
+/app/sfdx_hub.key

@@ -199,16 +199,23 @@ project, a template of variables needed can be found under ``env.example``.
 To configure and run your environment you must run 2 commands in the root directory of MetaCI
 Note that docker-compose build will take some significant time to build the first time but will
 be much faster for subsequent builds. It is also important to note that once you bring 
-up the web application it will take roughly 60 seconds to fully compile. 
-
+up the web application it will take roughly 60 seconds to fully compile.
 ::
     
     docker-compose build
 
 Running Your Docker Containers:
 -------------------------------
-If you would like to populate your instance of MetaCI with test data simply 
-set DJANGO_SETTINGS_MODULE to config.settings.local in the ``.env`` docker-compose.yml file. 
+MetaCI's docker container comes out of the box with development test
+data and the creation of a default admin user.
+
+If you would like to disable this functionality please add a `DJANGO_SETTINGS_MODULE` environment variable
+in the web service section of the docker-compose file from its default value (set in Dockerfile) from
+`config.settings.local` to `config.settings.production`.
+For examples of how to do this please see `setting docker-compose environment variables`_.
+
+.. _setting docker-compose environment variables: https://docs.docker.com/compose/environment-variables/
+
 Then run the following command:
 ::
 
@@ -217,7 +224,7 @@ Then run the following command:
     docker-compose up (for debug mode)
 
 After running this command which will take a couple minutes on startup visit ``localhost:8000/admin/login``
- and login with the following credentials:
+ and login with the following credentials if DJANGO_SETTINGS_MODULE is config.settings.local:
 
 username
     ``admin``
