@@ -119,7 +119,7 @@ CONNECTED_APP_CLIENT_ID:
     This represents the client id of the packaging org that MetaCI is running builds on
 
 CONNECTED_APP_CLIENT_SECRET: 
-    This represents the secret of the packaging org configured for MetaCI
+    The client secret of the connected app used for authenticating to persistent orgs.
 
 CONNECTED_APP_CALLBACK_URL:
     The connected app's callback url 
