@@ -127,6 +127,7 @@ INSTALLED_APPS += ("anymail",)
 MAILGUN_API_KEY = env("MAILGUN_API_KEY", default=None)
 ANYMAIL = {}
 ANYMAIL["MAILGUN_API_KEY"] = MAILGUN_API_KEY
+ANYMAIL["MAILGUN_SENDER_DOMAIN"] = env("MAILGUN_DOMAIN", default=None)
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
