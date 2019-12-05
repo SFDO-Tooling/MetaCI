@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Developing with Docker &#8212; metaci 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Deploy" href="deploy.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="deploy.html" title="Deploy"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">metaci 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="developing-with-docker">
+<h1>Developing with Docker<a class="headerlink" href="#developing-with-docker" title="Permalink to this headline">¶</a></h1>
+<p>You can develop your application in a <a class="reference external" href="https://www.docker.com/">Docker</a> container for simpler deployment onto bare Linux machines later. This instruction assumes an <a class="reference external" href="http://aws.amazon.com/">Amazon Web Services</a> EC2 instance, but it should work on any machine with Docker &gt; 1.3 and <a class="reference external" href="https://docs.docker.com/compose/">Docker compose</a> installed.</p>
+<div class="section" id="setting-up">
+<h2>Setting up<a class="headerlink" href="#setting-up" title="Permalink to this headline">¶</a></h2>
+<p>Docker encourages running one container for each process. This might mean one container for your web server, one for Django application and a third for your database. Once you’re happy composing containers in this way you can easily add more, such as a <a class="reference external" href="http://redis.io/">Redis</a> cache.</p>
+<p>The Docker compose tool (previously known as <a class="reference external" href="http://www.fig.sh/">fig</a>) makes linking these containers easy. An example set up for your Cookiecutter Django project might look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">webapp</span><span class="o">/</span> <span class="c1"># Your cookiecutter project would be in here</span>
+    <span class="n">Dockerfile</span>
+    <span class="o">...</span>
+<span class="n">database</span><span class="o">/</span>
+    <span class="n">Dockerfile</span>
+    <span class="o">...</span>
+<span class="n">webserver</span><span class="o">/</span>
+    <span class="n">Dockerfile</span>
+    <span class="o">...</span>
+<span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>Each component of your application would get its own <a class="reference external" href="https://docs.docker.com/reference/builder/">Dockerfile</a>. The rest of this example assumes you are using the <a class="reference external" href="https://registry.hub.docker.com/_/postgres/">base postgres image</a> for your database. Your database settings in <cite>config/common.py</cite> might then look something like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.backends.postgresql_psycopg2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;postgres&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;USER&#39;</span><span class="p">:</span> <span class="s1">&#39;postgres&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;HOST&#39;</span><span class="p">:</span> <span class="s1">&#39;database&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;PORT&#39;</span><span class="p">:</span> <span class="mi">5432</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="https://docs.docker.com/compose/#compose-documentation">Docker compose documentation</a> explains in detail what you can accomplish in the <cite>docker-compose.yml</cite> file, but an example configuration might look like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">database</span><span class="p">:</span>
+    <span class="nt">build</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">database</span>
+<span class="nt">webapp</span><span class="p">:</span>
+    <span class="nt">build</span><span class="p">:</span> <span class="nt">webapp</span><span class="p">:</span>
+    <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/usr/bin/python3.4 manage.py runserver 0.0.0.0:8000</span> <span class="c1"># dev setting</span>
+    <span class="c1"># command: gunicorn -b 0.0.0.0:8000 wsgi:application # production setting</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">webapp/your_project_name:/path/to/container/workdir/</span>
+    <span class="nt">links</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">database</span>
+<span class="nt">webserver</span><span class="p">:</span>
+    <span class="nt">build</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">webserver</span>
+    <span class="nt">ports</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="s">&quot;80:80&quot;</span>
+        <span class="p p-Indicator">-</span> <span class="s">&quot;443:443&quot;</span>
+    <span class="nt">links</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">webapp</span>
+</pre></div>
+</div>
+<p>We’ll ignore the webserver for now (you’ll want to comment that part out while we do). A working Dockerfile to run your cookiecutter application might look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FROM</span> <span class="n">ubuntu</span><span class="p">:</span><span class="mf">14.04</span>
+<span class="n">ENV</span> <span class="n">REFRESHED_AT</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">13</span>
+
+<span class="c1"># update packages and prepare to build software</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;apt-get&quot;</span><span class="p">,</span> <span class="s2">&quot;update&quot;</span><span class="p">]</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;apt-get&quot;</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">,</span> <span class="s2">&quot;install&quot;</span><span class="p">,</span> <span class="s2">&quot;build-essential&quot;</span><span class="p">,</span> <span class="s2">&quot;vim&quot;</span><span class="p">,</span> <span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;curl&quot;</span><span class="p">]</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;locale-gen&quot;</span><span class="p">,</span> <span class="s2">&quot;en_GB.UTF-8&quot;</span><span class="p">]</span>
+
+<span class="c1"># install latest python</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;apt-get&quot;</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">,</span> <span class="s2">&quot;build-dep&quot;</span><span class="p">,</span> <span class="s2">&quot;python3-dev&quot;</span><span class="p">,</span> <span class="s2">&quot;python3-imaging&quot;</span><span class="p">]</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;apt-get&quot;</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">,</span> <span class="s2">&quot;install&quot;</span><span class="p">,</span> <span class="s2">&quot;python3-dev&quot;</span><span class="p">,</span> <span class="s2">&quot;python3-imaging&quot;</span><span class="p">,</span> <span class="s2">&quot;python3-pip&quot;</span><span class="p">]</span>
+
+<span class="c1"># prepare postgreSQL support</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;apt-get&quot;</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">,</span> <span class="s2">&quot;build-dep&quot;</span><span class="p">,</span> <span class="s2">&quot;python3-psycopg2&quot;</span><span class="p">]</span>
+
+<span class="c1"># move into our working directory</span>
+<span class="c1"># ADD must be after chown see http://stackoverflow.com/a/26145444/1281947</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;groupadd&quot;</span><span class="p">,</span> <span class="s2">&quot;python&quot;</span><span class="p">]</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;useradd&quot;</span><span class="p">,</span> <span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;/bin/bash&quot;</span><span class="p">,</span> <span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;-G&quot;</span><span class="p">,</span> <span class="s2">&quot;python&quot;</span><span class="p">]</span>
+<span class="n">ENV</span> <span class="n">HOME</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">python</span>
+<span class="n">WORKDIR</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">python</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;chown&quot;</span><span class="p">,</span> <span class="s2">&quot;-R&quot;</span><span class="p">,</span> <span class="s2">&quot;python:python&quot;</span><span class="p">,</span> <span class="s2">&quot;/home/python&quot;</span><span class="p">]</span>
+<span class="n">ADD</span> <span class="o">./</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">python</span>
+
+<span class="c1"># manage requirements</span>
+<span class="n">ENV</span> <span class="n">REQUIREMENTS_REFRESHED_AT</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">25</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;pip3&quot;</span><span class="p">,</span> <span class="s2">&quot;install&quot;</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">]</span>
+
+<span class="c1"># uncomment the line below to use container as a non-root user</span>
+<span class="n">USER</span> <span class="n">python</span><span class="p">:</span><span class="n">python</span>
+</pre></div>
+</div>
+<p>Running <cite>sudo docker-compose build</cite> will follow the instructions in your <cite>docker-compose.yml</cite> file and build the database container, then your webapp, before mounting your cookiecutter project files as a volume in the webapp container and linking to the database. Our example yaml file runs in development mode but changing it to production mode is as simple as commenting out the line using <cite>runserver</cite> and uncommenting the line using <cite>gunicorn</cite>.</p>
+<p>Both are set to run on port <cite>0.0.0.0:8000</cite>, which is where the Docker daemon will discover it. You can now run <cite>sudo docker-compose up</cite> and browse to <cite>localhost:8000</cite> to see your application running.</p>
+</div>
+<div class="section" id="deployment">
+<h2>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h2>
+<p>You’ll need a webserver container for deployment. An example setup for <a class="reference external" href="http://wiki.nginx.org/Main">Nginx</a> might look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FROM</span> <span class="n">ubuntu</span><span class="p">:</span><span class="mf">14.04</span>
+<span class="n">ENV</span> <span class="n">REFRESHED_AT</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">11</span>
+
+<span class="c1"># get the nginx package and set it up</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;apt-get&quot;</span><span class="p">,</span> <span class="s2">&quot;update&quot;</span><span class="p">]</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;apt-get&quot;</span><span class="p">,</span> <span class="s2">&quot;-y&quot;</span><span class="p">,</span> <span class="s2">&quot;install&quot;</span><span class="p">,</span> <span class="s2">&quot;nginx&quot;</span><span class="p">]</span>
+
+<span class="c1"># forward request and error logs to docker log collector</span>
+<span class="n">RUN</span> <span class="n">ln</span> <span class="o">-</span><span class="n">sf</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">stdout</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">access</span><span class="o">.</span><span class="n">log</span>
+<span class="n">RUN</span> <span class="n">ln</span> <span class="o">-</span><span class="n">sf</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">stderr</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">error</span><span class="o">.</span><span class="n">log</span>
+<span class="n">VOLUME</span> <span class="p">[</span><span class="s2">&quot;/var/cache/nginx&quot;</span><span class="p">]</span>
+<span class="n">EXPOSE</span> <span class="mi">80</span> <span class="mi">443</span>
+
+<span class="c1"># load nginx conf</span>
+<span class="n">ADD</span> <span class="o">./</span><span class="n">site</span><span class="o">.</span><span class="n">conf</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">sites</span><span class="o">-</span><span class="n">available</span><span class="o">/</span><span class="n">your_cookiecutter_project</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;ln&quot;</span><span class="p">,</span> <span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;/etc/nginx/sites-available/your_cookiecutter_project&quot;</span><span class="p">,</span> <span class="s2">&quot;/etc/nginx/sites-enabled/your_cookiecutter_project&quot;</span><span class="p">]</span>
+<span class="n">RUN</span> <span class="p">[</span><span class="s2">&quot;rm&quot;</span><span class="p">,</span> <span class="s2">&quot;-rf&quot;</span><span class="p">,</span> <span class="s2">&quot;/etc/nginx/sites-available/default&quot;</span><span class="p">]</span>
+
+<span class="c1">#start the server</span>
+<span class="n">CMD</span> <span class="p">[</span><span class="s2">&quot;nginx&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;daemon off;&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>That Dockerfile assumes you have an Nginx conf file named <cite>site.conf</cite> in the same directory as the webserver Dockerfile. A very basic example, which forwards traffic onto the development server or gunicorn for processing, would look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># see http://serverfault.com/questions/577370/how-can-i-use-environment-variables-in-nginx-conf#comment730384_577370</span>
+<span class="n">upstream</span> <span class="n">localhost</span> <span class="p">{</span>
+    <span class="n">server</span> <span class="n">webapp_1</span><span class="p">:</span><span class="mi">8000</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">server</span> <span class="p">{</span>
+    <span class="n">location</span> <span class="o">/</span> <span class="p">{</span>
+        <span class="n">proxy_pass</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Running <cite>sudo docker-compose build webserver</cite> will build your server container. Running <cite>sudo docker-compose up</cite> will now expose your application directly on <cite>localhost</cite> (no need to specify the port number).</p>
+</div>
+<div class="section" id="building-and-running-your-app-on-ec2">
+<h2>Building and running your app on EC2<a class="headerlink" href="#building-and-running-your-app-on-ec2" title="Permalink to this headline">¶</a></h2>
+<p>All you now need to do to run your app in production is:</p>
+<ul class="simple">
+<li><p>Create an empty EC2 Linux instance (any Linux machine should do).</p></li>
+<li><p>Install your preferred source control solution, Docker and Docker compose on the news instance.</p></li>
+<li><p>Pull in your code from source control. The root directory should be the one with your <cite>docker-compose.yml</cite> file in it.</p></li>
+<li><p>Run <cite>sudo docker-compose build</cite> and <cite>sudo docker-compose up</cite>.</p></li>
+<li><p>Assign an <a class="reference external" href="https://aws.amazon.com/articles/1346">Elastic IP address</a> to your new machine.</p></li>
+</ul>
+<ul class="simple">
+<li><p>Point your domain name to the elastic IP.</p></li>
+</ul>
+<p><strong>Be careful with Elastic IPs</strong> because, on the AWS free tier, if you assign one and then stop the machine you will incur charges while the machine is down (presumably because you’re preventing them allocating the IP to someone else).</p>
+</div>
+<div class="section" id="security-advisory">
+<h2>Security advisory<a class="headerlink" href="#security-advisory" title="Permalink to this headline">¶</a></h2>
+<p>The setup described in this instruction will get you up-and-running but it hasn’t been audited for security. If you are running your own setup like this it is always advisable to, at a minimum, examine your application with a tool like <a class="reference external" href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP ZAP</a> to see what security holes you might be leaving open.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Developing with Docker</a><ul>
+<li><a class="reference internal" href="#setting-up">Setting up</a></li>
+<li><a class="reference internal" href="#deployment">Deployment</a></li>
+<li><a class="reference internal" href="#building-and-running-your-app-on-ec2">Building and running your app on EC2</a></li>
+<li><a class="reference internal" href="#security-advisory">Security advisory</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="deploy.html"
+                        title="previous chapter">Deploy</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/docker_ec2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="deploy.html" title="Deploy"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">metaci 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Jason Lantz.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.
+    </div>
+  </body>
+</html>
