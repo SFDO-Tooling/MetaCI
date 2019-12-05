@@ -21,7 +21,7 @@ To verify you have successfully installed docker type:
     
     docker -v
 
-.. note:: You should see something like the following: 
+*You should see something like the following:*
     ``Docker version 19.03.4, build 9013bf5``
 
 
@@ -33,14 +33,13 @@ To verify you have successfully installed docker-compose type:
 
     docker-compose -v
 
-.. note:: You should see something like the following: 
+*You should see something like the following:*
     ``docker-compose version 1.16.1, build 6d1ac219``
 
 Running MetaCI In Docker
-=========================
+========================
 
-Steps Necessary To Run MetaCI On Docker:
-----------------------------------------
+Below are the following steps necessary to run MetaCI on Docker:
 
 1. `.env File Creation and Variable Declaration`_ 
     .. _.env File Creation and Variable Declaration: 
@@ -53,9 +52,9 @@ Steps Necessary To Run MetaCI On Docker:
 
 
 .env File Creation And Variable Declaration
--------------------------------------------
+===========================================
 
-.. note:: Please begin by making a copy of env.example and renaming it .env in your root project directory
+*Please begin by making a copy of env.example and renaming it .env in your root project directory*
 
 Local Variables
 ===============
@@ -161,8 +160,8 @@ DJANGO_SENTRY_DSN
 
 Other Variables 
 ===============
-.. note:: Some variables are preset in this section if this is the case it 
-    will explicitly tell you where its declaration is in the description.
+
+*Some variables are preset in this section if this is the case it will explicitly tell you where its declaration is in the description.*
 
 DJANGO_SECRET_KEY: 
     This represents the secret key for the django web application and is used to sign session cookies;, 
