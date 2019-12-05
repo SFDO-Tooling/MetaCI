@@ -86,7 +86,7 @@ GITHUB_PASSWORD:
     This represents the password or personal access token a user must have to access 
     their account a `personal access token` will be used when Multi Factor Authentication is enabled.
 
-:OR:
+OR
 
 GITHUB_APP_ID:
     This represents the app id of your github app allowing you to authenticate your machine
