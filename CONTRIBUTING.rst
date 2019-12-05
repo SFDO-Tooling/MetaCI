@@ -1,6 +1,6 @@
-================
-Developing MetaCI via Docker
-================
+============================
+Developing MetaCI Via Docker
+============================
 
 MetaCI can be setup using either docker virtual containers
 or on your local machine. To set up MetaCI using docker please
@@ -8,9 +8,9 @@ see the following instructions `RUNNING_DOCKER.rst`_.
 
 .. _RUNNING_DOCKER.rst: https://github.com/SFDO-Tooling/MetaCI/blob/master/RUNNING_DOCKER.RST
 
-=======================
-Developing MetaCI via local machine
-=======================
+===================================
+Developing MetaCI Via Local Machine
+===================================
 
 As mentioned above, MetaCI can be configured locally. 
 To achieve this follow the instructions provided in `RUNNING.rst`_.
@@ -18,11 +18,13 @@ To achieve this follow the instructions provided in `RUNNING.rst`_.
 .. _RUNNING.rst: https://github.com/SFDO-Tooling/MetaCI/blob//master/RUNNING.RST
 
 Development Tasks
------------------
+=================
 
 To run these tests with docker first run the following commands, if you are not using docker,
 simply execute the commands in your project's root directory:
+
 ::
+
     docker-compose up -d
     docker-compose exec web bash
 
@@ -54,7 +56,7 @@ automatically prepended to commit messages):
 - 🙀 (``:scream_cat:``) -> ``rm -rf node_modules/; bin/unpack-node; yarn``
 
 Internationalization
---------------------
+====================
 
 To build and compile ``.mo`` and ``.po`` files for the backend, run::
 
@@ -82,8 +84,7 @@ translations to ``locales/<language>/translation.json``.
 .. _user language is auto-detected at runtime: https://github.com/i18next/i18next-browser-languageDetector
 
 Type Checking
---------------
-
+=============
 We use "flow_" for type-checking for the time being. You should be able to just
 type "flow" to validate that there are no known type errors.
 
@@ -97,7 +98,7 @@ At some point we will probably move to TypeScript.
 .. _flow: https://flow.org/
 
 Developing with SLDS
---------------------
+====================
 
 MetaCI uses https://github.com/SalesforceFoundation/django-slds which imports version 2.1.2 of the Salesforce Lightning Design System.
 
