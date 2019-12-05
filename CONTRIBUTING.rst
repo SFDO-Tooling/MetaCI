@@ -9,7 +9,7 @@ Using Docker
 ============
 
 To set up MetaCI using docker please
-see the following instructions `RUNNING_DOCKER.rst`_.
+see the following instructions `<./RUNNING_DOCKER.rst>`_.
 
 .. _RUNNING_DOCKER.rst: https://github.com/SFDO-Tooling/MetaCI/blob/master/RUNNING_DOCKER.RST
 
