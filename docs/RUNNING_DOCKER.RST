@@ -42,13 +42,14 @@ Running MetaCI In Docker
 Below are the following steps necessary to run MetaCI on Docker:
 
 1. `.env File Creation and Variable Declaration`_ 
-    .. _.env File Creation and Variable Declaration: 
+    .. _`.env File Creation and Variable Declaration`:
 
 2. `Building Your Docker Containers`_ 
-    .. _`Building Your Docker Containers`: 
+    .. _Building Your Docker Containers:
+
 
 3. `Running Your Docker Containers`_ 
-    .. _`Running Your Docker Containers`:
+    .. _Running Your Docker Containers:
 
 
 .env File Creation And Variable Declaration
@@ -201,7 +202,7 @@ DJANGO_SECRET_KEY:
     in the env.example will suffice. Otherwise use your production secret key.
     
 Building Your Docker Containers
-===============================
+-------------------------------
 
 This next section assumes you have downloaded ``docker`` and ``docker-compose``.
 Additionally it assumes you have a ``.env`` file in the root directory of this 
