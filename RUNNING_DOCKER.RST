@@ -1,5 +1,5 @@
-Development Setup
-=================
+Docker Development Setup
+========================
 
 Cloning the project
 -------------------
@@ -10,7 +10,7 @@ Cloning the project
     cd MetaCI
 
 Docker and Docker-Compose Installation:
---------------------------------------
+---------------------------------------
 To download and install docker please visit: https://hub.docker.com/?overlay=onboarding 
 and follow the installation instructions to download docker if needed.
 To verify you have successfully installed docker type:
@@ -19,9 +19,9 @@ To verify you have successfully installed docker type:
     
     docker -v
 
-You should see something like the following:
+.. note:: You should see something like the following: 
+    ``Docker version 19.03.4, build 9013bf5``
 
-``Docker version 19.03.4, build 9013bf5``
 
 To download and install docker-compose please visit: https://docs.docker.com/v17.09/compose/install/
 and follow the installation instructions to download docker-compose if needed.
@@ -31,32 +31,32 @@ To verify you have successfully installed docker-compose type:
 
     docker-compose -v
 
-You should see something like the following):
-
-``docker-compose version 1.16.1, build 6d1ac219``
+.. note:: You should see something like the following: 
+    ``docker-compose version 1.16.1, build 6d1ac219``
 
 Running MetaCI In Docker:
 =========================
 
-To run MetaCI on Docker there are 3 major steps necessary:
-----------------------------------------------------------
+Steps Necessary To Run MetaCI On Docker:
+--------------------------------------------------------------
 
-- `.env File Creation and Variable Declaration`_
-.. _.env File Creation and Variable Declaration:
+1. `.env File Creation and Variable Declaration`_ 
+    .. _.env File Creation and Variable Declaration: 
 
-- `Building Your Docker Containers`_
-.. _Building Your Docker Containers_: 
+2. `Building Your Docker Containers`_ 
+    .. _`Building Your Docker Containers`: 
 
-- `Running Your Docker Containers`_
-.. _Running Your Docker Containers:
+3. `Running Your Docker Containers`_ 
+    .. _`Running Your Docker Containers`:
 
-.env File Creation and Variable Declaration
+
+.env File Creation And Variable Declaration
 -------------------------------------------
 
-*Please begin by making a copy of env.example and renaming it .env in your root project directory*
+.. note:: Please begin by making a copy of env.example and renaming it .env in your root project directory
 
-Variables Required Locally
----------------------------------
+Local Variables
+---------------
 
 POSTGRES_USER: 
     Environment variable set in the docker-compose.yml file under the postgres service, 
@@ -84,7 +84,7 @@ GITHUB_PASSWORD:
     This represents the password or personal access token a user must have to access 
     their account a `personal access token` will be used when Multi Factor Authentication is enabled.
 
-or
+:OR:
 
 GITHUB_APP_ID:
     This represents the app id of your github app allowing you to authenticate your machine
@@ -157,8 +157,11 @@ DJANGO_SENTRY_DSN
     definition here
 
 
-Other Variables (some preset for user)
---------------------------------------
+Other Variables 
+---------------
+.. note:: Some variables are preset in this section if this is the case it 
+    will explicitly tell you where its declaration is in the description.
+
 DJANGO_SECRET_KEY: 
     This represents the secret key for the django web application and is used to sign session cookies;, 
     arbritary strings such as the one given in the env.example are used. Important this variable is 
@@ -189,13 +192,14 @@ DJANGO_HASHID_SALT:
     arbritary string due to non production defaults, can be overridden 
     in docker-compose.yml. Currently set in Dockerfile.
 
+
 DJANGO_SECRET_KEY: 
     This represents the key for the django web application, currently set to arbritary
     string due to non production defaults, can be overridden in docker-compose.yml.
     Currently set in Dockerfile. For local testing, arbritary strings such as the one given 
     in the env.example will suffice. Otherwise use your production secret key.
     
-Building Your Docker Containers:
+Building Your Docker Containers
 -------------------------------
 
 This next section assumes you have downloaded ``docker`` and ``docker-compose``.
@@ -210,8 +214,8 @@ up the web application it will take roughly 60 seconds to fully compile.
     
     docker-compose build
 
-Running Your Docker Containers:
--------------------------------
+Running Your Docker Containers
+------------------------------
 MetaCI's docker container comes out of the box with development test
 data and the creation of a default admin user.
 
@@ -230,11 +234,11 @@ Then run the following command:
     docker-compose up (for debug mode)
 
 After running this command which will take a couple minutes on startup visit ``localhost:8000/admin/login``
- and login with the following credentials if DJANGO_SETTINGS_MODULE is config.settings.local:
+and login with the following credentials if DJANGO_SETTINGS_MODULE is config.settings.local:
 
-username
+username:
     ``admin``
-password
+password:
     ``password``
 
 From here you should be able to run builds. However note that this default account will not be created 
@@ -260,19 +264,24 @@ To bring your virtual containers up for the first time run the following command
     docker-compose up -d
 
 To bring your virtual containers down run the following command:
-*The docker-compose down command will stop your containers, 
-but also removes the stopped containers as well as any networks that were created.*
+
+.. warning:: The docker-compose down command will stop your containers, 
+    but also removes the stopped containers as well as any networks that were created.
+
 ::
 
     docker-compose down
     
 Removes stopped service containers. To remove your stopped containers enter the following commands
-*Note this will destroy anything that is in the virtual environment, however the database data will persist
+
+.. warning:: This will destroy anything that is in the virtual environment, 
+    however the database data will persist 
+
 ::
 
     docker-compose rm
 
-(then enter ``y`` when prompted)
+(then enter ``y`` when prompted. If you would like to clear the database as well include a -v flag i.e. ``docker-compose down -v``)
 
 To view all running services run the following command:
 
@@ -350,6 +359,7 @@ Internationalization
 --------------------
 To run this in a docker container first run the following commands, 
 ::
+    
     docker-compose up -d
     docker-compose exec web bash
 
