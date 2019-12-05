@@ -65,6 +65,12 @@ To install the project-local version of Node (and `yarn`_)::
 
     bin/unpack-node
 
+Make sure the local node bin directory is added to your PATH (you'll need to
+do this every time you open a new terminal before you run yarn commands for this project,
+so you might want to add it to your shell's init script)::
+
+    PATH=./node/bin:$PATH
+
 If you can run ``which node`` and see a path inside your project directory ending with
 ``.../node/bin/node``, then you've got it set up right and can move on.
 
