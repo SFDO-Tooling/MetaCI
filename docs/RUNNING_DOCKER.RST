@@ -3,7 +3,7 @@ Docker Development Setup
 ========================
 
 Cloning the project
-===================
+-------------------
 
 ::
 
@@ -11,7 +11,7 @@ Cloning the project
     cd MetaCI
 
 Docker and Docker-Compose Installation
-======================================
+--------------------------------------
 
 To download and install docker please visit: https://hub.docker.com/?overlay=onboarding 
 and follow the installation instructions to download docker if needed.
@@ -53,12 +53,12 @@ Below are the following steps necessary to run MetaCI on Docker:
 
 
 .env File Creation And Variable Declaration
-===========================================
+-------------------------------------------
 
 *Please begin by making a copy of env.example and renaming it .env in your root project directory*
 
 Local Variables
-===============
+---------------
 
 POSTGRES_USER: 
     Environment variable set in the docker-compose.yml file under the postgres service, 
@@ -143,7 +143,7 @@ of the connected app that was created for ``SFDX_CLIENT_ID`` and ``SFDX_HUB_KEY`
 
 
 Production Variables
-====================
+--------------------
 
 GITHUB_WEBHOOK_SECRET
     definition here
@@ -160,7 +160,7 @@ DJANGO_SENTRY_DSN
 
 
 Other Variables 
-===============
+---------------
 
 *Some variables are preset in this section if this is the case it will explicitly tell you where its declaration is in the description.*
 
@@ -217,7 +217,7 @@ up the web application it will take roughly 60 seconds to fully compile.
     docker-compose build
 
 Running Your Docker Containers
-==============================
+------------------------------
 MetaCI's docker container comes out of the box with development test
 data and the creation of a default admin user.
 
@@ -247,7 +247,7 @@ From here you should be able to run builds. However note that this default accou
 when BUILD_ENV is set to production
 
 Docker Commands
-===============
+---------------
 To stop your virtual containers run the following command:
 The docker-compose stop command will stop your containers, but it won’t remove them.
 ::
@@ -306,7 +306,7 @@ Or you could directly run a command like this:
     docker-compose exec web python manage.py makemigrations
 
 Docker development using VS Code
-================================
+--------------------------------
 
 Because front-end and back-end dependencies are installed in a Docker container
 instead of locally, text editors that rely on locally-installed packages (e.g.
