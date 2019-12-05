@@ -10,8 +10,9 @@ Cloning the project
     git clone git@github.com:SFDO-Tooling/MetaCI
     cd MetaCI
 
-Docker and Docker-Compose Installation:
----------------------------------------
+Docker and Docker-Compose Installation
+======================================
+
 To download and install docker please visit: https://hub.docker.com/?overlay=onboarding 
 and follow the installation instructions to download docker if needed.
 To verify you have successfully installed docker type:
@@ -35,11 +36,11 @@ To verify you have successfully installed docker-compose type:
 .. note:: You should see something like the following: 
     ``docker-compose version 1.16.1, build 6d1ac219``
 
-Running MetaCI In Docker:
+Running MetaCI In Docker
 =========================
 
 Steps Necessary To Run MetaCI On Docker:
---------------------------------------------------------------
+----------------------------------------
 
 1. `.env File Creation and Variable Declaration`_ 
     .. _.env File Creation and Variable Declaration: 
@@ -57,7 +58,7 @@ Steps Necessary To Run MetaCI On Docker:
 .. note:: Please begin by making a copy of env.example and renaming it .env in your root project directory
 
 Local Variables
----------------
+===============
 
 POSTGRES_USER: 
     Environment variable set in the docker-compose.yml file under the postgres service, 
@@ -142,7 +143,7 @@ of the connected app that was created for ``SFDX_CLIENT_ID`` and ``SFDX_HUB_KEY`
 
 
 Production Variables
---------------------
+====================
 
 GITHUB_WEBHOOK_SECRET
     definition here
@@ -159,7 +160,7 @@ DJANGO_SENTRY_DSN
 
 
 Other Variables 
----------------
+===============
 .. note:: Some variables are preset in this section if this is the case it 
     will explicitly tell you where its declaration is in the description.
 
@@ -201,7 +202,7 @@ DJANGO_SECRET_KEY:
     in the env.example will suffice. Otherwise use your production secret key.
     
 Building Your Docker Containers
--------------------------------
+===============================
 
 This next section assumes you have downloaded ``docker`` and ``docker-compose``.
 Additionally it assumes you have a ``.env`` file in the root directory of this 
@@ -247,7 +248,6 @@ when BUILD_ENV is set to production
 
 Docker Commands
 ===============
-
 To stop your virtual containers run the following command:
 The docker-compose stop command will stop your containers, but it won’t remove them.
 ::
