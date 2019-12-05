@@ -1,16 +1,17 @@
-Development Setup
-=================
+===============================
+Local Machine Development Setup
+===============================
 
-Cloning the project
--------------------
+Cloning The Project
+===================
 
 ::
 
     git clone git@github.com:SFDO-Tooling/MetaCI
     cd MetaCI
 
-Making a virtual env
---------------------
+Making A Virtual Env
+====================
 
 MetaCI development requires Python v3.8. If ``which python3.8`` returns a
 non-empty path, it's already installed and you can continue to the next step. If
@@ -52,8 +53,8 @@ instead of any system-wide Node you may have.
 
 .. _Personal Access Token: https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
-Installing JavaScript requirements
-----------------------------------
+Installing JavaScript Requirements
+==================================
 
 The project-local version of `Node.js`_ is bundled with the repo and can be
 unpacked locally (in the git-ignored ``node/`` directory), so you don't have to
@@ -74,8 +75,8 @@ Then use ``yarn`` to install dependencies::
 .. _Node.js: http://nodejs.org
 .. _yarn: https://yarnpkg.com/
 
-Setting up the database
------------------------
+Setting Up The Database
+=======================
 
 Assuming you have `Postgres <https://www.postgresql.org/download/>`_ installed
 and running locally::
@@ -96,8 +97,8 @@ Run this command to create a necessary repeatable django-rq job in the database:
     ./manage.py metaci_scheduled_jobs
 
 
-Creating a superuser
---------------------
+Creating A Superuser
+====================
 
 To use the Django admin UI, you'll need to create a superuser::
 
@@ -108,8 +109,8 @@ than through the visible login button.
 
     http://localhost:8000/admin/login
 
-Running the server
-------------------
+Running The Server
+==================
 
 The local development server requires `Redis <https://redis.io/>`_ to manage
 background worker tasks. If you can successfully run ``redis-cli ping`` and see
