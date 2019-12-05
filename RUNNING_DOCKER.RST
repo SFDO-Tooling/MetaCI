@@ -3,7 +3,7 @@ Docker Development Setup
 ========================
 
 Cloning the project
--------------------
+===================
 
 ::
 
@@ -216,7 +216,7 @@ up the web application it will take roughly 60 seconds to fully compile.
     docker-compose build
 
 Running Your Docker Containers
-------------------------------
+==============================
 MetaCI's docker container comes out of the box with development test
 data and the creation of a default admin user.
 
@@ -246,7 +246,7 @@ From here you should be able to run builds. However note that this default accou
 when BUILD_ENV is set to production
 
 Docker Commands
----------------
+===============
 
 To stop your virtual containers run the following command:
 The docker-compose stop command will stop your containers, but it won’t remove them.
@@ -306,7 +306,7 @@ Or you could directly run a command like this:
     docker-compose exec web python manage.py makemigrations
 
 Docker development using VS Code
---------------------------------
+================================
 
 Because front-end and back-end dependencies are installed in a Docker container
 instead of locally, text editors that rely on locally-installed packages (e.g.
@@ -357,7 +357,7 @@ For more detailed instructions and options, see the `VS Code documentation`_.
 .. _VS Code documentation: https://code.visualstudio.com/docs/remote/containers
 
 Internationalization
---------------------
+====================
 To run this in a docker container first run the following commands, 
 ::
     
