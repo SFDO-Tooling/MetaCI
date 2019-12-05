@@ -18,9 +18,16 @@ Using Local Machine
 As mentioned above, MetaCI can be configured locally. 
 To achieve this follow the instructions provided in `<./docs/RUNNING.rst>`_.
 
+Running the Server
+==================
+Docker runs the server automatically. If you are not using Docker for 
+development, you can run it like this:
+
+- ``yarn serve``: starts development server (with watcher) at
+  `<http://localhost:8080/>`_ (assets are served from ``dist/`` dir)
+
 Development Tasks
 =================
-
 
 To run these tests with docker first run the following commands, 
 
@@ -33,8 +40,6 @@ If you are not using docker or are using the VS Code integrated terminal
 inside the Docker container simply execute the commands in your project's 
 root directory:
 
-- ``yarn serve``: starts development server (with watcher) at
-  `<http://localhost:8080/>`_ (assets are served from ``dist/`` dir)
 - ``yarn pytest``: run Python tests
 - ``yarn test``: run JS tests
 - ``yarn test:watch``: run JS tests with a watcher for development
@@ -49,6 +54,10 @@ root directory:
   dir
 - ``yarn prod``: builds production (minified) static assets into ``dist/prod/``
   dir
+- ``tsc``: check that there are no type errors in the Javascript
+
+Commits
+=======
 
 In commit messages or pull request titles, we use the following emojis to label
 which development commands need to be run before serving locally (these are
@@ -86,20 +95,6 @@ translations to ``locales/<language>/translation.json``.
 
 .. _GNU gettext toolset: https://www.gnu.org/software/gettext/
 .. _user language is auto-detected at runtime: https://github.com/i18next/i18next-browser-languageDetector
-
-Type Checking
-=============
-We use "flow_" for type-checking for the time being. You should be able to just
-type "flow" to validate that there are no known type errors.
-
-If you need to use libraries that do not have flow definitions, you could edit
-a file with a name like ``flow-typed/npm/@package/module_vx.x.x.js`` to stub out addition component
-type definitions. OR you can run ``flow-typed update --ignoreDeps dev`` to allow
-it to automatically generate stubs for modules with missing type definitions.
-
-At some point we will probably move to TypeScript.
-
-.. _flow: https://flow.org/
 
 Developing with SLDS
 ====================
