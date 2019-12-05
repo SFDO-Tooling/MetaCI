@@ -9,18 +9,14 @@ Using Docker
 ============
 
 To set up MetaCI using docker please
-see the following instructions `<./RUNNING_DOCKER.rst>`_.
-
-.. _RUNNING_DOCKER.rst: https://github.com/SFDO-Tooling/MetaCI/blob/master/RUNNING_DOCKER.RST
+see the following instructions `<./docs/RUNNING_DOCKER.rst>`_.
 
 
 Using Local Machine
 ===================
 
 As mentioned above, MetaCI can be configured locally. 
-To achieve this follow the instructions provided in `RUNNING.rst`_.
-
-.. _RUNNING.rst: https://github.com/SFDO-Tooling/MetaCI/blob//master/RUNNING.RST
+To achieve this follow the instructions provided in `<./docs/RUNNING.rst>`_.
 
 Development Tasks
 =================
