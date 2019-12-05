@@ -21,14 +21,17 @@ To achieve this follow the instructions provided in `<./docs/RUNNING.rst>`_.
 Development Tasks
 =================
 
-To run these tests with docker first run the following commands, if you are not using docker,
-simply execute the commands in your project's root directory:
+
+To run these tests with docker first run the following commands, 
 
 ::
 
     docker-compose up -d
     docker-compose exec web bash
 
+If you are not using docker or are using the VS Code integrated terminal 
+inside the Docker container simply execute the commands in your project's 
+root directory:
 
 - ``yarn serve``: starts development server (with watcher) at
   `<http://localhost:8080/>`_ (assets are served from ``dist/`` dir)
