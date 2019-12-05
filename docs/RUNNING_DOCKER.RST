@@ -41,15 +41,15 @@ Running MetaCI In Docker
 
 Below are the following steps necessary to run MetaCI on Docker:
 
-1. `.env File Creation and Variable Declaration`_ 
-    .. _`.env File Creation and Variable Declaration`:
+1. `.env File Creation and Variable Declaration`_
+    __ `.env File Creation and Variable Declaration`
 
 2. `Building Your Docker Containers`_ 
-    .. _Building Your Docker Containers:
+    __ `Building Your Docker Containers`
 
 
-3. `Running Your Docker Containers`_ 
-    .. _Running Your Docker Containers:
+3. `Running Your Docker Containers`_
+    __ `Running Your Docker Containers`
 
 
 .env File Creation And Variable Declaration
