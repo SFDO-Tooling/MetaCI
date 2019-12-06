@@ -19,6 +19,8 @@ services:
       context: .
       args:
         - BUILD_ENV=development
+        - CHROME_DRIVER_VERSION=78.0.3904.108
+        - CHROME_VERSION=google-chrome-stable
       dockerfile: Dockerfile
     command: |
         /bin/bash -c 'while !</dev/tcp/postgres/5432; do echo "Waiting for postgres databaseto start..."; /bin/sleep 1; done; \

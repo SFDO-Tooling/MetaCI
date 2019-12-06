@@ -168,11 +168,19 @@ DJANGO_SECRET_KEY:
     This represents the secret key for the django web application and is used to sign session cookies;, 
     arbritary strings such as the one given in the env.example are used. Important this variable is 
     not copied from another Django site.
-
 BUILD_ENV: 
     Docker argument variable used to determine what dependencies and scripts to run when 
     installing dependencies and populating databases, currently set in docker-compose.yml
-    web service environment variable
+    web service ARG variable section.
+CHROME_DRIVER_VERSION:
+    Docker argument variable used to determine what version of chromedriver to retrieve when 
+    installing in your docker container, currently set in docker-compose.yml
+    web service ARG variable section.
+CHROME_VERSION:
+    Docker argument variable used to determine what version of chrome to retrieve when 
+    installing in your docker container, currently set in docker-compose.yml
+    web service ARG variable section.
+
 
 NODE_VERSION: 
     Environment variable used to set node version for download, this variable is set in the Dockerfile
