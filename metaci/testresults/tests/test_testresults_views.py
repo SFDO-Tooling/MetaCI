@@ -5,7 +5,7 @@ from django.urls import reverse
 from metaci.testresults import views
 
 
-class TestTestCoverageViews:
+class TestTestResultsViews:
     client = Client()
 
     @pytest.mark.django_db
