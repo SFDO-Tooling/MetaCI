@@ -97,3 +97,10 @@ dump.rdb
 requirements/node*
 requirements/yarn*
 /node
+
+# postgres database
+postgres/
+# safeguarding secrets
+sfdx_hub.key
+
+docs/_build 

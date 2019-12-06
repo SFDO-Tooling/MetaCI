@@ -12,11 +12,11 @@ from django.db.models import Avg, Count, F, FloatField, Q, StdDev, Value
 from django.db.models.functions import Cast
 from django.urls import reverse
 from django.utils import timezone
-from postgres_stats.aggregates import Percentile
 
 from metaci.build import models as build_models
 from metaci.testresults.choices import OUTCOME_CHOICES, TEST_TYPE_CHOICES
 from metaci.utils import split_seq
+from postgres_stats.aggregates import Percentile
 
 
 class TestClass(models.Model):
