@@ -1,10 +1,9 @@
-import pytest
 from unittest.mock import Mock
 
+import pytest
 from django.core.management.base import CommandError
-
-from metaci.users.models import User
 from rest_framework.authtoken.models import Token
+
 from metaci.users.management.commands.usertoken import Command
 
 
@@ -26,4 +25,3 @@ class TestUserToken:
     def test_handle__user_does_not_exist(self, data):
         with pytest.raises(CommandError):
             self.command.handle(username="does not exist")
-
