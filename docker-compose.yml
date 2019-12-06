@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  postgres:
+    env_file:
+      - .env
+    volumes:
+      - ./postgres:/var/lib/postgresql/data:delegated
+    image: postgres:9.6
+    ports: 
+    - "5432:5432/tcp"
+    restart: always
+  redis:
+    image: "redis:5"
+    ports:
+      - "6379:6379"
+  web:
+    build:
+      context: .
+      args:
+        - BUILD_ENV=development
+      dockerfile: Dockerfile
+    command: |
+        /bin/bash -c 'while !</dev/tcp/postgres/5432; do echo "Waiting for postgres databaseto start..."; /bin/sleep 1; done; \
+        /bin/sleep 1; /bin/sh /app/utility/start_server.sh;'
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    volumes:
+      - .:/app

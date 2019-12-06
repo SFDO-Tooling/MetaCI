@@ -3,7 +3,13 @@
   "description": "A lightweight CI server for Salesforce developers to automate running CumulusCI flows against Github repositories",
   "repository": "https://github.com/SFDO-Tooling/MetaCI",
   "logo": "https://avatars.githubusercontent.com/u/5545431?v=3&s=100",
-  "keywords": ["ci", "python", "django", "salesforce", "github"],
+  "keywords": [
+    "ci",
+    "python",
+    "django",
+    "salesforce",
+    "github"
+  ],
   "env": {
     "CONNECTED_APP_CALLBACK_URL": {
       "description": "The callback url configured for the Connected App.  You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
@@ -13,7 +19,8 @@
       "description": "The Client ID of the Salesforce Connected App.  You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
       "value": ""
     },
-    "CONNECTED_APP_CLIENT_SECRET": { "description": "The Client Secret of the Salesforce Connected App. You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
+    "CONNECTED_APP_CLIENT_SECRET": {
+      "description": "The Client Secret of the Salesforce Connected App. You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
       "value": ""
     },
     "DJANGO_ALLOWED_HOSTS": {
@@ -115,16 +122,25 @@
   "addons": [
     "heroku-postgresql",
     "heroku-redis",
-    "sendgrid:starter"
+    "mailgun:starter"
   ],
   "buildpacks": [
-    {"url": "heroku/nodejs"},
-    {"url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"},
-     {"url": "heroku/python"}
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"
+    },
+    {
+      "url": "heroku/python"
+    }
   ],
   "environments": {
     "test": {
-      "addons": ["heroku-postgresql:in-dyno", "heroku-redis:in-dyno"],
+      "addons": [
+        "heroku-postgresql:in-dyno",
+        "heroku-redis:in-dyno"
+      ],
       "scripts": {
         "test-setup": "pip install --upgrade -r requirements/test.txt",
         "test": "./heroku_ci.sh"
