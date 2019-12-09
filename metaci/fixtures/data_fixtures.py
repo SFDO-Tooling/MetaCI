@@ -1,6 +1,6 @@
 import pytest
 
-from metaci.conftest import (
+from metaci.fixtures.factories import (
     BuildFactory,
     BuildFlowFactory,
     PlanFactory,
