@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
-from metaci.users.models import User
 from rest_framework.authtoken.models import Token
+
+from metaci.users.models import User
 
 
 class Command(BaseCommand):
@@ -13,6 +14,6 @@ class Command(BaseCommand):
         try:
             user = User.objects.get(username=options["username"])
         except User.DoesNotExist:
-            raise CommandError("User named does not exist".format(options["username"]))
+            raise CommandError(f"Username does not exist: {options['username']}")
         token, created = Token.objects.get_or_create(user=user)
-        self.stdout.write("Token: {}".format(token.key))
+        self.stdout.write(f"Token: {token.key}")
