@@ -1,11 +1,9 @@
-import pytest
 from unittest import mock
 
+import pytest
 from django.test import Client
 from django.urls import reverse
-from django.core.exceptions import PermissionDenied
 
-from metaci.plan import views
 from metaci.fixtures.factories import BranchFactory
 
 
