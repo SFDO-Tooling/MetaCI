@@ -18,7 +18,6 @@
     "i18next-xhr-backend": "^3.2.2",
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.15",
-    "node-sass": "^4.13.0",
     "query-string": "^6.9.0",
     "react": "^16.12.0",
     "react-document-title": "^2.0.3",
