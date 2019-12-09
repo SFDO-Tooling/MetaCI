@@ -1,13 +1,13 @@
-from metaci.conftest import StaffSuperuserFactory, TestResultFactory, PlanFactory
-import pytest
-
-from urllib.parse import urlencode
 import random
-from datetime import timedelta, datetime
-from django.utils import timezone
-from django.urls import reverse
+from datetime import datetime, timedelta
+from urllib.parse import urlencode
 
+import pytest
+from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
+
+from metaci.conftest import PlanFactory, StaffSuperuserFactory, TestResultFactory
 
 rand = random.Random()
 rand.seed("xyzzy")
@@ -69,9 +69,11 @@ class TestTestMethodPerfRESTAPI(APITestCase, _TestingHelpers):
     def setUp(self):
         self.client.force_authenticate(self.user)
         t1 = TestResultFactory(
-            method__name="Foo", duration=10, build_flow__tests_total=1
+            method__name="Foo", duration=10, build_flow__tests_total=1, outcome="Pass"
         )
-        TestResultFactory(duration=2, build_flow__tests_total=1, method=t1.method)
+        TestResultFactory(
+            duration=2, build_flow__tests_total=1, method=t1.method, outcome="Pass"
+        )
         TestResultFactory(method__name="Bar", duration=3, build_flow__tests_total=1)
         TestResultFactory(method__name="Bar", duration=5, build_flow__tests_total=1)
 
