@@ -5,7 +5,7 @@ from django.urls import reverse
 from metaci.testresults import views
 
 
-class TestTestCoverageViews:
+class TestTestResultsViews:
     client = Client()
 
     @pytest.mark.django_db
@@ -88,10 +88,11 @@ class TestTestCoverageViews:
 
         assert response.status_code == 200
 
-    @pytest.mark.skip
     @pytest.mark.django_db
     def test_build_flow_compare__superuser(self, data, superuser):
-        # TODO: NoReverseMatch troubleshooting
+        data["build"].commit = "shashasha"
+        data["build"].save()
+
         self.client.force_login(superuser)
         url = reverse("build_flow_compare")
         response = self.client.get(
@@ -100,18 +101,18 @@ class TestTestCoverageViews:
         )
         assert response.status_code == 200
 
-    @pytest.mark.skip
     @pytest.mark.django_db
-    def test_test_dashboard__superuser(self, data, superuser):
-        """Currently failing because test_dashboard has a fileter
-        that references a testresult field on TestMethod objs
-        have no clue what the code is trying to do."""
+    def test_build_flow_compare_to__superuser(self, data, superuser):
+        data["build"].commit = "shashasha"
+        data["build"].save()
+
         self.client.force_login(superuser)
-
         url = reverse(
-            "test_dashboard",
-            kwargs={"repo_owner": data["repo"].owner, "repo_name": data["repo"].name},
+            "build_flow_compare_to",
+            kwargs={"build_id": data["build"].id, "flow": data["buildflow"].flow},
         )
-        response = self.client.get(url)
-
+        response = self.client.get(
+            url,
+            {"buildflow1": data["buildflow"].id, "buildflow2": data["buildflow"].id,},
+        )
         assert response.status_code == 200

@@ -2,7 +2,6 @@ from django.conf.urls import url
 
 from metaci.testresults import views
 
-
 urlpatterns = [
     url(
         r"^(?P<build_id>\d+)/(?P<flow>.*)/compare-to",
@@ -33,9 +32,4 @@ urlpatterns = [
         name="test_result_robot",
     ),
     url(r"^compare/$", views.build_flow_compare, name="build_flow_compare"),
-    url(
-        r"dashboard/(?P<repo_owner>[\w-]+)/(?P<repo_name>[\w-]+)/$",
-        views.test_dashboard,
-        name="test_dashboard",
-    ),
 ]
