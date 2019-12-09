@@ -144,7 +144,6 @@ MANAGERS = ADMINS
 DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///metaci")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
-
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
 # Local time zone for this installation. Choices can be found here:
@@ -350,6 +349,7 @@ GITHUB_WEBHOOK_SECRET = None
 CONNECTED_APP_CLIENT_ID = None
 CONNECTED_APP_CLIENT_SECRET = None
 CONNECTED_APP_CALLBACK_URL = None
+
 SFDX_CLIENT_ID = None
 SFDX_HUB_KEY = None
 SFDX_HUB_USERNAME = None
