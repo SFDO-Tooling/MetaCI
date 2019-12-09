@@ -1,6 +1,5 @@
 import datetime
 import numbers
-import random
 
 import factory
 import factory.fuzzy
@@ -27,11 +26,6 @@ BUILD_STATUS_NAMES = (
     tuple(name for (name, label) in BUILD_STATUSES) + ("success",) * 7
 )  # weighted towards success!
 BUILD_FLOW_STATUS_NAMES = (name for (name, label) in BUILD_FLOW_STATUSES)
-
-rand = random.Random()
-rand.seed("limeandromeda")
-
-factory.random.reseed_random("TOtaLLY RaNdOM")
 
 
 def do_logs():
@@ -143,7 +137,9 @@ class TestClassFactory(factory.django.DjangoModelFactory):
         exclude = ("name_prefix",)
 
     name_prefix = "Test_"
-    repo = factory.LazyAttribute(lambda x: rand.choice(Repository.objects.all()))
+    repo = factory.Sequence(
+        lambda x: Repository.objects.all()[x % len(Repository.objects.all())]
+    )
     name = fake_name()
 
 
@@ -163,7 +159,8 @@ class TestMethodFactory(factory.django.DjangoModelFactory):
         if isinstance(extracted, numbers.Number):
             obj._target_success_pct = extracted
         else:
-            obj._target_success_pct = rand.random() * 100
+            obj._target_success_pct = (ord(obj.name[0].lower()) - ord("a")) * 4
+        obj._runs = 0
         obj.save()
 
 
@@ -180,11 +177,9 @@ class TestResultFactory(factory.django.DjangoModelFactory):
 
     @factory.LazyAttribute
     def outcome(result):
-        success = rand.random() * 100 < result.method._target_success_pct
-        if success:
-            return "success"
-        else:
-            return rand.choice(["CompileFail", "Fail", "Skip"])
+        return ["Pass", "Pass", "Pass", "CompileFail", "Fail", "Skip"][
+            result.method._runs % 6
+        ]
 
     @factory.post_generation
     def summarize(obj, create, extracted, **kwargs):
