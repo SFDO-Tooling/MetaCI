@@ -100,3 +100,19 @@ class TestTestResultsViews:
             {"buildflow1": data["buildflow"].id, "buildflow2": data["buildflow"].id,},
         )
         assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_build_flow_compare_to__superuser(self, data, superuser):
+        data["build"].commit = "shashasha"
+        data["build"].save()
+
+        self.client.force_login(superuser)
+        url = reverse(
+            "build_flow_compare_to",
+            kwargs={"build_id": data["build"].id, "flow": data["buildflow"].flow},
+        )
+        response = self.client.get(
+            url,
+            {"buildflow1": data["buildflow"].id, "buildflow2": data["buildflow"].id,},
+        )
+        assert response.status_code == 200
