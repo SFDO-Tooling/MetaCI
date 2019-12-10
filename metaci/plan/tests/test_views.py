@@ -54,7 +54,7 @@ class TestPlanViews:
         assert response.status_code == 403
 
     @mock.patch("metaci.plan.forms.RunPlanForm._get_branch_choices")
-    def test_plan_run_repo(self, branchChoices, data, superuser):
+    def test_plan_run_repo__get(self, branchChoices, data, superuser):
         self.client.force_login(superuser)
         url = reverse(
             "plan_run_repo",
@@ -64,14 +64,29 @@ class TestPlanViews:
                 "repo_name": data["repo"].name,
             },
         )
-        BranchFactory(name="feature/branch-a", repo=data["repo"])
-        branchChoices = ["feature/branch-a", "feature/branch-b"]
         response = self.client.get(url)
 
         assert response.status_code == 200
 
-        # response = self.client.post(url)
-        # assert response.status_code == 301
+    @mock.patch("metaci.plan.views.RunPlanForm")
+    def test_plan_run_repo__post(self, RunPlanForm, data, superuser):
+        self.client.force_login(superuser)
+        url = reverse(
+            "plan_run_repo",
+            kwargs={
+                "plan_id": data["plan"].id,
+                "repo_owner": data["repo"].owner,
+                "repo_name": data["repo"].name,
+            },
+        )
+
+        RunPlanForm.return_value = mock.Mock(
+            create_build=mock.Mock(return_value=data["build"])
+        )
+        response = self.client.post(
+            url, {"branch": BranchFactory(name="feature/branch-a", repo=data["repo"])}
+        )
+        assert response.status_code == 302
 
     def test_plan_run_repo__permission_denied(self, data, user):
         self.client.force_login(user)
