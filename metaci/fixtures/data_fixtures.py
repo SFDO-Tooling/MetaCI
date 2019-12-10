@@ -37,6 +37,9 @@ def data():
     data["planrepo"] = PlanRepositoryFactory(plan=data["plan"], repo=data["repo"])
     data["build"] = BuildFactory(planrepo=data["planrepo"])
     data["buildflow"] = BuildFlowFactory(build=data["build"], flow="flow-one")
+    data["buildflow"].tests_pass = 10
+    data["buildflow"].test_fail = 2
+    data["buildflow"].save()
 
     data["testclass"] = TestClassFactory(repo=data["repo"])
     data["testclass"].test_type = "Apex"
