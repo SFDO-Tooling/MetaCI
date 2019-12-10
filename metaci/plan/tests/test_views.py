@@ -1,6 +1,6 @@
-import pytest
 from unittest import mock
 
+import pytest
 from django.urls import reverse
 
 from metaci.fixtures.factories import BranchFactory
