@@ -4,7 +4,6 @@ ARG BUILD_ENV
 ARG CHROME_VERSION
 ARG CHROME_DRIVER_VERSION
 RUN mkdir /app
-
 # declaring necessary node and yarn versions
 ENV NODE_VERSION 10.16.3
 # installing node
@@ -21,7 +20,7 @@ RUN /bin/sh /app/utility/install_chrome.sh
 # Installing Chromedriver
 COPY ./utility/install_chromedriver.sh /app/utility/install_chromedriver.sh
 RUN /bin/sh /app/utility/install_chrome.sh
-# # installing sfdx
+# installing sfdx
 COPY ./utility/install_sfdx.sh /app/utility/install_sfdx.sh
 RUN /bin/sh /app/utility/install_sfdx.sh
 # installing python related dependencies with pip
