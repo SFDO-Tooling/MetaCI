@@ -10,6 +10,7 @@ from metaci.build.models import (
     Build,
     BuildFlow,
     FlowTask,
+    Rebuild,
 )
 from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.plan.models import Plan, PlanRepository, PlanSchedule
@@ -216,3 +217,13 @@ class FlowTaskFactory(factory.django.DjangoModelFactory):
     build_flow = factory.SubFactory(BuildFlowFactory)
     stepnum = factory.Sequence(lambda n: f"{n}")
     path = factory.Sequence(lambda n: f"flow_1.task_{n}")
+
+
+class RebuildFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Rebuild
+
+    user = factory.SubFactory(UserFactory)
+    build = factory.SubFactory(BuildFactory)
+    org_instance = factory.SubFactory(ScratchOrgInstanceFactory)
+    status = factory.fuzzy.FuzzyChoice(BUILD_STATUS_NAMES)
