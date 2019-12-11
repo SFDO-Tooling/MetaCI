@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This file installs the given Node version to the docker image
+# dynamically changing download link based on environmental 
+# Architecture
+
 # NEED TO SET NODE_VERSION ENVIRONMENT VARIABLE if not set already
 ARCH=
 dpkgArch="$(dpkg --print-architecture)"

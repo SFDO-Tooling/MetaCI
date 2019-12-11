@@ -1,5 +1,10 @@
 #!/bin/bash 
 
+# This file installs the given CHROME_DRIVER_VERSION to the docker
+# container downloading a stable version to the dockerfile image
+# If no CHROME_DRIVER_VERSION is declared it will take the local systems
+# CHROME VERSIONS.
+
 if [ -z "$CHROME_DRIVER_VERSION" ]; 
 then 
     CHROME_MAJOR_VERSION=$(google-chrome --version | sed -E "s/.* ([0-9]+)(\.[0-9]+){3}.*/\1/")

@@ -19,7 +19,7 @@ RUN /bin/sh /app/utility/install_yarn.sh
 COPY ./utility/install_chrome.sh /app/utility/install_chrome.sh
 RUN /bin/sh /app/utility/install_chrome.sh
 # Installing Chromedriver
-COPY ./utility/install_chrome.sh /app/utility/install_chrome.sh
+COPY ./utility/install_chromedriver.sh /app/utility/install_chromedriver.sh
 RUN /bin/sh /app/utility/install_chrome.sh
 # # installing sfdx
 COPY ./utility/install_sfdx.sh /app/utility/install_sfdx.sh
