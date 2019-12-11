@@ -27,3 +27,9 @@ sfdx force:auth:jwt:grant -u $SFDX_HUB_USERNAME -f /app/sfdx_hub.key -i $SFDX_CL
 # starting server and webpack
 yarn serve
 echo "ALL DONE!"
+
+echo "*****************************************************
+MetaCI is up and running in docker. 
+
+Go to http://localhost:8000/admin/login to log in
+******************************************************"
