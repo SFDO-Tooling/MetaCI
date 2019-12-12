@@ -6,7 +6,7 @@ python /app/manage.py migrate
 if [ "${DJANGO_SETTINGS_MODULE}" = "config.settings.local" ] ; then
     echo "CREATING ADMIN USER FOR TESTING PURPOSES..."
     # Using key error as an indicator for whether or not to run database population and job scheduling scripts
-    echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@test.com', 'password')" | python manage.py shell
+    echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', '$SFDX_HUB_USERNAME', 'password')" | python manage.py shell
     if [ $? -eq 0 ] ; then
         # populating database with test repository, done only once
         echo "POPULATING DATABASE WITH TEST DATA..."

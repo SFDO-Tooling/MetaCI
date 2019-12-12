@@ -2,11 +2,9 @@ FROM python:3.8
 
 ARG BUILD_ENV
 ARG CHROME_VERSION
-ARG CHROME_DRIVER_VERSION
+ARG CHROMEDRIVER_VERSION
 
 RUN mkdir /app
-# We need wget to set up the PPA and xvfb to have a virtual screen and unzip to install the Chromedriver
-# RUN apt-get install -y wget unzip
 
 # Set up the Chrome PPA
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
@@ -31,25 +29,18 @@ ENV PATH $CHROMEDRIVER_DIR:$PATH
 # declaring necessary node and yarn versions
 ENV NODE_VERSION 10.16.3
 # installing node
-COPY ./utility/install_node.sh /app/utility/install_node.sh
-RUN /bin/sh /app/utility/install_node.sh
+COPY ./docker/utility/install_node.sh /app/docker/utility/install_node.sh
+RUN /bin/sh /app/docker/utility/install_node.sh
 
 # declaring necessary node and yarn versions
 ENV YARN_VERSION 1.19.1
 # installing yarn
-COPY ./utility/install_yarn.sh /app/utility/install_yarn.sh
-RUN /bin/sh /app/utility/install_yarn.sh
-
-# Installing Google Chrome
-COPY ./utility/install_chrome.sh /app/utility/install_chrome.sh
-RUN /bin/sh /app/utility/install_chrome.sh
-# # Installing Chromedriver
-# COPY ./utility/install_chromedriver.sh /app/utility/install_chromedriver.sh
-# RUN /bin/sh /app/utility/install_chromedriver.sh
+COPY ./docker/utility/install_yarn.sh /app/docker/utility/install_yarn.sh
+RUN /bin/sh /app/docker/utility/install_yarn.sh
 
 # installing sfdx
-COPY ./utility/install_sfdx.sh /app/utility/install_sfdx.sh
-RUN /bin/sh /app/utility/install_sfdx.sh
+COPY ./docker/utility/install_sfdx.sh /app/docker/utility/install_sfdx.sh
+RUN /bin/sh /app/docker/utility/install_sfdx.sh
 
 # installing python related dependencies with pip
 COPY ./requirements /app/requirements
@@ -79,4 +70,5 @@ ENV DJANGO_SECRET_KEY 'sample secret key'
 # Avoid building prod assets in development
 RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
 RUN python /app/manage.py collectstatic --noinput
-RUN /app/utility/wrap_chrome_binary
+RUN /app/docker/utility/wrap_chrome_binary
+RUN ln -fs $(which google-chrome-stable) /app/.apt/usr/bin/google-chrome-stable
