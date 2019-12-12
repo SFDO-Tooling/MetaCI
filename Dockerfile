@@ -5,6 +5,29 @@ ARG CHROME_VERSION
 ARG CHROME_DRIVER_VERSION
 
 RUN mkdir /app
+# We need wget to set up the PPA and xvfb to have a virtual screen and unzip to install the Chromedriver
+# RUN apt-get install -y wget unzip
+
+# Set up the Chrome PPA
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
+
+# Update the package list and install chrome
+RUN apt-get update -y
+RUN apt-get install -y google-chrome-stable
+
+# Set up Chromedriver Environment variables
+ENV CHROMEDRIVER_VERSION 2.19
+ENV CHROMEDRIVER_DIR /chromedriver
+RUN mkdir $CHROMEDRIVER_DIR
+
+# Download and install Chromedriver
+RUN wget -q --continue -P $CHROMEDRIVER_DIR "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+RUN unzip $CHROMEDRIVER_DIR/chromedriver* -d $CHROMEDRIVER_DIR
+
+# Put Chromedriver into the PATH
+ENV PATH $CHROMEDRIVER_DIR:$PATH
+
 # declaring necessary node and yarn versions
 ENV NODE_VERSION 10.16.3
 # installing node
@@ -20,9 +43,9 @@ RUN /bin/sh /app/utility/install_yarn.sh
 # Installing Google Chrome
 COPY ./utility/install_chrome.sh /app/utility/install_chrome.sh
 RUN /bin/sh /app/utility/install_chrome.sh
-# Installing Chromedriver
-COPY ./utility/install_chromedriver.sh /app/utility/install_chromedriver.sh
-RUN /bin/sh /app/utility/install_chrome.sh
+# # Installing Chromedriver
+# COPY ./utility/install_chromedriver.sh /app/utility/install_chromedriver.sh
+# RUN /bin/sh /app/utility/install_chromedriver.sh
 
 # installing sfdx
 COPY ./utility/install_sfdx.sh /app/utility/install_sfdx.sh
@@ -32,13 +55,13 @@ RUN /bin/sh /app/utility/install_sfdx.sh
 COPY ./requirements /app/requirements
 RUN pip install --no-cache --upgrade pip
 RUN if [ "${BUILD_ENV}" = "production" ] ; then pip install --no-cache -r /app/requirements/production.txt ; else pip install --no-cache -r /app/requirements/local.txt ; fi
+RUN apt-get update -y && apt-get install -y libgconf-2-4
 
 # installing yarn dependencies
 COPY ./package.json /app/package.json
 COPY ./yarn.lock /app/yarn.lock
 WORKDIR /app
 RUN yarn install
-
 # copying rest of working directory to /app folder
 COPY . /app
 ENV PYTHONUNBUFFERED 1
@@ -56,4 +79,4 @@ ENV DJANGO_SECRET_KEY 'sample secret key'
 # Avoid building prod assets in development
 RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
 RUN python /app/manage.py collectstatic --noinput
-
+RUN /app/utility/wrap_chrome_binary
