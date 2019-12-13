@@ -69,7 +69,7 @@ class TestBuild:
         build.run()
         detach_logger(build)
 
-        assert build.status == "success"
+        assert build.status == "success", build.log
         assert "Build flow test completed successfully" in build.log
         assert "running test flow" in build.flows.get().log
 
