@@ -51,6 +51,8 @@ class TestBuild:
     @mock.patch("metaci.repository.models.Repository.github_api")
     @mock.patch("metaci.cumulusci.keychain.MetaCIProjectKeychain.get_org")
     def test_run(self, get_org, gh):
+        cwd = os.getcwd()
+
         # mock github zipball
         def archive(format, zip_content, ref):
             with open(Path(__file__).parent / "testproject.zip", "rb") as f:
@@ -66,8 +68,11 @@ class TestBuild:
         build = BuildFactory()
         build.plan.flows = "test"
 
-        build.run()
-        detach_logger(build)
+        try:
+            build.run()
+        finally:
+            detach_logger(build)
+            os.chdir(cwd)
 
         assert build.status == "success", build.log
         assert "Build flow test completed successfully" in build.log
