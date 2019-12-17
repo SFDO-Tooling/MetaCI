@@ -8,7 +8,7 @@ app = Flask(__name__)
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def redirect_all(path):
-    REDIRECT_DOMAIN = "sfdo-metaci.herokuapp.com"
+    REDIRECT_DOMAIN = "https://sfdo-metaci.herokuapp.com"
     redirect_url = f"{REDIRECT_DOMAIN}/{path}"
     return redirect(redirect_url, code=301)
 
