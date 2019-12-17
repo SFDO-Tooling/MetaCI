@@ -14,7 +14,7 @@ Local settings
 import os
 import socket
 
-from .common import *
+from .base import *
 
 # DEBUG
 # ------------------------------------------------------------------------------
@@ -110,18 +110,28 @@ HIREFIRE_PROCS = ["config.procs.WorkerProc"]
 HIREFIRE_TOKEN = env("HIREFIRE_TOKEN", default="localtest")
 
 METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.LocalAutoscaler"
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "127.0.0.1:8000",
+    "127.0.0.1:8080",
+    "localhost",
+    "0.0.0.0:8000",
+    "localhost:8000",
+    "localhost:8080",
+    "0.0.0.0",
+]
 
 # Site URL
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 # Github credentials
-GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET")
+GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET", default=None)
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", False)
 
 # Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID")
-CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET")
-CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL")
+CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID", default=None)
+CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET", default=None)
+CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL", default=None)
 
 AUTOSCALERS = {
     "local-app": {
@@ -132,9 +142,9 @@ AUTOSCALERS = {
 }
 
 # SFDX Credentials
-SFDX_CLIENT_ID = env("SFDX_CLIENT_ID")
-SFDX_HUB_KEY = env("SFDX_HUB_KEY")
-SFDX_HUB_USERNAME = env("SFDX_HUB_USERNAME")
+SFDX_CLIENT_ID = env("SFDX_CLIENT_ID", default=None)
+SFDX_HUB_KEY = env("SFDX_HUB_KEY", default="").replace(r"\n", "\n")
+SFDX_HUB_USERNAME = env("SFDX_HUB_USERNAME", default=None)
 
 SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=False)
 

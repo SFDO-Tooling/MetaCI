@@ -1,30 +1,26 @@
 import json
+
 import pytest
-
-from guardian.shortcuts import assign_perm
 from django.contrib.auth.models import Group
-
-from metaci.conftest import (
-    StaffSuperuserFactory,
-    UserFactory,
-    RepositoryFactory,
-    BranchFactory,
-    PlanFactory,
-    BuildFactory,
-    BuildFlowFactory,
-    PlanRepositoryFactory,
-    TestResultFactory,
-)
-
-from metaci.api import urls
-
-from metaci.plan.models import PlanRepository
-
+from guardian.shortcuts import assign_perm
 from rest_framework.test import APIClient, APITestCase
 
-from .test_testmethod_perf import _TestingHelpers
+from config.settings import base
+from metaci.api import urls
+from metaci.conftest import (
+    BranchFactory,
+    BuildFactory,
+    BuildFlowFactory,
+    PlanFactory,
+    PlanRepositoryFactory,
+    RepositoryFactory,
+    StaffSuperuserFactory,
+    TestResultFactory,
+    UserFactory,
+)
+from metaci.plan.models import PlanRepository
 
-from config.settings import common
+from .test_testmethod_perf import _TestingHelpers
 
 
 class TestAPISecurity(APITestCase):
@@ -125,7 +121,7 @@ class TestAPISecurity(APITestCase):
         client, user = self.make_user_and_client()
         superclient, superduper = self.make_user_and_client(StaffSuperuserFactory())
 
-        ip = common.ipv4_networks
+        ip = base.ipv4_networks
         BAD_ADDR = "192.250.0.8"
         GOOD_ADDR = "192.168.0.8"
 

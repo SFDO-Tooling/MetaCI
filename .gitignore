@@ -38,6 +38,7 @@ npm-debug.log*
 .tox
 htmlcov
 *.tap
+.pytest_cache/
 
 # Translations
 *.mo
@@ -64,6 +65,7 @@ node_modules/
 .env
 .envrc
 local_setup.sh
+list/
 
 # User-uploaded media
 metaci/media/
@@ -95,3 +97,10 @@ dump.rdb
 requirements/node*
 requirements/yarn*
 /node
+
+# postgres database
+postgres/
+# safeguarding secrets
+sfdx_hub.key
+
+docs/_build 

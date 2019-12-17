@@ -16,9 +16,7 @@ from typing import List
 
 import environ
 
-ROOT_DIR = (
-    environ.Path(__file__) - 3
-)  # (metaci/config/settings/common.py - 3 = metaci/)
+ROOT_DIR = environ.Path(__file__) - 3  # (metaci/config/settings/base.py - 3 = metaci/)
 APPS_DIR = ROOT_DIR.path("metaci")
 
 env = environ.Env()
@@ -143,7 +141,6 @@ MANAGERS = ADMINS
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///metaci")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
-
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -350,6 +347,7 @@ GITHUB_WEBHOOK_SECRET = None
 CONNECTED_APP_CLIENT_ID = None
 CONNECTED_APP_CLIENT_SECRET = None
 CONNECTED_APP_CALLBACK_URL = None
+
 SFDX_CLIENT_ID = None
 SFDX_HUB_KEY = None
 SFDX_HUB_USERNAME = None

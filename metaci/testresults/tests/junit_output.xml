@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<testsuites>
+    <testsuite errors="0" failures="0" hostname="bparker-ltm.internal.salesforce.com" name="pytest" skipped="1" tests="2" time="6.288" timestamp="2019-12-09T17:43:54.218885">
+        <testcase classname="app.TestTests" file="app/tests.py" line="13" name="test_method1" time="5.990"></testcase>
+        <testcase classname="app.TestTests" file="app/tests.py" line="21" name="test_method2" time="0.276">
+            <skipped message="unconditional skip" type="pytest.skip">metaci/testresults/tests/test_utils.py:21: unconditional skip</skipped>
+        </testcase>
+    </testsuite>
+</testsuites>
