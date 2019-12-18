@@ -16,9 +16,7 @@ from typing import List
 
 import environ
 
-ROOT_DIR = (
-    environ.Path(__file__) - 3
-)  # (metaci/config/settings/common.py - 3 = metaci/)
+ROOT_DIR = environ.Path(__file__) - 3  # (metaci/config/settings/base.py - 3 = metaci/)
 APPS_DIR = ROOT_DIR.path("metaci")
 
 env = environ.Env()
