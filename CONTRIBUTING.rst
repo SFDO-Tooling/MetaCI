@@ -9,14 +9,14 @@ Using Docker
 ============
 
 To set up MetaCI using docker please
-see the following instructions `<./docs/RUNNING_DOCKER.RST>`_.
+see the following instructions `<./docs/running_docker.rst>`_.
 
 
 Using Local Machine
 ===================
 
 As mentioned above, MetaCI can be configured locally. 
-To achieve this follow the instructions provided in `<./docs/RUNNING.RST>`_.
+To achieve this follow the instructions provided in `<./docs/running.rst>`_.
 
 Development Tasks
 =================

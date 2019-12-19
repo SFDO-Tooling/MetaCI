@@ -4,7 +4,7 @@ ARG BUILD_ENV
 ARG CHROME_VERSION
 ARG CHROMEDRIVER_VERSION
 
-RUN mkdir /app
+RUN mkdir /app; mkdir /app/.apt/; mkdir /app/.apt/usr/;mkdir /app/.apt/usr/bin/;
 
 # Set up the Chrome PPA
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
@@ -13,9 +13,13 @@ RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/so
 # Update the package list and install chrome
 RUN apt-get update -y
 RUN apt-get install -y google-chrome-stable
+COPY ./docker/utility/wrap_chrome_binary.sh /app/docker/utility/wrap_chrome_binary.sh
+RUN /app/docker/utility/wrap_chrome_binary.sh
+RUN ln -fs /usr/bin/google-chrome /usr/bin/chrome
+RUN cp -rf /usr/bin/google-chrome-stable /app/.apt/usr/bin/google-chrome-stable
 
 # Set up Chromedriver Environment variables
-ENV CHROMEDRIVER_VERSION 2.19
+ENV CHROMEDRIVER_VERSION 79.0.3945.36
 ENV CHROMEDRIVER_DIR /chromedriver
 RUN mkdir $CHROMEDRIVER_DIR
 
@@ -70,5 +74,3 @@ ENV DJANGO_SECRET_KEY 'sample secret key'
 # Avoid building prod assets in development
 RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
 RUN python /app/manage.py collectstatic --noinput
-RUN /app/docker/utility/wrap_chrome_binary
-RUN ln -fs $(which google-chrome-stable) /app/.apt/usr/bin/google-chrome-stable
