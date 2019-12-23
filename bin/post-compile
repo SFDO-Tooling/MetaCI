@@ -1,0 +1,6 @@
+echo SFDO_METACI_DEPLOY=${SFDO_METACI_DEPLOY}
+if [[ -z "${SFDO_METACI_DEPLOY}" ]]; then
+    echo Installing from sfdo-metaci.txt
+    pip3 install -r requirements/sfdo-metaci.txt > /dev/null 2>&1 || echo Pip install failed. Error suppressed for security reasons
+fi
+echo "Ran post_compile hook"
