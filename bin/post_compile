@@ -1,6 +1,10 @@
 echo SFDO_METACI_DEPLOY=${SFDO_METACI_DEPLOY}
+pip --version
 if [[ -z "${SFDO_METACI_DEPLOY}" ]]; then
     echo Installing from sfdo-metaci.txt
     pip3 install -r requirements/sfdo-metaci.txt > /dev/null 2>&1 || echo Pip install failed. Error suppressed for security reasons
+else
+    echo Not installing from sfdo-metaci.txt
 fi
+python -m snowfakery || echo "Warning: Snowfakery is not installed. If you don't use it, that is not a problem."
 echo "Ran hook from bin/post_compile"
