@@ -48,7 +48,7 @@ def import_test_results(build_flow, results, test_type):
     methods = {}
 
     for result in results:
-        class_and_method = "%s.%s" % (result["ClassName"], result["Method"])
+        class_and_method = f"{result['ClassName']}.{result['Method']}"
 
         testclass = classes.get(result["ClassName"], None)
         if not testclass:
@@ -101,9 +101,9 @@ def populate_limit_fields(testresult, code_unit):
             if test_used is not None and test_allowed:
                 test_percent = (test_used * 100) / test_allowed
 
-            setattr(testresult, "test_%s_used" % limit_type, test_used)
-            setattr(testresult, "test_%s_allowed" % limit_type, test_allowed)
-            setattr(testresult, "test_%s_percent" % limit_type, test_percent)
+            setattr(testresult, f"test_{limit_type}_used", test_used)
+            setattr(testresult, f"test_{limit_type}_allowed", test_allowed)
+            setattr(testresult, f"test_{limit_type}_percent", test_percent)
         except KeyError:
             continue
 
@@ -111,15 +111,15 @@ def populate_limit_fields(testresult, code_unit):
     worst_limit_test_percent = None
 
     for limit_type in LIMIT_TYPES:
-        percent_test = getattr(testresult, "test_%s_percent" % limit_type)
+        percent_test = getattr(testresult, f"test_{limit_type}_percent")
 
         if percent_test is None:
             continue
         if worst_limit_test_percent is None:
-            worst_limit_test = "test_%s_percent" % limit_type
+            worst_limit_test = f"test_{limit_type}_percent"
             worst_limit_test_percent = percent_test
         elif percent_test > worst_limit_test_percent:
-            worst_limit_test = "test_%s_percent" % limit_type
+            worst_limit_test = f"test_{limit_type}_percent"
             worst_limit_test_percent = percent_test
 
     testresult.worst_limit = worst_limit_test

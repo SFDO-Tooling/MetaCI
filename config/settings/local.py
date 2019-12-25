@@ -14,7 +14,7 @@ Local settings
 import os
 import socket
 
-from .common import *
+from .base import *
 
 # DEBUG
 # ------------------------------------------------------------------------------

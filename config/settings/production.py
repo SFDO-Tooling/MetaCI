@@ -1,301 +1,402 @@
 # -*- coding: utf-8 -*-
 """
-Production Configurations
+Django settings for metaci project.
 
-- Use Amazon's S3 for storing static files and uploaded media
-- Use Mailgun to send emails
-- Use Redis for cache
+For more information on this file, see
+https://docs.djangoproject.com/en/dev/topics/settings/
 
-- Use sentry for error logging
-
-
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
-import json
+import os
+from ipaddress import IPv4Network
+from typing import List
 
-from .common import *  # noqa
+import environ
 
-# from django.utils import six
+ROOT_DIR = (
+    environ.Path(__file__) - 3
+)  # (metaci/config/settings/common.py - 3 = metaci/)
+APPS_DIR = ROOT_DIR.path("metaci")
+
+env = environ.Env()
+env.read_env()
 
 
-# SECRET CONFIGURATION
+def ipv4_networks(val: str) -> List[IPv4Network]:
+    return [IPv4Network(s.strip()) for s in val.split(",")]
+
+
+def url_prefix(val: str) -> str:
+    return val.rstrip("/") + "/"
+
+
+def url_prefix_list(val: str) -> List[str]:
+    return [url_prefix(url) for url in val.split(",")]
+
+
+# APP CONFIGURATION
 # ------------------------------------------------------------------------------
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-# Raises ImproperlyConfigured exception if DJANGO_SECRET_KEY not in os.environ
-SECRET_KEY = env("DJANGO_SECRET_KEY")
-
-
-# This ensures that Django will be able to detect a secure connection
-# properly on Heroku.
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# raven sentry client
-# See https://docs.getsentry.com/hosted/clients/python/integrations/django/
-INSTALLED_APPS += ("raven.contrib.django.raven_compat",)
-INSTALLED_APPS += ("defender",)
-
-# Use Whitenoise to serve static files
-# See: https://whitenoise.readthedocs.io/
-WHITENOISE_MIDDLEWARE = ("whitenoise.middleware.WhiteNoiseMiddleware",)
-MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
-RAVEN_MIDDLEWARE = (
-    "raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware",
+DJANGO_APPS = (
+    # Default Django apps:
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.sites",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # Useful template tags:
+    "django.contrib.humanize",
+    # Admin
+    "django.contrib.admin",
 )
-MIDDLEWARE = RAVEN_MIDDLEWARE + MIDDLEWARE
-DEFENDER_MIDDLEWARE = ("defender.middleware.FailedLoginMiddleware",)
-MIDDLEWARE = MIDDLEWARE + DEFENDER_MIDDLEWARE
-
-
-# SECURITY CONFIGURATION
-# ------------------------------------------------------------------------------
-# See https://docs.djangoproject.com/en/1.9/ref/middleware/#module-django.middleware.security
-# and https://docs.djangoproject.com/ja/1.9/howto/deployment/checklist/#run-manage-py-check-deploy
-
-# set this to 60 seconds and then to 518400 when you can prove it works
-SECURE_HSTS_SECONDS = 60
-SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
-    "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True
+THIRD_PARTY_APPS = (
+    "allauth",  # registration
+    "allauth.account",  # registration
+    "allauth.socialaccount",  # registration
+    "allauth.socialaccount.providers.github",  # github
+    "crispy_forms",  # Form layouts
+    "django_filters",  # view helpers for filtering models
+    "django_js_reverse",  # allow JS to reverse URLs
+    "django_rq",
+    "django_slds_crispyforms",  # SLDS theme for crispyforms
+    "guardian",  # Per Object Permissions via django-guardian
+    "rest_framework",  # API
+    "rest_framework.authtoken",
+    "scheduler",  # django-rq-scheduler
+    "watson",  # Full text search
 )
-SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
-    "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True
+
+# Apps specific for this project go here.
+LOCAL_APPS = (
+    "metaci.users.apps.UsersConfig",
+    "metaci.api.apps.ApiConfig",
+    "metaci.build.apps.BuildConfig",
+    "metaci.create_org.apps.CreateOrgConfig",
+    "metaci.cumulusci.apps.CumulusCIConfig",
+    "metaci.notification.apps.NotificationConfig",
+    "metaci.plan.apps.PlanConfig",
+    "metaci.repository.apps.RepositoryConfig",
+    "metaci.testresults.apps.TestResultsConfig",
+    "metaci.release.apps.ReleaseConfig",
+    "metaci.db.apps.DBUtils",
 )
-SECURE_BROWSER_XSS_FILTER = True
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_HTTPONLY = True
-SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
-X_FRAME_OPTIONS = "DENY"
 
-# SITE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "127.0.0.1:8000",
+    "127.0.0.1:8080",
+    "localhost",
+    "localhost:8000",
+    "localhost:8080",
+]
+
+# MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
-# Hosts/domain names that are valid for this site
-# See https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["metaci.herokuapp.com"])
-# END SITE CONFIGURATION
-
-INSTALLED_APPS += ("gunicorn",)
-
-
-# STORAGE CONFIGURATION
-# ------------------------------------------------------------------------------
-# Uploaded Media Files
-# ------------------------
-# See: http://django-storages.readthedocs.io/en/latest/index.html
-INSTALLED_APPS += ("storages",)
-
-AWS_ACCESS_KEY_ID = env("DJANGO_AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = env("DJANGO_AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = env("DJANGO_AWS_STORAGE_BUCKET_NAME")
-AWS_AUTO_CREATE_BUCKET = True
-AWS_BUCKET_ACL = "private"
-AWS_DEFAULT_ACL = None
-
-# AWS_S3_CALLING_FORMAT = OrdinaryCallingFormat()
-
-# AWS cache settings, don't change unless you know what you're doing:
-# AWS_EXPIRY = 60 * 60 * 24 * 7
-
-# TODO See: https://github.com/jschneier/django-storages/issues/47
-# Revert the following and use str after the above-mentioned bug is fixed in
-# either django-storage-redux or boto
-# AWS_HEADERS = {
-#    'Cache-Control': six.b('max-age=%d, s-maxage=%d, must-revalidate' % (
-#        AWS_EXPIRY, AWS_EXPIRY))
-# }
-
-# URL that handles the media served from MEDIA_ROOT, used for managing
-# stored files.
-MEDIA_URL = "https://s3.amazonaws.com/{}/".format(AWS_STORAGE_BUCKET_NAME)
-DEFAULT_FILE_STORAGE = "config.settings.storage_backends.MediaStorage"
-
-# Static Assets
-# ------------------------
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-
-# EMAIL
-# ------------------------------------------------------------------------------
-DEFAULT_FROM_EMAIL = env(
-    "DJANGO_DEFAULT_FROM_EMAIL", default="metaci <noreply@metaci.herokuapp.com>"
+MIDDLEWARE = (
+    "log_request_id.middleware.RequestIDMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "sfdo_template_helpers.admin.middleware.AdminRestrictMiddleware",
 )
-EMAIL_SUBJECT_PREFIX = env("DJANGO_EMAIL_SUBJECT_PREFIX", default="[metaci] ")
-SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 
-# Anymail with Mailgun
-INSTALLED_APPS += ("anymail",)
-MAILGUN_API_KEY = env("MAILGUN_API_KEY", default=None)
-ANYMAIL = {}
-ANYMAIL["MAILGUN_API_KEY"] = MAILGUN_API_KEY
-ANYMAIL["MAILGUN_SENDER_DOMAIN"] = env("MAILGUN_DOMAIN", default=None)
+# MIGRATIONS CONFIGURATION
+# ------------------------------------------------------------------------------
+MIGRATION_MODULES = {"sites": "metaci.contrib.sites.migrations"}
 
-EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+# DEBUG
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
+DEBUG = env.bool("DJANGO_DEBUG", False)
+
+# FIXTURE CONFIGURATION
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-FIXTURE_DIRS
+FIXTURE_DIRS = (str(APPS_DIR.path("fixtures")),)
+
+# EMAIL CONFIGURATION
+# ------------------------------------------------------------------------------
+EMAIL_BACKEND = env(
+    "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
+)
+
+# MANAGER CONFIGURATION
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
+ADMINS = ()
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
+MANAGERS = ADMINS
+
+# DATABASE CONFIGURATION
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
+DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///metaci")}
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
+# GENERAL CONFIGURATION
+# ------------------------------------------------------------------------------
+# Local time zone for this installation. Choices can be found here:
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# although not all choices may be available on all operating systems.
+# In a Windows environment this must be set to your system time zone.
+TIME_ZONE = env("DJANGO_TIME_ZONE", default="UTC")
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
+LANGUAGE_CODE = "en-us"
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#site-id
+SITE_ID = 1
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
+USE_I18N = True
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
+USE_L10N = True
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
+USE_TZ = True
 
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
-# See:
-# https://docs.djangoproject.com/en/dev/ref/templates/api/#django.template.loaders.cached.Loader
-TEMPLATES[0]["OPTIONS"]["loaders"] = [
-    (
-        "django.template.loaders.cached.Loader",
-        [
-            "django.template.loaders.filesystem.Loader",
-            "django.template.loaders.app_directories.Loader",
-        ],
-    )
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#templates
+if os.path.exists(str(ROOT_DIR.path("dist", "prod"))):
+    TEMPLATE_DIRS = [
+        str(ROOT_DIR.path("dist", "prod")),
+        str(APPS_DIR.path("templates")),
+    ]
+else:
+    TEMPLATE_DIRS = [str(ROOT_DIR.path("dist")), str(APPS_DIR.path("templates"))]
+TEMPLATES = [
+    {
+        # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
+        # This gets overridden in settings.production:
+        "DIRS": TEMPLATE_DIRS,
+        "OPTIONS": {
+            # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
+            "debug": DEBUG,
+            # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
+            # https://docs.djangoproject.com/en/dev/ref/templates/api/#loader-types
+            "loaders": [
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ],
+            # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    }
 ]
 
+# See: http://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+# STATIC FILE CONFIGURATION
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
+STATIC_ROOT = str(ROOT_DIR("staticfiles"))
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
+STATIC_URL = "/static/"
+
+# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
     str(APPS_DIR.path("static")),
-    str(ROOT_DIR.path("dist", "prod")),
+    str(ROOT_DIR.path("dist")),
     str(ROOT_DIR.path("locales")),
     str(ROOT_DIR.path("node_modules/@salesforce-ux")),
 )
 
-TEMPLATES[0]["DIRS"] = [
-    str(ROOT_DIR.path("dist", "prod")),
-    str(APPS_DIR.path("templates")),
-]
-
-# DATABASE CONFIGURATION
-# ------------------------------------------------------------------------------
-
-# Use the Heroku-style specification
-# Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-DATABASES["default"] = env.db("DATABASE_URL")
-
-# CACHING
-# ------------------------------------------------------------------------------
-
-REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=1)
-REDIS_LOCATION = "{0}/{1}".format(env("REDIS_URL", default="redis://127.0.0.1:6379"), 0)
-# Heroku URL does not pass the DB number, so we parse it in
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_LOCATION,
-        "OPTIONS": {
-            "CONNECTION_POOL_CLASS": "redis.BlockingConnectionPool",
-            "CONNECTION_POOL_KWARGS": {
-                "max_connections": REDIS_MAX_CONNECTIONS,
-                "timeout": 20,
-            },
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
-            # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-        },
-    }
-}
-
-
-# Logging configuration, heroku logfmt
-# 12FA logs to stdout only.
-# request_id injected into logstream for all lines
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": True,
-    "root": {"level": "WARNING", "handlers": []},
-    "filters": {"request_id": {"()": "log_request_id.filters.RequestIDFilter"}},
-    "formatters": {
-        "logfmt": {
-            "format": "at=%(levelname)-8s request_id=%(request_id)s module=%(name)s %(message)s"
-        },
-        "simple": {"format": "at=%(levelname)-8s module=%(name)s msg=%(message)s"},
-    },
-    "handlers": {
-        "console_w_req": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "filters": ["request_id"],
-            "formatter": "logfmt",
-        },
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "filters": ["request_id"],
-            "formatter": "simple",
-        },
-    },
-    "loggers": {
-        "django": {"level": "ERROR", "handlers": ["console_w_req"], "propagate": False},
-        "raven": {"level": "DEBUG", "handlers": ["console_w_req"], "propagate": False},
-        "log_request_id.middleware": {
-            "handlers": ["console_w_req"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-        "rq.worker": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
-        "metaci": {"handlers": ["console"], "level": "INFO", "propagate": False},
-    },
-}
-
-# Sentry Configuration
-SENTRY_DSN = env("DJANGO_SENTRY_DSN", default=None)
-SENTRY_CLIENT = env(
-    "DJANGO_SENTRY_CLIENT", default="raven.contrib.django.raven_compat.DjangoClient"
+# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
+STATICFILES_FINDERS = (
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
-RAVEN_CONFIG = {}
-if SENTRY_DSN:
-    RAVEN_CONFIG["DSN"] = SENTRY_DSN
-    LOGGING["handlers"]["sentry"] = {
-        "level": "ERROR",
-        "class": "raven.contrib.django.raven_compat.handlers.SentryHandler",
-    }
-    LOGGING["loggers"]["sentry.errors"] = {
-        "level": "DEBUG",
-        "handlers": ["console"],
-        "propagate": False,
-    }
-    LOGGING["root"]["handlers"].append("sentry")
-    LOGGING["loggers"]["django"]["handlers"].append("sentry")
+# MEDIA CONFIGURATION
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
+MEDIA_ROOT = str(APPS_DIR("media"))
 
-# Add the HireFire middleware for monitoring queue to scale dynos
-# See: https://hirefire.readthedocs.io/
-HIREFIRE_TOKEN = env("HIREFIRE_TOKEN", default=None)
-if HIREFIRE_TOKEN:
-    HIREFIRE_PROCS = ["config.procs.WorkerProc"]
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
+MEDIA_URL = "/media/"
 
-HEROKU_TOKEN = env("HEROKU_TOKEN", default=None)
-HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
+# URL Configuration
+# ------------------------------------------------------------------------------
+ROOT_URLCONF = "config.urls"
 
-if HEROKU_TOKEN and HEROKU_APP_NAME:
-    METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
+# Location of root django.contrib.admin URL, use {% url 'admin:index' %}
+ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin")
+ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
 
-# Autoscalers are defined per METACI_APP
-AUTOSCALERS = json.loads(env("AUTOSCALERS", default="{}"))
+# Forward-compatible alias for use with IP-checking middleware
+ADMIN_AREA_PREFIX = ADMIN_URL
 
-if not AUTOSCALERS and HEROKU_APP_NAME:
-    # backwards compatability
-    AUTOSCALERS = {
-        HEROKU_APP_NAME: {
-            "app_name": HEROKU_APP_NAME,
-            "worker_type": WORKER_DYNO_NAME,
-            "max_workers": METACI_MAX_WORKERS,
-            "worker_reserve": METACI_WORKER_RESERVE,
-            "queues": ["default", "medium", "high"],
-        }
-    }
+# URLs other than ADMIN_AREA which should be secure
+RESTRICTED_PREFIXES = env("RESTRICTED_PREFIXES", default=[], cast=url_prefix_list)
+
+ADMIN_API_ALLOWED_SUBNETS = env(
+    "ADMIN_API_ALLOWED_SUBNETS",
+    default="0.0.0.0/0",
+    cast=ipv4_networks,
+    parse_default=True,
+)
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
+WSGI_APPLICATION = "config.wsgi.application"
 
 
-# Custom Admin URL, use {% url 'admin:index' %}
-ADMIN_URL = env("DJANGO_ADMIN_URL")
+# PASSWORD VALIDATION
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
+# ------------------------------------------------------------------------------
 
-# Site URL: assumes appname.herokuapp.com
-SITE_URL = env("SITE_URL")
-FROM_EMAIL = env("FROM_EMAIL")
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+# AUTHENTICATION CONFIGURATION
+# ------------------------------------------------------------------------------
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+    "guardian.backends.ObjectPermissionBackend",
+)
+
+# Some really nice defaults
+ACCOUNT_AUTHENTICATION_METHOD = "username"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
+ACCOUNT_ADAPTER = "metaci.users.adapters.AccountAdapter"
+SOCIALACCOUNT_ADAPTER = "metaci.users.adapters.SocialAccountAdapter"
+
+# Custom user app defaults
+# Select the correct user model
+AUTH_USER_MODEL = "users.User"
+LOGIN_REDIRECT_URL = "users:redirect"
+LOGIN_URL = "account_login"
+
+# SLUGLIFIER
+AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
+
+# django-rq
+REDIS_URL = env("REDIS_URL", default="redis://localhost:6379")
+REDIS_URL += "/0"
+RQ_QUEUES = {
+    "default": {
+        "USE_REDIS_CACHE": "default",
+        "DEFAULT_TIMEOUT": 7200,
+        "AUTOCOMMIT": False,
+    },
+    "medium": {
+        "USE_REDIS_CACHE": "default",
+        "DEFAULT_TIMEOUT": 7200,
+        "AUTOCOMMIT": False,
+    },
+    "high": {
+        "USE_REDIS_CACHE": "default",
+        "DEFAULT_TIMEOUT": 7200,
+        "AUTOCOMMIT": False,
+    },
+    "short": {
+        "USE_REDIS_CACHE": "default",
+        "DEFAULT_TIMEOUT": 500,
+        "AUTOCOMMIT": False,
+    },
+    "robot": {
+        "USE_REDIS_CACHE": "default",
+        "DEFAULT_TIMEOUT": 7200,
+        "AUTOCOMMIT": False,
+    },
+}
+
+# Site URL
+SITE_URL = None
+FROM_EMAIL = "test@mailinator.com"
 
 # Github credentials
-GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET")
+GITHUB_USERNAME = env("GITHUB_USERNAME", default=None)
+GITHUB_PASSWORD = env("GITHUB_PASSWORD", default=None)
+GITHUB_WEBHOOK_SECRET = None
 
 # Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID")
-CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET")
-CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL")
+CONNECTED_APP_CLIENT_ID = None
+CONNECTED_APP_CLIENT_SECRET = None
+CONNECTED_APP_CALLBACK_URL = None
 
-SFDX_CLIENT_ID = env("SFDX_CLIENT_ID")
-SFDX_HUB_KEY = env("SFDX_HUB_KEY")
-SFDX_HUB_USERNAME = env("SFDX_HUB_USERNAME")
+SFDX_CLIENT_ID = None
+SFDX_HUB_KEY = None
+SFDX_HUB_USERNAME = None
 
-# django-defender configuration
-DEFENDER_REDIS_NAME = "default"
+# Application Behaviors
+GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", True)
+METACI_FLOW_CALLBACK_ENABLED = env.bool("METACI_FLOW_CALLBACK_ENABLED", True)
+
+# Number of scratch orgs to leave available in the org.
+SCRATCH_ORG_RESERVE = env.int("METACI_SCRATCH_ORG_RESERVE", 10)
+
+# Autoscaler class used for scaling the worker formation
+METACI_WORKER_AUTOSCALER = env(
+    "METACI_WORKER_AUTOSCALER", default="metaci.build.autoscaling.NonAutoscaler"
+)
+# What's the max number of worker dynos we should scale up to
+METACI_MAX_WORKERS = env.int("METACI_MAX_WORKERS", 3)
+# How many worker slots to reserve for high-priority jobs.
+# Should be less than METACI_MAX_WORKERS
+METACI_WORKER_RESERVE = env.int("METACI_WORKER_RESERVE", 1)
+WORKER_DYNO_NAME = env("WORKER_DYNO_NAME", default=None) or "worker"
+
+
+# Django REST Framework
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 100,
+    "DEFAULT_PERMISSION_CLASSES": (
+        "metaci.api.permissions.IsOnSecureNetwork",
+        "rest_framework.permissions.IsAdminUser",
+    ),
+}
+
+# log_request_id settings
+LOG_REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"
+LOG_REQUESTS = True
+GENERATE_REQUEST_ID_IF_NOT_IN_HEADER = True
+REQUEST_ID_RESPONSE_HEADER = "X-Request-ID"
+
+# django-guardian settings
+GUARDIAN_MONKEY_PATCH = False
+
+JS_REVERSE_JS_VAR_NAME = "api_urls"
+JS_REVERSE_EXCLUDE_NAMESPACES = ["admin", "admin_rest"]

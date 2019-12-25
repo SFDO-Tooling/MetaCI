@@ -12,7 +12,6 @@ from robot import rebot
 
 from metaci.build.models import Build, BuildFlow
 from metaci.build.utils import paginate
-from metaci.repository.models import Repository
 from metaci.testresults.filters import BuildFlowFilter
 from metaci.testresults.importer import STATS_MAP
 from metaci.testresults.models import TestMethod, TestResult
@@ -78,22 +77,10 @@ def build_flow_tests(request, build_id, flow):
                 "value": getattr(result, column),
                 "status": "active",
             }
-            percent = None
-            if column.find("percent") != -1:
-                percent = column_data["value"]
-            elif column.find("used") != -1:
-                percent = getattr(result, column.replace("_used", "_percent"))
+            set_percent_data(result, column, column_data)
 
-            if percent is not None:
-                if percent < 50:
-                    column_data["status"] = "success"
-                elif percent < 70:
-                    column_data["status"] = "info"
-                elif percent < 80:
-                    column_data["status"] = "warning"
-                else:
-                    column_data["status"] = "danger"
             result_data["columns"].append(column_data)
+
         current_class_results.append(result_data)
         last_class = result.method.testclass
 
@@ -107,6 +94,24 @@ def build_flow_tests(request, build_id, flow):
     data["columns"] = columns
 
     return render(request, "testresults/build_flow_tests.html", data)
+
+
+def set_percent_data(result, column, column_data):
+    percent = None
+    if column.find("percent") != -1:
+        percent = column_data["value"]
+    elif column.find("used") != -1:
+        percent = getattr(result, column.replace("_used", "_percent"))
+
+    if percent is not None:
+        if percent < 50:
+            column_data["status"] = "success"
+        elif percent < 70:
+            column_data["status"] = "info"
+        elif percent < 80:
+            column_data["status"] = "warning"
+        else:
+            column_data["status"] = "danger"
 
 
 def test_result_detail(request, result_id):
@@ -204,7 +209,9 @@ def test_result_robot(request, result_id):
         log_html = patch_html(log_html)
         os.remove(source)
         os.remove(log)
-    return HttpResponse(log_html)
+        return HttpResponse(log_html)
+    else:
+        return HttpResponse(f"No robot_xml available in test result: {result}")
 
 
 def patch_html(html):
@@ -334,13 +341,3 @@ def build_flow_compare_to(request, build_id, flow):
 
     data = {"build_flow": build_flow, "filter": comparison_filter, "records": records}
     return render(request, "testresults/build_flow_compare_to.html", data)
-
-
-def test_dashboard(request, repo_owner, repo_name):
-    """ display a dashboard of test results from preconfigured methods """
-    repo = get_object_or_404(Repository, name=repo_name, owner=repo_owner)
-    builds = Build.objects.for_user(request.user)
-    methods = TestMethod.objects.filter(testclass__repo=repo, test_dashboard=True)
-    methods = methods.filter(testresult__build__in=builds).distinct()
-    data = {"repo": repo, "methods": methods}
-    return render(request, "testresults/test_dashboard.html", data)
