@@ -49,7 +49,6 @@ RUN /bin/sh /app/docker/utility/install_sfdx.sh
 COPY ./requirements /app/requirements
 RUN pip install --no-cache --upgrade pip
 RUN if [ "${BUILD_ENV}" = "production" ] ; then pip install --no-cache -r /app/requirements/production.txt ; else pip install --no-cache -r /app/requirements/local.txt ; fi
-# RUN apt-get update -y && apt-get install -y libgconf-2-4
 
 # installing yarn dependencies
 COPY ./package.json /app/package.json
