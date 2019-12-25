@@ -16,6 +16,8 @@ from typing import List
 
 import environ
 
+from .base import *  # noqa
+
 ROOT_DIR = (
     environ.Path(__file__) - 3
 )  # (metaci/config/settings/common.py - 3 = metaci/)
