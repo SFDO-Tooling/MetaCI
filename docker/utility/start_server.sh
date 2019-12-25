@@ -26,7 +26,6 @@ echo "AUTHORIZING SFDX via JWT key auth..."
 sfdx force:auth:jwt:grant -u $SFDX_HUB_USERNAME -f /app/sfdx_hub.key -i $SFDX_CLIENT_ID --setdefaultdevhubusername
 # starting server and webpack
 yarn serve
-echo "ALL DONE!"
 
 echo "*****************************************************
 MetaCI is up and running in docker. 
