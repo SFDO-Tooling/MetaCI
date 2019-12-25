@@ -4,7 +4,7 @@ ARG BUILD_ENV
 ARG CHROME_VERSION
 ARG CHROMEDRIVER_VERSION
 
-RUN mkdir /app; mkdir /app/.apt/; mkdir /app/.apt/usr/;mkdir /app/.apt/usr/bin/;
+RUN mkdir -p /app/.apt/usr/bin
 
 # Set up the Chrome PPA
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
@@ -16,7 +16,6 @@ RUN apt-get install -y google-chrome-stable
 COPY ./docker/utility/wrap_chrome_binary.sh /app/docker/utility/wrap_chrome_binary.sh
 RUN /app/docker/utility/wrap_chrome_binary.sh
 RUN ln -fs /usr/bin/google-chrome /usr/bin/chrome
-RUN cp -rf /usr/bin/google-chrome-stable /app/.apt/usr/bin/google-chrome-stable
 
 # Set up Chromedriver Environment variables
 ENV CHROMEDRIVER_VERSION 79.0.3945.36
@@ -50,7 +49,7 @@ RUN /bin/sh /app/docker/utility/install_sfdx.sh
 COPY ./requirements /app/requirements
 RUN pip install --no-cache --upgrade pip
 RUN if [ "${BUILD_ENV}" = "production" ] ; then pip install --no-cache -r /app/requirements/production.txt ; else pip install --no-cache -r /app/requirements/local.txt ; fi
-RUN apt-get update -y && apt-get install -y libgconf-2-4
+# RUN apt-get update -y && apt-get install -y libgconf-2-4
 
 # installing yarn dependencies
 COPY ./package.json /app/package.json
