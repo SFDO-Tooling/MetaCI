@@ -1,6 +1,4 @@
 echo SFDO_METACI_DEPLOY=${SFDO_METACI_DEPLOY}
-pip install --upgrade pip    # Upgrade pip to get embeddable env vars feature
-pip --version
 if [ -n "${SFDO_METACI_DEPLOY}" ]; then
     echo Installing from sfdo-metaci.txt
     pip3 install -r requirements/sfdo-metaci.txt > /dev/null  # Pip is obscuring the password now

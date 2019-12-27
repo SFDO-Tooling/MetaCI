@@ -1,0 +1,2 @@
+pip install --upgrade pip    # Upgrade pip to get embeddable env vars feature
+pip --version
