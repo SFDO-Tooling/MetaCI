@@ -78,12 +78,8 @@ PyJWT==1.7.1
 # Django Defender
 django-defender==0.6.2
 
-# Django Postgres Stats
-django-postgres-stats==1.0.0
-
 # SFDO Template Helpers for authorization middleware and other helpers
--e git+https://github.com/SFDO-Tooling/sfdo-template-helpers.git@v0.6.0#egg=sfdo_template_helpers
+https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.9.0.tar.gz
 
 # Let Javascript refer to Django URLs by name
 django-js-reverse==0.9.1
-
