@@ -178,10 +178,6 @@ CHROMEDRIVER_DIR:
 CHROMEDRIVER_VERSION:
     Docker argument variable used to determine what version of chromedriver to retrieve when 
     installing in your docker container, currently set in docker-compose.yml, also default set in Dockerfile.
-CHROME_VERSION:
-    Docker argument variable used to determine what version of chrome to retrieve when 
-    installing in your docker container, currently set in docker-compose.yml
-    web service ARG variable section.
 NODE_VERSION: 
     Environment variable used to set node version for download, this variable is set in the Dockerfile
 

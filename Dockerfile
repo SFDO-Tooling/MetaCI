@@ -1,7 +1,6 @@
 FROM python:3.8
 
 ARG BUILD_ENV
-ARG CHROME_VERSION
 ARG CHROMEDRIVER_VERSION
 
 RUN mkdir -p /app/.apt/usr/bin
