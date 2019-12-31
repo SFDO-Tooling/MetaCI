@@ -1,4 +1,4 @@
-import { perfDataReducer, perfDataUIReducer } from 'store/perfdata/reducer';
+import { perfDataReducer, perfDataUIReducer } from '@/store/perfdata/reducer';
 
 describe('PerfDataReducer', () => {
   test('Should initialize to loading state', () => {

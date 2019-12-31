@@ -10,9 +10,10 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const merge = require('webpack-merge');
-const webpack = require('webpack');
 
 const common = require('./webpack.common.js');
+
+const webpack = require('webpack');
 
 module.exports = merge(common, {
   mode: 'production',

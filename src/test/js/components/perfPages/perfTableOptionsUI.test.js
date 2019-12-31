@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { renderWithRedux, storeWithApi } from '../../utils';
-import testmethod_perf_UI_data from '../../api/testmethod_perf_UI.json';
+import PerfTableOptionsUI from '@/components/perfPages/perfTableOptionsUI';
+import { QueryParamHelpers } from '@/components/perfPages/perfTableUtils';
 
-import { QueryParamHelpers } from 'components/perfPages/perfTableUtils';
-import PerfTableOptionsUI from 'components/perfPages/perfTableOptionsUI';
+import testmethod_perf_UI_data from '../../api/testmethod_perf_UI.json';
+import { renderWithRedux, storeWithApi } from '../../utils';
 
 describe('Perf Table Options', () => {
   test('Initial Render', () => {

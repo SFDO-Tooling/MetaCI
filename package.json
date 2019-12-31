@@ -131,7 +131,7 @@
     "lint": "npm-run-all -p lintpy lintjs -s stylelint tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "JEST_JUNIT_OUTPUT='./coverage/junit.xml' jest --ci --runInBand --reporters=default --reporters=jest-junit",
+    "test:coverage": "JEST_JUNIT_OUTPUT_DIR='./coverage' jest --ci --runInBand --reporters=default --reporters=jest-junit",
     "test:report-coverage": "cat ./coverage/lcov.info | coveralls",
     "test:check-coverage": "nyc check-coverage --temp-directory coverage",
     "tsc": "tsc",

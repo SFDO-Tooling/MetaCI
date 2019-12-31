@@ -26,9 +26,8 @@ module.exports = {
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: [
-    'src/js/**/*.{js,jsx}',
+    'src/js/**/*.{js,jsx,ts,tsx}',
     '!src/js/index.js',
-    '!src/js/raven.js',
     '!src/js/i18n.js',
   ],
 
@@ -36,9 +35,11 @@ module.exports = {
   coverageDirectory: 'coverage',
 
   // An array of regexp pattern strings used to skip coverage collection
-  // coveragePathIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  coveragePathIgnorePatterns: [
+    'src/js/index.tsx',
+    'src/js/i18n.ts',
+    '/node_modules/',
+  ],
 
   // A list of reporter names that Jest uses when writing coverage reports
   coverageReporters: ['text-summary', 'html', 'lcovonly', 'json'],
@@ -65,12 +66,7 @@ module.exports = {
   moduleDirectories: ['src/js', 'static', 'node_modules'],
 
   // An array of file extensions your modules use
-  // moduleFileExtensions: [
-  //   "js",
-  //   "json",
-  //   "jsx",
-  //   "node"
-  // ],
+  moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
   moduleNameMapper: {
@@ -178,5 +174,5 @@ module.exports = {
   // watchPathIgnorePatterns: [],
 
   // Whether to use watchman for file crawling
-  watchman: true,
+  // watchman: true,
 };
