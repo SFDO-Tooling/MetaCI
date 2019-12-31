@@ -5,14 +5,16 @@ Production Configurations
 - Use Amazon's S3 for storing static files and uploaded media
 - Use Mailgun to send emails
 - Use Redis for cache
+
 - Use sentry for error logging
 
-"""
 
+"""
 from __future__ import absolute_import, unicode_literals
-from .base import *  # noqa
+
 import json
 
+from .base import *  # noqa
 
 # from django.utils import six
 
