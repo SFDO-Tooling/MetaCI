@@ -36,7 +36,7 @@ COPY ./docker/utility/install_node.sh /app/docker/utility/install_node.sh
 RUN /bin/sh /app/docker/utility/install_node.sh
 
 # declaring necessary node and yarn versions
-ENV YARN_VERSION 1.19.1
+ENV YARN_VERSION 1.21.1
 # installing yarn
 COPY ./docker/utility/install_yarn.sh /app/docker/utility/install_yarn.sh
 RUN /bin/sh /app/docker/utility/install_yarn.sh
