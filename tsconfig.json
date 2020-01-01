@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "commonjs",
+    "module": "esnext",
     // "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
@@ -19,11 +19,23 @@
     "isolatedModules": true,
     "baseUrl": "src/js",
     "paths": {
-      "*": ["*", "src/*"],
-      "@/*": ["src/js/*"],
-      "#/*": ["static/images/*"]
+      "*": [
+        "*",
+        "src/*"
+      ],
+      "@/*": [
+        "src/js/*"
+      ],
+      "#/*": [
+        "static/images/*"
+      ]
     }
   },
-  "include": ["src/js/**/*.ts", "src/js/**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/js/**/*.ts",
+    "src/js/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -33,7 +33,6 @@
     "reselect": "^4.0.0",
     "run-p": "^0.0.0",
     "sarcastic": "^1.5.0",
-    "sass-loader": "^8.0.0",
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
@@ -86,7 +85,6 @@
     "lint-staged": "^9.5.0",
     "mini-css-extract-plugin": "^0.8.0",
     "node-fetch": "^2.6.0",
-    "node-sass": "^4.13.0",
     "npm-run-all": "^4.1.5",
     "nyc": "^14.1.1",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
@@ -94,6 +92,7 @@
     "prettier": "^1.19.1",
     "redux-mock-store": "^1.5.4",
     "run-sequence": "^2.2.1",
+    "sass": "^1.24.0",
     "sass-loader": "^8.0.0",
     "stylelint": "^12.0.0",
     "stylelint-config-recommended-scss": "^4.0.0",
@@ -132,7 +131,7 @@
     "lint": "npm-run-all -p lintpy lintjs -s stylelint tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "JEST_JUNIT_OUTPUT='./coverage/junit.xml' jest --ci --runInBand --reporters=default --reporters=jest-junit",
+    "test:coverage": "JEST_JUNIT_OUTPUT_DIR='./coverage' jest --ci --runInBand --reporters=default --reporters=jest-junit",
     "test:report-coverage": "cat ./coverage/lcov.info | coveralls",
     "test:check-coverage": "nyc check-coverage --temp-directory coverage",
     "tsc": "tsc",
