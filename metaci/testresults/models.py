@@ -8,7 +8,7 @@ from collections import OrderedDict, namedtuple
 from dateutil.tz import gettz
 from django.apps import apps
 from django.db import models
-from django.db.models import Avg, Count, F, FloatField, Q, StdDev, Value
+from django.db.models import Aggregate, Avg, Count, F, FloatField, Q, StdDev, Value
 from django.db.models.functions import Cast
 from django.urls import reverse
 from django.utils import timezone
@@ -16,7 +16,6 @@ from django.utils import timezone
 from metaci.build import models as build_models
 from metaci.testresults.choices import OUTCOME_CHOICES, TEST_TYPE_CHOICES
 from metaci.utils import split_seq
-from postgres_stats.aggregates import Percentile
 
 
 class TestClass(models.Model):
@@ -271,14 +270,22 @@ class TestResultAsset(models.Model):
 FieldType = namedtuple("FieldType", ["label", "aggregation"])
 
 
+class Percentile(Aggregate):
+    function = "PERCENTILE_CONT"
+    name = "percentile"
+    output_field = FloatField()
+    template = "%(function)s(%(percentile)s) WITHIN GROUP (ORDER BY %(expressions)s)"
+    allow_distinct = False
+
+
 def NearMin(field):
     "DB Statistical function for almost the minimum but not quite."
-    return Percentile(field, 0.5, output_field=FloatField())
+    return Percentile(field, percentile=0.05)
 
 
 def NearMax(field):
     "DB Statistical function for almost the maximum but not quite."
-    return Percentile(field, 0.95, output_field=FloatField())
+    return Percentile(field, percentile=0.95)
 
 
 class TestResultPerfSummaryBase(models.Model):
