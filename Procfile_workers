@@ -1,0 +1,2 @@
+worker_a: python manage.py metaci_rqworker high medium default --worker-class metaci.build.worker.RequeueingWorker --sentry-dsn=""
+worker_b: python manage.py metaci_rqworker high medium default --worker-class metaci.build.worker.RequeueingWorker --sentry-dsn=""
