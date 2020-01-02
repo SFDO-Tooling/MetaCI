@@ -1,13 +1,12 @@
 import fetchMock from 'fetch-mock';
 
+import { assertUIData } from '@/api/testmethod_perf_UI_JSON_schema';
+import { assertPerfData } from '@/api/testmethod_perfdata_JSON_schema';
+import * as actions from '@/store/perfdata/actions';
+
 import testmethod_perf_UI_data from '../../api/testmethod_perf_UI.json';
 import testmethod_perf_data from '../../api/testmethod_perf.json';
-
 import { storeWithApi } from './../../utils';
-
-import * as actions from 'store/perfdata/actions';
-import { assertPerfData } from 'api/testmethod_perfdata_JSON_schema';
-import { assertUIData } from 'api/testmethod_perf_UI_JSON_schema';
 
 describe('perfRESTFetch', () => {
   const url = actions.testmethod_perfdata_url;
