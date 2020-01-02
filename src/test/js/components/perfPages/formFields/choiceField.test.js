@@ -1,7 +1,7 @@
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
 
-import { createField, AllFilters } from 'components/perfPages/formFields';
+import { AllFilters, createField } from '@/components/perfPages/formFields';
 
 describe('Choice Field', () => {
   test('Renders Choice Fields with defauled value', () => {
@@ -9,7 +9,10 @@ describe('Choice Field', () => {
       name: 'MyChoiceFilter',
       field_type: 'ChoiceField',
       field_module: '',
-      choices: [['choice1', 'value1'], ['choicd2', 'value2']],
+      choices: [
+        ['choice1', 'value1'],
+        ['choicd2', 'value2'],
+      ],
     };
     const field = createField(filterDef, 'value1');
 
