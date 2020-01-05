@@ -34,7 +34,7 @@ django-redis==4.11.0
 redis==3.3.11
 
 # Django RQ
-rq==1.1.0
+rq==1.2.0
 rq-scheduler==0.9.1
 django-rq==2.2.0
 django-rq-scheduler==1.1.3
