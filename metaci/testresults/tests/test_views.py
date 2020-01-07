@@ -97,7 +97,7 @@ class TestTestResultsViews:
         url = reverse("build_flow_compare")
         response = self.client.get(
             url,
-            {"buildflow1": data["buildflow"].id, "buildflow2": data["buildflow"].id,},
+            {"buildflow1": data["buildflow"].id, "buildflow2": data["buildflow"].id},
         )
         assert response.status_code == 200
 
@@ -113,6 +113,6 @@ class TestTestResultsViews:
         )
         response = self.client.get(
             url,
-            {"buildflow1": data["buildflow"].id, "buildflow2": data["buildflow"].id,},
+            {"buildflow1": data["buildflow"].id, "buildflow2": data["buildflow"].id},
         )
         assert response.status_code == 200

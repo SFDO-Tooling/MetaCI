@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# This file installs the given Yarn version to the docker image
 # NEED TO SET YARN_VERSION ENVIRONMENT VARIABLE if not set already
 set -ex
 for key in \

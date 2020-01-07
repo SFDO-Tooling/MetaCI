@@ -150,10 +150,7 @@ const select = (appState: AppState) => ({
 });
 
 const WrappedPerfPage: ComponentType<{}> = withRouter(
-  connect(
-    select,
-    actions,
-  )(UnwrappedPerfPage),
+  connect(select, actions)(UnwrappedPerfPage),
 );
 
 export default WrappedPerfPage;
