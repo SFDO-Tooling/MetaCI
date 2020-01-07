@@ -40,7 +40,7 @@ django-rq==2.2.0
 django-rq-scheduler==1.1.3
 
 # CumulusCI
-cumulusci==3.3.0
+https://github.com/SFDO-Tooling/CumulusCI/tarball/master
 requests[security]==2.22.0
 
 # Salesforce Lightning Design System for Django
