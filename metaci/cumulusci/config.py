@@ -1,5 +1,4 @@
-from cumulusci.core.config import BaseGlobalConfig
-from cumulusci.core.config import BaseProjectConfig
+from cumulusci.core.config import BaseGlobalConfig, BaseProjectConfig
 
 
 class MetaCIProjectConfig(BaseProjectConfig):
@@ -10,6 +9,15 @@ class MetaCIProjectConfig(BaseProjectConfig):
             kwargs["additional_yaml"] = build.plan.yaml_config
 
         super(MetaCIProjectConfig, self).__init__(global_config_obj, *args, **kwargs)
+
+    def construct_subproject_config(self, **kwargs):
+        # make sure build gets attached to projects for included sources
+        return MetaCIProjectConfig(
+            self.global_config_obj,
+            self.build,
+            included_sources=self.included_sources,
+            **kwargs
+        )
 
     @property
     def config_project_local_path(self):
