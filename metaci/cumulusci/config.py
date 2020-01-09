@@ -11,12 +11,9 @@ class MetaCIProjectConfig(BaseProjectConfig):
         super(MetaCIProjectConfig, self).__init__(global_config_obj, *args, **kwargs)
 
     def construct_subproject_config(self, **kwargs):
-        # make sure build gets attached to projects for included sources
-        return MetaCIProjectConfig(
-            self.global_config_obj,
-            self.build,
-            included_sources=self.included_sources,
-            **kwargs
+        # For included sources, use a normal project config not tied to the build.
+        return BaseProjectConfig(
+            self.global_config_obj, included_sources=self.included_sources, **kwargs
         )
 
     @property
