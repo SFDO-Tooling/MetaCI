@@ -11,20 +11,11 @@ Using Docker
 To set up MetaCI using docker please
 see the following instructions `<./docs/running_docker.rst>`_.
 
-
 Using Local Machine
 ===================
 
 As mentioned above, MetaCI can be configured locally. 
 To achieve this follow the instructions provided in `<./docs/running.rst>`_.
-
-Running the Server
-==================
-Docker runs the server automatically. If you are not using Docker for 
-development, you can run it like this:
-
-- ``yarn serve``: starts development server (with watcher) at
-  `<http://localhost:8080/>`_ (assets are served from ``dist/`` dir)
 
 Development Tasks
 =================
