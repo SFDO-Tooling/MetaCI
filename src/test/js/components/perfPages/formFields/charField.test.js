@@ -1,7 +1,7 @@
+import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
 
-import { createField, AllFilters } from 'components/perfPages/formFields';
+import { AllFilters, createField } from '@/components/perfPages/formFields';
 
 describe('Text Field', () => {
   test('renders CharField with value', () => {

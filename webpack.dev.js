@@ -11,9 +11,10 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const I18nextWebpackPlugin = require('i18next-scanner-webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const merge = require('webpack-merge');
-const babel = require('@babel/core');
 
 const common = require('./webpack.common.js');
+
+const babel = require('@babel/core');
 
 module.exports = merge(common, {
   mode: 'development',
@@ -76,13 +77,14 @@ module.exports = merge(common, {
       // https://github.com/i18next/i18next-scanner/issues/88
       transform(file, enc, done) {
         const extname = path.extname(file.path);
-        if (['.js'].includes(extname)) {
+        if (['.js', '.jsx', '.ts', '.tsx'].includes(extname)) {
           const parser = this.parser;
           fs.readFile(file.path, enc, (err, data) => {
             if (err) {
               done(err);
             } else {
               const options = {
+                filename: file.path,
                 presets: ['@babel/preset-typescript'],
                 plugins: [
                   '@babel/plugin-syntax-jsx',

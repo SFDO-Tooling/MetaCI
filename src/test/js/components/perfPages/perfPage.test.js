@@ -1,12 +1,12 @@
+import fetchMock from 'fetch-mock';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import fetchMock from 'fetch-mock';
 
-import { renderWithRedux, storeWithApi } from '../../utils';
+import PerfPage from '@/components/perfPages/perfPage';
+
 import testmethod_perf_UI_data from '../../api/testmethod_perf_UI.json';
 import testmethod_perf_data from '../../api/testmethod_perf.json';
-
-import PerfPage from 'components/perfPages/perfPage';
+import { renderWithRedux, storeWithApi } from '../../utils';
 
 const initialStoreState = {
   user: {},

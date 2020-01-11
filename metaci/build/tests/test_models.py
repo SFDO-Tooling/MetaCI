@@ -1,6 +1,6 @@
 import os
+from pathlib import Path
 from unittest import mock
-from unittest.mock import Mock
 
 import pytest
 from cumulusci.core.config import OrgConfig
@@ -48,10 +48,37 @@ class TestBuild:
         build = Build(repo=repo, plan=plan)
         assert build.planrepo == planrepo
 
+    @mock.patch("metaci.repository.models.Repository.github_api")
+    @mock.patch("metaci.cumulusci.keychain.MetaCIProjectKeychain.get_org")
+    def test_run(self, get_org, gh):
+        # mock github zipball
+        def archive(format, zip_content, ref):
+            with open(Path(__file__).parent / "testproject.zip", "rb") as f:
+                zip_content.write(f.read())
+
+        gh.archive.side_effect = archive
+
+        # mock org config
+        org_config = OrgConfig({}, "test")
+        org_config.refresh_oauth_token = mock.Mock()
+        get_org.return_value = org_config
+
+        build = BuildFactory()
+        build.plan.flows = "test"
+
+        try:
+            build.run()
+        finally:
+            detach_logger(build)
+
+        assert build.status == "success", build.log
+        assert "Build flow test completed successfully" in build.log
+        assert "running test flow" in build.flows.get().log
+
     def test_delete_org(self):
         build = BuildFactory()
         build.org_instance = ScratchOrgInstanceFactory(org__repo=build.repo)
-        build.org_instance.delete_org = Mock()
+        build.org_instance.delete_org = mock.Mock()
         org_config = OrgConfig({"scratch": True}, "dev")
         build.delete_org(org_config)
         build.org_instance.delete_org.assert_called_once()
@@ -60,7 +87,7 @@ class TestBuild:
     def test_delete_org__not_scratch(self):
         build = BuildFactory()
         build.org_instance = ScratchOrgInstanceFactory(org__repo=build.repo)
-        build.org_instance.delete_org = Mock()
+        build.org_instance.delete_org = mock.Mock()
         org_config = OrgConfig({}, "dev")
         build.delete_org(org_config)
         build.org_instance.delete_org.assert_not_called()
@@ -69,7 +96,7 @@ class TestBuild:
     def test_delete_org__keep_org(self):
         build = BuildFactory(keep_org=True)
         org = ScratchOrgInstanceFactory()
-        org.delete_org = Mock()
+        org.delete_org = mock.Mock()
         build.org_instance = org
         org_config = OrgConfig({"scratch": True}, "dev")
         build.delete_org(org_config)
@@ -80,7 +107,7 @@ class TestBuild:
         build = BuildFactory(status="error")
         build.plan.keep_org_on_error = True
         org = ScratchOrgInstanceFactory()
-        org.delete_org = Mock()
+        org.delete_org = mock.Mock()
         build.org_instance = org
         org_config = OrgConfig({"scratch": True}, "dev")
         build.delete_org(org_config)
@@ -91,7 +118,7 @@ class TestBuild:
         build = BuildFactory(status="fail")
         build.plan.keep_org_on_fail = True
         org = ScratchOrgInstanceFactory()
-        org.delete_org = Mock()
+        org.delete_org = mock.Mock()
         build.org_instance = org
         org_config = OrgConfig({"scratch": True}, "dev")
         build.delete_org(org_config)

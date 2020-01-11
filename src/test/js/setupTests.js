@@ -1,5 +1,6 @@
 import 'isomorphic-fetch';
 import '@testing-library/jest-dom/extend-expect';
+
 import fetchMock from 'fetch-mock';
 
 beforeAll(() => {

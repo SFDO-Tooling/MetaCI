@@ -10,7 +10,10 @@ env:
   commonjs: true
   jest: true
   node: false
+plugins:
+  - simple-import-sort
 rules:
-  import/namespace:
-    - 2
-    - allowComputed: true
+  # Import
+  simple-import-sort/sort: 1
+  import/default: 0
+  import/order: 0

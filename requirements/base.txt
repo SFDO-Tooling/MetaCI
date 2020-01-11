@@ -1,5 +1,7 @@
-setuptools==42.0.2
+setuptools==44.0.0
 
+# CumulusCI
+cumulusci==3.4.0
 
 # Django
 django==2.2.9
@@ -20,7 +22,7 @@ django-model-utils==4.0.0
 django-guardian==2.1.0
 
 # Images
-Pillow==6.2.1
+Pillow==7.0.0
 
 # For user registration, either via email or social
 # Well-built with regular release cycles!
@@ -34,14 +36,10 @@ django-redis==4.11.0
 redis==3.3.11
 
 # Django RQ
-rq==1.1.0
+rq==1.2.0
 rq-scheduler==0.9.1
 django-rq==2.2.0
 django-rq-scheduler==1.1.3
-
-# CumulusCI
-cumulusci==3.3.0
-requests[security]==2.22.0
 
 # Salesforce Lightning Design System for Django
 django-slds-crispyforms==0.1.0  # pyup: ignore # there are releases with no package
@@ -69,7 +67,7 @@ django-log-request-id==1.4.0
 psycopg2-binary==2.8.4
 
 # django-storages for S3
-boto3==1.10.45
+boto3==1.10.46
 django-storages==1.8
 
 # JSON web token

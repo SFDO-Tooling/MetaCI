@@ -1,7 +1,7 @@
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
 
-import { createField, AllFilters } from 'components/perfPages/formFields';
+import { AllFilters, createField } from '@/components/perfPages/formFields';
 
 describe('Decimal Field', () => {
   test('renders DecimalField with value', () => {
