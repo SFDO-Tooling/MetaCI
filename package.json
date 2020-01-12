@@ -42,7 +42,7 @@
     "@babel/polyfill": "^7.7.0",
     "@babel/preset-env": "^7.7.6",
     "@babel/preset-react": "^7.7.0",
-    "@babel/preset-typescript": "^7.7.2",
+    "@babel/preset-typescript": "^7.8.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
     "@types/js-cookie": "^2.2.4",
