@@ -1,4 +1,4 @@
-setuptools==44.0.0
+setuptools==45.0.0
 
 # CumulusCI
 cumulusci==3.4.0
@@ -62,12 +62,12 @@ djangorestframework-filters==1.0.0.dev0
 coreapi==2.3.3
 
 # log-request-id for X-Request-Id header
-django-log-request-id==1.4.0
+django-log-request-id==1.4.1
 
 psycopg2-binary==2.8.4
 
 # django-storages for S3
-boto3==1.10.46
+boto3==1.11.00
 django-storages==1.8
 
 # JSON web token
