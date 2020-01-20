@@ -1,11 +1,11 @@
 # Test dependencies go here.
 -r base.txt
 
-pytest==5.3.2
-pytest-django==3.7.0
+pytest==5.3.3
+pytest-django==3.8.0
 pytest-factoryboy==2.0.3
 pytest-tap==2.5
-coverage==5.0.2
+coverage==5.0.3
 coveralls==1.10.0
 flake8==3.7.9
 factory_boy==2.12.0
