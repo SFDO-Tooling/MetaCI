@@ -33,7 +33,7 @@ So, what does this thing actually do?
 * Admins can configure Repositories, Plans, Orgs, and Services to configure build Plan
 * A Plan can be triggered by a regex match on a commit, a tag, or manually by an admin against any branch in the repo
 * Builds are queued in a Redis message queue for background worker dynos to run the builds
-* Integration with Hirefire.io provides automatic scaling up and down for worker dynos based on pending builds in the queue.  Hirefire checks every minute and makes the appropriate scaling action meaning scaling up to 25 concurrent builds takes at most one minute.
+* Automatic scaling up and down for worker dynos based on pending builds in the queue.
 * Creating a commit or tag triggered Plan automatically creates the webhooks on the repo in Github
 * Github webhooks trigger builds for any active matching Plans
 * Simple concurrency logic: If the target org is persistent, attempt to get a lock to the org.  If a lock is obtained, run the build.  If not, reattempt the lock until obtained.  If the build runs against a scratch org, run concurrently.
