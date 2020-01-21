@@ -31,7 +31,7 @@ So, what does this thing actually do?
 
 * Salesforce Lightning Design System UI
 * Admins can configure Repositories, Plans, Orgs, and Services to configure build Plan
-* A Plan can triggered by a regex match on a commit, a tag, or manually by an admin against any branch in the repo
+* A Plan can be triggered by a regex match on a commit, a tag, or manually by an admin against any branch in the repo
 * Builds are queued in a Redis message queue for background worker dynos to run the builds
 * Integration with Hirefire.io provides automatic scaling up and down for worker dynos based on pending builds in the queue.  Hirefire checks every minute and makes the appropriate scaling action meaning scaling up to 25 concurrent builds takes at most one minute.
 * Creating a commit or tag triggered Plan automatically creates the webhooks on the repo in Github
