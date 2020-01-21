@@ -16,6 +16,8 @@ from metaci.conftest import (
     UserFactory,
 )
 
+BUILD_TIMEOUT = 100
+
 
 @mock.patch("metaci.build.management.commands.run_build.scratch_org_limits")
 @mock.patch("metaci.build.management.commands.run_build.run_build")
@@ -30,7 +32,7 @@ class TestRunBuild(TestCase):
     def _testrun_build(self, run_build, scratch_org_limits, org_is_scratch):
         repo = RepositoryFactory(name="myrepo")
         branch = BranchFactory(name="mybranch", repo=repo)
-        plan = PlanFactory(name="myplan", org="myorg")
+        plan = PlanFactory(name="myplan", org="myorg", build_timeout=BUILD_TIMEOUT)
         PlanRepositoryFactory(repo=repo, plan=plan)
         user = UserFactory(username="username")
         org = OrgFactory(name="myorg", repo=repo, scratch=org_is_scratch)
@@ -55,3 +57,8 @@ class TestRunBuild(TestCase):
         assert build.branch == branch
         assert build.plan == plan
         assert build.org == org
+
+    @mock.patch("metaci.build.management.commands.run_build.lock_org")
+    def test_run_build_sets_lock(self, lock_org, run_build, scratch_org_limits):
+        self._testrun_build(run_build, scratch_org_limits, False)
+        assert lock_org.mock_calls[0][1][2] == 100
