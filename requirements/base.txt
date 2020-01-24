@@ -1,7 +1,7 @@
 setuptools==45.0.0
 
 # CumulusCI
-cumulusci==3.5.1
+cumulusci==3.5.3
 
 # Django
 django==2.2.9
