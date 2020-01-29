@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 scratch_org_limits().remaining > settings.SCRATCH_ORG_RESERVE
             ), "Not enough scratch orgs"
         else:
-            status = lock_org(build.org, build.pk)
+            status = lock_org(build.org, build.pk, build.plan.build_timeout)
 
             assert status, "Could not lock org"
 

@@ -1,7 +1,7 @@
-setuptools==45.0.0
+setuptools==45.1.0
 
 # CumulusCI
-cumulusci==3.5.1
+cumulusci==3.5.3
 
 # Django
 django==2.2.9
@@ -67,7 +67,7 @@ django-log-request-id==1.4.1
 psycopg2-binary==2.8.4
 
 # django-storages for S3
-boto3==1.11.5
+boto3==1.11.9
 django-storages==1.8
 
 # JSON web token
