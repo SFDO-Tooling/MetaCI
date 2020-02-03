@@ -33,7 +33,7 @@ awesome-slugify==1.6.5
 
 # Redis support
 django-redis==4.11.0
-redis==3.4.0
+redis==3.3.11
 
 # Django RQ
 rq==1.2.2
