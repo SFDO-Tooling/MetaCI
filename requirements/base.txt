@@ -1,7 +1,7 @@
 setuptools==45.1.0
 
 # CumulusCI
-cumulusci==3.5.3
+cumulusci==3.5.4
 
 # Django
 django==2.2.9
@@ -33,10 +33,10 @@ awesome-slugify==1.6.5
 
 # Redis support
 django-redis==4.11.0
-redis==3.3.11
+redis==3.4.1
 
 # Django RQ
-rq==1.2.0
+rq==1.2.2
 rq-scheduler==0.9.1
 django-rq==2.2.0
 django-rq-scheduler==1.1.3
