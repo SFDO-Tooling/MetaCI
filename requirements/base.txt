@@ -68,7 +68,7 @@ psycopg2-binary==2.8.4
 
 # django-storages for S3
 boto3==1.11.9
-django-storages==1.8
+django-storages==1.9.1
 
 # JSON web token
 PyJWT==1.7.1
