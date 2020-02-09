@@ -2031,10 +2031,10 @@
   resolved "https://registry.yarnpkg.com/@salesforce/babel-preset-design-system-react/-/babel-preset-design-system-react-3.0.0.tgz#b8334d14fc3801064ac5b6e5349145dc057bc17f"
   integrity sha512-NM3aObtfYl9RpfVu5eDU96fmTW7Mj2V1Y1O5b8dpLGESgXxqHiGIV7d4bKHzmD8O00g1qjPAPusd0f2IB7Yi0Q==
 
-"@salesforce/design-system-react@^0.10.16":
-  version "0.10.17"
-  resolved "https://registry.yarnpkg.com/@salesforce/design-system-react/-/design-system-react-0.10.17.tgz#fbf5fa2e350f53555fba687bbcf7bed217146f7e"
-  integrity sha512-FYpLULu+5JZfOM+qD1oCMeGY6Mpujg35ILsao4YSoBMwXO7VEen1gNYzuuF0m9PqUepEPgHwzQKk5zdQcr3gNg==
+"@salesforce/design-system-react@^0.10.18":
+  version "0.10.18"
+  resolved "https://registry.yarnpkg.com/@salesforce/design-system-react/-/design-system-react-0.10.18.tgz#0cd941c492d04e55dcce359710f6ee24ea89a28a"
+  integrity sha512-8/1iZ7PAz3XoTetLKY0DV6oF7BBSuSTK/igoNK0aprVNQBUZYbrdtjSNhnxR60H+r8vtqQfr94MeXYHU5dZEPA==
   dependencies:
     "@salesforce/babel-preset-design-system-react" "^3.0.0"
     classnames "^2.2.6"
