@@ -24,12 +24,12 @@ BUILD_TIMEOUT = 100
 @pytest.mark.django_db
 class TestRunBuild(TestCase):
     def test_run_build_persistent(self, run_build, scratch_org_limits):
-        self._testrun_build(run_build, scratch_org_limits, False)
+        self._testrun_build(run_build, scratch_org_limits, False, False)
 
     def test_run_build_scratch(self, run_build, scratch_org_limits):
-        self._testrun_build(run_build, scratch_org_limits, True)
+        self._testrun_build(run_build, scratch_org_limits, True, False)
 
-    def _testrun_build(self, run_build, scratch_org_limits, org_is_scratch):
+    def _testrun_build(self, run_build, scratch_org_limits, org_is_scratch, no_lock):
         repo = RepositoryFactory(name="myrepo")
         branch = BranchFactory(name="mybranch", repo=repo)
         plan = PlanFactory(name="myplan", org="myorg", build_timeout=BUILD_TIMEOUT)
@@ -47,7 +47,7 @@ class TestRunBuild(TestCase):
         scratch_org_limits.return_value = mock.Mock()
         scratch_org_limits.return_value.remaining = settings.SCRATCH_ORG_RESERVE + 5
         c = Command()
-        c.handle("myrepo", "mybranch", "commit", "myplan", "username")
+        c.handle("myrepo", "mybranch", "commit", "myplan", "username", no_lock=no_lock)
         assert build_pk
         build = Build.objects.get(pk=build_pk)
         assert not build.task_id_check  # wasn't queued
@@ -60,5 +60,10 @@ class TestRunBuild(TestCase):
 
     @mock.patch("metaci.build.management.commands.run_build.lock_org")
     def test_run_build_sets_lock(self, lock_org, run_build, scratch_org_limits):
-        self._testrun_build(run_build, scratch_org_limits, False)
+        self._testrun_build(run_build, scratch_org_limits, False, False)
         assert lock_org.mock_calls[0][1][2] == 100
+
+    @mock.patch("metaci.build.management.commands.run_build.lock_org")
+    def test_run_build_can_skip_lock(self, lock_org, run_build, scratch_org_limits):
+        self._testrun_build(run_build, scratch_org_limits, False, True)
+        assert not lock_org.mock_calls
