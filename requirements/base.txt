@@ -1,7 +1,7 @@
-setuptools==45.1.0
+setuptools==45.2.0
 
 # CumulusCI
-cumulusci==3.5.4
+cumulusci==3.6.0
 
 # Django
 django==2.2.9
@@ -19,7 +19,7 @@ django_filter==2.2.0
 django-model-utils==4.0.0
 
 # Per Object Permissions
-django-guardian==2.1.0
+django-guardian==2.2.0
 
 # Images
 Pillow==7.0.0
@@ -67,8 +67,8 @@ django-log-request-id==1.4.1
 psycopg2-binary==2.8.4
 
 # django-storages for S3
-boto3==1.11.9
-django-storages==1.8
+boto3==1.11.13
+django-storages==1.9.1
 
 # JSON web token
 PyJWT==1.7.1
