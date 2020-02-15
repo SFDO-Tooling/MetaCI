@@ -290,7 +290,7 @@ class Build(models.Model):
         self.logger = init_logger(self)
         worker_str = f"in {self.worker_id}" if self.worker_id else ""
         self.logger.info(
-            f"-- Building commit {self.commit} {worker_str} with {cumulsuci_version}"
+            f"-- Building commit {self.commit} {worker_str} with CumulusCI version {cumulsuci_version}"
         )
         self.flush_log()
         build = self.current_rebuild if self.current_rebuild else self
