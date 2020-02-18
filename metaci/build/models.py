@@ -10,7 +10,7 @@ import zipfile
 from glob import iglob
 from io import BytesIO
 
-from cumulusci import __version__ as cumulsuci_version
+from cumulusci import __version__ as cumulusci_version
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
 from cumulusci.core.exceptions import (
     ApexTestException,
@@ -290,7 +290,7 @@ class Build(models.Model):
         self.logger = init_logger(self)
         worker_str = f"in {self.worker_id}" if self.worker_id else ""
         self.logger.info(
-            f"-- Building commit {self.commit} {worker_str} with CumulusCI version {cumulsuci_version}"
+            f"-- Building commit {self.commit} {worker_str} with CumulusCI version {cumulusci_version}"
         )
         self.flush_log()
         build = self.current_rebuild if self.current_rebuild else self
