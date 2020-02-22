@@ -94,6 +94,7 @@ class Plan(models.Model):
     yaml_config = models.TextField(
         null=True, blank=True, validators=[validate_yaml_field]
     )
+    build_timeout = models.IntegerField(default=8 * 60 * 60)
 
     objects = PlanQuerySet.as_manager()
 

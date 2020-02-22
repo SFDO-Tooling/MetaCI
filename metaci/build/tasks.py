@@ -11,7 +11,6 @@ from metaci.build.signals import build_complete
 from metaci.cumulusci.models import Org, jwt_session, sf_session
 from metaci.repository.utils import create_status
 
-BUILD_TIMEOUT = 28800
 ACTIVESCRATCHORGLIMITS_KEY = "metaci:activescratchorgs:limits"
 
 ActiveScratchOrgLimits = namedtuple("ActiveScratchOrgLimits", ["remaining", "max"])
@@ -80,7 +79,9 @@ def run_build(build_id, lock_id=None):
 
 def start_build(build, lock_id=None):
     queue = django_rq.get_queue(build.plan.queue)
-    result = queue.enqueue(run_build, build.id, lock_id, job_timeout=BUILD_TIMEOUT)
+    result = queue.enqueue(
+        run_build, build.id, lock_id, job_timeout=build.plan.build_timeout
+    )
     build.task_id_check = None
     build.task_id_run = result.id
     build.save()
@@ -88,8 +89,8 @@ def start_build(build, lock_id=None):
     return result
 
 
-def lock_org(org, build_id):
-    return cache.add(org.lock_id, f"build-{build_id}", timeout=BUILD_TIMEOUT)
+def lock_org(org, build_id, timeout):
+    return cache.add(org.lock_id, f"build-{build_id}", timeout=timeout)
 
 
 @django_rq.job("short", timeout=60)
@@ -132,7 +133,7 @@ def check_queued_build(build_id):
         )
     else:
         # For persistent orgs, use the cache to lock the org
-        status = lock_org(org, build_id)
+        status = lock_org(org, build_id, build.plan.build_timeout)
 
         if status is True:
             # Lock successful, run the build

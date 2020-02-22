@@ -4,11 +4,11 @@
 black==19.10b0
 isort==4.3.21
 
-Sphinx==2.3.1
-django-extensions==2.2.5
-Werkzeug==0.16.0
+Sphinx==2.4.2
+django-extensions==2.2.8
+Werkzeug==1.0.0
 
-django-debug-toolbar==2.1
+django-debug-toolbar==2.2
 
 # improved REPL
 ipdb==0.12.3

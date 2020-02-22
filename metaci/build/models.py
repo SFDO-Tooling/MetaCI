@@ -10,16 +10,7 @@ import zipfile
 from glob import iglob
 from io import BytesIO
 
-from django.apps import apps
-from django.conf import settings
-from django.contrib.postgres.fields import JSONField
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
-from django.http import Http404
-from django.urls import reverse
-from django.utils import timezone
-
+from cumulusci import __version__ as cumulusci_version
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
 from cumulusci.core.exceptions import (
     ApexTestException,
@@ -30,6 +21,16 @@ from cumulusci.core.exceptions import (
 from cumulusci.core.flowrunner import FlowCoordinator
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from cumulusci.utils import elementtree_parse_file
+from django.apps import apps
+from django.conf import settings
+from django.contrib.postgres.fields import JSONField
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
+from django.http import Http404
+from django.urls import reverse
+from django.utils import timezone
+
 from metaci.build.tasks import set_github_status
 from metaci.build.utils import format_log, set_build_info
 from metaci.cumulusci.config import MetaCIGlobalConfig
@@ -288,7 +289,9 @@ class Build(models.Model):
     def run(self):
         self.logger = init_logger(self)
         worker_str = f"in {self.worker_id}" if self.worker_id else ""
-        self.logger.info(f"-- Building commit {self.commit} {worker_str}")
+        self.logger.info(
+            f"-- Building commit {self.commit} {worker_str} with CumulusCI version {cumulusci_version}"
+        )
         self.flush_log()
         build = self.current_rebuild if self.current_rebuild else self
         set_build_info(build, status="running", time_start=timezone.now())

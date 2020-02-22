@@ -3,10 +3,10 @@ import re
 import subprocess
 import sys
 
+import cumulusci
 import django
 from django.conf import settings
 from django.views.generic.base import TemplateView
-import cumulusci
 
 
 class AboutView(TemplateView):
@@ -27,7 +27,7 @@ class AboutView(TemplateView):
 
         # Salesforce DX
         out = subprocess.check_output(["sfdx", "--version"])
-        match = re.match(r"sfdx-cli/(\d+.\d+.\d+)-.+", out)
+        match = re.match(r"sfdx-cli/(\d+.\d+.\d+)-.+", out.decode("utf-8"))
         if match:
             context["SFDX_CLI_VERSION"] = match.group(1)
 

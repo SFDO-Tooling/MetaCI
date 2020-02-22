@@ -22,6 +22,11 @@ class Command(BaseCommand):
         parser.add_argument("plan_name", type=str)
         parser.add_argument("commit", type=str)
         parser.add_argument("username_or_email", type=str)
+        parser.add_argument(
+            "--no-lock",
+            action="store_true",
+            help="Do not lock the org. Use with extreme caution.",
+        )
 
     def handle(
         self,
@@ -58,8 +63,8 @@ class Command(BaseCommand):
             assert (
                 scratch_org_limits().remaining > settings.SCRATCH_ORG_RESERVE
             ), "Not enough scratch orgs"
-        else:
-            status = lock_org(build.org, build.pk)
+        elif not options["no_lock"]:
+            status = lock_org(build.org, build.pk, build.plan.build_timeout)
 
             assert status, "Could not lock org"
 
