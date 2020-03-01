@@ -12,7 +12,7 @@ whitenoise==5.0.1
 
 
 # Forms
-django-crispy-forms==1.8.1
+django-crispy-forms==1.9.0
 django_filter==2.2.0
 
 # Models
