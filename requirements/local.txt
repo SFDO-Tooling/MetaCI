@@ -11,4 +11,4 @@ Werkzeug==1.0.0
 django-debug-toolbar==2.2
 
 # improved REPL
-ipdb==0.12.3
+ipdb==0.13.1
