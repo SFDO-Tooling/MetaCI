@@ -96,7 +96,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("plan", "0021_auto_20181018_2143"),
-        ("build", "0026_auto_20190122_2128"),
+        ("build", "0025_buildflowasset_category"),
         ("guardian", "0001_initial"),
     ]
 
