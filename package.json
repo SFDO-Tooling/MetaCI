@@ -147,19 +147,16 @@
   "lint-staged": {
     "*.js": [
       "prettier --write",
-      "eslint '*.js' src/js src/test --ext .js,.ts,.jsx,.tsx --fix",
-      "git add"
+      "eslint '*.js' src/js src/test --ext .js,.ts,.jsx,.tsx --fix"
     ],
     "*.scss": [
       "prettier --write",
-      "stylelint",
-      "git add"
+      "stylelint"
     ],
     "*.py": [
       "isort",
       "black",
-      "flake8",
-      "git add"
+      "flake8"
     ]
   }
 }
