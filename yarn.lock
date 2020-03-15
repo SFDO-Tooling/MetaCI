@@ -4599,12 +4599,7 @@ core-js@^2.4.0:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.11.tgz#38831469f9922bded8ee21c9dc46985e0399308c"
   integrity sha512-5wjnpaT/3dV+XB4borEsnAYQchn00XSgTAWKDkEqv+K8KevjbzmofK6hfJ9TZIlpj2N0xQpazy7PiRQiWHqzWg==
 
-core-js@^3.0.0:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.6.1.tgz#39d5e2e346258cc01eb7d44345b1c3c014ca3f05"
-  integrity sha512-186WjSik2iTGfDjfdCZAxv2ormxtKgemjC3SI6PL31qOA0j5LhTDVjHChccoc7brwLvpvLPiMyRlcO88C4l1QQ==
-
-core-js@^3.6.4:
+core-js@^3.0.0, core-js@^3.6.4:
   version "3.6.4"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.6.4.tgz#440a83536b458114b9cb2ac1580ba377dc470647"
   integrity sha512-4paDGScNgZP2IXXilaffL9X7968RuvwlkK3xWtZRVqgd8SYNiVKRJvkFd1aqqEuPfN7E68ZHEp9hDj6lHj4Hyw==
@@ -6274,10 +6269,10 @@ fbjs@^0.8.9:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.18"
 
-fetch-mock@^9.1.1:
-  version "9.1.1"
-  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.1.1.tgz#840b8abaf5e42f464715fe9d0810f6598df6eec9"
-  integrity sha512-v216/fXpLttuXZloT22T5mkOTmvHIHSienp3bCuUIN6QrBfw0Bdke4O6GFAHxPKRmUMwCKPgHI2jVJBzVndlDw==
+fetch-mock@^9.2.1:
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.2.1.tgz#bf1ae34800cf27570a9c1058d3472461d159c696"
+  integrity sha512-VgnqSA7KUI9uJceekpzrVyJvy3U6qZo2BmzVz8RuWvF4Wc5EV7TbFFZwQM7OGV4CKmsMPYarOyxqd74aM3xO3w==
   dependencies:
     babel-runtime "^6.26.0"
     core-js "^3.0.0"
