@@ -10,7 +10,9 @@ app = Flask(__name__)
 def redirect_all(path):
     REDIRECT_DOMAIN = "https://sfdo-metaci.herokuapp.com"
     redirect_url = f"{REDIRECT_DOMAIN}/{path}"
-    return redirect(redirect_url, code=301)
+    response = redirect(redirect_url, code=301)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000"
+    return response
 
 
 if __name__ == "__main__":
