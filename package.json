@@ -19,7 +19,7 @@
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.15",
     "query-string": "^6.10.1",
-    "react": "^16.12.0",
+    "react": "^16.13.1",
     "react-document-title": "^2.0.3",
     "react-dom": "^16.12.0",
     "react-i18next": "^11.3.1",
