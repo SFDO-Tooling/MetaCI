@@ -10,7 +10,6 @@
   "dependencies": {
     "@salesforce-ux/design-system": "^2.11.3",
     "@salesforce/design-system-react": "^0.10.18",
-    "@salesforce/sfdx-lwc-jest": "^0.7.1",
     "@sentry/browser": "^5.12.1",
     "del": "^5.1.0",
     "i18next": "^19.1.0",
@@ -43,7 +42,7 @@
     "@babel/preset-react": "^7.8.3",
     "@babel/preset-typescript": "^7.8.3",
     "@testing-library/jest-dom": "^5.1.1",
-    "@testing-library/react": "^9.4.0",
+    "@testing-library/react": "^10.0.1",
     "@types/js-cookie": "^2.2.4",
     "@types/lodash": "^4.14.148",
     "@types/react": "^16.9.19",
@@ -75,8 +74,8 @@
     "eslint-plugin-react-hooks": "^2.3.0",
     "eslint-plugin-simple-import-sort": "^5.0.1",
     "fetch-mock": "^9.1.1",
-    "file-loader": "^5.0.2",
-    "html-webpack-plugin": "^3.2.0",
+    "file-loader": "^6.0.0",
+    "html-webpack-plugin": "^4.0.2",
     "husky": "^4.2.1",
     "i18next-scanner-webpack": "^0.4.4",
     "jest": "^25.1.0",
@@ -88,7 +87,7 @@
     "nyc": "^15.0.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "postcss-loader": "^3.0.0",
-    "prettier": "^1.19.1",
+    "prettier": "^2.0.2",
     "redux-mock-store": "^1.5.4",
     "run-sequence": "^2.2.1",
     "sass": "^1.25.0",
@@ -97,7 +96,7 @@
     "stylelint-config-recommended-scss": "^4.2.0",
     "stylelint-scss": "^3.14.2",
     "typescript": "^3.7.5",
-    "url-loader": "^3.0.0",
+    "url-loader": "^4.0.0",
     "webpack": "^4.41.2",
     "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.10",
@@ -106,7 +105,7 @@
   },
   "engines": {
     "node": "10.16.3",
-    "yarn": "1.21.1"
+    "yarn": "1.22.4"
   },
   "scripts": {
     "webpack:serve": "webpack-dev-server --config webpack.dev.js",
@@ -115,7 +114,7 @@
     "rq:work": "python manage.py metaci_rqworker short",
     "rq:scheduler": "python manage.py rqscheduler --queue short",
     "serve": "run-p django:serve webpack:serve rq:work rq:scheduler",
-    "prettier": "prettier --write 'src/js/**/*.js' 'src/js/**/.*.js' 'src/sass/**/*.scss'",
+    "prettier": "prettier --write 'src/js/**/*.ts' 'src/sass/**/*.scss'",
     "eslint": "eslint '*.js' src/js src/test --ext .js,.ts,.jsx,.tsx --fix",
     "stylelint": "stylelint 'src/sass/**/*.scss'",
     "flake8": "flake8 manage.py metaci/ config/",
