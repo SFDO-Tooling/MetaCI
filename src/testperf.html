@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
-
-    <!-- Styles --
-    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.chunks.vendors.css[0] %>" type="text/css">
-    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.chunks.app.css[0] %>" type="text/css">
-    -->
+    <% for (var path of htmlWebpackPlugin.files.css) { %>
+      <link rel="stylesheet" href="<%= path %>" type="text/css">
+    <% } %>
   </head>
   <body>
       {% if request.user.is_authenticated %}
@@ -17,12 +15,9 @@
           </div>
         </main>
 
-        <!-- JavaScript -->
-        <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.runtime.entry %>"></script>
-        <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.vendors.entry %>"></script>
-        <script type="text/javascript" charset="utf-8">
-        </script>
-        <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.app.entry %>"></script>
+        <% for (var path of htmlWebpackPlugin.files.js) { %>
+          <script type="text/javascript" src="<%= path %>"></script>
+        <% } %>
       {% else %}
         <main id="app" class="slds-grid__vertical slds-page-header">
             <p>Please login to view this data.</p>

@@ -10,7 +10,6 @@
   "dependencies": {
     "@salesforce-ux/design-system": "^2.11.3",
     "@salesforce/design-system-react": "^0.10.18",
-    "@salesforce/sfdx-lwc-jest": "^0.7.1",
     "@sentry/browser": "^5.12.1",
     "acorn": "^5.5.3",
     "del": "^5.1.0",
@@ -116,7 +115,7 @@
     "rq:work": "python manage.py metaci_rqworker short",
     "rq:scheduler": "python manage.py rqscheduler --queue short",
     "serve": "run-p django:serve webpack:serve rq:work rq:scheduler",
-    "prettier": "prettier --write 'src/js/**/*.js' 'src/js/**/.*.js' 'src/sass/**/*.scss'",
+    "prettier": "prettier --write 'src/js/**/*.ts' 'src/sass/**/*.scss'",
     "eslint": "eslint '*.js' src/js src/test --ext .js,.ts,.jsx,.tsx --fix",
     "stylelint": "stylelint 'src/sass/**/*.scss'",
     "flake8": "flake8 manage.py metaci/ config/",
