@@ -60,24 +60,21 @@ Below are the following steps necessary to run MetaCI on Docker:
 Local Variables
 ---------------
 
-POSTGRES_USER: 
-    Environment variable set in the docker-compose.yml file under the postgres service, 
-    represents database user. This value has already been configured for you unless 
-    you decide to reconfigure it.
+POSTGRES_USER:
+    Environment variable set in ``.env``, representing the database username.
+    This value defaults to ``metaci``.
 
 POSTGRES_PASSWORD: 
-    Environment variable set in the docker-compose.yml file under the postgres service,
-    represents database password.This database is configured with no password for 
-    development purposes so leave as is unless changing for production purposes.
+    Environment variable set in ``.env``, representing the database password.
+    This value defaults to ``metaci``.
 
 POSTGRES_DB:
-    Environment variable set in the docker-compose.yml file under the postgres service,
-    represents database. This variable has already been set to the proper 
-    value `metaci` for the user.
+    Environment variable set in ``.env``, representing the database name.
+    This value defaults to ``metaci``.
 
-MetaCI needs a connection to the GitHub API to fetch repositories and create releases. 
-This can be set up using a personal GitHub account by setting GITHUB_USERNAME and GITHUB_PASSWORD, 
-or using a GitHub App by setting GITHUB_APP_ID and GITHUB_APP_KEY.
+MetaCI must authenticate with the GitHub API to fetch repositories and create releases. 
+This can be set up for a GitHub user by setting GITHUB_USERNAME and GITHUB_PASSWORD, 
+or for a GitHub App by setting GITHUB_APP_ID and GITHUB_APP_KEY.
 
 GITHUB_USERNAME:     
     This represents the username of either the tester or service account configured for MetaCI
@@ -95,8 +92,9 @@ GITHUB_APP_ID:
 GITHUB_APP_KEY:
     This represents the private key used for authentication for github applications.
 
-If you need to generate a personal access token please visit the following: 
-https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
+If you need to generate a personal access token please visit `Github's documentation`_:
+
+.. _Github's documentation: https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
 SFDX_CLIENT_ID:       
     This tells sfdx the client id of the connected app to use for connecting to 
