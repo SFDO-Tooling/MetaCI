@@ -6,7 +6,7 @@ from tempfile import mkstemp
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.clickjacking import xframe_options_exempt
 from robot import rebot
 
@@ -341,3 +341,9 @@ def build_flow_compare_to(request, build_id, flow):
 
     data = {"build_flow": build_flow, "filter": comparison_filter, "records": records}
     return render(request, "testresults/build_flow_compare_to.html", data)
+
+
+def build_flow_download_asset(request, build_id, flow, category):
+    build_flow = find_buildflow(request, build_id, flow)
+    asset = build_flow.assets.get(category=category)
+    return redirect(asset.asset.url)
