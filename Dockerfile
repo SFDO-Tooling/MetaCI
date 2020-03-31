@@ -60,17 +60,14 @@ WORKDIR /app
 RUN yarn install
 # copying rest of working directory to /app folder
 COPY . /app
-ENV PYTHONUNBUFFERED 1
 
-# Don't write .pyc files
-ENV PYTHONDONTWRITEBYTECODE 1
-# setting default environment variables which can be overridden
-# in docker-compoose
-ENV REDIS_URL "redis://redis:6379"
-ENV DJANGO_SETTINGS_MODULE config.settings.local
-ENV DATABASE_URL postgres://metaci:metaci@postgres:5432/metaci
-ENV DJANGO_HASHID_SALT 'sample hashid salt'
-ENV DJANGO_SECRET_KEY 'sample secret key'
+ENV DATABASE_URL=postgres://metaci:metaci@postgres:5432/metaci \
+  DJANGO_HASHID_SALT='sample hashid=salt' \
+  DJANGO_SECRET_KEY='sample secret=key' \
+  DJANGO_SETTINGS_MODULE=config.settings.local \
+  PYTHONDONTWRITEBYTECODE=1 \
+  PYTHONUNBUFFERED=1 \
+  REDIS_URL="redis://redis:6379"
 
 # Avoid building prod assets in development
 RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
