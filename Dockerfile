@@ -50,8 +50,8 @@ RUN /bin/sh /app/docker/utility/install_sfdx.sh
 
 # installing python related dependencies with pip
 COPY ./requirements /app/requirements
-RUN pip install --no-cache --upgrade pip
-RUN pip install --no-cache -r /app/requirements/$BUILD_ENV.txt 
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r /app/requirements/$BUILD_ENV.txt
 
 # installing yarn dependencies
 COPY ./package.json /app/package.json
