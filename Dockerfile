@@ -1,7 +1,7 @@
 FROM python:3.8
 
 ARG BUILD_ENV=local
-ARG CHROMEDRIVER_VERSION=80.0.3987.106
+ARG CHROMEDRIVER_VERSION
 
 RUN mkdir -p /app/.apt/usr/bin
 
@@ -23,13 +23,12 @@ RUN /app/docker/utility/wrap_chrome_binary.sh
 RUN ln -fs /usr/bin/google-chrome /usr/bin/chrome
 
 # Set up Chromedriver Environment variables
-ENV CHROMEDRIVER_VERSION $CHROMEDRIVER_VERSION
 ENV CHROMEDRIVER_DIR /chromedriver
 RUN mkdir $CHROMEDRIVER_DIR
 
 # Download and install Chromedriver
-RUN wget -q --continue -P $CHROMEDRIVER_DIR "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
-RUN unzip $CHROMEDRIVER_DIR/chromedriver* -d $CHROMEDRIVER_DIR
+COPY ./docker/utility/install_chromedriver.sh /app/docker/utility/install_chromedriver.sh
+RUN /app/docker/utility/install_chromedriver.sh $CHROMEDRIVER_DIR $CHROMEDRIVER_VERSION
 
 # Put Chromedriver into the PATH
 ENV PATH $CHROMEDRIVER_DIR:$PATH

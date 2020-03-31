@@ -171,10 +171,6 @@ CHROMEDRIVER_DIR:
     This environment variable represents the directory where the chromedriver package resides
     in the filesystem. CHROMEDRIVER_DIR is set for you in the Dockerfile.
 
-CHROMEDRIVER_VERSION:
-    Environment variable containing the current chromedriver version, defaults to
-    ``CHROMEDRIVER_VERSION`` build argument.
-
 NODE_VERSION: 
     Environment variable used to set node version for download, this variable is set in the Dockerfile
 
@@ -210,8 +206,10 @@ BUILD_ENV:
     ``local``, ``production``, and ``test``.
 
 CHROMEDRIVER_VERSION:
-    Argument used to determine what version of chromedriver to install, also sets
-    CHROMEDRIVER_VERSION environment variable.
+    Argument used to override the version of Chromedriver to install, which defaults to
+    the Chromedriver version returned by ``https://chromedriver.storage.googleapis.com/LATEST_RELEASE_X``
+    (where ``X`` is the version number of the installed Chrome version).
+
 
 Building Your Docker Containers
 -------------------------------
@@ -310,9 +308,9 @@ something out manually in that test environment for any reason you can run the f
 
     docker-compose exec web bash
 
-After this you will be inside of a linux commandline, and are free to test around in your container.
+This will drop you into a bash shell running inside your container, where can execute commands.
 
-Or you could directly run a command like this:
+You can also run commands directly:
 ::
     
     docker-compose exec web python manage.py makemigrations
