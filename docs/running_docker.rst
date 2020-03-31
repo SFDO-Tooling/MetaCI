@@ -60,24 +60,21 @@ Below are the following steps necessary to run MetaCI on Docker:
 Local Variables
 ---------------
 
-POSTGRES_USER: 
-    Environment variable set in the docker-compose.yml file under the postgres service, 
-    represents database user. This value has already been configured for you unless 
-    you decide to reconfigure it.
+POSTGRES_USER:
+    Environment variable set in ``.env``, representing the database username.
+    This value defaults to ``metaci``.
 
 POSTGRES_PASSWORD: 
-    Environment variable set in the docker-compose.yml file under the postgres service,
-    represents database password.This database is configured with no password for 
-    development purposes so leave as is unless changing for production purposes.
+    Environment variable set in ``.env``, representing the database password.
+    This value defaults to ``metaci``.
 
 POSTGRES_DB:
-    Environment variable set in the docker-compose.yml file under the postgres service,
-    represents database. This variable has already been set to the proper 
-    value `metaci` for the user.
+    Environment variable set in ``.env``, representing the database name.
+    This value defaults to ``metaci``.
 
-MetaCI needs a connection to the GitHub API to fetch repositories and create releases. 
-This can be set up using a personal GitHub account by setting GITHUB_USERNAME and GITHUB_PASSWORD, 
-or using a GitHub App by setting GITHUB_APP_ID and GITHUB_APP_KEY.
+MetaCI must authenticate with the GitHub API to fetch repositories and create releases. 
+This can be set up for a GitHub user by setting GITHUB_USERNAME and GITHUB_PASSWORD, 
+or for a GitHub App by setting GITHUB_APP_ID and GITHUB_APP_KEY.
 
 GITHUB_USERNAME:     
     This represents the username of either the tester or service account configured for MetaCI
@@ -95,8 +92,9 @@ GITHUB_APP_ID:
 GITHUB_APP_KEY:
     This represents the private key used for authentication for github applications.
 
-If you need to generate a personal access token please visit the following: 
-https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
+If you need to generate a personal access token please visit `Github's documentation`_:
+
+.. _Github's documentation: https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 
 SFDX_CLIENT_ID:       
     This tells sfdx the client id of the connected app to use for connecting to 
@@ -168,16 +166,11 @@ DJANGO_SECRET_KEY:
     This represents the secret key for the django web application and is used to sign session cookies;, 
     arbritary strings such as the one given in the env.example are used. Important this variable is 
     not copied from another Django site.
-BUILD_ENV: 
-    Docker argument variable used to determine what dependencies and scripts to run when 
-    installing dependencies and populating databases, currently set in docker-compose.yml
-    web service ARG variable section.
+
 CHROMEDRIVER_DIR:
     This environment variable represents the directory where the chromedriver package resides
     in the filesystem. CHROMEDRIVER_DIR is set for you in the Dockerfile.
-CHROMEDRIVER_VERSION:
-    Docker argument variable used to determine what version of chromedriver to retrieve when 
-    installing in your docker container, currently set in docker-compose.yml, also default set in Dockerfile.
+
 NODE_VERSION: 
     Environment variable used to set node version for download, this variable is set in the Dockerfile
 
@@ -198,13 +191,26 @@ DJANGO_HASHID_SALT:
     arbritary string due to non production defaults, can be overridden 
     in docker-compose.yml. Currently set in Dockerfile.
 
-
 DJANGO_SECRET_KEY: 
     This represents the key for the django web application, currently set to arbritary
     string due to non production defaults, can be overridden in docker-compose.yml.
     Currently set in Dockerfile. For local testing, arbritary strings such as the one given 
     in the env.example will suffice. Otherwise use your production secret key.
     
+Build Arguments
+-------------------------------
+
+BUILD_ENV:
+    Argument used to determine what dependencies and scripts to run when installing
+    dependencies, populating databases, and setting ``DJANGO_SETTINGS_MODULE``. Values:
+    ``local``, ``production``, and ``test``.
+
+CHROMEDRIVER_VERSION:
+    Argument used to override the version of Chromedriver to install, which defaults to
+    the Chromedriver version returned by ``https://chromedriver.storage.googleapis.com/LATEST_RELEASE_X``
+    (where ``X`` is the version number of the installed Chrome version).
+
+
 Building Your Docker Containers
 -------------------------------
 
@@ -302,9 +308,9 @@ something out manually in that test environment for any reason you can run the f
 
     docker-compose exec web bash
 
-After this you will be inside of a linux commandline, and are free to test around in your container.
+This will drop you into a bash shell running inside your container, where can execute commands.
 
-Or you could directly run a command like this:
+You can also run commands directly:
 ::
     
     docker-compose exec web python manage.py makemigrations
