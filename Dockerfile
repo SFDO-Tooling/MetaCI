@@ -1,7 +1,7 @@
 FROM python:3.8
 
-ARG BUILD_ENV
-ARG CHROMEDRIVER_VERSION
+ARG BUILD_ENV=local
+ARG CHROMEDRIVER_VERSION=80.0.3987.106
 
 RUN mkdir -p /app/.apt/usr/bin
 
@@ -21,7 +21,7 @@ RUN /app/docker/utility/wrap_chrome_binary.sh
 RUN ln -fs /usr/bin/google-chrome /usr/bin/chrome
 
 # Set up Chromedriver Environment variables
-ENV CHROMEDRIVER_VERSION 79.0.3945.36
+ENV CHROMEDRIVER_VERSION $CHROMEDRIVER_VERSION
 ENV CHROMEDRIVER_DIR /chromedriver
 RUN mkdir $CHROMEDRIVER_DIR
 
@@ -51,7 +51,7 @@ RUN /bin/sh /app/docker/utility/install_sfdx.sh
 # installing python related dependencies with pip
 COPY ./requirements /app/requirements
 RUN pip install --no-cache --upgrade pip
-RUN if [ "${BUILD_ENV}" = "production" ] ; then pip install --no-cache -r /app/requirements/production.txt ; else pip install --no-cache -r /app/requirements/local.txt ; fi
+RUN pip install --no-cache -r /app/requirements/$BUILD_ENV.txt 
 
 # installing yarn dependencies
 COPY ./package.json /app/package.json

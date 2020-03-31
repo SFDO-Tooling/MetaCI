@@ -166,16 +166,15 @@ DJANGO_SECRET_KEY:
     This represents the secret key for the django web application and is used to sign session cookies;, 
     arbritary strings such as the one given in the env.example are used. Important this variable is 
     not copied from another Django site.
-BUILD_ENV: 
-    Docker argument variable used to determine what dependencies and scripts to run when 
-    installing dependencies and populating databases, currently set in docker-compose.yml
-    web service ARG variable section.
+
 CHROMEDRIVER_DIR:
     This environment variable represents the directory where the chromedriver package resides
     in the filesystem. CHROMEDRIVER_DIR is set for you in the Dockerfile.
+
 CHROMEDRIVER_VERSION:
-    Docker argument variable used to determine what version of chromedriver to retrieve when 
-    installing in your docker container, currently set in docker-compose.yml, also default set in Dockerfile.
+    Environment variable containing the current chromedriver version, defaults to
+    ``CHROMEDRIVER_VERSION`` build argument.
+
 NODE_VERSION: 
     Environment variable used to set node version for download, this variable is set in the Dockerfile
 
@@ -196,13 +195,24 @@ DJANGO_HASHID_SALT:
     arbritary string due to non production defaults, can be overridden 
     in docker-compose.yml. Currently set in Dockerfile.
 
-
 DJANGO_SECRET_KEY: 
     This represents the key for the django web application, currently set to arbritary
     string due to non production defaults, can be overridden in docker-compose.yml.
     Currently set in Dockerfile. For local testing, arbritary strings such as the one given 
     in the env.example will suffice. Otherwise use your production secret key.
     
+Build Arguments
+-------------------------------
+
+BUILD_ENV:
+    Argument used to determine what dependencies and scripts to run when installing
+    dependencies and populating databases. Values: ``local``, ``production``, and
+    ``test``.
+
+CHROMEDRIVER_VERSION:
+    Argument used to determine what version of chromedriver to install, also sets
+    CHROMEDRIVER_VERSION environment variable.
+
 Building Your Docker Containers
 -------------------------------
 
