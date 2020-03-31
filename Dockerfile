@@ -5,7 +5,9 @@ ARG CHROMEDRIVER_VERSION=80.0.3987.106
 
 RUN mkdir -p /app/.apt/usr/bin
 
+# https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#using-pipes
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Set up the Chrome PPA
 # Update the package list and install chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
