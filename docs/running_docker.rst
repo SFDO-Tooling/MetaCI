@@ -206,8 +206,8 @@ Build Arguments
 
 BUILD_ENV:
     Argument used to determine what dependencies and scripts to run when installing
-    dependencies and populating databases. Values: ``local``, ``production``, and
-    ``test``.
+    dependencies, populating databases, and setting ``DJANGO_SETTINGS_MODULE``. Values:
+    ``local``, ``production``, and ``test``.
 
 CHROMEDRIVER_VERSION:
     Argument used to determine what version of chromedriver to install, also sets

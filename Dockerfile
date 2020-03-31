@@ -64,7 +64,7 @@ COPY . /app
 ENV DATABASE_URL=postgres://metaci:metaci@postgres:5432/metaci \
   DJANGO_HASHID_SALT='sample hashid=salt' \
   DJANGO_SECRET_KEY='sample secret=key' \
-  DJANGO_SETTINGS_MODULE=config.settings.local \
+  DJANGO_SETTINGS_MODULE=config.settings.$BUILD_ENV \
   PYTHONDONTWRITEBYTECODE=1 \
   PYTHONUNBUFFERED=1 \
   REDIS_URL="redis://redis:6379"
