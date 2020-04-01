@@ -1,4 +1,26 @@
 {% extends 'layout_full.html' %}
+{% load static %}
+
+{% block base_title %}
+    MetaCI - Build #{{ build.id }}
+{% endblock %}
+
+{% block base_head %}
+    {{ block.super }}
+    <meta name="twitter:card" content="summary" />
+    <meta name="og:type" content="article" />
+    <meta property="og:title" content="MetaCI - Build #{{ build.id }}" />
+    <meta name="og:description" content="The build of plan {{ build.plan }} on commit {{ build.commit }} of {{ build.branch.name }} completed{% if build.get_status == 'success' %} successfully{% elif build.get_status == 'fail' %} with deploy or test failures{% elif build.get_status == 'error' %} with errors{% endif %}." />
+    {% if build.get_status == 'fail' or build.get_status == 'error' %}
+    <meta property="og:image" content='{% static "images/Fail.png"%}' />
+    <meta name="twitter:image" content='{% static "images/Fail.png"%}' />
+    <meta name="twitter:image:alt" content='Red X signifying a failed build' />
+    {% else %}
+    <meta property="og:image" content='{% static "images/OK.png"%}' />
+    <meta name="twitter:image" content='{% static "images/OK.png"%}' />
+    <meta name="twitter:image:alt" content='Green check signifying a successful build' />
+    {% endif %}
+{% endblock %}
 
 {% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
 
