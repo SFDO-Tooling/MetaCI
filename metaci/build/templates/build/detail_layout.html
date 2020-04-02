@@ -10,7 +10,7 @@
     <meta name="twitter:card" content="summary" />
     <meta name="og:type" content="article" />
     <meta property="og:title" content="MetaCI - Build #{{ build.id }}" />
-    <meta name="og:description" content="The build of plan {{ build.plan }} on commit {{ build.commit }} of {{ build.branch.name }} completed{% if build.get_status == 'success' %} successfully{% elif build.get_status == 'fail' %} with deploy or test failures{% elif build.get_status == 'error' %} with errors{% endif %}." />
+    <meta name="og:description" content="[{{ build.repo.name }}]: The build of plan {{ build.plan }} on commit {{ build.commit }} of {{ build.branch.name }} completed{% if build.get_status == 'success' %} successfully{% elif build.get_status == 'fail' %} with deploy or test failures{% elif build.get_status == 'error' %} with errors{% endif %}." />
     {% if build.get_status == 'fail' or build.get_status == 'error' %}
     <meta property="og:image" content='{% static "images/Fail.png"%}' />
     <meta name="twitter:image" content='{% static "images/Fail.png"%}' />
