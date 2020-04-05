@@ -45,7 +45,7 @@
     "@testing-library/react": "^10.0.1",
     "@types/js-cookie": "^2.2.4",
     "@types/lodash": "^4.14.148",
-    "@types/react": "^16.9.19",
+    "@types/react": "^16.9.32",
     "@types/react-document-title": "^2.0.3",
     "@types/react-dom": "^16.9.5",
     "@types/react-redux": "^7.1.7",
