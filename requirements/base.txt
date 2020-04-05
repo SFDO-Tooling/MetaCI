@@ -22,7 +22,7 @@ django-model-utils==4.0.0
 django-guardian==2.2.0
 
 # Images
-Pillow==7.0.0
+Pillow==7.1.1
 
 # For user registration, either via email or social
 # Well-built with regular release cycles!
