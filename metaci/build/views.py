@@ -1,16 +1,15 @@
+from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from watson import search as watson
 
 from metaci.build.filters import BuildFilter
 from metaci.build.forms import QATestingForm
-from metaci.build.models import Build
-from metaci.build.models import Rebuild
+from metaci.build.models import Build, Rebuild
 from metaci.build.utils import view_queryset
 
 
@@ -114,6 +113,10 @@ def build_detail_org(request, build_id, rebuild_id=None):
 
     if not request.user.has_perm("plan.org_login", build.planrepo):
         raise PermissionDenied("You are not authorized to view this build org")
+
+    context["can_log_in"] = (
+        build.org.scratch or settings.METACI_ALLOW_PERSISTENT_ORG_LOGIN
+    )
 
     context["tab"] = "org"
     rebuild = context["rebuild"]
