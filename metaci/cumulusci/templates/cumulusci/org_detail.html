@@ -42,11 +42,13 @@
 </a>
 {% endif %}
 {% endif %}
+{% if can_log_in %}
 <a href="{{ org.get_absolute_url }}/login" target="_blank">
   <button class="slds-button slds-button--brand">
     Log In
   </button>
 </a>
+{% endif %}
 {% endif %}
 {% endblock %}
 
