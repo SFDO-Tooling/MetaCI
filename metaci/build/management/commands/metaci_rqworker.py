@@ -2,6 +2,8 @@ import os
 
 from django.conf import settings
 from django_rq.management.commands.rqworker import Command as BaseCommand
+from rq.exceptions import ShutDownImminentException
+from rq.worker import HerokuWorker
 
 
 class Command(BaseCommand):
@@ -22,3 +24,14 @@ class Command(BaseCommand):
             options["sentry_dsn"] = ""
 
         return super().handle(*args, **options)
+
+
+# Raise ShutDownImminentException immediately; no reason to dilly-dally
+HerokuWorker.imminent_shutdown_delay = 0
+
+# As defined in rq, ShutDownImminentException extends Exception.
+# That means it will get caught by all `except Exception` handlers,
+# which is frustrating because we want it to fall through everything
+# to the requeue_on_imminent_shutdown exception handler.
+# Extending BaseException instead will let it do that.
+ShutDownImminentException.__bases__ = (BaseException,)

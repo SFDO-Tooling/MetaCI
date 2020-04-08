@@ -5,6 +5,7 @@ import django_rq
 from django import db
 from django.conf import settings
 from django.core.cache import cache
+from rq.exceptions import ShutDownImminentException
 
 from metaci.build.autoscaling import autoscale
 from metaci.build.signals import build_complete
@@ -55,6 +56,16 @@ def run_build(build_id, lock_id=None):
             sender=build.__class__, build=build, status=build.get_status()
         )
 
+    except ShutDownImminentException:
+        # The Heroku dyno is restarting.
+        # Log that, leave the build's status as running,
+        # and let the exception fall through to the rq worker to requeue the job.
+        build.log += (
+            "\nERROR: Build aborted because the Heroku dyno restarted. "
+            "MetaCI will try to start a rebuild."
+        )
+        build.save()
+        raise
     except Exception as e:
         if lock_id:
             cache.delete(lock_id)
