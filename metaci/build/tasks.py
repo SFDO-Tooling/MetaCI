@@ -8,6 +8,7 @@ from django.core.cache import cache
 from rq.exceptions import ShutDownImminentException
 
 from metaci.build.autoscaling import autoscale
+from metaci.build.exceptions import RequeueJob
 from metaci.build.signals import build_complete
 from metaci.cumulusci.models import Org, jwt_session, sf_session
 from metaci.repository.utils import create_status
@@ -65,7 +66,7 @@ def run_build(build_id, lock_id=None):
             "MetaCI will try to start a rebuild."
         )
         build.save()
-        raise
+        raise RequeueJob
     except Exception as e:
         if lock_id:
             cache.delete(lock_id)

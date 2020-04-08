@@ -1,13 +1,18 @@
 from rq import requeue_job
-from rq.exceptions import ShutDownImminentException
 
 
 class BuildError(Exception):
     pass
 
 
-def requeue_on_imminent_shutdown(job, exc_type, exc_value, traceback):
-    # If the worker aborted due to a Heroku dyno restart, requeue the job.
-    if isinstance(exc_value, ShutDownImminentException):
-        requeue_job(job.id)
+class RequeueJob(Exception):
+    pass
+
+
+def maybe_requeue_job(job, exc_type, exc_value, traceback):
+    # If the job raised RequeueJob, requeue it.
+    # (This is done here in an rq exception handler
+    # because it can't be requeued until it is in the failed job registry.)
+    if isinstance(exc_value, RequeueJob):
+        requeue_job(job.id, None)
         return False
