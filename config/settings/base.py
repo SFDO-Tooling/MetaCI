@@ -333,6 +333,7 @@ RQ_QUEUES = {
         "AUTOCOMMIT": False,
     },
 }
+RQ_EXCEPTION_HANDLERS = ["metaci.build.exceptions.requeue_on_imminent_shutdown"]
 
 # Site URL
 SITE_URL = None
