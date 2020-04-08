@@ -24,6 +24,7 @@ def org_detail(request, org_id):
     instances = org.instances.filter(deleted=False) if org.scratch else []
 
     context = {"builds": builds, "org": org, "instances": instances}
+    context["can_log_in"] = org.scratch or settings.METACI_ALLOW_PERSISTENT_ORG_LOGIN
     return render(request, "cumulusci/org_detail.html", context=context)
 
 
