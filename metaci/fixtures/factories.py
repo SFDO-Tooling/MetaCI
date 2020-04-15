@@ -75,6 +75,7 @@ class OrgFactory(factory.django.DjangoModelFactory):
         model = Org
 
     repo = factory.SubFactory(RepositoryFactory)
+    json = "{}"
 
 
 class ScratchOrgInstanceFactory(factory.django.DjangoModelFactory):

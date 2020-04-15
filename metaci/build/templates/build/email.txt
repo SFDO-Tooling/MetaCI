@@ -11,5 +11,3 @@ Error Message:
 {{ build.get_error_message }}
 
 {% endif %}
-Last 25 Log Lines:
-{{ log_lines }}

@@ -63,7 +63,9 @@
         </a>
         {% endif %}
         {% endif %}
+        {% if can_log_in %}
         <a href="{{ build.org.get_absolute_url }}/login"><button class="slds-button slds-button--brand">Log In</button></a>
+        {% endif %}
       </div>
     </div>
   </div>

@@ -333,6 +333,7 @@ RQ_QUEUES = {
         "AUTOCOMMIT": False,
     },
 }
+RQ_EXCEPTION_HANDLERS = ["metaci.build.exceptions.maybe_requeue_job"]
 
 # Site URL
 SITE_URL = None
@@ -355,6 +356,7 @@ SFDX_HUB_USERNAME = None
 # Application Behaviors
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", True)
 METACI_FLOW_CALLBACK_ENABLED = env.bool("METACI_FLOW_CALLBACK_ENABLED", True)
+METACI_ALLOW_PERSISTENT_ORG_LOGIN = env.bool("METACI_ALLOW_PERSISTENT_ORG_LOGIN", False)
 
 # Number of scratch orgs to leave available in the org.
 SCRATCH_ORG_RESERVE = env.int("METACI_SCRATCH_ORG_RESERVE", 10)

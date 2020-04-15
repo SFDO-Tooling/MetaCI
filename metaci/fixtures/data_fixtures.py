@@ -3,6 +3,7 @@ import pytest
 from metaci.fixtures.factories import (
     BuildFactory,
     BuildFlowFactory,
+    OrgFactory,
     PlanFactory,
     PlanRepositoryFactory,
     RepositoryFactory,
@@ -35,7 +36,8 @@ def data():
     data["repo"] = RepositoryFactory()
     data["plan"] = PlanFactory()
     data["planrepo"] = PlanRepositoryFactory(plan=data["plan"], repo=data["repo"])
-    data["build"] = BuildFactory(planrepo=data["planrepo"])
+    data["org"] = OrgFactory()
+    data["build"] = BuildFactory(planrepo=data["planrepo"], org=data["org"])
     data["buildflow"] = BuildFlowFactory(
         build=data["build"], flow="flow-one", tests_pass=10, tests_fail=2
     )

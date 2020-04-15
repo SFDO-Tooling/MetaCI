@@ -91,7 +91,7 @@ Check the Procfile to see the commands used to run the workers on Heroku.  You c
 
 .. code-block:: bash
 
-    python manage.py metaci_rqworker high medium default short --worker-class metaci.build.worker.RequeueingWorker
+    python manage.py metaci_rqworker high medium default short
 
 Configuring Repositories
 ------------------------
