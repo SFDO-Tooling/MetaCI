@@ -93,6 +93,8 @@ def build_flow_tests(request, build_id, flow):
     data["custom_sort"] = custom_sort
     data["columns"] = columns
 
+    data["assets"] = build_flow.assets.all()
+
     return render(request, "testresults/build_flow_tests.html", data)
 
 

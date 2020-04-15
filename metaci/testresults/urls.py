@@ -9,6 +9,11 @@ urlpatterns = [
         name="build_flow_compare_to",
     ),
     url(
+        r"^(?P<build_id>\d+)/(?P<flow>.*)/download-asset/(?P<category>.*)$",
+        views.build_flow_download_asset,
+        name="build_flow_download_asset",
+    ),
+    url(
         r"^(?P<build_id>\d+)/(?P<flow>.*)$",
         views.build_flow_tests,
         name="build_flow_tests",
@@ -17,11 +22,6 @@ urlpatterns = [
         r"^trend/method/(?P<method_id>\d+)$",
         views.test_method_trend,
         name="test_method_trend",
-    ),
-    url(
-        r"^(?P<build_id>\d+)/(?P<flow>.*)/download-asset/(?P<category>.*)$",
-        views.build_flow_download_asset,
-        name="build_flow_download_asset",
     ),
     url(
         r"^method/(?P<method_id>\d+)$", views.test_method_peek, name="test_method_peek"

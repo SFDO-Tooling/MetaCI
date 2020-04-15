@@ -81,47 +81,59 @@
     <a href="/tests/{{ build_flow.build.id }}/{{ build_flow.flow }}?sort=-worst_limit_percent&columns=worst_limit,worst_limit_percent">Sort by worst percent used</a>
   {% endif %}
 
-      {% for class_results in results_by_class %}
-      <div class="slds-box slds-p-top--large">
-        <h3 class="slds-text-heading--small slds-p-bottom--small">{{ class_results.class.name }}</h3>
+  {% for class_results in results_by_class %}
+  <div class="slds-box slds-p-top--large">
+    <h3 class="slds-text-heading--small slds-p-bottom--small">{{ class_results.class.name }}</h3>
 
-          <table class="slds-table slds-table--bordered slds-table--cell-buffer">
-            <thead>
-              <tr class="slds-text-title--caps">
-                <th>Method</th>
-                <th>Result</th>
-                <th>Duration</th>
-                {% for column in columns %}
-                <th>{{ column }}</th>
-                {% endfor %}
-              </tr>
-            </thead>
-            <tbody>
-            {% for result in class_results.results %}
-              <tr>
-                <td><a href="{{ result.result.get_absolute_url }}">{{ result.result.method.name }}</a>
-                    <a href="/tests/trend/method/{{ result.result.method.id }}" title="Trend">
-                      <span class="slds-icon_container slds-icon-standard-metric" title="Trend">
-                        {% autoescape off %}
-                        <svg aria-hidden="true" class="slds-icon">
-                          <use xlink:href="/static/design-system/assets/icons/standard-sprite/svg/symbols.svg#metrics"></use>
-                        </svg>
-                        {% endautoescape %}
-                        <span class="slds-assistive-text">Like</span>
-                      </span>
-                    </a>
-                </td>
-                
-                <td class="{% if result.result.outcome == 'Pass' %}success{% else %}danger{% endif %}">{{ result.result.outcome }}</td>
-                <td>{{ result.result.duration }}</td>
-                {% for column in result.columns %}
-                <td class="{{ column.status }}">{{ column.value }}</td>
-                {% endfor %}
-              </tr>
+      <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+        <thead>
+          <tr class="slds-text-title--caps">
+            <th>Method</th>
+            <th>Result</th>
+            <th>Duration</th>
+            {% for column in columns %}
+            <th>{{ column }}</th>
             {% endfor %}
-            <tbody>
-          </table>
-      </div>
-      {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+        {% for result in class_results.results %}
+          <tr>
+            <td><a href="{{ result.result.get_absolute_url }}">{{ result.result.method.name }}</a>
+                <a href="/tests/trend/method/{{ result.result.method.id }}" title="Trend">
+                  <span class="slds-icon_container slds-icon-standard-metric" title="Trend">
+                    {% autoescape off %}
+                    <svg aria-hidden="true" class="slds-icon">
+                      <use xlink:href="/static/design-system/assets/icons/standard-sprite/svg/symbols.svg#metrics"></use>
+                    </svg>
+                    {% endautoescape %}
+                    <span class="slds-assistive-text">Like</span>
+                  </span>
+                </a>
+            </td>
+            
+            <td class="{% if result.result.outcome == 'Pass' %}success{% else %}danger{% endif %}">{{ result.result.outcome }}</td>
+            <td>{{ result.result.duration }}</td>
+            {% for column in result.columns %}
+            <td class="{{ column.status }}">{{ column.value }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+        <tbody>
+      </table>
+  </div>
+  {% endfor %}
 
+  {% if assets %}
+  <h3 class="slds-text-heading--small slds-p-top--small">Assets:</h3>
+  <ul class="slds-list_dotted">
+    {% for asset in assets %}
+    <li>
+      <a href="/tests/{{ build_flow.build.id }}/{{ build_flow.flow }}/download-asset/{{ asset.category }}">{{ asset.category }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+    
+</div>
 {% endblock %}
