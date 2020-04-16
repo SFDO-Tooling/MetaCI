@@ -27,7 +27,7 @@
           <td>
           {% for build in column %}
             {% if build.get_status == 'queued' or build.get_status == 'waiting' or build.get_status == 'running' %}
-              <a href="{{ build.get_absolute_url }}" title="Started: {{ build.get_time_start|naturaltime }}{{ build.commit }}">
+              <a href="{{ build.get_absolute_url }}" title="Started: {{ build.get_time_start|naturaltime }} Commit: {{ build.commit }}">
                 <div class="slds-media__figure"> 
                   {% autoescape off %}
                   <svg class="slds-button__icon slds-theme--default" aria-hidden="true">
