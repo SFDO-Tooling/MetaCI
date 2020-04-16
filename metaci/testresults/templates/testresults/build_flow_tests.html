@@ -124,16 +124,18 @@
   </div>
   {% endfor %}
 
-  {% if assets %}
   <h3 class="slds-text-heading--small slds-p-top--small">Assets:</h3>
   <ul class="slds-list_dotted">
-    {% for asset in assets %}
-    <li>
-      <a href="/tests/{{ build_flow.build.id }}/{{ build_flow.flow }}/download-asset/{{ asset.category }}">{{ asset.category }}</a>
-    </li>
-    {% endfor %}
+    {% if assets %}
+      {% for asset in assets %}
+      <li>
+        <a href="/tests/{{ build_flow.build.id }}/{{ build_flow.flow }}/download-asset/{{ asset.category }}">{{ asset.category }}</a>
+      </li>
+      {% endfor %}
+    {% else %}
+      <li>No assets were stored.</li>
+    {% endif %}
   </ul>
-  {% endif %}
-    
+
 </div>
 {% endblock %}
