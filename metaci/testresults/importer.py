@@ -64,7 +64,7 @@ def import_test_results(build_flow, results, test_type):
             method, created = TestMethod.objects.get_or_create(
                 testclass=testclass, name=result["Method"]
             )
-            methods[result["Method"]] = method
+            methods[class_and_method] = method
 
         duration = None
         if (
