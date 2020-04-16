@@ -1,8 +1,10 @@
 import pytest
+from django.core.files.base import ContentFile
 from django.test import Client
 from django.urls import reverse
 
 from metaci.testresults import views
+from metaci.build.models import BuildFlowAsset
 
 
 class TestTestResultsViews:
@@ -116,3 +118,22 @@ class TestTestResultsViews:
             {"buildflow1": data["buildflow"].id, "buildflow2": data["buildflow"].id},
         )
         assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_build_flow_download_asset(self, data, superuser):
+        asset = BuildFlowAsset(
+            build_flow=data["buildflow"], asset=ContentFile("", "test"), category="test"
+        )
+        asset.save()
+
+        self.client.force_login(superuser)
+        url = reverse(
+            "build_flow_download_asset",
+            kwargs={
+                "build_id": data["build"].id,
+                "flow": data["buildflow"].flow,
+                "category": "test",
+            },
+        )
+        response = self.client.get(url)
+        assert response.status_code == 302
