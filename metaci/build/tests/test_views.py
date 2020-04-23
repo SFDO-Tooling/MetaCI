@@ -30,6 +30,34 @@ class TestBuildViews:
 
         assert response.status_code == 200
 
+    def test_build_detail__stacktrace_present(self, client, superuser, data):
+        client.force_login(superuser)
+        data["build"].status = "error"
+        data["build"].traceback = "This is the stacktrace."
+        data["build"].save()
+
+        url = reverse("build_detail", kwargs={"build_id": data["build"].id})
+        response = client.get(url)
+
+        assert response.status_code == 200
+        assert response.templates[0].name == "build/detail.html"
+        assert "Stacktrace" in str(response.content)
+
+    def test_build_detail__build_error_no_stacktrace(self, client, user, data):
+        assign_perm("plan.view_builds", user, data["planrepo"])
+        client.force_login(user)
+        data["build"].status = "error"
+        data["build"].traceback = "This is the stacktrace."
+        data["build"].save()
+
+        url = reverse("build_detail", kwargs={"build_id": data["build"].id})
+        response = client.get(url)
+
+        assert response.status_code == 200
+        assert response.templates[0].name == "build/detail.html"
+        # non-superusers shouldn't see a stacktrace
+        assert "Stacktrace" not in str(response.content)
+
     def test_build_detail_flows(self, client, superuser, data):
         client.force_login(superuser)
         url = reverse("build_detail_flows", kwargs={"build_id": data["build"].id})
