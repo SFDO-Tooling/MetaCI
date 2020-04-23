@@ -2,13 +2,13 @@
 {% block tab_content %}
 {% if build.get_status == 'fail' or build.get_status == 'error' %}
 <div class="slds-box slds-theme--warning slds-m-bottom--large">
-{% if build.plan.role == 'qa' %}
+  {% if build.plan.role == 'qa' %}
   <h3 class="slds-text-heading--large">QA Comment by {{ build.get_qa_user }}</h3>
   <p>{{ build.get_qa_comment|linebreaks }}</p>
-{% else %}
+  {% else %}
   <h3 class="slds-text-heading--large">Build Exception: {{ build.get_exception }}</h3>
   <p>{{ build.get_error_message|linebreaks }}</p>
-{% endif %}
+  {% endif %}
 </div>
 {% endif %}
 <div class="slds-box">
@@ -17,4 +17,12 @@
   {{ build.get_log_html }}
   {% endautoescape %}
 </div>
+{% if user.is_superuser and build.get_status == 'error' %}
+<div class="slds-box">
+  <h3 class="slds-text-heading--large slds-m-bottom--medium">Stacktrace</h3>
+  <pre>
+  {{ build.traceback }}
+  </pre>
+</div>
+{% endif %}
 {% endblock %}
