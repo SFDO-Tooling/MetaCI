@@ -9,4 +9,4 @@ coverage==5.1
 coveralls==2.0.0
 flake8==3.7.9
 factory_boy==2.12.0
-responses==0.10.12
+responses==0.10.14
