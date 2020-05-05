@@ -117,19 +117,19 @@ class Build(models.Model):
         related_name="builds",
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     commit = models.CharField(max_length=64)
     commit_message = models.TextField(null=True, blank=True)
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     plan = models.ForeignKey(
-        "plan.Plan", related_name="builds", on_delete=models.CASCADE
+        "plan.Plan", related_name="builds", on_delete=models.PROTECT
     )
     planrepo = models.ForeignKey(
         "plan.PlanRepository",
         related_name="builds",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True,
     )
     org = models.ForeignKey(
@@ -137,14 +137,14 @@ class Build(models.Model):
         related_name="builds",
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     org_instance = models.ForeignKey(
         "cumulusci.ScratchOrgInstance",
         related_name="builds",
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
     schedule = models.ForeignKey(
         "plan.PlanSchedule",
@@ -176,7 +176,7 @@ class Build(models.Model):
         related_name="current_builds",
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
     time_queue = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True, blank=True)
@@ -193,7 +193,7 @@ class Build(models.Model):
         max_length=50, choices=RELEASE_REL_TYPES, null=True, blank=True
     )
     release = models.ForeignKey(
-        "release.Release", on_delete=models.SET_NULL, null=True, blank=True
+        "release.Release", on_delete=models.PROTECT, null=True, blank=True
     )
     org_note = models.CharField(max_length=255, default="", blank=True, null=True)
     org_api_version = models.CharField(max_length=5, blank=True, null=True)
@@ -755,14 +755,14 @@ class Rebuild(models.Model):
         "build.Build", related_name="rebuilds", on_delete=models.CASCADE
     )
     user = models.ForeignKey(
-        "users.User", related_name="rebuilds", on_delete=models.CASCADE
+        "users.User", related_name="rebuilds", on_delete=models.PROTECT
     )
     org_instance = models.ForeignKey(
         "cumulusci.ScratchOrgInstance",
         related_name="rebuilds",
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
     status = models.CharField(max_length=16, choices=BUILD_STATUSES, default="queued")
     exception = models.TextField(null=True, blank=True)
