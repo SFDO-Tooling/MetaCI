@@ -60,37 +60,39 @@ const PerfDataTable = ({
   /* https://appexchange.salesforce.com/listingDetail?listingId=a0N3A00000E9TBZUA3 */
   const PerfDataTableFooter = () => (
     <div className="slds-card__footer slds-grid">
-      {/* eslint-disable-next-line react/prop-types */
-      items.length > 0 && perfState && Boolean(perfState.perfdata) && (
-        <>
-          <div
-            className="slds-col slds-size--1-of-2"
-            style={{ textAlign: 'left' }}
-          >
-            {i18n.t('Showing {{fromnum}} to {{tonum}} of {{totalnum}}', {
-              fromnum: (page * page_size).toString(),
-              tonum: Math.min((page + 1) * page_size, count),
-              totalnum: count.toString(),
-            })}
-          </div>
-          <div className="slds-col slds-size--1-of-2">
-            <button
-              onClick={() => goPageFromUrl(previousPage)}
-              className="slds-button slds-button--brand"
-              disabled={!previousPage}
+      {
+        /* eslint-disable-next-line react/prop-types */
+        items.length > 0 && perfState && Boolean(perfState.perfdata) && (
+          <>
+            <div
+              className="slds-col slds-size--1-of-2"
+              style={{ textAlign: 'left' }}
             >
-              Previous
-            </button>
-            <button
-              onClick={() => goPageFromUrl(nextPage)}
-              className="slds-button slds-button--brand"
-              disabled={!nextPage}
-            >
-              Next
-            </button>
-          </div>
-        </>
-      )}
+              {i18n.t('Showing {{fromnum}} to {{tonum}} of {{totalnum}}', {
+                fromnum: (page * page_size).toString(),
+                tonum: Math.min((page + 1) * page_size, count),
+                totalnum: count.toString(),
+              })}
+            </div>
+            <div className="slds-col slds-size--1-of-2">
+              <button
+                onClick={() => goPageFromUrl(previousPage)}
+                className="slds-button slds-button--brand"
+                disabled={!previousPage}
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => goPageFromUrl(nextPage)}
+                className="slds-button slds-button--brand"
+                disabled={!nextPage}
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )
+      }
     </div>
   );
 
