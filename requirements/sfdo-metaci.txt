@@ -1,1 +1,0 @@
-git+https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/SalesforceFoundation/Snowfakery.git@master
