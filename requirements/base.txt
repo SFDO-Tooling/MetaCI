@@ -1,10 +1,10 @@
 setuptools==46.1.3
 
 # CumulusCI
-cumulusci==3.12.1
+cumulusci==3.12.2
 
 # Django
-django==2.2.11
+django==2.2.12
 
 # Configuration
 django-environ==0.4.5
@@ -33,11 +33,11 @@ awesome-slugify==1.6.5
 
 # Redis support
 django-redis==4.11.0
-redis==3.4.1
+redis==3.5.1
 
 # Django RQ
 rq==1.3.0
-rq-scheduler==0.9.1
+rq-scheduler==0.10.0
 django-rq==2.3.1
 django-rq-scheduler==1.1.3
 
@@ -67,7 +67,7 @@ django-log-request-id==1.5.0
 psycopg2-binary==2.8.5
 
 # django-storages for S3
-boto3==1.12.46
+boto3==1.13.6
 django-storages==1.9.1
 
 # JSON web token
