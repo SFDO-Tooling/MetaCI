@@ -22,8 +22,6 @@ class RunPlanForm(forms.Form):
         self.plan = planrepo.plan
         self.repo = planrepo.repo
         self.user = user
-        org = kwargs.pop("org", None)
-        self.org = org
         super(RunPlanForm, self).__init__(*args, **kwargs)
         self.fields["branch"].choices = self._get_branch_choices()
         self.fields["release"].queryset = self.repo.releases
@@ -31,9 +29,6 @@ class RunPlanForm(forms.Form):
         self.helper.form_class = "form-vertical"
         self.helper.form_id = "run-build-form"
         self.helper.form_method = "post"
-        self.advanced_mode = False
-        if "advanced_mode" in args[0]:
-            self.advanced_mode = args[0]["advanced_mode"] == "1"
         self.helper.layout = Layout(
             Fieldset(
                 "Choose the branch you want to build",
@@ -46,28 +41,38 @@ class RunPlanForm(forms.Form):
                 css_class="slds-form-element",
             ),
         )
+        org = self.repo.orgs.get(name=self.plan.org)
+        if org.scratch:
+            self.helper.layout.append(
+                Fieldset(
+                    "Keep org after build is done?",
+                    Field("keep_org", css_class="slds-checkbox"),
+                    css_class="slds-form-element",
+                )
+            )
+        if is_release_plan(self.plan):
+            self.helper.layout.append(
+                Fieldset(
+                    "What release is this connected to?",
+                    Field("release", css_class="slds-input"),
+                    css_class="slds-form-element",
+                ),
+            )
+
+        self.advanced_mode = False
+        if "advanced_mode" in args[0]:
+            self.advanced_mode = args[0]["advanced_mode"] == "1"
         if self.advanced_mode:
             self.helper.layout.extend(
                 [
-                    Fieldset(
-                        "Keep org? (scratch orgs only)",
-                        Field("keep_org", css_class="slds-checkbox"),
-                        css_class="slds-form-element",
-                    ),
                     Fieldset(
                         "Enter the commit you want to build.  The HEAD commit on the branch will be used if you do not specify a commit",
                         Field("commit", css_class="slds-input"),
                         css_class="slds-form-element",
                     ),
-                    Fieldset(
-                        "What release is this connected to?",
-                        Field("release", css_class="slds-input"),
-                        css_class="slds-form-element",
-                    ),
                 ]
             )
-        else:
-            self.helper.layout.extend([Field("keep_org")])
+
         self.helper.layout.append(
             FormActions(
                 Submit(
@@ -86,8 +91,20 @@ class RunPlanForm(forms.Form):
                 choices.append((branch.name, branch.name))
         return tuple(choices)
 
-    def create_build(self):
+    def clean(self):
+        if is_release_plan(self.plan):
+            release = self.cleaned_data.get("release")
+            if not release:
+                self.add_error("release", "Please specify the release.")
+            elif (
+                settings.METACI_ENFORCE_RELEASE_CHANGE_CASE
+                and not release.change_case_link
+            ):
+                self.add_error(
+                    "release", "This release does not link to a change case."
+                )
 
+    def create_build(self):
         commit = self.cleaned_data.get("commit")
         if not commit:
             gh_repo = self.repo.github_api
@@ -111,7 +128,6 @@ class RunPlanForm(forms.Form):
             repo=self.repo,
             plan=self.plan,
             planrepo=self.planrepo,
-            org=self.org,
             branch=branch,
             commit=commit,
             keep_org=keep_org,
@@ -125,3 +141,7 @@ class RunPlanForm(forms.Form):
         build.save()
 
         return build
+
+
+def is_release_plan(plan):
+    return plan.role in ("release_deploy", "release", "release_test")

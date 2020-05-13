@@ -34,9 +34,9 @@ def data():
     """Creates a lot of interconnected test data"""
     data = {}
     data["repo"] = RepositoryFactory()
-    data["plan"] = PlanFactory()
+    data["plan"] = PlanFactory(org="dev")
     data["planrepo"] = PlanRepositoryFactory(plan=data["plan"], repo=data["repo"])
-    data["org"] = OrgFactory()
+    data["org"] = OrgFactory(repo=data["repo"], name="dev")
     data["build"] = BuildFactory(planrepo=data["planrepo"], org=data["org"])
     data["buildflow"] = BuildFlowFactory(
         build=data["build"], flow="flow-one", tests_pass=10, tests_fail=2
