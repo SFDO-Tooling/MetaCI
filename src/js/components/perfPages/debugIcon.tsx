@@ -30,7 +30,7 @@ const select = (appState: AppState) => ({
   apiURL: selectPerfDataAPIUrl(appState),
 });
 
-const DebugIcon: React.ComponentType<{}> = connect(
+const DebugIcon: React.ComponentType = connect(
   select,
   null,
 )(UnwrappedDebugIcon);

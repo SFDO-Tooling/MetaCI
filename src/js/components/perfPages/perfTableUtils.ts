@@ -1,4 +1,4 @@
-import queryString from 'query-string';
+import { parse, stringify } from 'query-string';
 import is from 'sarcastic';
 
 // This differs from the normal query paramemter helper classes in that
@@ -47,14 +47,14 @@ export class QueryParamHelpers {
     [Key: string]: unknown;
   } => ({
     ...this.default_params,
-    ...queryString.parse(window.location.search),
+    ...parse(window.location.search),
   });
 
   // set a value. Does not merge list-like values. It overwrites them.
   public set = (newQueryParts: {
     [Key: string]: string | string[] | null | typeof undefined;
-  }) => {
-    const qs = queryString.stringify({ ...this.getAll(), ...newQueryParts });
+  }): void => {
+    const qs = stringify({ ...this.getAll(), ...newQueryParts });
     window.history.pushState(null, '', `${window.location.pathname}?${qs}`);
   };
 }
@@ -67,4 +67,5 @@ export const addIds = (
   rows: {
     [key: string]: unknown;
   }[],
-): {}[] => rows.map((row, index) => ({ ...row, id: index.toString() }));
+): Record<string, unknown>[] =>
+  rows.map((row, index) => ({ ...row, id: index.toString() }));
