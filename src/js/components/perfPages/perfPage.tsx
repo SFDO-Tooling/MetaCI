@@ -72,7 +72,8 @@ export const UnwrappedPerfPage = ({
   }
 
   // for effects that only run once.
-  const useMount = (f) => useEffect(f, [f]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const useMount = (f) => useEffect(f, []);
 
   // Fetch the UI data
   useMount(() => {
