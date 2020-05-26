@@ -9,7 +9,7 @@ import settings from '@salesforce/design-system-react/components/settings';
 import getApiFetch from 'api/api_fetch';
 import ErrorBoundary from 'components/error';
 import PerfPage from 'components/perfPages/perfPage';
-import i18n from 'i18next';
+import i18next from 'i18next';
 import * as React from 'react';
 import DocumentTitle from 'react-document-title';
 import * as ReactDOM from 'react-dom';
@@ -17,7 +17,7 @@ import { Provider } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import logger from 'redux-logger';
+import { logger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import reducer from 'store';
 import { logError } from 'utils/logging';
@@ -25,7 +25,7 @@ import { logError } from 'utils/logging';
 import init_i18n from './i18n';
 
 const App = () => (
-  <DocumentTitle title={i18n.t('Meta CI')}>
+  <DocumentTitle title={i18next.t('Meta CI')}>
     <div
       className="slds-grid
         slds-grid_vertical"

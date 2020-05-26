@@ -28,7 +28,7 @@ export type ServerDataFetcher = (params?: {
 }) => void;
 
 const actions = {
-  doPerfRESTFetch: (queryparts: {}) =>
+  doPerfRESTFetch: (queryparts: Record<string, unknown>) =>
     perfRESTFetch('/api/testmethod_perf?', queryparts),
   doPerfREST_UI_Fetch: perfREST_UI_Fetch,
 };
@@ -38,7 +38,7 @@ type ReduxProps = {
   perfUIState: PerfData_UI_State;
   perfUIStatus: LoadingStatus;
   testMethodPerfUI: TestMethodPerfUI;
-  doPerfRESTFetch: (params: {}) => null;
+  doPerfRESTFetch: (params: Record<string, unknown>) => null;
   doPerfREST_UI_Fetch: typeof perfREST_UI_Fetch;
   // eslint-disable-next-line no-use-before-define
 } & typeof actions;
@@ -54,7 +54,7 @@ export const UnwrappedPerfPage = ({
   perfUIState,
   testMethodPerfUI,
   perfUIStatus,
-}: ReduxProps & RouteComponentProps & SelfProps) => {
+}: ReduxProps & RouteComponentProps & SelfProps): React.ReactNode => {
   const uiAvailable = perfUIStatus === 'AVAILABLE';
   const queryparams = new QueryParamHelpers(
     get(testMethodPerfUI, 'defaults', {}),
@@ -72,7 +72,7 @@ export const UnwrappedPerfPage = ({
   }
 
   // for effects that only run once.
-  const useMount = (f) => useEffect(f, []);
+  const useMount = (f) => useEffect(f, [f]);
 
   // Fetch the UI data
   useMount(() => {
@@ -96,7 +96,7 @@ export const UnwrappedPerfPage = ({
     }
   }, [uiAvailable, doPerfRESTFetch, testMethodPerfUI]);
 
-  let results: {}[];
+  let results: Record<string, unknown>[];
   if (
     perfState &&
     perfState.perfdata &&
@@ -149,7 +149,7 @@ const select = (appState: AppState) => ({
   perfUIState: selectPerfUIState(appState),
 });
 
-const WrappedPerfPage: ComponentType<{}> = withRouter(
+const WrappedPerfPage: ComponentType = withRouter(
   connect(select, actions)(UnwrappedPerfPage),
 );
 

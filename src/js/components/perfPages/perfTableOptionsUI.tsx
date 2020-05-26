@@ -6,7 +6,7 @@ import {
   FilterDefinition,
   TestMethodPerfUI,
 } from 'api/testmethod_perf_UI_JSON_schema';
-import i18n from 'i18next';
+import i18next from 'i18next';
 import get from 'lodash/get';
 import React, { ComponentType, useState } from 'react';
 import { connect } from 'react-redux';
@@ -107,7 +107,7 @@ Props & ReduxProps) => {
       <AccordionPanel
         id="perfPanelColumns"
         key="perfPanelColumns"
-        summary={i18n.t('Columns')}
+        summary={i18next.t('Columns')}
         expanded={perfPanelColumnsExpanded}
         onTogglePanel={() =>
           setPerfPanelColumnsExpanded(!perfPanelColumnsExpanded)
@@ -126,7 +126,7 @@ Props & ReduxProps) => {
         id="perfPanelFilters"
         key="perfPanelFilters"
         summary={
-          i18n.t('Filters') +
+          i18next.t('Filters') +
           (filterPanelCount > 0 ? ` (${filterPanelCount})` : '')
         }
         expanded={perfPanelFiltersExpanded}
@@ -140,7 +140,7 @@ Props & ReduxProps) => {
         id="perfPaneDates"
         key="perfPaneDates"
         summary={
-          i18n.t('Date Range') +
+          i18next.t('Date Range') +
           (dateRangeCount ? ` (${dateRangeCount.toString()})` : '')
         }
         expanded={perfPanelDatesExpanded}
@@ -161,7 +161,7 @@ Props & ReduxProps) => {
       <AccordionPanel
         id="perfPanelOptions"
         key="perfPanelOptions"
-        summary={i18n.t('Options')}
+        summary={i18next.t('Options')}
         expanded={perfPanelOptionsExpanded}
         onTogglePanel={() => {
           setPerfPanelOptionsExpanded(!perfPanelOptionsExpanded);
@@ -171,7 +171,7 @@ Props & ReduxProps) => {
           <React.Fragment>
             <TextInput
               defaultValue={queryparams.get('page_size')}
-              label={i18n.t('Page Size')}
+              label={i18next.t('Page Size')}
               tooltip="Number of rows to fetch per page"
               onValueUpdate={(value: string) =>
                 fetchServerData({ page_size: value })

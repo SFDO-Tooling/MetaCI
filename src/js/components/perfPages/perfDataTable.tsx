@@ -1,10 +1,10 @@
 import DataTable from '@salesforce/design-system-react/components/data-table';
 import DataTableColumn from '@salesforce/design-system-react/components/data-table/column';
 import Spinner from '@salesforce/design-system-react/components/spinner';
-import i18n from 'i18next';
+import i18next from 'i18next';
 import get from 'lodash/get';
 import zip from 'lodash/zip';
-import queryString from 'query-string';
+import { parse } from 'query-string';
 import * as React from 'react';
 import { LoadingStatus, PerfDataState } from 'store/perfdata/reducer';
 
@@ -15,7 +15,7 @@ interface Props {
   fetchServerData: ServerDataFetcher;
   queryparams: QueryParamHelpers;
   perfState: PerfDataState;
-  items: {}[];
+  items: Record<string, unknown>[];
 }
 
 const PerfDataTable = ({
@@ -23,7 +23,7 @@ const PerfDataTable = ({
   items,
   perfState,
   queryparams,
-}: Props) => {
+}: Props): React.ReactNode => {
   if (perfState && perfState.status === 'ERROR') {
     const message =
       get(perfState, 'reason.reason.detail') ||
@@ -37,7 +37,7 @@ const PerfDataTable = ({
    */
   const goPageFromUrl = (url: string) => {
     const qs = url.split('?', 2)[1];
-    const qParts = queryString.parse(qs);
+    const qParts = parse(qs);
     const page = qParts.page;
     if (Array.isArray(page)) {
       fetchServerData({ page: page[1] });
@@ -68,7 +68,7 @@ const PerfDataTable = ({
               className="slds-col slds-size--1-of-2"
               style={{ textAlign: 'left' }}
             >
-              {i18n.t('Showing {{fromnum}} to {{tonum}} of {{totalnum}}', {
+              {i18next.t('Showing {{fromnum}} to {{tonum}} of {{totalnum}}', {
                 fromnum: (page * page_size).toString(),
                 tonum: Math.min((page + 1) * page_size, count),
                 totalnum: count.toString(),
