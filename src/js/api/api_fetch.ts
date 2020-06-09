@@ -37,7 +37,7 @@ const getApiFetch = () => (
   opts: {
     [key: string]: any;
   } = {},
-) => {
+): Promise<any> => {
   const options = Object.assign({}, { headers: {} }, opts);
   const method = options.method || 'GET';
   if (!csrfSafeMethod(method)) {
