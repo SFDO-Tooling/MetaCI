@@ -75,7 +75,9 @@ const DecimalField = (
   // linter bug?
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let step: number | null | typeof undefined = parseInt(filter.step, 10);
-  step = isNaN(step) ? 1 : step;
+  if (isNaN(step)) {
+    step = 1;
+  }
 
   return {
     name: filter.name,

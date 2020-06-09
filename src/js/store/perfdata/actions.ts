@@ -81,7 +81,11 @@ export const perfREST_API = ({
 export const perfRESTFetch = (
   url: string,
   params?: Record<string, unknown>,
-) => (dispatch: Dispatch, _getState: RootState, { apiFetch }): Promise => {
+) => (
+  dispatch: Dispatch,
+  _getState: RootState,
+  { apiFetch }: { Function },
+): Promise => {
   if (params) {
     url = `${url}&${stringify(params)}`;
   }
