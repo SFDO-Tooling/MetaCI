@@ -333,6 +333,7 @@ RQ_QUEUES = {
         "AUTOCOMMIT": False,
     },
 }
+RQ_EXCEPTION_HANDLERS = ["metaci.build.exceptions.maybe_requeue_job"]
 
 # Site URL
 SITE_URL = None
@@ -352,9 +353,18 @@ SFDX_CLIENT_ID = None
 SFDX_HUB_KEY = None
 SFDX_HUB_USERNAME = None
 
+SF_SANDBOX_LOGIN_URL = env(
+    "SF_SANDBOX_LOGIN_URL", default="https://test.salesforce.com"
+)
+SF_PROD_LOGIN_URL = env("SF_PROD_LOGIN_URL", default="https://login.salesforce.com")
+
 # Application Behaviors
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", True)
 METACI_FLOW_CALLBACK_ENABLED = env.bool("METACI_FLOW_CALLBACK_ENABLED", True)
+METACI_ALLOW_PERSISTENT_ORG_LOGIN = env.bool("METACI_ALLOW_PERSISTENT_ORG_LOGIN", False)
+METACI_ENFORCE_RELEASE_CHANGE_CASE = env.bool(
+    "METACI_ENFORCE_RELEASE_CHANGE_CASE", False
+)
 
 # Number of scratch orgs to leave available in the org.
 SCRATCH_ORG_RESERVE = env.int("METACI_SCRATCH_ORG_RESERVE", 10)

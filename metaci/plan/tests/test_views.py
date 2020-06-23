@@ -4,6 +4,7 @@ import pytest
 from django.urls import reverse
 
 from metaci.fixtures.factories import BranchFactory
+from metaci.fixtures.factories import ReleaseFactory
 
 
 @pytest.mark.django_db
@@ -84,6 +85,34 @@ class TestPlanViews:
             url, {"branch": BranchFactory(name="feature/branch-a", repo=data["repo"])}
         )
         assert response.status_code == 302
+
+    def test_plan_run_repo__no_change_case(self, mocker, client, data, superuser):
+        mocker.patch("metaci.plan.forms.RunPlanForm._get_branch_choices")
+        mocker.patch(
+            "metaci.plan.forms.settings", METACI_ENFORCE_RELEASE_CHANGE_CASE=True
+        )
+        data["plan"].role = "release"
+        data["plan"].save()
+
+        client.force_login(superuser)
+        url = reverse(
+            "plan_run_repo",
+            kwargs={
+                "plan_id": data["plan"].id,
+                "repo_owner": data["repo"].owner,
+                "repo_name": data["repo"].name,
+            },
+        )
+
+        response = client.post(
+            url,
+            {
+                "branch": BranchFactory(name="feature/branch-a", repo=data["repo"]).pk,
+                "release": ReleaseFactory(repo=data["repo"]).pk,
+            },
+        )
+        assert response.status_code == 200
+        assert b"This release does not link to a change case." in response.content
 
     def test_plan_run_repo__permission_denied(self, client, data, user):
         client.force_login(user)

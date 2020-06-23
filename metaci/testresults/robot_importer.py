@@ -168,7 +168,7 @@ def parse_test(test, suite, root):
 
     test_info = {
         "suite": suite,
-        "name": test.attrib["name"],
+        "name": test.attrib.get("name") or "<no name>",
         "elem": test,
         "status": "Pass" if status.attrib["status"] == "PASS" else "Fail",
         "screenshots": [],

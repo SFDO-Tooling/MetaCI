@@ -21,7 +21,7 @@ class ErrorBoundary extends React.Component<
   }
 
   /* istanbul ignore next */
-  public componentDidCatch(error: Error, info: {}) {
+  public componentDidCatch(error: Error, info: string): void {
     this.setState({ hasError: true, error, info });
     logError(error, info);
   }
@@ -61,7 +61,11 @@ class ErrorBoundary extends React.Component<
 
 const gradient = 'linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)';
 
-export const AuthError = ({ message }: { message: string }) => (
+export const AuthError = ({
+  message,
+}: {
+  message: string;
+}): React.ReactNode => (
   <BrandBand
     id="brand-band-lightning-blue"
     className="slds-p-around_small"

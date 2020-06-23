@@ -14,6 +14,7 @@ from metaci.build.models import (
 )
 from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.plan.models import Plan, PlanRepository, PlanSchedule
+from metaci.release.models import Release
 from metaci.repository.models import Branch, Repository
 from metaci.testresults.models import (
     TestClass,
@@ -75,6 +76,7 @@ class OrgFactory(factory.django.DjangoModelFactory):
         model = Org
 
     repo = factory.SubFactory(RepositoryFactory)
+    json = "{}"
 
 
 class ScratchOrgInstanceFactory(factory.django.DjangoModelFactory):
@@ -227,3 +229,8 @@ class RebuildFactory(factory.django.DjangoModelFactory):
     build = factory.SubFactory(BuildFactory)
     org_instance = factory.SubFactory(ScratchOrgInstanceFactory)
     status = factory.fuzzy.FuzzyChoice(BUILD_STATUS_NAMES)
+
+
+class ReleaseFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Release

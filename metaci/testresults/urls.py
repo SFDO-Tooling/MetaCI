@@ -9,6 +9,11 @@ urlpatterns = [
         name="build_flow_compare_to",
     ),
     url(
+        r"^(?P<build_id>\d+)/(?P<flow>.*)/download-asset/(?P<category>.*)$",
+        views.build_flow_download_asset,
+        name="build_flow_download_asset",
+    ),
+    url(
         r"^(?P<build_id>\d+)/(?P<flow>.*)$",
         views.build_flow_tests,
         name="build_flow_tests",

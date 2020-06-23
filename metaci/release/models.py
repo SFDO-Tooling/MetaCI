@@ -29,7 +29,7 @@ class Release(StatusModel):
     package_version_id = models.CharField(
         _("package version id"), max_length=18, null=True, blank=True
     )
-    git_tag = models.CharField(_("git tag"), max_length=1024, null=True, blank=True)
+    git_tag = models.CharField(_("git tag"), max_length=1024, null=True)
     github_release = models.URLField(
         _("github release"), max_length=1024, null=True, blank=True
     )
@@ -49,6 +49,9 @@ class Release(StatusModel):
     )
     work_item_link = models.URLField(
         _("work item link"), max_length=1024, null=True, blank=True
+    )
+    change_case_link = models.URLField(
+        _("change case link"), max_length=1024, null=True, blank=True
     )
 
     class Meta:

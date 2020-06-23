@@ -1,22 +1,15 @@
 from urllib.parse import urljoin
 
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import user_passes_test
+from django.conf import settings
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 
-from metaci.build.utils import paginate
-from metaci.build.utils import view_queryset
-from metaci.cumulusci.forms import OrgLockForm
-from metaci.cumulusci.forms import OrgUnlockForm
-from metaci.cumulusci.models import Org
-from metaci.cumulusci.models import ScratchOrgInstance
+from metaci.build.utils import paginate, view_queryset
+from metaci.cumulusci.forms import OrgLockForm, OrgUnlockForm
+from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.cumulusci.utils import get_connected_app
-from metaci.plan.models import PlanRepository
 
 
 @login_required
@@ -31,6 +24,7 @@ def org_detail(request, org_id):
     instances = org.instances.filter(deleted=False) if org.scratch else []
 
     context = {"builds": builds, "org": org, "instances": instances}
+    context["can_log_in"] = org.scratch or settings.METACI_ALLOW_PERSISTENT_ORG_LOGIN
     return render(request, "cumulusci/org_detail.html", context=context)
 
 
@@ -82,6 +76,9 @@ def org_login(request, org_id, instance_id=None):
 
     # For non-scratch orgs, just log into the org
     if not org.scratch:
+        if not settings.METACI_ALLOW_PERSISTENT_ORG_LOGIN:
+            raise PermissionDenied("Logging in to persistent orgs is disabled.")
+
         org_config = get_org_config(org)
         return HttpResponseRedirect(org_config.start_url)
 
@@ -111,11 +108,10 @@ def org_instance_delete(request, org_id, instance_id):
 
     # Verify access
     try:
-        org = Org.objects.for_user(request.user).get(id=org_id)
+        Org.objects.for_user(request.user).get(id=org_id)
     except Org.DoesNotExist:
         raise PermissionDenied("You are not authorized to view this org")
 
-    context = {"instance": instance}
     if instance.deleted:
         raise Http404("Cannot delete: this org instance is already deleted")
 
@@ -129,7 +125,7 @@ def org_instance_detail(request, org_id, instance_id):
 
     # Verify access
     try:
-        org = Org.objects.for_user(request.user).get(id=org_id)
+        Org.objects.for_user(request.user).get(id=org_id)
     except Org.DoesNotExist:
         raise PermissionDenied("You are not authorized to view this org")
 

@@ -102,7 +102,7 @@ class LocalAutoscaler(Autoscaler):
                             [
                                 "python",
                                 "./manage.py",
-                                "rqworker",
+                                "metaci_rqworker",
                                 "high",
                                 "medium",
                                 "default",
