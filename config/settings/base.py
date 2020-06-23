@@ -353,6 +353,11 @@ SFDX_CLIENT_ID = None
 SFDX_HUB_KEY = None
 SFDX_HUB_USERNAME = None
 
+SF_SANDBOX_LOGIN_URL = env(
+    "SF_SANDBOX_LOGIN_URL", default="https://test.salesforce.com"
+)
+SF_PROD_LOGIN_URL = env("SF_PROD_LOGIN_URL", default="https://login.salesforce.com")
+
 # Application Behaviors
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", True)
 METACI_FLOW_CALLBACK_ENABLED = env.bool("METACI_FLOW_CALLBACK_ENABLED", True)
