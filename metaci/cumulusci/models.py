@@ -23,16 +23,12 @@ from simple_salesforce.exceptions import SalesforceError
 def jwt_session(url=None, username=None):
     if url is None:
         url = settings.SF_PROD_LOGIN_URL
-    aud = (
-        "https://login.salesforce.com"
-        if url == settings.SF_PROD_LOGIN_URL
-        else "https://test.salesforce.com"
-    )
+
     payload = {
         "alg": "RS256",
         "iss": settings.SFDX_CLIENT_ID,
         "sub": username,
-        "aud": aud,
+        "aud": url,  # jwt aud is NOT mydomain
         "exp": timegm(datetime.utcnow().utctimetuple()),
     }
     encoded_jwt = jwt.encode(payload, settings.SFDX_HUB_KEY, algorithm="RS256")
