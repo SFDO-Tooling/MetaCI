@@ -112,11 +112,10 @@ class TestResult(models.Model):
     method = models.ForeignKey(
         TestMethod, related_name="test_results", on_delete=models.CASCADE
     )
-    # The task field is used to reconstitute the test log,
-    # because the task has a list of options used by robot when the
-    # test was run (e.g. noncritical, tagstatlink, etc)
-
     # NOTE: This field is currently only populated for robot tasks
+    # The task field is used to reconstitute the test log, which is
+    # needed because the task has a list of options used by robot when
+    # the test was run (e.g. noncritical, tagstatlink, etc)
     task = models.ForeignKey(
         "build.FlowTask",
         related_name="test_results",
@@ -131,6 +130,9 @@ class TestResult(models.Model):
     stacktrace = models.TextField(null=True, blank=True)
     message = models.TextField(null=True, blank=True)
     source_file = models.CharField(max_length=255)
+    # robot_keyword will be used to store the first keyword that failed in
+    # a failing test.
+    robot_keyword = models.CharField(max_length=255, null=True, blank=True, db_index=True)
     robot_xml = models.TextField(null=True, blank=True)
     email_invocations_used = models.IntegerField(null=True, blank=True, db_index=True)
     email_invocations_allowed = models.IntegerField(
