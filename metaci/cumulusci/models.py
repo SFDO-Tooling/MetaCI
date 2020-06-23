@@ -22,7 +22,7 @@ from simple_salesforce.exceptions import SalesforceError
 
 def jwt_session(url=None, username=None):
     if url is None:
-        url = "https://login.salesforce.com"
+        url = settings.SF_PROD_LOGIN_URL
 
     payload = {
         "alg": "RS256",
