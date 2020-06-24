@@ -84,6 +84,8 @@ def import_robot_test_results(build_flow, path):
             duration=result["duration"],
             outcome=result["status"],
             source_file=result["suite"]["file"],
+            message=result["message"],
+            robot_keyword=result["failing_keyword"],
             robot_xml=result["xml"],
             task=robot_task,
         )
@@ -166,12 +168,27 @@ def parse_test(test, suite, root):
     setup_time = _robot_duration(setup.find("status")) if setup else zero
     teardown_time = _robot_duration(teardown.find("status")) if teardown else zero
 
+    # I'm not 100% convinced this is what we want. It's great in the
+    # normal case, but it's possible for a test to have multiple failing
+    # keywords. We'll tackle that when it becomes an issue. For now,
+    # we just grab the first failing keyword.
+    keyword = None
+    if status.attrib["status"] == "FAIL":
+        failed_keyword_element = test.find("./kw/status[@status='FAIL']/..")
+        if failed_keyword_element:
+            keyword = failed_keyword_element.attrib.get("name")
+            library = failed_keyword_element.attrib.get("library")
+            if library:
+                keyword = f"{library}.{keyword}"
+
     test_info = {
         "suite": suite,
         "name": test.attrib.get("name") or "<no name>",
         "elem": test,
         "status": "Pass" if status.attrib["status"] == "PASS" else "Fail",
         "screenshots": [],
+        "message": status.text,
+        "failing_keyword": keyword,
     }
     delta = _robot_duration(status)
     duration = delta - (setup_time + teardown_time)
