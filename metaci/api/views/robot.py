@@ -11,6 +11,7 @@ class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     serializer_class = RobotTestResultSerializer
+    renderer_classes = [BrowsableAPIRenderer, JSONRenderer, SimpleCSVRenderer]
 
     def get_queryset(self):
         queryset = TestResult.objects.all()
