@@ -11,6 +11,7 @@ from metaci.api.views.repository import BranchViewSet
 from metaci.api.views.repository import RepositoryViewSet
 from metaci.api.views.testmethod_perf import TestMethodPerfListView
 from metaci.api.views.testmethod_perf_UI import TestMethodPerfUIApiView
+from metaci.api.views.robot import RobotTestResultViewSet
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 
@@ -29,6 +30,8 @@ router.register(r"testmethod_perf", TestMethodPerfListView, basename="testmethod
 router.register(
     r"testmethod_perf_UI", TestMethodPerfUIApiView, basename="testmethod_perf_UI"
 )
+router.register(r"robot", RobotTestResultViewSet, basename="robot")
+
 urlpatterns = router.urls
 
 schema_view = get_schema_view(title="MetaCI API")
