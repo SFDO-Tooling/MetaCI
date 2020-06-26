@@ -3,15 +3,19 @@ from metaci.testresults.models import TestResult
 
 
 class RobotTestResultSerializer(serializers.ModelSerializer):
-    method = serializers.ReadOnlyField(source="method.name")
+    test_name = serializers.ReadOnlyField(source="method.name")
+    repo_name = serializers.CharField(
+        source="build_flow.build.repo.name", read_only=True
+    )
 
     class Meta:
         model = TestResult
         fields = (
             "id",
+            "repo_name",
             "outcome",
             "source_file",
-            "method",
+            "test_name",
             "message",
             "robot_keyword",
         )
