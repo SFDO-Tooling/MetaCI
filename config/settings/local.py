@@ -125,7 +125,6 @@ ALLOWED_HOSTS = [
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 # Github credentials
-GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET", default=None)
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", False)
 
 # Salesforce OAuth Connected App credentials
