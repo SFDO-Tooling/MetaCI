@@ -26,7 +26,14 @@ class BuildFlowFilter(django_filters.FilterSet):
 
 class RobotResultFilter(django_filters.FilterSet):
     repo_name = django_filters.CharFilter(
-        field_name="build_flow__build__repo__name", label="Repository name", lookup_expr="iexact"
+        field_name="build_flow__build__repo__name",
+        label="Repository name",
+        lookup_expr="iexact",
+    )
+    branch_name = django_filters.CharFilter(
+        field_name="build_flow__build__branch__name",
+        label="Branch name",
+        lookup_expr="iexact",
     )
     test_name = django_filters.CharFilter(
         field_name="method__name", label="Test name", lookup_expr="iexact",
