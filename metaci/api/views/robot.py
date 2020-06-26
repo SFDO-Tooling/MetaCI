@@ -1,9 +1,11 @@
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
 from metaci.api.renderers import SimpleCSVRenderer
 from metaci.api.serializers.robot import RobotTestResultSerializer
 from metaci.testresults.models import TestResult
-
+from metaci.testresults.filters import RobotResultFilter
+from rest_framework.filters import OrderingFilter
 
 class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -12,16 +14,18 @@ class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = RobotTestResultSerializer
     renderer_classes = [BrowsableAPIRenderer, JSONRenderer, SimpleCSVRenderer]
+    filterset_class = RobotResultFilter
 
     def get_queryset(self):
         queryset = TestResult.objects.all()
-        repo = self.request.query_params.get("repo", None)
-        if repo is not None:
-            queryset = queryset.filter(build_flow__build__repo__name=repo)
+        # FIXME: I'd like the user to be able to specify a period
+        # of time such as "last two weeks" or "this month"...
+        # I also need to
 
+        # this is probably not the best default, but it's
+        # good enough for now. Eventually I should add django's
+        # ordering filter.
         sort = self.request.query_params.get("sort", "id").split(",")
         queryset = queryset.order_by(*sort)
 
-        # FIXME: I'd like the user to be able to specify a period
-        # of time such as "last two weeks" or "this month"...
         return queryset
