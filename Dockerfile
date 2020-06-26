@@ -62,9 +62,7 @@ RUN yarn install
 # copying rest of working directory to /app folder
 COPY . /app
 
-ENV DATABASE_URL=postgres://metaci:metaci@postgres:5432/metaci \
-  DJANGO_HASHID_SALT='sample hashid=salt' \
-  DJANGO_SECRET_KEY='sample secret=key' \
+ENV DJANGO_HASHID_SALT='sample hashid=salt' \
   DJANGO_SETTINGS_MODULE=config.settings.$BUILD_ENV \
   PYTHONDONTWRITEBYTECODE=1 \
   PYTHONUNBUFFERED=1 \
