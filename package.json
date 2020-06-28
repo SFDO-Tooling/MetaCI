@@ -72,7 +72,7 @@
     "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-react-hooks": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^5.0.1",
-    "fetch-mock": "^9.4.0",
+    "fetch-mock": "^9.10.3",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.2.0",
     "husky": "^4.2.5",

@@ -4978,10 +4978,10 @@ fbjs@^0.8.9:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.18"
 
-fetch-mock@^9.4.0:
-  version "9.10.1"
-  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.10.1.tgz#1f0a7a3795490956bf4cfd5fa6ff912bc4dc71d3"
-  integrity sha512-pTSLpg/Z9LvoqTRu8S9Aeyu4wsyNHLcqON6F5iw1nLHkSOZ+snKgkijwtOVtVsgNzyiZCq9NHRwGxPRpLwth7A==
+fetch-mock@^9.10.3:
+  version "9.10.3"
+  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.10.3.tgz#33d85cf9f1e463822a8f5e2c28f9a8a8c7256abd"
+  integrity sha512-vvTW3vu+6sgDuOpInd8VtaaYlt56Un/zrEvBmT8JppDXj2ZY3PQgIAoxqdSAFR5o/10jJ1yFBhXLQ/Dce/p+jg==
   dependencies:
     babel-runtime "^6.26.0"
     core-js "^3.0.0"
