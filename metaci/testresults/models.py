@@ -132,7 +132,9 @@ class TestResult(models.Model):
     source_file = models.CharField(max_length=255)
     # robot_keyword will be used to store the first keyword that failed in
     # a failing test.
-    robot_keyword = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    robot_keyword = models.CharField(
+        max_length=255, null=True, blank=True, db_index=True
+    )
     robot_xml = models.TextField(null=True, blank=True)
     email_invocations_used = models.IntegerField(null=True, blank=True, db_index=True)
     email_invocations_allowed = models.IntegerField(
