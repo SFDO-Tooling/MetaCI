@@ -7,6 +7,7 @@ from metaci.testresults.models import TestResult
 from metaci.testresults.filters import RobotResultFilter
 from rest_framework.filters import OrderingFilter
 
+
 class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A viewset for viewing robot framework test results
@@ -17,7 +18,8 @@ class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = RobotResultFilter
 
     def get_queryset(self):
-        queryset = TestResult.objects.all()
+        queryset = TestResult.objects.filter(method__testclass__test_type="Robot")
+
         # FIXME: I'd like the user to be able to specify a period
         # of time such as "last two weeks" or "this month"...
         # I also need to
