@@ -41,6 +41,9 @@ class RobotResultFilter(django_filters.FilterSet):
     outcome = django_filters.CharFilter(
         field_name="outcome", label="Outcome", lookup_expr="iexact",
     )
+    source_file = django_filters.CharFilter(
+        field_name="source_file", label="Source file", lookup_expr="iexact",
+    )
 
     class Meta:
         model = TestResult
