@@ -60,17 +60,23 @@ Below are the following steps necessary to run MetaCI on Docker:
 Local Variables
 ---------------
 
+DJANGO_SECRET_KEY: 
+    This represents the secret key used to sign session cookies for the Django web application.
+    Set it to an arbitrary string that is not shared with another Django site.
+
 POSTGRES_USER:
     Environment variable set in ``.env``, representing the database username.
     This value defaults to ``metaci``.
 
 POSTGRES_PASSWORD: 
     Environment variable set in ``.env``, representing the database password.
-    This value defaults to ``metaci``.
 
 POSTGRES_DB:
     Environment variable set in ``.env``, representing the database name.
     This value defaults to ``metaci``.
+
+DATABASE_URL:
+    Used by Django to connect to PostgreSQL. Edit it to make sure the password matches POSTGRES_PASSWORD.
 
 MetaCI must authenticate with the GitHub API to fetch repositories and create releases. 
 This can be set up for a GitHub user by setting GITHUB_USERNAME and GITHUB_PASSWORD, 
@@ -112,16 +118,9 @@ SFDX_CLIENT_ID:
 SFDX_HUB_KEY:          
     SFDX_HUB_KEY is the private key that was used to create the certificate.
     Shared through last pass. In the form of a pem key. 
-    Called `SFDX Hub Org Key` n Release Engineering folder.
     
-FORMATTING SFDX_HUB_KEY in .env
-    IMPORTANT to format on a single line, escaping each newline in the key with ``\n``
-    character otherwise the variable will not be read correctly. Must look like the 
-    following example and CANNOT BE IN QUOTES:
-
-::
-
-    SFDX_HUB_KEY=-----BEGIN RSA PRIVATE KEY-----\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nv4fU8l7TeYVQVvSdWJmN3sBZ4bnG3GSu1u6viGQwxulxtJrLnclEgL2Tq0npRn/x\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nDMG9uoYPD4X0rkKz/4PI2jcO4NgkWfTiQY0yEDQNM31Sfcw5lNSeKHrrnG7fHx3q\nu9fb7GxWMi74LBlMVlseREzfYRyUI7ukPZNgdvAGbp3TI0ITAQTbTzKPR4FdyZbm\nysuDXZuQpbifXxBKPVVYHxbdEYkabK4FKeB1cNRI72T0jt+r6DqFTjfpJHs/FjEo\nq86HWtHWGh1AYaIi5LBMLQ1tNEcSNvvZW49AsUISqJRFwFvwubBhLh36DaucM4aI\nWPLQUeUCgYEA37+Qy6o3vvfwj0pJ4Ecqo5FRZkxBbUmVTdr1RVPAFxRchsKzsvx4\nWKRDkmIlvf/vpaB4cUsYDZVOd1qGXciFQODk+FfLbOCDbcR1qv87YL/tKNRO/sox\nBt3yS6vyCokn48Ycaqs+tYcHC2O0Vaye/VvwwUSQMLLVdGR84N2hzX8CgYEA3S15\ndqEiWI8a27EX4AD4q9avNJJCwkO5B9/YBnZBpy1DcFSozP5JfgoH1ilK4tmiXjZO\n3Y+oTcKRUKOSQPjv8obTt3N3xtdabWMW6sH31kOfiKOmDg2lw/UjYQ+xO5FBE/Pi\nOR4XRbhSe04dJ+U2Gik38f/WtgA9h53YOeAJ5UMCgYA2kFLRN+tsSK6DYwxtAy3k\nwZVmKwZxjlY4rELP60KW3kJKIsULywHWLAjGc+TcVsOsUlvM1RFCjryZ4puN106X\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nMINDSJIBAAAFDVCXwVAe1YBRi+WpkTp02mOPbgj9NgjpwKQEOJugAqdzBdprBxTs\nDtfenYxFW9Iqj58oCzDuUJGWkA4lolYMkcbvEhE2fhOTNH9UdFyhC6WDQuaFnr1x\nbC4LAoGAbzqfS4vF+kloxneGdWJnAiibvEEUWVmMZ4GMF0a7w0x2l+jwiGT2Kt8P\nC5VdZvMMktzfTHynq6j6BfnSYCBJFNp1EbwZksGtEnT4ggCdIVNY+N1wVeok1vp/\n17/R87a1O62MeA5gBeGdpoMof/XrFVUdb/kSXyNt8miUeLOez/M=\n-----END RSA PRIVATE KEY-----
+    In .env, important to format on a single line, representing any newlines in the key as ``\n``
+    otherwise the variable will not be read correctly.
 
 SFDX_HUB_USERNAME: 
     This represents the username used to login to your sfdx hub account
@@ -140,32 +139,10 @@ To acquire the connected_app variables just use the client id, client secret and
 of the connected app that was created for ``SFDX_CLIENT_ID`` and ``SFDX_HUB_KEY``.
 
 
-Production Variables
---------------------
-
-GITHUB_WEBHOOK_SECRET
-    definition here
-DJANGO_AWS_ACCESS_KEY_ID
-    definition here
-DJANGO_AWS_SECRET_ACCESS_KEY
-    definition here
-DJANGO_AWS_STORAGE_BUCKET_NAME
-    definition here
-DJANGO_SERVER_EMAIL
-    definition here
-DJANGO_SENTRY_DSN
-    definition here
-
-
 Other Variables 
 ---------------
 
 *Some variables are preset in this section if this is the case it will explicitly tell you where its declaration is in the description.*
-
-DJANGO_SECRET_KEY: 
-    This represents the secret key for the django web application and is used to sign session cookies;, 
-    arbritary strings such as the one given in the env.example are used. Important this variable is 
-    not copied from another Django site.
 
 CHROMEDRIVER_DIR:
     This environment variable represents the directory where the chromedriver package resides
@@ -190,12 +167,6 @@ DJANGO_HASHID_SALT:
     This represents the hashid salt for the django application, currently set to 
     arbritary string due to non production defaults, can be overridden 
     in docker-compose.yml. Currently set in Dockerfile.
-
-DJANGO_SECRET_KEY: 
-    This represents the key for the django web application, currently set to arbritary
-    string due to non production defaults, can be overridden in docker-compose.yml.
-    Currently set in Dockerfile. For local testing, arbritary strings such as the one given 
-    in the env.example will suffice. Otherwise use your production secret key.
     
 Build Arguments
 -------------------------------
