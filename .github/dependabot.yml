@@ -6,16 +6,6 @@ updates:
     interval: weekly
     day: sunday
   open-pull-requests-limit: 99
-  ignore:
-  - dependency-name: coverage
-    versions:
-    - "= 5.x"
-  - dependency-name: Django
-    versions:
-    - "= 3.x"
-  - dependency-name: simple-salesforce
-    versions:
-    - "= 0.74.3"
 - package-ecosystem: npm
   directory: "/"
   schedule:
