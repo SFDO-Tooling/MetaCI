@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Placeholder wrapper script to make sure the commands in Procfile
+# work even when the heroku/redis buildpack is not in use.
+
+exec "$@"
