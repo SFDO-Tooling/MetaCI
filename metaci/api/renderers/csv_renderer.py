@@ -1,9 +1,10 @@
 # I started here: https://www.django-rest-framework.org/api-guide/renderers/#example
 
-from rest_framework import renderers
-import unicodecsv as csv
+import csv
 import io
 import logging
+
+from rest_framework import renderers
 
 logger = logging.getLogger(__name__)
 
@@ -23,12 +24,12 @@ class SimpleCSVRenderer(renderers.BaseRenderer):
             return detail
 
         table_data = self.to_table(data["results"])
-        csv_buffer = io.BytesIO()
+        csv_buffer = io.StringIO()
         writer = csv.writer(csv_buffer)
         for row in table_data:
             writer.writerow(row)
 
-        return csv_buffer.getvalue()
+        return csv_buffer.getvalue().encode("utf-8")
 
     def to_table(self, data, fields=None):
         """Generator to stream the data as a series of rows"""
