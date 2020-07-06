@@ -1,11 +1,10 @@
-from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework import viewsets
-from django_filters.rest_framework import DjangoFilterBackend
-from metaci.api.renderers import SimpleCSVRenderer
+from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
+
+from metaci.api.renderers.csv_renderer import SimpleCSVRenderer
 from metaci.api.serializers.robot import RobotTestResultSerializer
-from metaci.testresults.models import TestResult
 from metaci.testresults.filters import RobotResultFilter
-from rest_framework.filters import OrderingFilter
+from metaci.testresults.models import TestResult
 
 
 class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
