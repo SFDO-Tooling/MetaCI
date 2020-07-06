@@ -18,6 +18,9 @@ class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = TestResult.objects.filter(method__testclass__test_type="Robot")
+        queryset = queryset.prefetch_related(
+            "build_flow__build__branch", "build_flow__build__repo", "method__testclass",
+        )
 
         # FIXME: I'd like the user to be able to specify a period
         # of time such as "last two weeks" or "this month"...
