@@ -106,6 +106,8 @@ class TestResultManager(models.Manager):
 
 
 class TestResult(models.Model):
+    __test__ = False  # keep pytest from whining
+
     build_flow = models.ForeignKey(
         "build.BuildFlow", related_name="test_results", on_delete=models.CASCADE
     )
