@@ -16,6 +16,7 @@ class ReleaseAdmin(admin.ModelAdmin):
                     "release_creation_date",
                     ("sandbox_push_date", "production_push_date"),
                     "work_item_link",
+                    "change_case_link",
                 )
             },
         ),
@@ -26,17 +27,17 @@ class ReleaseAdmin(admin.ModelAdmin):
         ("Salesforce Release", {"fields": ("package_version_id", "trialforce_id")}),
     )
 
+    date_hierarchy = "release_creation_date"
     list_display = (
         "repo",
-        "version_name",
+        "git_tag",
         "status",
         "release_creation_date",
         "package_version_id",
     )
-    list_display_links = ("version_name",)
+    list_display_links = ("git_tag",)
     list_filter = ("repo", "status")
     list_select_related = ("repo",)
-    save_as = True
     search_fields = ["^package_version_id", "^git_tag"]
     empty_value_display = "-empty-"
 

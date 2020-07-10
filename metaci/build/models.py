@@ -323,7 +323,14 @@ class Build(models.Model):
 
         except Exception as e:
             self.logger.error(str(e))
-            set_build_info(build, status="error", time_end=timezone.now())
+            set_build_info(
+                build,
+                status="error",
+                time_end=timezone.now(),
+                error_message=str(e),
+                exception=e.__class__.__name__,
+                traceback="".join(traceback.format_tb(e.__traceback__)),
+            )
             self.delete_build_dir()
             self.flush_log()
             return
@@ -605,18 +612,18 @@ class BuildFlow(models.Model):
             status = "success"
 
         except FAIL_EXCEPTIONS as e:
+            self.logger.error(traceback.format_exc())
             exception = e
             self.load_test_results()
             status = "fail"
 
         except Exception as e:
+            self.logger.error(traceback.format_exc())
             exception = e
             status = "error"
 
         kwargs = {"status": status, "time_end": timezone.now()}
         if exception:
-            if status == "error":
-                self.logger.error(str(exception))
             kwargs["error_message"] = str(exception)
             kwargs["exception"] = exception.__class__.__name__
             kwargs["traceback"] = "".join(traceback.format_tb(exception.__traceback__))

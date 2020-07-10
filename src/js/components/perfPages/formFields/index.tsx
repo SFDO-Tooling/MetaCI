@@ -75,9 +75,10 @@ const DecimalField = (
   // linter bug?
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let step: number | null | typeof undefined = parseInt(filter.step, 10);
-  step = isNaN(step) ? 1 : step;
+  if (isNaN(step)) {
+    step = 1;
+  }
 
-  // TODO: Test why this uses TextInput instead of Input. Can't use minValue with TextInput.
   return {
     name: filter.name,
     currentValue,
@@ -103,7 +104,7 @@ export const createField = (
   filterDef: FilterDefinition,
   currentValue: string | null,
   onSubmit: (value) => void,
-) => {
+): FieldTypes => {
   const fieldType = FieldTypes[filterDef.field_type];
   if (fieldType) {
     return fieldType(filterDef, currentValue, onSubmit);
@@ -133,7 +134,11 @@ const spacerField = {
   render: () => <span />, // eslint-disable-line react/display-name
 };
 
-export const AllFilters = ({ filters }: { filters: Field[] }) => {
+export const AllFilters = ({
+  filters,
+}: {
+  filters: Field[];
+}): React.ReactNode => {
   // Yes...this is gross. I'm sorry.
   filters.splice(2, 0, spacerField, spacerField);
   filters = filters.filter((x) => x); // get rid of nulls

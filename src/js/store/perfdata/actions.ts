@@ -1,8 +1,7 @@
 import { assertUIData, UIData } from 'api/testmethod_perf_UI_JSON_schema';
 import { assertPerfData } from 'api/testmethod_perfdata_JSON_schema';
-import queryString from 'query-string';
-import { AnyAction } from 'redux';
-import { ThunkDispatch } from 'redux-thunk';
+import { stringify } from 'query-string';
+import { Dispatch } from 'redux';
 import { PerfData } from 'store/perfdata/reducer';
 
 export const testmethod_perfdata_url = '/api/testmethod_perf';
@@ -43,8 +42,6 @@ export type UIDataAction =
   | UIDataLoadingAction
   | UIDataError;
 
-type ReduxDispatch = ThunkDispatch<{}, {}, AnyAction>;
-
 export const perfREST_API = ({
   dispatch,
   apiFetch,
@@ -52,12 +49,12 @@ export const perfREST_API = ({
   url,
   checkValid,
 }: {
-  dispatch: ReduxDispatch;
+  dispatch: Dispatch;
   apiFetch: UntypedFunc;
   prefix: string;
   url: string;
   checkValid: UntypedFunc;
-}) => {
+}): Promise => {
   dispatch({ type: `${prefix}_DATA_LOADING`, payload: { url } });
   return apiFetch(url, { method: 'GET' }).then((payload: any) => {
     try {
@@ -81,13 +78,16 @@ export const perfREST_API = ({
 
 /* eslint-disable no-use-before-define */
 
-export const perfRESTFetch = (url: string, params?: {}) => (
-  dispatch: ReduxDispatch,
-  _getState: any,
-  { apiFetch },
-) => {
+export const perfRESTFetch = (
+  url: string,
+  params?: Record<string, unknown>,
+) => (
+  dispatch: Dispatch,
+  _getState: RootState,
+  { apiFetch }: { Function },
+): Promise => {
   if (params) {
-    url = `${url}&${queryString.stringify(params)}`;
+    url = `${url}&${stringify(params)}`;
   }
   return perfREST_API({
     dispatch,
@@ -98,14 +98,14 @@ export const perfRESTFetch = (url: string, params?: {}) => (
   });
 };
 
-export const perfREST_UI_Fetch = (params?: {}) => (
-  dispatch: ReduxDispatch,
-  _getState: any,
+export const perfREST_UI_Fetch = (params?: Record<string, unknown>) => (
+  dispatch: Dispatch,
+  _getState: RootState,
   { apiFetch }: { apiFetch: any },
-) => {
+): Promise => {
   let url = testmethod_perf_UI_url;
   if (params) {
-    url = `${url}?${queryString.stringify(params)}`;
+    url = `${url}?${stringify(params)}`;
   }
   return perfREST_API({
     dispatch,
@@ -116,5 +116,5 @@ export const perfREST_UI_Fetch = (params?: {}) => (
   });
 };
 
-// flowlint-next-line unclear-type:off
+// eslint-disable-next-line @typescript-eslint/ban-types
 type UntypedFunc = Function; // the types would be quite complex.

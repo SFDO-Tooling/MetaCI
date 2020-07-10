@@ -288,7 +288,7 @@ AUTHENTICATION_BACKENDS = (
 # Some really nice defaults
 ACCOUNT_AUTHENTICATION_METHOD = "username"
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = env("ACCOUNT_EMAIL_VERIFICATION", default="mandatory")
 
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 ACCOUNT_ADAPTER = "metaci.users.adapters.AccountAdapter"
@@ -342,7 +342,7 @@ FROM_EMAIL = "test@mailinator.com"
 # Github credentials
 GITHUB_USERNAME = env("GITHUB_USERNAME", default=None)
 GITHUB_PASSWORD = env("GITHUB_PASSWORD", default=None)
-GITHUB_WEBHOOK_SECRET = None
+GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET", default="")
 
 # Salesforce OAuth Connected App credentials
 CONNECTED_APP_CLIENT_ID = None
@@ -353,10 +353,18 @@ SFDX_CLIENT_ID = None
 SFDX_HUB_KEY = None
 SFDX_HUB_USERNAME = None
 
+SF_SANDBOX_LOGIN_URL = env(
+    "SF_SANDBOX_LOGIN_URL", default="https://test.salesforce.com"
+)
+SF_PROD_LOGIN_URL = env("SF_PROD_LOGIN_URL", default="https://login.salesforce.com")
+
 # Application Behaviors
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", True)
 METACI_FLOW_CALLBACK_ENABLED = env.bool("METACI_FLOW_CALLBACK_ENABLED", True)
 METACI_ALLOW_PERSISTENT_ORG_LOGIN = env.bool("METACI_ALLOW_PERSISTENT_ORG_LOGIN", False)
+METACI_ENFORCE_RELEASE_CHANGE_CASE = env.bool(
+    "METACI_ENFORCE_RELEASE_CHANGE_CASE", False
+)
 
 # Number of scratch orgs to leave available in the org.
 SCRATCH_ORG_RESERVE = env.int("METACI_SCRATCH_ORG_RESERVE", 10)

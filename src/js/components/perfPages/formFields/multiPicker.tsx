@@ -24,7 +24,11 @@ const getSelectionListFromDefaultValue = (options: any[], defaultValue) => {
   return undefined;
 };
 
-const MultiPicker = ({ onChange, choices, defaultValue }: Props) => {
+const MultiPicker = ({
+  onChange,
+  choices,
+  defaultValue,
+}: Props): React.ReactNode => {
   console.assert(choices && choices.length, 'Choices is empty', choices); // eslint-disable-line no-console
   const options = choices.map((pair) => ({ id: pair[0], label: pair[1] }));
 

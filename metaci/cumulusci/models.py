@@ -22,7 +22,7 @@ from simple_salesforce.exceptions import SalesforceError
 
 def jwt_session(url=None, username=None):
     if url is None:
-        url = "https://login.salesforce.com"
+        url = settings.SF_PROD_LOGIN_URL
 
     payload = {
         "alg": "RS256",
@@ -193,7 +193,7 @@ class ScratchOrgInstance(models.Model):
         return ScratchOrgConfig(org_config, self.org.name)
 
     def get_jwt_based_session(self):
-        return jwt_session("https://test.salesforce.com", self.username)
+        return jwt_session(settings.SF_SANDBOX_LOGIN_URL, self.username)
 
     def delete_org(self, org_config=None):
         if org_config is None:

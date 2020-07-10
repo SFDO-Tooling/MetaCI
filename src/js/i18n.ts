@@ -1,4 +1,4 @@
-import i18n from 'i18next';
+import i18next from 'i18next';
 import i18n_detector from 'i18next-browser-languagedetector';
 import i18n_backend from 'i18next-xhr-backend';
 import { initReactI18next } from 'react-i18next';
@@ -9,7 +9,7 @@ import { logError } from 'utils/logging';
 // are loaded).
 
 const init = (cb: (error?: string) => void): Promise<any> =>
-  i18n
+  i18next
     .use(i18n_detector)
     .use(i18n_backend)
     .use(initReactI18next)

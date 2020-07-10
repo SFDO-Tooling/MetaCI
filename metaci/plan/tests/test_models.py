@@ -1,9 +1,7 @@
-from django.contrib.auth.models import User
 from django.test import TestCase
 
 from metaci.repository.models import Repository
 from metaci.plan.models import Plan
-from metaci.plan.models import PlanRepository
 
 
 class PlanTestCase(TestCase):
