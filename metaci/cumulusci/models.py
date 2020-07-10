@@ -140,7 +140,7 @@ class ExpiredOrgManager(models.Manager):
 
 class ScratchOrgInstance(models.Model):
     org = models.ForeignKey(
-        "cumulusci.Org", related_name="instances", on_delete=models.CASCADE
+        "cumulusci.Org", related_name="instances", on_delete=models.PROTECT
     )
     build = models.ForeignKey(
         "build.Build",
