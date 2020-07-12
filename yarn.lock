@@ -5874,15 +5874,15 @@ i18next-browser-languagedetector@^5.0.0:
   dependencies:
     "@babel/runtime" "^7.5.5"
 
-i18next-scanner-webpack@^0.4.4:
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/i18next-scanner-webpack/-/i18next-scanner-webpack-0.4.5.tgz#63cc7df999b25ce42206c5869acefc648913eb61"
-  integrity sha512-OIkgTztJYsQwzaw9nwFVogs7glHrHjr3gPrkdUZ+qI12bHiOqxjLbl/DKDmKKgH01qzTgk2lZuMhQ5uiO9UB6Q==
+i18next-scanner-webpack@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/i18next-scanner-webpack/-/i18next-scanner-webpack-0.5.0.tgz#983e68b09848360798ccf9adfe41b1afc28661f4"
+  integrity sha512-6Ot+uZyBEzGihscw6n1CApvNjJ5fB09SvAngjtDFpJwgbYEx+AfEGh9ZLP5B436UQ0bEm0vXB7Nguu6XviENTg==
   dependencies:
-    i18next-scanner "^2.10.3"
+    i18next-scanner "^2.11.0"
     vinyl-fs "^3.0.3"
 
-i18next-scanner@^2.10.3:
+i18next-scanner@^2.11.0:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/i18next-scanner/-/i18next-scanner-2.11.0.tgz#58c7ffadd5192cdb2b1b2a6c743b1314050ccb4c"
   integrity sha512-/QqbSnUj9v6EwndaWeHp8NkHqLKAIHSlI1HXSyLdIPKWYM+Fnpk2tjnyjP8qn7L0rLT7HLH4bvyiw61wOIxf0A==
