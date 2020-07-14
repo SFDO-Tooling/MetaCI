@@ -1,10 +1,10 @@
-setuptools==47.3.1
+setuptools==49.1.2
 
 # CumulusCI
-cumulusci==3.15.0.dev4
+cumulusci==3.16.0.dev1
 
 # Django
-django==2.2.13
+django==2.2.14
 
 # Configuration
 django-environ==0.4.5
@@ -12,7 +12,7 @@ whitenoise==5.1.0
 
 
 # Forms
-django-crispy-forms==1.9.1
+django-crispy-forms==1.9.2
 django_filter==2.3.0
 
 # Models
@@ -66,7 +66,7 @@ django-log-request-id==1.5.0
 psycopg2-binary==2.8.5
 
 # django-storages for S3
-boto3==1.14.13
+boto3==1.14.20
 django-storages==1.9.1
 
 # JSON web token
