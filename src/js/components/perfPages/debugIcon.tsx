@@ -1,4 +1,5 @@
 import Icon from '@salesforce/design-system-react/components/icon';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { AppState } from 'store';
@@ -24,6 +25,10 @@ const UnwrappedDebugIcon = ({ debugStatus, apiURL }: ReduxProps) =>
       </a>
     </div>
   ) : null;
+UnwrappedDebugIcon.propTypes = {
+  debugStatus: PropTypes.bool,
+  apiURL: PropTypes.string.isRequired,
+};
 
 const select = (appState: AppState) => ({
   debugStatus: selectDebugStatus(appState),
