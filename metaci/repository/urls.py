@@ -36,6 +36,12 @@ urlpatterns = [
         kwargs={"tab": "perf"},
     ),
     url(
+        r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/results",
+        repository_views.repo_results,
+        name="repo_results",
+        kwargs={"tab": "results"},
+    ),
+    url(
         r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/tests",
         repository_views.repo_tests,
         name="repo_tests",

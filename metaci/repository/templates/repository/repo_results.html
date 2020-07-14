@@ -1,0 +1,109 @@
+{% extends 'layout_full.html' %}
+
+{% block layout_parent_link %}<a href="/repos/">Repos</a>{% endblock %}
+
+{% block layout_header_text %}{{ repo }}{% endblock %}
+
+{% block layout_header_details %}
+  <ul class="slds-grid slds-page-header__detail-row">
+    <li class="slds-page-header__detail-block">
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">URL</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ repo.url }}">
+        <a href="{{ repo.url }}" target="_blank">{{ repo.url }}</a>
+      </p>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block layout_body %}
+
+<div class="slds-tabs--default">
+  <ul class="slds-tabs--default__nav" role="tablist">
+    <li class="slds-tabs--default__item" title="Builds" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Latest Builds</a></li>
+    <li class="slds-tabs--default__item" title="Branches" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/branches" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Branches</a></li>
+    <li class="slds-tabs--default__item" title="Plans" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/plans" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item">Plans</a></li>
+    <li class="slds-tabs--default__item" title="Orgs" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/orgs" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-4" id="tab-default-4__item">Orgs</a></li>
+    <li class="slds-tabs--default__item {% if tab == 'perf' %}slds-active {% endif %}" title="Perf" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/perf" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-5" id="tab-default-5__item">Perf (Beta)</a></li>
+    <li class="slds-tabs--default__item {% if tab == 'results' %}slds-active {% endif %}" title="Robot Results" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/results" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-6" id="tab-default-6__item">Robot Results</a></li>
+  </ul>
+</div>
+
+<div id="tab-default-6" class="slds-tabs--default__content slds-show"
+     role="tabpanel" aria-labelledby="tab-default-6__item">
+  <div class="slds-p-bottom_small">
+    <div class="slds-box">
+
+      <div class="slds-text-body_regular">
+        The links on this page enable you to download a CSV file with
+        robot results for a specific time period and for a specific
+        branch. A week is considered to start on Monday (eg: tests that
+        run over a weekend are considered to be last week).
+      </div>
+
+      <div class="slds-text-body_regular">
+        <br /> <!-- why must I use this? Why isn't there naturally some space between paragraphs? -->
+        <div class="slds-media__figure">
+          <svg class="slds-button__icon slds-theme--info_alt" aria-hidden="true">
+            <use xlink:href="/static/design-system/assets/icons/utility-sprite/svg/symbols.svg#info_alt"></use>
+          </svg>
+          <span class="slds-assistive-text">Info</span>
+          These links can be bookmarked since they do not have hard-coded dates in them.
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- it might be nice to have a third column with a sparkline for % passed ... -->
+  <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+    <thead>
+      <tr class="slds-text-title--caps">
+        <th scope="col"><div class="slds-truncate" title="">Branch</div></th>
+        <th scope="col"><div class="slds-truncate" title="">Robot Results</div></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% with branches=repo.branches.all %}
+      <tr>
+        <td>all branches</td>
+        <td>{% include "./robot_api_links.html" with args="&repo_name="|add:repo.name %}</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="slds-truncate" title="master">
+            {% for branch in branches %}
+              {% if branch.name == "master" %}
+                <div class="slds-truncate" title="{{ branch.name }}">
+                  <a href="{{ branch.get_absolute_url }}">{{ branch.name }}</a>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </td>
+        <td>
+          {% with args="&repo_name="|add:repo.name|add:"&branch_name=master" %}
+            {% include "./robot_api_links.html" %}
+          {% endwith %}
+        </td>
+      </tr>
+      <tr style='background-color: #EEF1F6;'><td colspan=2></td></tr>
+      {% for branch in branches %}
+        {% if branch.name != "master" %}
+          <tr>
+            <td>
+              <div class="slds-truncate" title="{{ branch.name }}">
+                <a href="{{ branch.get_absolute_url }}">{{ branch.name }}</a>
+              </div>
+            </td>
+            <td>
+              {% with args="&repo_name="|add:repo.name|add:"&branch_name="|add:branch.name  %}
+                {% include "./robot_api_links.html" %}
+              {% endwith %}
+            </td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    {% endwith %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
