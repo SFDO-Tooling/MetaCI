@@ -110,6 +110,17 @@ class TestAPIRobot(APITestCase):
         actual = response.content.decode().splitlines()
         self.assertCountEqual(expected, actual)
 
+    def test_branch_filter(self):
+        self.client.force_authenticate(self.superuser)
+        response = self.client.get("/api/robot.csv&branch_name=master")
+        expected = [
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
+            f"2,{self.today},repo1,master,Pass,file1.robot,Passing 1,,x",
+            f"3,{self.today},repo1,master,Pass,file1.robot,Passing 2,,",
+        ]
+        actual = response.content.decode().splitlines()
+        self.assertCountEqual(expected, actual)
+
     def test_repo_filter(self):
         self.client.force_authenticate(self.superuser)
         response = self.client.get("/api/robot.csv?repo_name=repo2")
@@ -197,7 +208,6 @@ class TestAPIRobotDateHandling(APITestCase):
             "2020-01-03",
             "2020-01-03",
         ):
-            #            time_end = dateutil.parser.parse(f"{date} 01:00:00")
             time_end = timezone.make_aware(
                 dateutil.parser.parse(f"{date} 01:00:00"), tz
             )

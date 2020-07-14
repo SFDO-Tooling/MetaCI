@@ -55,6 +55,10 @@ class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
             time_end__date__gte=start_date, time_end__date__lt=end_date
         )
 
+        branch_name = self.request.query_params.get("branch_name", None)
+        if branch_name is not None:
+            buildflows = buildflows.filter(build__branch__name=branch_name)
+
         queryset = (
             TestResult.objects.filter(
                 method__testclass__test_type="Robot", build_flow_id__in=buildflows,
