@@ -1,8 +1,10 @@
 """Test cases for /api/robot, mostly focusing on csv output"""
 
+from unittest.mock import patch
 import dateutil.parser
 from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
+from metaci.api.views.robot import RobotTestResultViewSet
 
 from metaci.conftest import (
     BranchFactory,
@@ -201,12 +203,12 @@ class TestAPIRobotDateHandling(APITestCase):
         tz = timezone.get_current_timezone()
         for date in (
             cls.today,
-            "2020-01-01",
-            "2020-01-02",
-            "2020-01-02",
-            "2020-01-03",
-            "2020-01-03",
-            "2020-01-03",
+            "2020-Jan-01",
+            "2020-Jan-02",
+            "2020-Jan-02",
+            "2020-Jan-03",
+            "2020-Jan-03",
+            "2020-Jan-03",
         ):
             time_end = timezone.make_aware(
                 dateutil.parser.parse(f"{date} 01:00:00"), tz
@@ -260,3 +262,34 @@ class TestAPIRobotDateHandling(APITestCase):
             "14,2020-01-03 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,,Some keyword",
         ]
         self.assertCountEqual(expected, actual)
+
+class TestAPIRobotTimePeriods(APITestCase):
+    """Verify the date range computations are correct"""
+    def test_range(self):
+
+        errors = []
+        with patch("metaci.api.views.robot.RobotTestResultViewSet._get_today") as mock_get_today:
+            # Note: Monday of the week with this date is Dec 30,
+            # chosen to handle the case of last week, last month cross
+            # month and year boundaries
+            mock_get_today.return_value=dateutil.parser.parse("2020-01-01").date()
+
+            ranges = {
+                "today": ("2020-01-01", "2020-01-02"),
+                "yesterday": ("2019-12-31", "2020-01-01"),
+                "thisweek": ("2019-12-30", "2020-01-02"),
+                "lastweek": ("2019-12-23", "2019-12-30"),
+                "thismonth": ("2020-01-01", "2020-02-01"),
+                "lastmonth": ("2019-12-01", "2020-01-01"),
+            }
+            viewset = RobotTestResultViewSet()
+            for range_name, expected_ranges in ranges.items():
+                actual_start, actual_end = viewset._get_date_range(range_name)
+                expected_start, expected_end=(
+                    dateutil.parser.parse(date).date() for date in expected_ranges
+                )
+                if expected_start != actual_start:
+                    errors.append(f"{range_name}: start expected {expected_start} actual {actual_start}")
+                if expected_end != actual_end:
+                    errors.append(f"{range_name}: end expected {expected_end} actual {actual_end}")
+        assert not errors, "date range exceptions\n" + "\n".join(errors)
