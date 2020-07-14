@@ -12,7 +12,11 @@ logger = logging.getLogger(__name__)
 class SimpleCSVRenderer(renderers.BaseRenderer):
     """Renders simple 1-level-deep data as csv"""
 
-    media_type = "text/plain"  # should we use text/csv instead?
+    # Setting media_type to text/csv results in the file being
+    # downloaded rather than being displayed in the browser.
+    # I _think_ that's what I want, but is there a smarter
+    # way to do this (eg: by passing in an accept header)?
+    media_type = "text/csv"
     format = "csv"
 
     def render(self, data, media_type=None, renderer_context={}):
