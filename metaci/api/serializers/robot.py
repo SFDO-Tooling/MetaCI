@@ -28,6 +28,6 @@ class RobotTestResultSerializer(serializers.ModelSerializer):
             "outcome",
             "source_file",
             "test_name",
-            "message",
             "robot_keyword",
+            "message",
         )

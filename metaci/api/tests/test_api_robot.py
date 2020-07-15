@@ -101,13 +101,13 @@ class TestAPIRobot(APITestCase):
         self.client.force_authenticate(self.superuser)
         response = self.client.get("/api/robot.csv")
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
             f"2,{self.today},repo1,master,Pass,file1.robot,Passing 1,,",
             f"3,{self.today},repo1,master,Pass,file1.robot,Passing 2,,",
-            f"4,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 1,epic fail,KW1",
-            f"5,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 2,epic fail,KW1",
-            f"6,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 3,epic fail,KW2",
-            f"7,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 4,ʃıɐɟ ɔıdǝ,KW3",
+            f"4,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 1,KW1,epic fail",
+            f"5,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 2,KW1,epic fail",
+            f"6,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 3,KW2,epic fail",
+            f"7,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 4,KW3,ʃıɐɟ ɔıdǝ",
         ]
         actual = response.content.decode().splitlines()
         self.assertCountEqual(expected, actual)
@@ -116,8 +116,8 @@ class TestAPIRobot(APITestCase):
         self.client.force_authenticate(self.superuser)
         response = self.client.get("/api/robot.csv&branch_name=master")
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
-            f"2,{self.today},repo1,master,Pass,file1.robot,Passing 1,,x",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
+            f"2,{self.today},repo1,master,Pass,file1.robot,Passing 1,,",
             f"3,{self.today},repo1,master,Pass,file1.robot,Passing 2,,",
         ]
         actual = response.content.decode().splitlines()
@@ -127,11 +127,11 @@ class TestAPIRobot(APITestCase):
         self.client.force_authenticate(self.superuser)
         response = self.client.get("/api/robot.csv?repo_name=repo2")
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
-            f"4,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 1,epic fail,KW1",
-            f"5,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 2,epic fail,KW1",
-            f"6,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 3,epic fail,KW2",
-            f"7,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 4,ʃıɐɟ ɔıdǝ,KW3",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
+            f"4,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 1,KW1,epic fail",
+            f"5,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 2,KW1,epic fail",
+            f"6,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 3,KW2,epic fail",
+            f"7,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 4,KW3,ʃıɐɟ ɔıdǝ",
         ]
 
         actual = response.content.decode().splitlines()
@@ -141,7 +141,7 @@ class TestAPIRobot(APITestCase):
         self.client.force_authenticate(self.superuser)
         response = self.client.get("/api/robot.csv?branch_name=master")
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
             f"2,{self.today},repo1,master,Pass,file1.robot,Passing 1,,",
             f"3,{self.today},repo1,master,Pass,file1.robot,Passing 2,,",
         ]
@@ -152,11 +152,11 @@ class TestAPIRobot(APITestCase):
         self.client.force_authenticate(self.superuser)
         response = self.client.get("/api/robot.csv?outcome=Fail")
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
-            f"4,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 1,epic fail,KW1",
-            f"5,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 2,epic fail,KW1",
-            f"6,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 3,epic fail,KW2",
-            f"7,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 4,ʃıɐɟ ɔıdǝ,KW3",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
+            f"4,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 1,KW1,epic fail",
+            f"5,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 2,KW1,epic fail",
+            f"6,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 3,KW2,epic fail",
+            f"7,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 4,KW3,ʃıɐɟ ɔıdǝ",
         ]
         actual = response.content.decode().splitlines()
         self.assertCountEqual(expected, actual)
@@ -165,8 +165,8 @@ class TestAPIRobot(APITestCase):
         self.client.force_authenticate(self.superuser)
         response = self.client.get("/api/robot.csv?test_name=Failing 2")
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
-            f"5,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 2,epic fail,KW1",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
+            f"5,{self.today},repo2,feature/robot,Fail,file2.robot,Failing 2,KW1,epic fail",
         ]
         actual = response.content.decode().splitlines()
         self.assertCountEqual(expected, actual)
@@ -175,9 +175,9 @@ class TestAPIRobot(APITestCase):
         self.client.force_authenticate(self.superuser)
         response = self.client.get("/api/robot.csv?source_file=file3.robot")
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
-            f"6,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 3,epic fail,KW2",
-            f"7,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 4,ʃıɐɟ ɔıdǝ,KW3",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
+            f"6,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 3,KW2,epic fail",
+            f"7,{self.today},repo2,feature/robot,Fail,file3.robot,Failing 4,KW3,ʃıɐɟ ɔıdǝ",
         ]
         actual = response.content.decode().splitlines()
         self.assertCountEqual(expected, actual)
@@ -231,8 +231,8 @@ class TestAPIRobotDateHandling(APITestCase):
         response = self.client.get("/api/robot.csv")
         actual = response.content.decode().splitlines()
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
-            f"8,{self.today},repo1,master,Pass,/tmp/example.robot,Test 1,,Some keyword",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
+            f"8,{self.today},repo1,master,Pass,/tmp/example.robot,Test 1,Some keyword,",
         ]
         self.assertCountEqual(expected, actual)
 
@@ -242,9 +242,9 @@ class TestAPIRobotDateHandling(APITestCase):
         response = self.client.get("/api/robot.csv?from=2020-01-02")
         actual = response.content.decode().splitlines()
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
-            "10,2020-01-02 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,,Some keyword",
-            "11,2020-01-02 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,,Some keyword",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
+            "10,2020-01-02 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,Some keyword,",
+            "11,2020-01-02 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,Some keyword,",
         ]
         self.assertCountEqual(expected, actual)
 
@@ -254,12 +254,12 @@ class TestAPIRobotDateHandling(APITestCase):
         response = self.client.get("/api/robot.csv?from=2020-01-02&to=2020-01-03")
         actual = response.content.decode().splitlines()
         expected = [
-            "id,date,repo_name,branch_name,outcome,source_file,test_name,message,robot_keyword",
-            "10,2020-01-02 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,,Some keyword",
-            "11,2020-01-02 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,,Some keyword",
-            "12,2020-01-03 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,,Some keyword",
-            "13,2020-01-03 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,,Some keyword",
-            "14,2020-01-03 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,,Some keyword",
+            "id,date,repo_name,branch_name,outcome,source_file,test_name,robot_keyword,message",
+            "10,2020-01-02 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,Some keyword,",
+            "11,2020-01-02 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,Some keyword,",
+            "12,2020-01-03 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,Some keyword,",
+            "13,2020-01-03 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,Some keyword,",
+            "14,2020-01-03 01:00:00,repo1,master,Pass,/tmp/example.robot,Test 1,Some keyword,",
         ]
         self.assertCountEqual(expected, actual)
 
