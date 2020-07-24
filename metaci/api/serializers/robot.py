@@ -22,10 +22,11 @@ class RobotTestResultSerializer(serializers.ModelSerializer):
         model = TestResult
         fields = (
             "id",
+            "outcome",
             "date",
+            "duration",
             "repo_name",
             "branch_name",
-            "outcome",
             "source_file",
             "test_name",
             "robot_keyword",
