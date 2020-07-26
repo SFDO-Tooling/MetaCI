@@ -6,7 +6,7 @@ pytest-django==3.9.0
 pytest-factoryboy==2.0.3
 pytest-mock==3.2.0
 pytest-tap==3.1
-coverage==5.2
+coverage==5.2.1
 coveralls==2.1.1
 flake8==3.8.3
 factory_boy==2.12.0
