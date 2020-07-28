@@ -113,7 +113,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
 
         return org_config
 
-    def set_org(self, org_config):
+    def set_org(self, org_config, global_org=True):
         org_json = json.dumps(org_config.config, cls=DjangoJSONEncoder)
         try:
             org = Org.objects.get(repo=self.build.repo, name=org_config.name)
