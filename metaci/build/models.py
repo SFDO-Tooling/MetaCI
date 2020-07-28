@@ -33,7 +33,7 @@ from django.utils import timezone
 
 from metaci.build.tasks import set_github_status
 from metaci.build.utils import format_log, set_build_info
-from metaci.cumulusci.config import MetaCIGlobalConfig
+from metaci.cumulusci.config import MetaCIUniversalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
 from metaci.testresults.importer import import_test_results
@@ -443,8 +443,8 @@ class Build(models.Model):
         return build_dir
 
     def get_project_config(self):
-        global_config = MetaCIGlobalConfig()
-        project_config = global_config.get_project_config(self)
+        universal_config = MetaCIUniversalConfig()
+        project_config = universal_config.get_project_config(self)
         keychain = MetaCIProjectKeychain(project_config, None, self)
         project_config.set_keychain(keychain)
         return project_config
