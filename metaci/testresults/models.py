@@ -306,7 +306,7 @@ class TestResultPerfSummaryBase(models.Model):
         "repository.Repository",
         #        related_name="testresult_perfsummaries",
         db_column="repo_id",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
     rel_branch = models.ForeignKey(
         "repository.Branch",
@@ -314,7 +314,7 @@ class TestResultPerfSummaryBase(models.Model):
         null=False,
         blank=False,
         db_column="branch_id",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
 
     rel_plan = models.ForeignKey(
@@ -323,7 +323,7 @@ class TestResultPerfSummaryBase(models.Model):
         null=False,
         blank=False,
         db_column="plan_id",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
 
     rel_planrepo = models.ForeignKey(
@@ -331,7 +331,7 @@ class TestResultPerfSummaryBase(models.Model):
         null=False,
         blank=False,
         db_column="planrepo_id",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
 
     method = models.ForeignKey(
@@ -339,7 +339,7 @@ class TestResultPerfSummaryBase(models.Model):
         #        related_name="testresult_perfsummaries",
         null=False,
         blank=False,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
 
     agg_duration_average = models.FloatField(null=True, blank=False)

@@ -4,6 +4,7 @@ import Spinner from '@salesforce/design-system-react/components/spinner';
 import i18next from 'i18next';
 import get from 'lodash/get';
 import zip from 'lodash/zip';
+import PropTypes from 'prop-types';
 import { parse } from 'query-string';
 import * as React from 'react';
 import { LoadingStatus, PerfDataState } from 'store/perfdata/reducer';
@@ -179,6 +180,9 @@ const PerfDataTableSpinner = ({ status }: SpinnerProps) => {
     );
   }
   return null;
+};
+PerfDataTableSpinner.propTypes = {
+  status: PropTypes.string.isRequired,
 };
 
 export default PerfDataTable;
