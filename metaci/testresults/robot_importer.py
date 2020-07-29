@@ -167,6 +167,7 @@ def parse_test(test, suite, root):
     zero = timedelta(seconds=0)
     setup_time = _robot_duration(setup.find("status")) if setup else zero
     teardown_time = _robot_duration(teardown.find("status")) if teardown else zero
+    tags = test.find("tags")
 
     # I'm not 100% convinced this is what we want. It's great in the
     # normal case, but it's possible for a test to have multiple failing
@@ -181,6 +182,7 @@ def parse_test(test, suite, root):
             if library:
                 keyword = f"{library}.{keyword}"
 
+    robot_tags = ",".join([tag.text for tag in tags.iterfind("tag")] if tags else []),
     test_info = {
         "suite": suite,
         "name": test.attrib.get("name") or "<no name>",
@@ -189,7 +191,9 @@ def parse_test(test, suite, root):
         "screenshots": [],
         "message": status.text,
         "failing_keyword": keyword,
+        "robot_tags": robot_tags,
     }
+
     delta = _robot_duration(status)
     duration = delta - (setup_time + teardown_time)
 

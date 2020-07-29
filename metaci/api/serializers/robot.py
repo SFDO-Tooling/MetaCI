@@ -29,6 +29,7 @@ class RobotTestResultSerializer(serializers.ModelSerializer):
             "branch_name",
             "source_file",
             "test_name",
+            "robot_tags",
             "robot_keyword",
             "message",
         )
