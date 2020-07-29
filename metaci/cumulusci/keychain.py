@@ -71,9 +71,9 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         org_config = json.loads(org.json)
 
         if org.scratch:
-            config = ScratchOrgConfig(org_config, org.name)
+            config = ScratchOrgConfig(org_config, org.name, keychain=self)
         else:
-            config = OrgConfig(org_config, org.name)
+            config = OrgConfig(org_config, org.name, keychain=self)
 
         # Attach the org model instance to the org config
         config.org = org
@@ -113,7 +113,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
 
         return org_config
 
-    def set_org(self, org_config):
+    def set_org(self, org_config, global_org=True):
         org_json = json.dumps(org_config.config, cls=DjangoJSONEncoder)
         try:
             org = Org.objects.get(repo=self.build.repo, name=org_config.name)

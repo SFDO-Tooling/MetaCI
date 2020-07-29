@@ -2,10 +2,10 @@
 -r test.txt
 
 black==19.10b0
-isort==5.0.9
+isort==5.1.4
 
 Sphinx==3.1.2
-django-extensions==3.0.2
+django-extensions==3.0.3
 Werkzeug==1.0.1
 
 django-debug-toolbar==2.2
