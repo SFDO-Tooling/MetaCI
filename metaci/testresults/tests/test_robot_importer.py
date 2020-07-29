@@ -126,3 +126,11 @@ class RobotImporterTestCase(TestCase):
         test_result = models.TestResult.objects.get(method__name="Passing test")
         self.assertEqual(test_result.message, "Life is good, yo.")
         self.assertEqual(test_result.robot_keyword, None)
+
+    def test_import_robot_tags(self):
+        """Verify that robot tags are added to the database"""
+        buildflow = BuildFlowFactory()
+        path = PurePath(__file__).parent / "robot_1.xml"
+        robot_importer.import_robot_test_results(buildflow, path)
+        test_results = models.TestResult.objects.filter(method__name="FakeTestResult")
+        assert test_results[0].robot_tags == "tag with spaces,w-123456"

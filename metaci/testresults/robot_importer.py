@@ -87,6 +87,7 @@ def import_robot_test_results(build_flow, path):
             message=result["message"],
             robot_keyword=result["failing_keyword"],
             robot_xml=result["xml"],
+            robot_tags=result["robot_tags"],
             task=robot_task,
         )
         testresult.save()
@@ -182,7 +183,9 @@ def parse_test(test, suite, root):
             if library:
                 keyword = f"{library}.{keyword}"
 
-    robot_tags = ",".join([tag.text for tag in tags.iterfind("tag")] if tags else []),
+    robot_tags = ",".join(
+        sorted([tag.text for tag in tags.iterfind("tag")]) if tags else []
+    )
     test_info = {
         "suite": suite,
         "name": test.attrib.get("name") or "<no name>",
