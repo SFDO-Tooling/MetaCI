@@ -8,7 +8,7 @@ django==2.2.15
 
 # Configuration
 django-environ==0.4.5
-whitenoise==5.1.0
+whitenoise==5.2.0
 
 
 # Forms
