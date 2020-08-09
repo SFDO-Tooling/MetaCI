@@ -4,7 +4,7 @@
 black==19.10b0
 isort==5.2.2
 
-Sphinx==3.1.2
+Sphinx==3.2.0
 django-extensions==3.0.3
 Werkzeug==1.0.1
 
