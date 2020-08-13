@@ -11,6 +11,14 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from metaci.release.utils import update_release_from_github
 
 
+class ChangeCaseTemplate(models.Model):
+    name = models.CharField(_("name"), max_length=255)
+    case_template_id = models.CharField(_("case template id"), max_length=18)
+
+    def __str__(self):
+        return self.name
+
+
 class Release(StatusModel):
     STATUS = Choices("draft", "published", "hidden")
     created = AutoCreatedField(_("created"))
@@ -49,6 +57,9 @@ class Release(StatusModel):
     )
     work_item_link = models.URLField(
         _("work item link"), max_length=1024, null=True, blank=True
+    )
+    change_case_template = models.ForeignKey(
+        "release.ChangeCaseTemplate", on_delete=models.SET_NULL, null=True
     )
     change_case_link = models.URLField(
         _("change case link"), max_length=1024, null=True, blank=True

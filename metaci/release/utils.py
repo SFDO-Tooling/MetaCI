@@ -3,9 +3,12 @@ from __future__ import unicode_literals
 
 import logging
 import re
+import urllib.parse
 
+from django.conf import settings
+from django.db import transaction
 from django.utils.dateparse import parse_date
-from django.utils.dateparse import parse_datetime
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -52,3 +55,30 @@ def update_release_from_github(release, repo_api=None):
         release.trialforce_id = trialforce_id[0]
 
     return release
+
+
+def send_release_webhook(project_config, release):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
+        return
+    logger.info(
+        f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+    )
+    tag = release.git_tag
+    payload = {
+        "case_template_id": release.change_case_template.case_template_id,
+        "package_name": project_config.project__package__name,
+        "version": project_config.get_version_for_tag(tag),
+        "release_url": f"{release.repo.url}/releases/tag/{urllib.parse.quote(tag)}",
+    }
+    response = requests.post(settings.METACI_RELEASE_WEBHOOK_URL, json=payload)
+    result = response.json()
+    if result["success"]:
+        with transaction.atomic():
+            case_id = result["id"]
+            case_url = (
+                f"https://gus.lightning.force.com/lightning/r/Case/{case_id}/view"
+            )
+            release.change_case_link = case_url
+            release.save()
+    else:
+        raise Exception("\n".join(err["message"] for err in result["errors"]))
