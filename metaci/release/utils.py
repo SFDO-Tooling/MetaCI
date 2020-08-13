@@ -5,10 +5,10 @@ import logging
 import re
 import urllib.parse
 
+import requests
 from django.conf import settings
 from django.db import transaction
 from django.utils.dateparse import parse_date
-import requests
 
 logger = logging.getLogger(__name__)
 
@@ -75,9 +75,7 @@ def send_release_webhook(project_config, release):
     if result["success"]:
         with transaction.atomic():
             case_id = result["id"]
-            case_url = (
-                f"https://gus.lightning.force.com/lightning/r/Case/{case_id}/view"
-            )
+            case_url = settings.METACI_CHANGE_CASE_URL_TEMPLATE.format(case_id=case_id)
             release.change_case_link = case_url
             release.save()
     else:
