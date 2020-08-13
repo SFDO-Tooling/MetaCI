@@ -8,7 +8,9 @@ from ..utils import send_release_webhook
 
 def test_send_release_webhook(mocked_responses, mocker, transactional_db):
     mocker.patch(
-        "metaci.release.utils.settings", METACI_RELEASE_WEBHOOK_URL="https://webhook"
+        "metaci.release.utils.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_CHANGE_CASE_URL_TEMPLATE="{case_id}",
     )
     mocked_responses.add("POST", "https://webhook", json={"success": True, "id": "2"})
 
@@ -18,10 +20,7 @@ def test_send_release_webhook(mocked_responses, mocker, transactional_db):
 
     send_release_webhook(project_config, release)
 
-    assert (
-        release.change_case_link
-        == "https://gus.lightning.force.com/lightning/r/Case/2/view"
-    )
+    assert release.change_case_link == "2"
 
 
 def test_send_release_webhook__disabled(mocked_responses):
