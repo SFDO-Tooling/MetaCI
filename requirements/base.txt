@@ -1,4 +1,4 @@
-setuptools==49.2.1
+setuptools==49.6.0
 
 # CumulusCI
 cumulusci==3.17.1
