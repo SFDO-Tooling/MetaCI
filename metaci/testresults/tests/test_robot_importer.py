@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
+import xml.etree.ElementTree as ET
 
 import pytest
 from django.test import TestCase
@@ -80,3 +81,26 @@ class RobotImporterTestCase(TestCase):
         for result in models.TestResult.objects.all():
             assert result.task is not None
             assert result.task.stepnum == "2"
+
+    def test_execution_errors(self):
+        """Verify pre-test execution errors are imported
+
+        If robot has errors before the first test runs (eg: import
+        errors) these errors were being thrown away. This test verifies
+        that execution errors appear in imported test results.
+        """
+
+        buildflow = BuildFlowFactory()
+        path = PurePath(__file__).parent / "robot_with_import_errors.xml"
+        robot_importer.import_robot_test_results(buildflow, path)
+
+        test_result = models.TestResult.objects.last()
+        root = ET.fromstring(test_result.robot_xml)
+        msg_elements = root.findall("./errors/msg")
+        error_messages = [element.text for element in msg_elements]
+
+        expected_error_messages = [
+            "Error in file 'example.robot' on line 2: Library setting requires value.",
+            "Error in file 'example.robot' on line 3: Resource setting requires value.",
+        ]
+        self.assertCountEqual(error_messages, expected_error_messages)
