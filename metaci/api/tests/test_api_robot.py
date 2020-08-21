@@ -5,6 +5,7 @@ import dateutil.parser
 from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 from metaci.api.views.robot import RobotTestResultViewSet
+from guardian.shortcuts import assign_perm
 
 from metaci.conftest import (
     BranchFactory,
@@ -120,16 +121,16 @@ class TestAPIRobot(APITestCase):
         response = self.client.get("/api/robot/")
         assert response.status_code == 200
 
-    def xtest_user_access(self):
-        """
-        Make sure the superuser can access the API
+    def test_unauthenticated_user_access(self):
+        """Make sure an unauthenticated user cannot access the API"""
 
-        This test fails. Am I doing the test wrong or did
-        I implement the API wrong?
-        """
-        user = UserFactory()
-        self.client.force_authenticate(user)
+        self.client.logout()
+        response = self.client.get("/api/robot.json/")
+        assert response.status_code == 401
 
+    def test_authenticated_user_access(self):
+        """Make sure an authenticated user can access the API"""
+        self.client.force_authenticate(self.user)
         response = self.client.get("/api/robot.json/")
         assert response.status_code == 200
 
@@ -341,3 +342,38 @@ class TestAPIRobotTimePeriods(APITestCase):
                         f"{range_name}: end expected {expected_end} actual {actual_end}"
                     )
         assert not errors, "date range exceptions\n" + "\n".join(errors)
+
+
+class TestAPIRobotFilterByUser(APITestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.superuser = StaffSuperuserFactory()
+        cls.user = UserFactory()
+        cls.client = APIClient()
+
+        TestResultFactory(method__testclass__test_type="Robot")
+        TestResultFactory(method__testclass__test_type="Robot")
+        TestResultFactory(method__testclass__test_type="Robot")
+
+        testresults = TestResult.objects.all()
+        assign_perm(
+            "plan.view_builds", cls.user, testresults[0].build_flow.build.planrepo
+        )
+        assign_perm(
+            "plan.view_builds", cls.user, testresults[1].build_flow.build.planrepo
+        )
+
+    def test_testresult_filter__as_user(self):
+        """Verify user only sees the results they are allowed to see"""
+        self.client.force_authenticate(self.user)
+        response = self.client.get("/api/robot.json")
+        data = response.json()
+        assert data["count"] == 2
+
+    def test_testresult_filter__as_superuser(self):
+        """Verify superuser sees all results"""
+        self.client.force_authenticate(self.superuser)
+        response = self.client.get("/api/robot.json")
+        data = response.json()
+        assert data["count"] == 3

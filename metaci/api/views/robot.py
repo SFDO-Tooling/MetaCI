@@ -2,15 +2,16 @@ import datetime
 
 import dateutil.parser
 from dateutil.relativedelta import relativedelta, MO
-from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
+from rest_framework.permissions import IsAuthenticated
 
 from metaci.api.renderers.csv_renderer import SimpleCSVRenderer
 from metaci.api.serializers.robot import RobotTestResultSerializer
 from metaci.build.models import BuildFlow
 from metaci.testresults.filters import RobotResultFilter
 from metaci.testresults.models import TestResult
+from metaci.plan.models import PlanRepository
 
 
 class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
@@ -21,6 +22,7 @@ class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RobotTestResultSerializer
     renderer_classes = [BrowsableAPIRenderer, JSONRenderer, SimpleCSVRenderer]
     filterset_class = RobotResultFilter
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """Return a query set for robot results
@@ -57,7 +59,9 @@ class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
         assert start_date <= end_date
 
         buildflows = BuildFlow.objects.filter(
-            time_end__date__gte=start_date, time_end__date__lt=end_date
+            time_end__date__gte=start_date,
+            time_end__date__lt=end_date,
+            build__planrepo__in=PlanRepository.objects.for_user(self.request.user),
         )
 
         branch_name = self.request.query_params.get("branch_name", None)
