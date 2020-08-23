@@ -64,7 +64,7 @@ djangorestframework-filters==1.0.0.dev1
 coreapi==2.3.3
 
 # log-request-id for X-Request-Id header
-django-log-request-id==1.5.0
+django-log-request-id==1.6.0
 
 psycopg2-binary==2.8.5
 
