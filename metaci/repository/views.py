@@ -112,6 +112,14 @@ def repo_perf(request, owner, name, tab):
     return render(request, "repository/repo_perf.html", context=context)
 
 
+def repo_results(request, owner, name, tab):
+    repo = Repository.objects.get_for_user_or_404(
+        request.user, {"owner": owner, "name": name}
+    )
+
+    context = {"repo": repo, "tab": tab}
+    return render(request, "repository/repo_results.html", context=context)
+
 repo_tests = repo_perf
 
 
@@ -252,4 +260,3 @@ def tag_is_release(tag, repo):
 
 def get_tag_name_from_ref(ref):
     return ref[len(TAG_BRANCH_PREFIX) :]
-
