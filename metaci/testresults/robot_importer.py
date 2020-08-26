@@ -234,5 +234,13 @@ def render_robot_test_xml(root, test):
     if test["suite"]["teardown"] is not None:
         suite.append(test["suite"]["teardown"])
     suite.append(test["suite"]["status"])
+
+    # Append text execution errors, if any. These are errors that
+    # happen outside of an individual test, such as problems importing
+    # a library or resource file.
+    execution_errors = root.find("errors")
+    if execution_errors:
+        testroot.append(execution_errors)
+
     test_xml = ET.tostring(testroot, encoding="unicode")
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 3.2.1 (Python 3.8.4 on darwin)" generated="20200817 10:57:14.875" rpa="false">
+  <suite id="s1" name="Example" source="example.robot">
+    <test id="s1-t1" name="Example">
+      <kw name="Log" library="BuiltIn">
+        <doc>Logs the given message with the given level.</doc>
+        <arguments>
+          <arg>hello, world</arg>
+        </arguments>
+        <msg timestamp="20200817 10:57:14.914" level="INFO">hello, world</msg>
+        <status status="PASS" starttime="20200817 10:57:14.913" endtime="20200817 10:57:14.914"></status>
+      </kw>
+      <status status="PASS" starttime="20200817 10:57:14.913" endtime="20200817 10:57:14.914" critical="yes"></status>
+    </test>
+    <status status="PASS" starttime="20200817 10:57:14.878" endtime="20200817 10:57:14.914"></status>
+  </suite>
+  <statistics>
+    <total>
+      <stat pass="1" fail="0">Critical Tests</stat>
+      <stat pass="1" fail="0">All Tests</stat>
+    </total>
+    <tag>
+    </tag>
+    <suite>
+      <stat pass="1" fail="0" id="s1" name="Example">Example</stat>
+    </suite>
+  </statistics>
+  <errors>
+    <msg timestamp="20200817 10:57:14.912" level="ERROR">Error in file 'example.robot' on line 2: Library setting requires value.</msg>
+    <msg timestamp="20200817 10:57:14.912" level="ERROR">Error in file 'example.robot' on line 3: Resource setting requires value.</msg>
+  </errors>
+</robot>

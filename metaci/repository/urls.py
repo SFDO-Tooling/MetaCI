@@ -2,7 +2,6 @@ from django.conf.urls import url
 
 from metaci.repository import views as repository_views
 
-
 urlpatterns = [
     url(
         r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/branch/(?P<branch>.*)$",

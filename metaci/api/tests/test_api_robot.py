@@ -1,12 +1,13 @@
 """Test cases for /api/robot, mostly focusing on csv output"""
 
 from unittest.mock import patch
+
 import dateutil.parser
 from django.utils import timezone
-from rest_framework.test import APIClient, APITestCase
-from metaci.api.views.robot import RobotTestResultViewSet
 from guardian.shortcuts import assign_perm
+from rest_framework.test import APIClient, APITestCase
 
+from metaci.api.views.robot import RobotTestResultViewSet
 from metaci.conftest import (
     BranchFactory,
     RepositoryFactory,

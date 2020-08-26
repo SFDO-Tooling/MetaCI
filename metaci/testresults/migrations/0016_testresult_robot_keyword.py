@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('testresults', '0015_auto_20191202_1856'),
+        ("testresults", "0015_auto_20191202_1856"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='testresult',
-            name='robot_keyword',
-            field=models.CharField(blank=True, db_index=True, max_length=255, null=True),
+            model_name="testresult",
+            name="robot_keyword",
+            field=models.CharField(
+                blank=True, db_index=True, max_length=255, null=True
+            ),
         ),
     ]

@@ -1,22 +1,19 @@
 import hmac
 import json
 import re
-
 from hashlib import sha1
 
-from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from metaci.repository.models import Branch
-from metaci.repository.models import Repository
-from metaci.release.models import Release
+
 from metaci.build.models import Build
 from metaci.build.utils import view_queryset
-
+from metaci.release.models import Release
+from metaci.repository.models import Branch, Repository
 
 TAG_BRANCH_PREFIX = "refs/tags/"
 
@@ -119,6 +116,7 @@ def repo_results(request, owner, name, tab):
 
     context = {"repo": repo, "tab": tab}
     return render(request, "repository/repo_results.html", context=context)
+
 
 repo_tests = repo_perf
 
@@ -249,7 +247,7 @@ def get_or_create_release(push, tag, repo):
     release, _ = Release.objects.get_or_create(
         repo=repo,
         git_tag=tag,
-        defaults={"created_from_commit": push["head_commit"]["id"], "status": "draft",},
+        defaults={"created_from_commit": push["head_commit"]["id"], "status": "draft"},
     )
     return release
 

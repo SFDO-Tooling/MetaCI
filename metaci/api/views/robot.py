@@ -1,17 +1,17 @@
 import datetime
 
 import dateutil.parser
-from dateutil.relativedelta import relativedelta, MO
+from dateutil.relativedelta import MO, relativedelta
 from rest_framework import viewsets
-from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 
 from metaci.api.renderers.csv_renderer import SimpleCSVRenderer
 from metaci.api.serializers.robot import RobotTestResultSerializer
 from metaci.build.models import BuildFlow
+from metaci.plan.models import PlanRepository
 from metaci.testresults.filters import RobotResultFilter
 from metaci.testresults.models import TestResult
-from metaci.plan.models import PlanRepository
 
 
 class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
