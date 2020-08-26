@@ -2,7 +2,6 @@ from django.conf.urls import url
 
 from metaci.repository import views as repository_views
 
-
 urlpatterns = [
     url(
         r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/branch/(?P<branch>.*)$",
@@ -34,6 +33,12 @@ urlpatterns = [
         repository_views.repo_perf,
         name="repo_perf",
         kwargs={"tab": "perf"},
+    ),
+    url(
+        r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/results",
+        repository_views.repo_results,
+        name="repo_results",
+        kwargs={"tab": "results"},
     ),
     url(
         r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/tests",
