@@ -106,17 +106,18 @@ class TestResultManager(models.Manager):
 
 
 class TestResult(models.Model):
+    __test__ = False  # keep pytest from whining
+
     build_flow = models.ForeignKey(
         "build.BuildFlow", related_name="test_results", on_delete=models.CASCADE
     )
     method = models.ForeignKey(
         TestMethod, related_name="test_results", on_delete=models.CASCADE
     )
-    # The task field is used to reconstitute the test log,
-    # because the task has a list of options used by robot when the
-    # test was run (e.g. noncritical, tagstatlink, etc)
-
     # NOTE: This field is currently only populated for robot tasks
+    # The task field is used to reconstitute the test log, which is
+    # needed because the task has a list of options used by robot when
+    # the test was run (e.g. noncritical, tagstatlink, etc)
     task = models.ForeignKey(
         "build.FlowTask",
         related_name="test_results",
@@ -131,6 +132,16 @@ class TestResult(models.Model):
     stacktrace = models.TextField(null=True, blank=True)
     message = models.TextField(null=True, blank=True)
     source_file = models.CharField(max_length=255)
+    # robot_keyword will be used to store the first keyword that failed in
+    # a failing test.
+    robot_keyword = models.CharField(
+        max_length=255, null=True, blank=True, db_index=True
+    )
+    # Maybe robot_tags should be a one-to-many relationship with a tags
+    # table, but that seems like overkill for my immediate needs.
+    # For now, making it a CharField that contains a comma-separated
+    # list of tags is sufficient.
+    robot_tags = models.CharField(max_length=80, null=True, blank=True,)
     robot_xml = models.TextField(null=True, blank=True)
     email_invocations_used = models.IntegerField(null=True, blank=True, db_index=True)
     email_invocations_allowed = models.IntegerField(

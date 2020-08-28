@@ -84,7 +84,10 @@ def import_robot_test_results(build_flow, path):
             duration=result["duration"],
             outcome=result["status"],
             source_file=result["suite"]["file"],
+            message=result["message"],
+            robot_keyword=result["failing_keyword"],
             robot_xml=result["xml"],
+            robot_tags=result["robot_tags"],
             task=robot_task,
         )
         testresult.save()
@@ -165,14 +168,35 @@ def parse_test(test, suite, root):
     zero = timedelta(seconds=0)
     setup_time = _robot_duration(setup.find("status")) if setup else zero
     teardown_time = _robot_duration(teardown.find("status")) if teardown else zero
+    tags = test.find("tags")
 
+    # I'm not 100% convinced this is what we want. It's great in the
+    # normal case, but it's possible for a test to have multiple failing
+    # keywords. We'll tackle that when it becomes an issue. For now,
+    # we just grab the first failing keyword.
+    keyword = None
+    if status.attrib["status"] == "FAIL":
+        failed_keyword_element = test.find("./kw/status[@status='FAIL']/..")
+        if failed_keyword_element:
+            keyword = failed_keyword_element.attrib.get("name")
+            library = failed_keyword_element.attrib.get("library")
+            if library:
+                keyword = f"{library}.{keyword}"
+
+    robot_tags = ",".join(
+        sorted([tag.text for tag in tags.iterfind("tag")]) if tags else []
+    )
     test_info = {
         "suite": suite,
         "name": test.attrib.get("name") or "<no name>",
         "elem": test,
         "status": "Pass" if status.attrib["status"] == "PASS" else "Fail",
         "screenshots": [],
+        "message": status.text,
+        "failing_keyword": keyword,
+        "robot_tags": robot_tags,
     }
+
     delta = _robot_duration(status)
     duration = delta - (setup_time + teardown_time)
 
@@ -210,5 +234,13 @@ def render_robot_test_xml(root, test):
     if test["suite"]["teardown"] is not None:
         suite.append(test["suite"]["teardown"])
     suite.append(test["suite"]["status"])
+
+    # Append text execution errors, if any. These are errors that
+    # happen outside of an individual test, such as problems importing
+    # a library or resource file.
+    execution_errors = root.find("errors")
+    if execution_errors:
+        testroot.append(execution_errors)
+
     test_xml = ET.tostring(testroot, encoding="unicode")
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)

@@ -39,6 +39,7 @@ cci task run performance_tests_CO</msg>
 </kw>
 <tags>
 <tag>w-123456</tag>
+<tag>tag with spaces</tag>
 </tags>
 <status status="PASS" starttime="20190805 08:58:20.001" endtime="20190805 08:59:31.009" critical="yes"></status>
 </test>

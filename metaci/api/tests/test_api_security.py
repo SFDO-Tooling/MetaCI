@@ -143,6 +143,7 @@ class TestAPISecurity(APITestCase):
                     "testmethod_perf_UI/",
                     "testmethod_perf/",
                     "testmethod_results/",
+                    "robot/",
                 ]
                 if is_public:
                     # IP address and user role don't matter for public URL
