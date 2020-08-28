@@ -4,7 +4,10 @@ from __future__ import unicode_literals
 import logging
 import re
 import urllib.parse
+from calendar import timegm
+from datetime import datetime
 
+import jwt
 import requests
 from django.conf import settings
 from django.db import transaction
@@ -70,7 +73,19 @@ def send_release_webhook(project_config, release):
         "version": project_config.get_version_for_tag(tag),
         "release_url": f"{release.repo.url}/releases/tag/{urllib.parse.quote(tag)}",
     }
-    response = requests.post(settings.METACI_RELEASE_WEBHOOK_URL, json=payload)
+    token = jwt.encode(
+        {
+            "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
+            "exp": timegm(datetime.utcnow().utctimetuple()),
+        },
+        settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
+        algorithm="HS256",
+    )
+    response = requests.post(
+        settings.METACI_RELEASE_WEBHOOK_URL,
+        json=payload,
+        headers={"Authorization": f"Bearer {token.decode('latin1')}"},
+    )
     result = response.json()
     if result["success"]:
         with transaction.atomic():
