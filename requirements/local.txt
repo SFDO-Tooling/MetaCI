@@ -1,7 +1,7 @@
 # Local development dependencies go here
 -r test.txt
 
-black==19.10b0
+black==20.8b1
 isort==5.3.2
 
 Sphinx==3.2.0
