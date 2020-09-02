@@ -11,6 +11,8 @@ def test_send_release_webhook(mocked_responses, mocker, transactional_db):
         "metaci.release.utils.settings",
         METACI_RELEASE_WEBHOOK_URL="https://webhook",
         METACI_CHANGE_CASE_URL_TEMPLATE="{case_id}",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
     )
     mocked_responses.add("POST", "https://webhook", json={"success": True, "id": "2"})
 
@@ -30,7 +32,10 @@ def test_send_release_webhook__disabled(mocked_responses):
 
 def test_send_release_webhook__error(mocked_responses, mocker, transactional_db):
     mocker.patch(
-        "metaci.release.utils.settings", METACI_RELEASE_WEBHOOK_URL="https://webhook"
+        "metaci.release.utils.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
     )
     mocked_responses.add(
         "POST",
