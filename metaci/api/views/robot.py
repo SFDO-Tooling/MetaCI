@@ -70,7 +70,8 @@ class RobotTestResultViewSet(viewsets.ReadOnlyModelViewSet):
 
         queryset = (
             TestResult.objects.filter(
-                method__testclass__test_type="Robot", build_flow_id__in=buildflows,
+                method__testclass__test_type="Robot",
+                build_flow_id__in=buildflows,
             )
             .prefetch_related(
                 "build_flow__build__branch",

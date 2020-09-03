@@ -141,7 +141,11 @@ class TestResult(models.Model):
     # table, but that seems like overkill for my immediate needs.
     # For now, making it a CharField that contains a comma-separated
     # list of tags is sufficient.
-    robot_tags = models.CharField(max_length=80, null=True, blank=True,)
+    robot_tags = models.CharField(
+        max_length=80,
+        null=True,
+        blank=True,
+    )
     robot_xml = models.TextField(null=True, blank=True)
     email_invocations_used = models.IntegerField(null=True, blank=True, db_index=True)
     email_invocations_allowed = models.IntegerField(
@@ -301,8 +305,8 @@ def NearMax(field):
 
 class TestResultPerfSummaryBase(models.Model):
     """Abstract base class mode which can be used to summarize by different
-        time periods e.g. daily, weekly, monthly. Currently used only
-        by a weekly base class"""
+    time periods e.g. daily, weekly, monthly. Currently used only
+    by a weekly base class"""
 
     class Meta:
         abstract = True
@@ -478,8 +482,8 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
     @classmethod
     def _parse_start_and_date_dates(cls, start_string, end_string):
         """This code can be called from command lines, periodic jobs or
-           other code. This function provides helpful default behaviours
-           and date parsing to all of those contexts."""
+        other code. This function provides helpful default behaviours
+        and date parsing to all of those contexts."""
         from metaci.build.models import BuildFlow
 
         DATE_FORMAT = "%Y-%m-%d"

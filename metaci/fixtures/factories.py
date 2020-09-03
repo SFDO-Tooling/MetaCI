@@ -42,8 +42,8 @@ def do_logs():
 
 def fake_name(prefix=None):
     """Generate a fake name with a certain prefix. You can push the name_prefix
-       from outside of the factory if you have a preference when you instantiate
-       the class."""
+    from outside of the factory if you have a preference when you instantiate
+    the class."""
     return factory.LazyAttribute(
         lambda a: (getattr(a, "name_prefix", None) or prefix or "")
         + factory.Faker("word").generate({})

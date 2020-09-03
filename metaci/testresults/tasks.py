@@ -1,12 +1,13 @@
-from django_rq import job
-from metaci.testresults.models import TestResultPerfWeeklySummary
 from datetime import datetime, timedelta
+
+from django_rq import job
+
+from metaci.testresults.models import TestResultPerfWeeklySummary
 
 
 @job
 def generate_summaries():
-    """ An RQ repeatable task to summarize test results for faster querying.
-    """
+    """An RQ repeatable task to summarize test results for faster querying."""
     TestResultPerfWeeklySummary.summarize_week(datetime.now())
     is_sunday = datetime.now().weekday() == 6
     if is_sunday:

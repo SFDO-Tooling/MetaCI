@@ -6,10 +6,12 @@ from metaci.testresults.models import TestResult
 class RobotTestResultSerializer(serializers.ModelSerializer):
     test_name = serializers.ReadOnlyField(source="method.name")
     repo_name = serializers.CharField(
-        source="build_flow.build.repo.name", read_only=True,
+        source="build_flow.build.repo.name",
+        read_only=True,
     )
     branch_name = serializers.CharField(
-        source="build_flow.build.branch.name", read_only=True,
+        source="build_flow.build.branch.name",
+        read_only=True,
     )
     # At the moment, the only dates we have available are from the build
     # itself. It would be nice if this was the actual datetime of the

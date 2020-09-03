@@ -36,13 +36,19 @@ class RobotResultFilter(django_filters.FilterSet):
         lookup_expr="iexact",
     )
     test_name = django_filters.CharFilter(
-        field_name="method__name", label="Test name", lookup_expr="iexact",
+        field_name="method__name",
+        label="Test name",
+        lookup_expr="iexact",
     )
     outcome = django_filters.CharFilter(
-        field_name="outcome", label="Outcome", lookup_expr="iexact",
+        field_name="outcome",
+        label="Outcome",
+        lookup_expr="iexact",
     )
     source_file = django_filters.CharFilter(
-        field_name="source_file", label="Source file", lookup_expr="iexact",
+        field_name="source_file",
+        label="Source file",
+        lookup_expr="iexact",
     )
 
     class Meta:
