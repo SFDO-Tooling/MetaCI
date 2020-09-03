@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('release', '0004_auto_20200513_1504'),
+        ("release", "0004_auto_20200513_1504"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='release',
-            name='git_tag',
-            field=models.CharField(max_length=1024, null=True, verbose_name='git tag'),
+            model_name="release",
+            name="git_tag",
+            field=models.CharField(max_length=1024, null=True, verbose_name="git tag"),
         ),
     ]

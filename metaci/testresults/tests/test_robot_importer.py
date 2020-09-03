@@ -74,7 +74,9 @@ class RobotImporterTestCase(TestCase):
             time_end = output_xml_mtime + timedelta(seconds=end_offset)
 
             task = FlowTaskFactory(
-                build_flow=buildflow, time_start=time_start, time_end=time_end,
+                build_flow=buildflow,
+                time_start=time_start,
+                time_end=time_end,
             )
             task.save()
 

@@ -6,7 +6,7 @@ from tempfile import mkstemp
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.clickjacking import xframe_options_exempt
 from robot import rebot
 
@@ -311,7 +311,9 @@ def test_method_trend(request, method_id):
     return render(request, "testresults/test_method_trend.html", data)
 
 
-def build_flow_compare(request,):
+def build_flow_compare(
+    request,
+):
     """ compare two buildflows for their limits usage """
     execution1_id = request.GET.get("buildflow1", None)
     execution2_id = request.GET.get("buildflow2", None)

@@ -42,6 +42,9 @@ export type UIDataAction =
   | UIDataLoadingAction
   | UIDataError;
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type UntypedFunc = Function; // the types would be quite complex.
+
 export const perfREST_API = ({
   dispatch,
   apiFetch,
@@ -115,6 +118,3 @@ export const perfREST_UI_Fetch = (params?: Record<string, unknown>) => (
     checkValid: assertUIData,
   });
 };
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-type UntypedFunc = Function; // the types would be quite complex.
