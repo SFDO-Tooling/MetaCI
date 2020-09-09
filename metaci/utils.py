@@ -18,7 +18,7 @@ def generate_hash():
 # from https://stackoverflow.com/a/3226719/11151197
 def split_seq(iterable, size):
     """Split an iterable into batches of a particular size.
-       The last batch may be smaller."""
+    The last batch may be smaller."""
     it = iter(iterable)
     item = list(itertools.islice(it, size))
     while item:

@@ -9,7 +9,8 @@ class TestUser(unittest.TestCase):
 
     def test__str__(self):
         self.assertEqual(
-            self.user.__str__(), "testuser",
+            self.user.__str__(),
+            "testuser",
         )
 
     def test_get_absolute_url(self):
