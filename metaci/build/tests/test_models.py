@@ -9,6 +9,7 @@ from metaci.build.models import Build
 from metaci.conftest import (
     BranchFactory,
     BuildFactory,
+    BuildFlowFactory,
     PlanFactory,
     PlanRepositoryFactory,
     PlanScheduleFactory,
@@ -134,6 +135,16 @@ class TestBuild:
     def test_dyno_worker_id(self):
         build = BuildFactory()
         assert build.worker_id == "faker.1"
+
+
+@pytest.mark.django_db
+class TestBuildFlow:
+    def test_set_commit_status(self):
+        build_flow = BuildFlowFactory()
+        build_flow.build.plan.commit_status_template = "{{ 2 + 2 }}"
+        build_flow.flow_instance = mock.Mock()
+        build_flow.set_commit_status()
+        assert build_flow.build.commit_status == "4"
 
 
 def detach_logger(model):

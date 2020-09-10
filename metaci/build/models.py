@@ -30,6 +30,7 @@ from django.db import models
 from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
+from jinja2.sandbox import ImmutableSandboxedEnvironment
 
 from metaci.build.tasks import set_github_status
 from metaci.build.utils import format_log, set_build_info
@@ -81,6 +82,8 @@ FAIL_EXCEPTIONS = (
     RobotTestFailure,
 )
 
+jinja2_env = ImmutableSandboxedEnvironment()
+
 
 class GnarlyEncoder(DjangoJSONEncoder):
     """ A Very Gnarly Encoder that serializes a repr() if it can't get anything else.... """
@@ -121,6 +124,12 @@ class Build(models.Model):
     )
     commit = models.CharField(max_length=64)
     commit_message = models.TextField(null=True, blank=True)
+    commit_status = models.CharField(
+        max_length=140,
+        null=True,
+        blank=True,
+        help_text="Optional success message to be reported as a github commit status",
+    )
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     plan = models.ForeignKey(
@@ -604,6 +613,9 @@ class BuildFlow(models.Model):
             # Run the flow
             self.run_flow(project_config, org_config)
 
+            # Determine build commit status
+            self.set_commit_status()
+
             # Load test results
             self.load_test_results()
 
@@ -649,6 +661,13 @@ class BuildFlow(models.Model):
 
         # Run the flow
         return self.flow_instance.run(org_config)
+
+    def set_commit_status(self):
+        if self.build.plan.commit_status_template:
+            template = jinja2_env.from_string(self.build.plan.commit_status_template)
+            message = template.render(results=self.flow_instance.results)
+            self.build.commit_status = message
+            self.build.save()
 
     def record_result(self):
         self.status = "success"

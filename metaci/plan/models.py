@@ -82,7 +82,18 @@ class Plan(models.Model):
     regex = models.CharField(max_length=255, null=True, blank=True)
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
-    context = models.CharField(max_length=255, null=True, blank=True)
+    context = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="If set, builds of this plan will update the commit status in GitHub using this context.",
+    )
+    commit_status_template = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Template for the commit message set after a successful build.",
+    )
     active = models.BooleanField(default=True)
     keep_org_on_error = models.BooleanField(default=False)
     keep_org_on_fail = models.BooleanField(default=False)
