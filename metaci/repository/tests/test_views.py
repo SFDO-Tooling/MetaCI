@@ -361,6 +361,11 @@ class TestRepositoryViews(TestCase):
         actual = views.get_branch_name_from_payload(tag_payload)
         assert actual == f"tag: {tag_name}"
 
+    def test_get_branch_name_from_payload__branches(self):
+        payload = {"branches": [{"name": "test-branch"}]}
+        result = views.get_branch_name_from_payload(payload)
+        assert result == "test-branch"
+
     @pytest.mark.django_db
     def test_get_or_create_branch(self):
         branch_name = "test-branch"
@@ -381,22 +386,28 @@ class TestRepositoryViews(TestCase):
 
     @mock.patch("metaci.repository.views.tag_is_release")
     @mock.patch("metaci.repository.views.get_or_create_release")
-    def test_get_release_applicable(self, get_release, tag_is_release):
-        push = {"ref": "refs/tags/release-1", "head_commit": "abc123"}
+    def test_get_release_if_applicable(self, get_release, tag_is_release):
+        payload = {"ref": "refs/tags/release-1", "head_commit": "abc123"}
         repo = mock.Mock()
         repo.release_tag_regex = r"refs/tags/release-1"
 
         get_release.return_value = True
         tag_is_release.return_value = True
 
-        release = views.get_release_if_applicable(push, repo)
+        release = views.get_release_if_applicable(payload, repo)
 
         assert release
 
-    def test_get_release_not_applicable(self):
-        push = {"ref": "refs/tags/test-tag"}
+    def test_get_release_if_applicable__no_ref(self):
+        payload = {}
+        repo = mock.Mock()
+        result = views.get_release_if_applicable(payload, repo)
+        assert result is None
+
+    def test_get_release_if_applicable__not_release_tag(self):
+        payload = {"ref": "refs/tags/test-tag"}
         repo = mock.Mock(release_tag_regex=False)
-        actual = views.get_release_if_applicable(push, repo)
+        actual = views.get_release_if_applicable(payload, repo)
         assert actual is None
 
     @mock.patch("metaci.repository.views.re.match")

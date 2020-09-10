@@ -77,3 +77,32 @@ class PlanTestCase(TestCase):
         )
         self.assertFalse(run_build)
         self.assertEqual(commit, None)
+
+    def test_check_github_event__status_event(self):
+        payload = {"context": "Package Upload", "state": "success", "sha": "SHA"}
+        plan = Plan(
+            name="Test Plan",
+            role="feature",
+            trigger="status",
+            regex="Package Upload",
+            flows="test_flow",
+            org="test_org",
+            context="test case",
+        )
+        run_build, commit, commit_message = plan.check_github_event("status", payload)
+        assert run_build
+        assert commit == "SHA"
+
+    def test_check_github_event__status_event_no_match(self):
+        payload = {"context": "something", "state": "success", "sha": "SHA"}
+        plan = Plan(
+            name="Test Plan",
+            role="feature",
+            trigger="status",
+            regex="something else",
+            flows="test_flow",
+            org="test_org",
+            context="test case",
+        )
+        run_build, commit, commit_message = plan.check_github_event("status", payload)
+        assert not run_build
