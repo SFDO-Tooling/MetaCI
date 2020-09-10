@@ -10,7 +10,7 @@ from django.views.generic import TemplateView
 
 from metaci import views as mbci_views
 from metaci.build import views as build_views
-from metaci.repository.views import github_push_webhook
+from metaci.repository.views import github_webhook
 
 urlpatterns = [
     url(
@@ -41,7 +41,7 @@ urlpatterns = [
     url(r"^orgs/", include("metaci.cumulusci.urls")),
     url(r"^hirefire/", include("metaci.hirefire.urls")),
     url(r"^repos/", include("metaci.repository.urls")),
-    url(r"^webhook/github/push$", github_push_webhook, name="github_push_webhook"),
+    url(r"^webhook/github/push$", github_webhook, name="github_webhook"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

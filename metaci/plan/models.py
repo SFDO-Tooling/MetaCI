@@ -13,7 +13,12 @@ from guardian.shortcuts import get_objects_for_user
 from metaci.build.models import Build
 from metaci.repository.models import Branch, Repository
 
-TRIGGER_TYPES = (("manual", "Manual"), ("commit", "Commit"), ("tag", "Tag"))
+TRIGGER_TYPES = (
+    ("manual", "Manual"),
+    ("commit", "Commit"),
+    ("status", "Commit Status"),
+    ("tag", "Tag"),
+)
 
 BUILD_ROLES = (
     ("beta_release", "Beta Release"),
@@ -122,54 +127,64 @@ class Plan(models.Model):
         for repo in self.repos.all():
             yield repo
 
-    def check_push(self, push):
+    def check_github_event(self, event, payload):
         run_build = False
         commit = None
         commit_message = None
 
-        # Handle commit events
-        if self.trigger == "commit":
-            # Check if the event was triggered by a commit
-            if not push["ref"].startswith("refs/heads/"):
-                return run_build, commit, commit_message
-            branch = push["ref"][11:]
+        if event == "push":
+            # Handle commit events
+            if self.trigger == "commit":
+                # Check if the event was triggered by a commit
+                if not payload["ref"].startswith("refs/heads/"):
+                    return run_build, commit, commit_message
+                branch = payload["ref"][11:]
 
-            # Check the branch against regex
-            if not re.match(self.regex, branch):
+                # Check the branch against regex
+                if not re.match(self.regex, branch):
+                    return run_build, commit, commit_message
+
+                run_build = True
+                commit = payload["after"]
+                if commit == "0000000000000000000000000000000000000000":
+                    run_build = False
+                    commit = None
+                    return run_build, commit, commit_message
+
+                for commit_info in payload.get("commits", []):
+                    if commit_info["id"] == commit:
+                        commit_message = commit_info["message"]
+                        break
+
+                # Skip build if commit message contains [ci skip]
+                if commit_message and "[ci skip]" in commit_message:
+                    run_build = False
+                    commit = None
+
+            # Handle tag events
+            elif self.trigger == "tag":
+                # Check if the event was triggered by a tag
+                if not payload["ref"].startswith("refs/tags/"):
+                    return run_build, commit, commit_message
+                tag = payload["ref"][10:]
+
+                # Check the tag against regex
+                if not re.match(self.regex, tag):
+                    return run_build, commit, commit_message
+
+                run_build = True
+                commit = payload["head_commit"]["id"]
+
+        elif (
+            event == "status"
+            and self.trigger == "status"
+            and payload["state"] == "success"
+        ):
+            if not re.match(self.regex, payload["context"]):
                 return run_build, commit, commit_message
 
             run_build = True
-            commit = push["after"]
-            if commit == "0000000000000000000000000000000000000000":
-                run_build = False
-                commit = None
-                return run_build, commit, commit_message
-
-            for commit_info in push.get("commits", []):
-                if commit_info["id"] == commit:
-                    commit_message = commit_info["message"]
-                    break
-
-            # Skip build if commit message contains [ci skip]
-            if commit_message and "[ci skip]" in commit_message:
-                run_build = False
-                commit = None
-            return run_build, commit, commit_message
-
-        # Handle tag events
-        elif self.trigger == "tag":
-            # Check if the event was triggered by a tag
-            if not push["ref"].startswith("refs/tags/"):
-                return run_build, commit, commit_message
-            tag = push["ref"][10:]
-
-            # Check the tag against regex
-            if not re.match(self.regex, tag):
-                return run_build, commit, commit_message
-
-            run_build = True
-            commit = push["head_commit"]["id"]
-            return run_build, commit, commit_message
+            commit = payload["sha"]
 
         return run_build, commit, commit_message
 
