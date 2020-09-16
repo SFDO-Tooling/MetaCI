@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 
-from metaci.release.models import Release
+from metaci.release.models import ChangeCaseTemplate, Release
 
 
 class ReleaseAdmin(admin.ModelAdmin):
@@ -16,6 +16,7 @@ class ReleaseAdmin(admin.ModelAdmin):
                     "release_creation_date",
                     ("sandbox_push_date", "production_push_date"),
                     "work_item_link",
+                    "change_case_template",
                     "change_case_link",
                 )
             },
@@ -42,4 +43,5 @@ class ReleaseAdmin(admin.ModelAdmin):
     empty_value_display = "-empty-"
 
 
+admin.site.register(ChangeCaseTemplate)
 admin.site.register(Release, ReleaseAdmin)

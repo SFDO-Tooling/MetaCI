@@ -1,6 +1,7 @@
 import os
 
 import pytest
+import responses
 
 from metaci.fixtures.data_fixtures import data, superuser, user
 from metaci.fixtures.factories import (
@@ -14,6 +15,7 @@ from metaci.fixtures.factories import (
     PlanScheduleFactory,
     RebuildFactory,
     RepositoryFactory,
+    ReleaseFactory,
     ScratchOrgInstanceFactory,
     StaffSuperuserFactory,
     TestClassFactory,
@@ -32,3 +34,9 @@ def restore_cwd():
         yield
     finally:
         os.chdir(cwd)
+
+
+@pytest.fixture()
+def mocked_responses():
+    with responses.RequestsMock() as mocked:
+        yield mocked

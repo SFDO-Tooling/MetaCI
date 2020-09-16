@@ -14,7 +14,7 @@ from metaci.build.models import (
 )
 from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.plan.models import Plan, PlanRepository, PlanSchedule
-from metaci.release.models import Release
+from metaci.release.models import ChangeCaseTemplate, Release
 from metaci.repository.models import Branch, Repository
 from metaci.testresults.models import (
     TestClass,
@@ -231,6 +231,17 @@ class RebuildFactory(factory.django.DjangoModelFactory):
     status = factory.fuzzy.FuzzyChoice(BUILD_STATUS_NAMES)
 
 
+class ChangeCaseTemplateFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ChangeCaseTemplate
+
+    case_template_id = "1"
+
+
 class ReleaseFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Release
+
+    change_case_template = factory.SubFactory(ChangeCaseTemplateFactory)
+    repo = factory.SubFactory(RepositoryFactory)
+    git_tag = "release/1.0"

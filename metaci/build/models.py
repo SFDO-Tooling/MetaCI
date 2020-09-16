@@ -37,6 +37,7 @@ from metaci.build.utils import format_log, set_build_info
 from metaci.cumulusci.config import MetaCIUniversalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
+from metaci.release.utils import send_release_webhook
 from metaci.testresults.importer import import_test_results
 from metaci.testresults.robot_importer import import_robot_test_results
 from metaci.utils import generate_hash
@@ -410,6 +411,9 @@ class Build(models.Model):
             self.delete_build_dir()
             self.flush_log()
             return
+
+        if self.plan.role == "release":
+            send_release_webhook(project_config, self.release)
 
         if self.plan.role == "qa":
             self.logger.info("Build complete, org is now ready for QA testing")
