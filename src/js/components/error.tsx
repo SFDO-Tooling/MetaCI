@@ -7,6 +7,16 @@ import * as React from 'react';
 import { Trans } from 'react-i18next';
 import { logError } from 'utils/logging';
 
+const EmptyIllustration = ({ message }: { message: React.ReactNode }) => (
+  <Illustration
+    heading="Yikes! An error occurred!  :("
+    messageBody={message}
+    name="Broken"
+    path={`${svgPath}#broken`}
+    size="large"
+  />
+);
+
 interface Props {
   children: React.ReactNode;
 }
@@ -101,16 +111,6 @@ export const AuthError = ({
       </video>
     </div>
   </BrandBand>
-);
-
-const EmptyIllustration = ({ message }: { message: React.ReactNode }) => (
-  <Illustration
-    heading="Yikes! An error occurred!  :("
-    messageBody={message}
-    name="Broken"
-    path={`${svgPath}#broken`}
-    size="large"
-  />
 );
 
 export default ErrorBoundary;

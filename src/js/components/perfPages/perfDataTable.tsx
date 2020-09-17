@@ -12,6 +12,26 @@ import { LoadingStatus, PerfDataState } from 'store/perfdata/reducer';
 import { ServerDataFetcher } from './perfPage';
 import { QueryParamHelpers } from './perfTableUtils';
 
+interface SpinnerProps {
+  status: LoadingStatus;
+}
+
+const PerfDataTableSpinner = ({ status }: SpinnerProps) => {
+  if (status === 'LOADING') {
+    return (
+      <Spinner
+        size="small"
+        variant="base"
+        assistiveText={{ label: 'Small spinner' }}
+      />
+    );
+  }
+  return null;
+};
+PerfDataTableSpinner.propTypes = {
+  status: PropTypes.string.isRequired,
+};
+
 interface Props {
   fetchServerData: ServerDataFetcher;
   queryparams: QueryParamHelpers;
@@ -163,26 +183,6 @@ const PerfDataTable = ({
       </div>
     </div>
   );
-};
-
-interface SpinnerProps {
-  status: LoadingStatus;
-}
-
-const PerfDataTableSpinner = ({ status }: SpinnerProps) => {
-  if (status === 'LOADING') {
-    return (
-      <Spinner
-        size="small"
-        variant="base"
-        assistiveText={{ label: 'Small spinner' }}
-      />
-    );
-  }
-  return null;
-};
-PerfDataTableSpinner.propTypes = {
-  status: PropTypes.string.isRequired,
 };
 
 export default PerfDataTable;

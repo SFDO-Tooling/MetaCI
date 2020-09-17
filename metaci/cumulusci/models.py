@@ -1,13 +1,9 @@
 from __future__ import unicode_literals
 
 import json
-from calendar import timegm
-from datetime import datetime
-from urllib.parse import urljoin
 
-import jwt
-import requests
 from cumulusci.core.config import OrgConfig, ScratchOrgConfig
+from cumulusci.oauth.salesforce import jwt_session
 from django.apps import apps
 from django.conf import settings
 from django.core.cache import cache
@@ -18,30 +14,6 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from simple_salesforce import Salesforce as SimpleSalesforce
 from simple_salesforce.exceptions import SalesforceError
-
-
-def jwt_session(url=None, username=None):
-    if url is None:
-        url = settings.SF_PROD_LOGIN_URL
-
-    payload = {
-        "alg": "RS256",
-        "iss": settings.SFDX_CLIENT_ID,
-        "sub": username,
-        "aud": url,  # jwt aud is NOT mydomain
-        "exp": timegm(datetime.utcnow().utctimetuple()),
-    }
-    encoded_jwt = jwt.encode(payload, settings.SFDX_HUB_KEY, algorithm="RS256")
-    data = {
-        "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-        "assertion": encoded_jwt,
-    }
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    auth_url = urljoin(url, "services/oauth2/token")
-    response = requests.post(url=auth_url, data=data, headers=headers)
-    response.raise_for_status()
-
-    return response.json()
 
 
 def sf_session(jwt):
@@ -193,7 +165,14 @@ class ScratchOrgInstance(models.Model):
         return ScratchOrgConfig(org_config, self.org.name)
 
     def get_jwt_based_session(self):
-        return jwt_session(settings.SF_SANDBOX_LOGIN_URL, self.username)
+        config = json.loads(self.json)
+        return jwt_session(
+            settings.SFDX_CLIENT_ID,
+            settings.SFDX_HUB_KEY,
+            self.username,
+            url=config.get("instance_url") or settings.SF_SANDBOX_LOGIN_URL,
+            auth_url=config.get("id"),
+        )
 
     def delete_org(self, org_config=None):
         if org_config is None:
@@ -201,7 +180,11 @@ class ScratchOrgInstance(models.Model):
 
         try:
             # connect to SFDX Hub
-            sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
+            sfjwt = jwt_session(
+                settings.SFDX_CLIENT_ID,
+                settings.SFDX_HUB_KEY,
+                settings.SFDX_HUB_USERNAME,
+            )
             sf = sf_session(sfjwt)
             # query ActiveScratchOrg via OrgId
             asos = sf.query(

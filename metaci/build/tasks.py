@@ -2,6 +2,7 @@ import time
 from collections import namedtuple
 
 import django_rq
+from cumulusci.oauth.salesforce import jwt_session
 from django import db
 from django.conf import settings
 from django.core.cache import cache
@@ -10,7 +11,7 @@ from rq.exceptions import ShutDownImminentException
 from metaci.build.autoscaling import autoscale
 from metaci.build.exceptions import RequeueJob
 from metaci.build.signals import build_complete
-from metaci.cumulusci.models import Org, jwt_session, sf_session
+from metaci.cumulusci.models import Org, sf_session
 from metaci.repository.utils import create_status
 
 ACTIVESCRATCHORGLIMITS_KEY = "metaci:activescratchorgs:limits"
@@ -27,7 +28,9 @@ def scratch_org_limits():
     if cached:
         return cached
 
-    sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
+    sfjwt = jwt_session(
+        settings.SFDX_CLIENT_ID, settings.SFDX_HUB_KEY, settings.SFDX_HUB_USERNAME
+    )
     limits = sf_session(sfjwt).limits()["ActiveScratchOrgs"]
     value = ActiveScratchOrgLimits(remaining=limits["Remaining"], max=limits["Max"])
     # store it for 65 seconds, enough til the next tick. we may want to tune this
