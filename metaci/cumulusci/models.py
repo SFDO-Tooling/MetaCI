@@ -171,7 +171,7 @@ class ScratchOrgInstance(models.Model):
             settings.SFDX_HUB_KEY,
             self.username,
             url=config.get("instance_url") or settings.SF_SANDBOX_LOGIN_URL,
-            auth_url=config.get("id"),
+            auth_url=settings.SF_SANDBOX_LOGIN_URL,
         )
 
     def delete_org(self, org_config=None):
