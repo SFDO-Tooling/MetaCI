@@ -1,6 +1,3 @@
-from django.conf import settings
-
-
 def create_status(build):
     if not build.plan.context:
         # skip setting Github status if the context field is empty
@@ -22,7 +19,9 @@ def create_status(build):
         description = "{} is testing".format(build.user)
     if build.get_status() == "success":
         state = "success"
-        if build.plan.role == "qa":
+        if build.commit_status:
+            description = build.commit_status
+        elif build.plan.role == "qa":
             description = "{} approved. See details for QA comments".format(
                 build.qa_user
             )

@@ -157,34 +157,39 @@ def validate_github_webhook(request):
 
 @csrf_exempt
 @require_POST
-def github_push_webhook(request):
+def github_webhook(request):
     validate_github_webhook(request)
-    push = json.loads(request.body)
+    event = request.META.get("HTTP_X_GITHUB_EVENT")
+    payload = json.loads(request.body)
 
     try:
-        repo = get_repository(push)
+        repo = get_repository(payload)
     except Repository.DoesNotExist:
         return HttpResponse("Not listening for this repository")
 
-    branch_name = get_branch_name_from_payload(push)
+    branch_name = get_branch_name_from_payload(payload)
 
     if not branch_name:
         return HttpResponse("No branch found")
 
     branch = get_or_create_branch(branch_name, repo)
-    release = get_release_if_applicable(push, repo)
-    create_builds(push, repo, branch, release)
+    release = get_release_if_applicable(payload, repo)
+    create_builds(event, payload, repo, branch, release)
 
     return HttpResponse("OK")
 
 
-def get_repository(push):
-    repo_id = push["repository"]["id"]
+def get_repository(event):
+    repo_id = event["repository"]["id"]
     return Repository.objects.get(github_id=repo_id)
 
 
-def get_branch_name_from_payload(push):
-    branch_ref = push.get("ref")
+def get_branch_name_from_payload(event):
+    if "branches" in event:
+        branch_name = event["branches"][0]["name"]
+        return branch_name
+
+    branch_ref = event.get("ref")
     if not branch_ref:
         return None
 
@@ -206,12 +211,12 @@ def get_or_create_branch(branch_name, repo):
     return branch
 
 
-def create_builds(push, repo, branch, release):
+def create_builds(event, payload, repo, branch, release):
     for pr in repo.planrepository_set.should_run().filter(
         plan__trigger__in=["commit", "tag"]
     ):
         plan = pr.plan
-        run_build, commit, commit_message = plan.check_push(push)
+        run_build, commit, commit_message = plan.check_github_event(event, payload)
         if run_build:
             build = Build(
                 repo=repo,
@@ -233,21 +238,24 @@ def is_tag(ref):
     return True if ref.startswith(TAG_BRANCH_PREFIX) else False
 
 
-def get_release_if_applicable(push, repo):
+def get_release_if_applicable(event, repo):
     """Gets the corresponding release if 'ref' references a release tag"""
+    if "ref" not in event:
+        return
+
     release = None
-    if is_tag(push["ref"]) and repo.release_tag_regex:
-        tag = get_tag_name_from_ref(push["ref"])
-        if tag_is_release(tag, repo) and push["head_commit"]:
-            release = get_or_create_release(push, tag, repo)
+    if is_tag(event["ref"]) and repo.release_tag_regex:
+        tag = get_tag_name_from_ref(event["ref"])
+        if tag_is_release(tag, repo) and event["head_commit"]:
+            release = get_or_create_release(event, tag, repo)
     return release
 
 
-def get_or_create_release(push, tag, repo):
+def get_or_create_release(event, tag, repo):
     release, _ = Release.objects.get_or_create(
         repo=repo,
         git_tag=tag,
-        defaults={"created_from_commit": push["head_commit"]["id"], "status": "draft"},
+        defaults={"created_from_commit": event["head_commit"]["id"], "status": "draft"},
     )
     return release
 

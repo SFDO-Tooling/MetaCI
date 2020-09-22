@@ -53,8 +53,8 @@ urlpatterns = [
     ),
     url(
         r"webhook/github/push$",
-        repository_views.github_push_webhook,
-        name="github_push_webhook",
+        repository_views.github_webhook,
+        name="github_webhook",
     ),
     url(r"$", repository_views.repo_list, name="repo_list"),
 ]
