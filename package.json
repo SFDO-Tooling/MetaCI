@@ -11,7 +11,7 @@
     "@salesforce-ux/design-system": "^2.11.8",
     "@salesforce/design-system-react": "^0.10.19",
     "@sentry/browser": "^5.15.5",
-    "del": "^5.1.0",
+    "del": "^6.0.0",
     "i18next": "^19.5.5",
     "i18next-browser-languagedetector": "^6.0.0",
     "i18next-xhr-backend": "^3.2.2",
