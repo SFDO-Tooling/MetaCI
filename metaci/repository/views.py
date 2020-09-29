@@ -214,7 +214,7 @@ def get_or_create_branch(branch_name, repo):
 
 def create_builds(event, payload, repo, branch, release):
     for pr in repo.planrepository_set.should_run().filter(
-        plan__trigger__in=["commit", "tag"]
+        plan__trigger__in=["commit", "tag", "status"]
     ):
         plan = pr.plan
         run_build, commit, commit_message = plan.check_github_event(event, payload)
