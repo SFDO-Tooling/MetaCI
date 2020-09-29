@@ -185,7 +185,8 @@ def get_repository(event):
 
 
 def get_branch_name_from_payload(event):
-    if "branches" in event:
+    branches = event.get("branches")
+    if branches:
         branch_name = event["branches"][0]["name"]
         return branch_name
 
