@@ -8,6 +8,6 @@ pytest-mock==3.3.1
 pytest-tap==3.1
 coverage==5.3
 coveralls==2.1.2
-flake8==3.8.3
+flake8==3.8.4
 factory_boy==3.0.1
 responses==0.12.0
