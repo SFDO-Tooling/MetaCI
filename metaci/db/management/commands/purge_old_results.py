@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Iterable
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -14,7 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         year_ago = timezone.now() - timedelta(days=365)
 
-        def show_progress(source, batch_size=1000):
+        def show_progress(source: Iterable, batch_size: int = 1000):
             i = 0
             for item in source:
                 i += 1
@@ -38,7 +39,7 @@ class Command(BaseCommand):
             f"Deleting {count} test result assets from over a year ago..."
         )
         with transaction.atomic():
-            for asset in show_progress(old_assets.iterator(), self.stdout):
+            for asset in show_progress(old_assets.iterator()):
                 asset.asset.delete()
                 asset.delete()
         self.stdout.write("Done.\n")
