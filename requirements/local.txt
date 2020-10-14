@@ -2,7 +2,7 @@
 -r test.txt
 
 black==20.8b1
-isort==5.5.3
+isort==5.6.2
 
 Sphinx==3.2.1
 django-extensions==3.0.9
@@ -11,4 +11,4 @@ Werkzeug==1.0.1
 django-debug-toolbar==3.1.1
 
 # improved REPL
-ipdb==0.13.3
+ipdb==0.13.4
