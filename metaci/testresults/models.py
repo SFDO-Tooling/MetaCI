@@ -147,13 +147,9 @@ class TestResult(models.Model):
         blank=True,
     )
     robot_xml = models.TextField(null=True, blank=True)
-    email_invocations_used = models.IntegerField(null=True, blank=True, db_index=True)
-    email_invocations_allowed = models.IntegerField(
-        null=True, blank=True, db_index=True
-    )
-    email_invocations_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
-    )
+    email_invocations_used = models.IntegerField(null=True, blank=True)
+    email_invocations_allowed = models.IntegerField(null=True, blank=True)
+    email_invocations_percent = models.IntegerField(null=True, blank=True)
     soql_queries_used = models.IntegerField(null=True, blank=True)
     soql_queries_allowed = models.IntegerField(null=True, blank=True)
     soql_queries_percent = models.IntegerField(null=True, blank=True)
@@ -223,18 +219,12 @@ class TestResult(models.Model):
     test_callouts_used = models.IntegerField(null=True, blank=True)
     test_callouts_allowed = models.IntegerField(null=True, blank=True)
     test_callouts_percent = models.IntegerField(null=True, blank=True)
-    worst_limit = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    worst_limit = models.CharField(max_length=255, null=True, blank=True)
     worst_limit_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    worst_limit_nontest = models.CharField(
-        max_length=255, null=True, blank=True, db_index=True
-    )
-    worst_limit_nontest_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
-    )
-    worst_limit_test = models.CharField(
-        max_length=255, null=True, blank=True, db_index=True
-    )
-    worst_limit_test_percent = models.IntegerField(null=True, blank=True, db_index=True)
+    worst_limit_nontest = models.CharField(max_length=255, null=True, blank=True)
+    worst_limit_nontest_percent = models.IntegerField(null=True, blank=True)
+    worst_limit_test = models.CharField(max_length=255, null=True, blank=True)
+    worst_limit_test_percent = models.IntegerField(null=True, blank=True)
 
     objects = TestResultManager()
 
