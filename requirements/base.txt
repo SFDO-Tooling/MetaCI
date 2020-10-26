@@ -1,4 +1,4 @@
-setuptools==50.3.0
+setuptools==50.3.2
 
 # CumulusCI
 cumulusci==3.22.0.dev0
