@@ -1,7 +1,7 @@
-setuptools==50.3.0
+setuptools==50.3.2
 
 # CumulusCI
-cumulusci==3.22.0.dev0
+cumulusci==3.22.0
 
 # SFDO Template Helpers for authorization middleware and other helpers
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
@@ -25,10 +25,10 @@ django-model-utils==4.0.0
 django-guardian==2.3.0
 
 # Images
-Pillow==7.2.0
+Pillow==8.0.1
 
 # For user registration, either via email or social
-django-allauth==0.42.0
+django-allauth==0.43.0
 
 # Unicode slugification
 awesome-slugify==1.6.5
@@ -69,14 +69,14 @@ django-log-request-id==1.6.0
 psycopg2-binary==2.8.6
 
 # django-storages for S3
-boto3==1.15.16
+boto3==1.16.4
 django-storages==1.10.1
 
 # JSON web token
 PyJWT==1.7.1
 
 # Django Defender
-django-defender==0.7.0
+django-defender==0.8.0
 
 # Let Javascript refer to Django URLs by name
 django-js-reverse==0.9.1
