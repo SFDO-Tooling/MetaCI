@@ -412,9 +412,6 @@ class Build(models.Model):
             self.flush_log()
             return
 
-        if self.plan.role == "release":
-            send_release_webhook(project_config, self.release)
-
         if self.plan.role == "qa":
             self.logger.info("Build complete, org is now ready for QA testing")
         elif org_config.created:
@@ -422,6 +419,14 @@ class Build(models.Model):
 
         self.delete_build_dir()
         self.flush_log()
+
+        if self.plan.role == "release":
+            try:
+                send_release_webhook(project_config, self.release)
+            except Exception as err:
+                self.logger.error(f"Error while sending release webhook: {err}")
+                set_build_info(build, status="error", time_end=timezone.now())
+                return
 
         if self.plan.role == "qa":
             set_build_info(
