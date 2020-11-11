@@ -424,8 +424,11 @@ class Build(models.Model):
             try:
                 send_release_webhook(project_config, self.release)
             except Exception as err:
-                self.logger.error(f"Error while sending release webhook: {err}")
-                set_build_info(build, status="error", time_end=timezone.now())
+                message = f"Error while sending release webhook: {err}"
+                self.logger.error(message)
+                set_build_info(
+                    build, status="error", exception=message, time_end=timezone.now()
+                )
                 return
 
         if self.plan.role == "qa":
