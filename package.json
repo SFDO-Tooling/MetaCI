@@ -108,7 +108,7 @@
     "yarn": "1.22.4"
   },
   "scripts": {
-    "webpack:serve": "webpack-dev-server --config webpack.dev.js",
+    "webpack:serve": "webpack serve --config webpack.dev.js",
     "django:serve": "python manage.py runserver 0.0.0.0:8000",
     "redis:clear": "redis-cli FLUSHALL",
     "rq:work": "python manage.py metaci_rqworker short",
