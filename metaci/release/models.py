@@ -2,12 +2,12 @@
 from __future__ import unicode_literals
 
 import datetime
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
 from model_utils import Choices
-from model_utils.models import StatusModel
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
+from model_utils.models import StatusModel
 
 from metaci.release.utils import update_release_from_github
 
