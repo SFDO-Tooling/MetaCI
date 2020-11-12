@@ -652,6 +652,14 @@ class BuildFlow(models.Model):
 
         flow_config = project_config.get_flow(self.flow)
 
+        if self.plan.role == "release":
+            flow_config["options"].update(
+                {
+                    "sandbox_date": self.build.release.sandbox_push_date,
+                    "production_date": self.build.release.production_push_date,
+                }
+            )
+
         callbacks = None
         if settings.METACI_FLOW_CALLBACK_ENABLED:
             from metaci.build.flows import MetaCIFlowCallback

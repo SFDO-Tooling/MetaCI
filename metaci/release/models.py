@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -46,11 +47,22 @@ class Release(StatusModel):
     )
 
     release_creation_date = models.DateField(
-        _("release creation date"), null=True, blank=True
+        _("release creation date"),
+        null=True,
+        blank=True,
+        default=datetime.date.today().isoformat(),
     )
-    sandbox_push_date = models.DateField(_("sandbox push date"), null=True, blank=True)
+    sandbox_push_date = models.DateField(
+        _("sandbox push date"),
+        null=True,
+        blank=True,
+        default=(datetime.date.today() + datetime.timedelta(days=6)).isoformat(),
+    )
     production_push_date = models.DateField(
-        _("production push date"), null=True, blank=True
+        _("production push date"),
+        null=True,
+        blank=True,
+        default=(datetime.date.today() + datetime.timedelta(days=6)).isoformat(),
     )
     created_from_commit = models.CharField(
         _("created from commit"), max_length=1024, null=True, blank=True
