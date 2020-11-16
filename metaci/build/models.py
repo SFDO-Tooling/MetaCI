@@ -660,7 +660,7 @@ class BuildFlow(models.Model):
 
         flow_config = project_config.get_flow(self.flow)
 
-        if self.plan.role == "release":
+        if self.build.plan.role == "release":
             flow_config["options"].update(
                 {
                     "sandbox_date": self.build.release.sandbox_push_date,
