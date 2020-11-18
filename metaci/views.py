@@ -8,6 +8,8 @@ import django
 from django.conf import settings
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
+from django.http import HttpResponseForbidden
+from django.template import TemplateDoesNotExist
 
 
 class AboutView(TemplateView):
@@ -55,5 +57,5 @@ class AboutView(TemplateView):
 
 def custom_403(request, exception):
     """Always redirect users to login via GitHub"""
-    return render(request, "account/login.html")
+    return HttpResponseForbidden(render(request, "account/login.html"))
 
