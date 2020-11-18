@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from metaci.views import custom_403
 
 from django.conf import settings
 from django.conf.urls import include, url
@@ -55,7 +56,7 @@ if settings.DEBUG:
         ),
         url(
             r"^403/$",
-            default_views.permission_denied,
+            mbci_views.custom_403,
             kwargs={"exception": Exception("Permission Denied")},
         ),
         url(

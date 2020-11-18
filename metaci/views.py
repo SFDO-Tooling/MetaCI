@@ -6,6 +6,7 @@ import sys
 import cumulusci
 import django
 from django.conf import settings
+from django.shortcuts import render
 from django.views.generic.base import TemplateView
 
 
@@ -50,3 +51,9 @@ class AboutView(TemplateView):
         context["METACI_FLOW_CALLBACK_ENABLED"] = settings.METACI_FLOW_CALLBACK_ENABLED
 
         return context
+
+
+def custom_403(request, exception):
+    """Always redirect users to login via GitHub"""
+    return render(request, "account/login.html")
+
