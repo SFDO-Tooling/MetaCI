@@ -660,13 +660,20 @@ class BuildFlow(models.Model):
 
         flow_config = project_config.get_flow(self.flow)
 
-        if self.build.plan.role == "release":
-            flow_config["options"].update(
-                {
-                    "sandbox_date": self.build.release.sandbox_push_date,
-                    "production_date": self.build.release.production_push_date,
-                }
-            )
+        if (
+            self.build.plan.role == "release"
+            and self.build.release
+            and flow_config.name == "release_production"
+        ):
+            for k, v in flow_config.config["steps"].items():
+                if v["task"] == "github_release_notes":
+                    v["options"] = {
+                        "tag": "^^github_release.tag_name",
+                        "publish": True,
+                        "version_id": "^^upload_production.version_id",
+                        "sandbox_date": self.build.release.sandbox_push_date,
+                        "production_date": self.build.release.production_push_date,
+                    }
 
         callbacks = None
         if settings.METACI_FLOW_CALLBACK_ENABLED:
