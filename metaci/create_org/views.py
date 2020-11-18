@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 from metaci.plan.models import Plan, PlanRepository
 
-@login_required
+
 def create_org(request):
     planrepos = PlanRepository.objects.for_user(request.user, "plan.run_plan")
     planrepos.filter(plan__role__in=["scratch", "qa"])
