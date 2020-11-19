@@ -50,19 +50,19 @@ class Release(StatusModel):
         _("release creation date"),
         null=True,
         blank=True,
-        default=datetime.date.today().isoformat(),
+        default=(datetime.date.today().isoformat()),
     )
     sandbox_push_date = models.DateField(
         _("sandbox push date"),
         null=True,
         blank=True,
-        default=(datetime.date.today() + datetime.timedelta(days=6)).isoformat(),
+        default=(datetime.date.today().isoformat()),
     )
     production_push_date = models.DateField(
         _("production push date"),
         null=True,
         blank=True,
-        default=(datetime.date.today() + datetime.timedelta(days=6)).isoformat(),
+        default=((datetime.date.today() + datetime.timedelta(days=6)).isoformat()),
     )
     created_from_commit = models.CharField(
         _("created from commit"), max_length=1024, null=True, blank=True

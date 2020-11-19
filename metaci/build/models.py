@@ -666,6 +666,7 @@ class BuildFlow(models.Model):
             options["github_release_notes"] = {
                 "sandbox_date": self.build.release.sandbox_push_date,
                 "production_date": self.build.release.production_push_date,
+                "trial_info": self.build.release.trialforce_id,
             }
 
         callbacks = None
