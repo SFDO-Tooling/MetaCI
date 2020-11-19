@@ -1,12 +1,9 @@
-from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 
-from metaci.plan.models import Plan, PlanRepository
+from metaci.plan.models import PlanRepository
 
-@login_required
+
 def create_org(request):
     planrepos = PlanRepository.objects.for_user(request.user, "plan.run_plan")
     planrepos.filter(plan__role__in=["scratch", "qa"])

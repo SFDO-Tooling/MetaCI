@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from metaci.views import custom_403
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import handler403, include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views import defaults as default_views
@@ -44,6 +45,9 @@ urlpatterns = [
     url(r"^webhook/github/push$", github_webhook, name="github_webhook"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+# override default error view
+handler403 = "metaci.views.custom_403"
+
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
     # these url in browser to see how these error pages look like.
@@ -55,7 +59,7 @@ if settings.DEBUG:
         ),
         url(
             r"^403/$",
-            default_views.permission_denied,
+            mbci_views.custom_403,
             kwargs={"exception": Exception("Permission Denied")},
         ),
         url(
