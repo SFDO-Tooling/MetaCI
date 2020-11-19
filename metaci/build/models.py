@@ -660,20 +660,13 @@ class BuildFlow(models.Model):
 
         flow_config = project_config.get_flow(self.flow)
 
-        if (
-            self.build.plan.role == "release"
-            and self.build.release
-            and flow_config.name == "release_production"
-        ):
-            for k, v in flow_config.config["steps"].items():
-                if v["task"] == "github_release_notes":
-                    v["options"] = {
-                        "tag": "^^github_release.tag_name",
-                        "publish": True,
-                        "version_id": "^^upload_production.version_id",
-                        "sandbox_date": self.build.release.sandbox_push_date,
-                        "production_date": self.build.release.production_push_date,
-                    }
+        # If it's a release build, pass the dates in
+        options = {}
+        if self.build.plan.role == "release" and self.build.release:
+            options["github_release_notes"] = {
+                "sandbox_date": self.build.release.sandbox_push_date,
+                "production_date": self.build.release.production_push_date,
+            }
 
         callbacks = None
         if settings.METACI_FLOW_CALLBACK_ENABLED:
@@ -683,7 +676,11 @@ class BuildFlow(models.Model):
 
         # Create the flow and handle initialization exceptions
         self.flow_instance = FlowCoordinator(
-            project_config, flow_config, name=self.flow, callbacks=callbacks
+            project_config,
+            flow_config,
+            name=self.flow,
+            options=options,
+            callbacks=callbacks,
         )
 
         # Run the flow
