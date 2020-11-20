@@ -1,5 +1,4 @@
 import json
-from os import popen
 
 from django.core.management.base import BaseCommand
 from requests.exceptions import HTTPError
@@ -23,7 +22,9 @@ class Command(BaseCommand):
     help = "Creates a JSON file with user information and prints out the URL"
 
     def handle(
-        self, *args, **kwargs,
+        self,
+        *args,
+        **options,
     ):
         packaging_orgs = Org.objects.filter(name="packaging")
         orgdata = [_handle_packaging_org(org) for org in packaging_orgs]
@@ -31,14 +32,10 @@ class Command(BaseCommand):
         bad_orgs = [org for org in orgdata if org.get("error")]
         assert len(good_orgs) + len(bad_orgs) == len(orgdata)
         storage = JSONDataStorage()
-        commit = popen("git log | head -n 1").read().split()[-1]
-        mode = "prod" if not popen("git diff").read().strip() else "draft"
         with storage.open(FILENAME, "wt") as f:
             data = {
                 "orgs": good_orgs,
                 "errors": bad_orgs,
-                "commit": commit,
-                "mode": mode,
             }
             json.dump(data, f, indent=1)
         url = storage.url(FILENAME)
