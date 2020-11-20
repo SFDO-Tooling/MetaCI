@@ -26,7 +26,7 @@ class Command(BaseCommand):
         *args,
         **options,
     ):
-        packaging_orgs = Org.objects.filter(name="packaging")
+        packaging_orgs = Org.objects.filter(name="packaging").order_by("repo__name")
         orgdata = [_handle_packaging_org(org) for org in packaging_orgs]
         good_orgs = [org for org in orgdata if org.get("users")]
         bad_orgs = [org for org in orgdata if org.get("error")]
