@@ -47,7 +47,7 @@
 {% endblock %}
 
 {% block layout_header_buttons %}
-{% if user.is_authenticated %}
+{% if can_run_plan %}
 <a href="{{ plan.get_absolute_url }}/run">
   <button class="slds-button slds-button--neutral slds-button--last">
     Run
