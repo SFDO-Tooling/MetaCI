@@ -54,11 +54,13 @@
 {% endblock %}
 
 {% block layout_header_buttons %}
-      <a href="{{ planrepo.get_absolute_url }}/run">
-        <button class="slds-button slds-button--neutral slds-button--last">
-          Run
-        </button>
-      </a>
+{% if user.is_authenticated %}
+<a href="{{ planrepo.get_absolute_url }}/run">
+  <button class="slds-button slds-button--neutral slds-button--last">
+    Run
+  </button>
+</a>
+{% endif %}
 {% endblock %}
 
 {% block layout_body %}
