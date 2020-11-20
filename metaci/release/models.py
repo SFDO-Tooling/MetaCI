@@ -21,6 +21,12 @@ class ChangeCaseTemplate(models.Model):
 
 
 class Release(StatusModel):
+    def get_sandbox_date():
+        return datetime.date.today()
+
+    def get_production_date():
+        return datetime.date.today() + datetime.timedelta(days=6)
+
     STATUS = Choices("draft", "published", "hidden")
     created = AutoCreatedField(_("created"))
     modified = AutoLastModifiedField(_("modified"))
@@ -50,19 +56,19 @@ class Release(StatusModel):
         _("release creation date"),
         null=True,
         blank=True,
-        default=(datetime.date.today().isoformat()),
+        default=get_sandbox_date,
     )
     sandbox_push_date = models.DateField(
         _("sandbox push date"),
         null=True,
         blank=True,
-        default=(datetime.date.today().isoformat()),
+        default=get_sandbox_date,
     )
     production_push_date = models.DateField(
         _("production push date"),
         null=True,
         blank=True,
-        default=((datetime.date.today() + datetime.timedelta(days=6)).isoformat()),
+        default=get_production_date,
     )
     created_from_commit = models.CharField(
         _("created from commit"), max_length=1024, null=True, blank=True
