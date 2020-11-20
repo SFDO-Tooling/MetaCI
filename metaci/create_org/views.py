@@ -1,8 +1,7 @@
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.shortcuts import render
 
-from metaci.plan.models import Plan, PlanRepository
+from metaci.plan.models import PlanRepository
 
 
 def create_org(request):
