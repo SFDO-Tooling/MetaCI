@@ -46,7 +46,7 @@ def fake_name(prefix=None):
     the class."""
     return factory.LazyAttribute(
         lambda a: (getattr(a, "name_prefix", None) or prefix or "")
-        + factory.Faker("word").generate({})
+        + factory.Faker("word").generate({"locale": None})
     )
 
 
