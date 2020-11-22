@@ -46,7 +46,7 @@ django-rq-scheduler==1.1.3
 # Salesforce Lightning Design System for Django
 django-slds-crispyforms==0.1.0  # pyup: ignore # there are releases with no package
 
-ansi2html==1.5.2
+ansi2html==1.6.0
 
 junitparser>=0.8
 
