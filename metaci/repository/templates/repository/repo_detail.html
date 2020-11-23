@@ -48,6 +48,9 @@
             <div class="slds-truncate" title="">Commit</div>
           </th>
           <th scope="col">
+            <div class="slds-truncate" title="">Queued</div>
+          </th>
+          <th scope="col">
             <div class="slds-truncate" title="">Start Date</div>
           </th>
           <th scope="col">
@@ -71,7 +74,10 @@
             <div class="slds-truncate" title="{{ build.branch.name }}">{{ build.branch.name }}</div>
           </td>
           <td data-label="Commit">
-            <div class="slds-truncate" title="{{ build.commit }}">{{ build.commit }}</div>
+            <div class="slds-truncate" title="{{ build.get_commit }}">{{ build.get_commit }}</div>
+          </td>
+          <td data-label="Queued">
+            <div class="slds-truncate" title="{{ build.get_time_queue }}">{{ build.get_time_queue }}</div>
           </td>
           <td data-label="Start Date">
             <div class="slds-truncate" title="{{ build.get_time_start }}">{{ build.get_time_start }}</div>
