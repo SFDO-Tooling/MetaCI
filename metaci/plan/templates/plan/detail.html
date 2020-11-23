@@ -47,11 +47,13 @@
 {% endblock %}
 
 {% block layout_header_buttons %}
+{% if can_run_plan %}
 <a href="{{ plan.get_absolute_url }}/run">
   <button class="slds-button slds-button--neutral slds-button--last">
     Run
   </button>
 </a>
+{% endif %}
 {% endblock %}
 
 {% block layout_body %}
@@ -78,7 +80,8 @@
     {% for pr in plan.planrepository_set.all %}
     <tr>
       <th data-label="Repository">
-        <div class="slds-truncate" title="{{ pr.repo.name }}"><a href="{{ pr.get_absolute_url }}">{{ pr.repo.name }}</a></div>
+        <div class="slds-truncate" title="{{ pr.repo.name }}"><a href="{{ pr.get_absolute_url }}">{{ pr.repo.name }}</a>
+        </div>
       </th>
       <td data-label="Active">
         {{ pr.active|yesno }}
@@ -121,7 +124,8 @@
         <div class="slds-truncate" title="{{ build.id }}"><a href="/builds/{{ build.id }}">{{ build.id }}</a></div>
       </th>
       <td data-label="Status">
-        <div class="slds-truncate slds-badge {% if build.get_status == 'fail'%} slds-theme--error {%elif build.get_status == 'error' %}slds-theme--offline{% elif build.get_status == 'success' %}slds-theme--success{% endif %}"
+        <div
+          class="slds-truncate slds-badge {% if build.get_status == 'fail'%} slds-theme--error {%elif build.get_status == 'error' %}slds-theme--offline{% elif build.get_status == 'success' %}slds-theme--success{% endif %}"
           title="{{ build.get_status }}">{{ build.get_status }}</div>
       </td>
       <td data-label="Repository">
