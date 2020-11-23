@@ -5,60 +5,62 @@
 {% block layout_header_text %}Latest Builds for {{ plan.name }}: {{ repo.name }}{% endblock %}
 
 {% block layout_header_details %}
-  <ul class="slds-grid slds-page-header__detail-row">
+<ul class="slds-grid slds-page-header__detail-row">
 
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repository">Repository</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ repo.name }}">
-        <a href="{{repo.get_absolute_url}}">{{ repo.name }}</a>
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Role">Role</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ plan.role }}">
-        {{ plan.role }}
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Trigger">Trigger</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ plan.trigger }}">
-        {{ plan.trigger }}
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Regex">Regex</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ plan.regex }}">
-        {{ plan.regex }}
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org">Org</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ plan.org }}">
-        {{ plan.org }}
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Flows">Flows</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ plan.flows }}">
-        {{ plan.flows }}
-      </p>
-    </li>
-    <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Active?">Active?</p>
-      <p class="slds-text-body--regular slds-truncate slds-badge {% if plan.active %}slds-theme--success{% else %}slds-theme--error{% endif %}"
-        title="{{ build.get_status }}" title="{{ plan.active }}">
-        {{ plan.active }}
-      </p>
-    </li>
-  </ul>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Repository">Repository</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{ repo.name }}">
+      <a href="{{repo.get_absolute_url}}">{{ repo.name }}</a>
+    </p>
+  </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Role">Role</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{ plan.role }}">
+      {{ plan.role }}
+    </p>
+  </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Trigger">Trigger</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{ plan.trigger }}">
+      {{ plan.trigger }}
+    </p>
+  </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Regex">Regex</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{ plan.regex }}">
+      {{ plan.regex }}
+    </p>
+  </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org">Org</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{ plan.org }}">
+      {{ plan.org }}
+    </p>
+  </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Flows">Flows</p>
+    <p class="slds-text-body--regular slds-truncate" title="{{ plan.flows }}">
+      {{ plan.flows }}
+    </p>
+  </li>
+  <li class="slds-page-header__detail-block">
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Active?">Active?</p>
+    <p class="slds-text-body--regular slds-truncate slds-badge {% if plan.active %}slds-theme--success{% else %}slds-theme--error{% endif %}"
+      title="{{ build.get_status }}" title="{{ plan.active }}">
+      {{ plan.active }}
+    </p>
+  </li>
+</ul>
 {% endblock %}
 
 {% block layout_header_buttons %}
-      <a href="{{ planrepo.get_absolute_url }}/run">
-        <button class="slds-button slds-button--neutral slds-button--last">
-          Run
-        </button>
-      </a>
+{% if can_run_plan %}
+<a href="{{ planrepo.get_absolute_url }}/run">
+  <button class="slds-button slds-button--neutral slds-button--last">
+    Run
+  </button>
+</a>
+{% endif %}
 {% endblock %}
 
 {% block layout_body %}
@@ -92,13 +94,15 @@
     </tr>
   </thead>
   <tbody>
-  {% for build in builds %}
+    {% for build in builds %}
     <tr>
       <th data-label="Build Number">
         <div class="slds-truncate" title="{{ build.id }}"><a href="/builds/{{ build.id }}">{{ build.id }}</a></div>
       </th>
       <td data-label="Status">
-        <div class="slds-truncate slds-badge {% if build.get_status == 'fail' %} slds-theme--error {% elif build.get_status == 'error' %}slds-theme--offline{% elif build.get_status == 'success' %}slds-theme--success{% endif %}" title="{{ build.get_status }}">{{ build.get_status }}</div>
+        <div
+          class="slds-truncate slds-badge {% if build.get_status == 'fail' %} slds-theme--error {% elif build.get_status == 'error' %}slds-theme--offline{% elif build.get_status == 'success' %}slds-theme--success{% endif %}"
+          title="{{ build.get_status }}">{{ build.get_status }}</div>
       </td>
       <td data-label="Commit">
         <div class="slds-truncate" title="{{ build.commit }}">{{ build.commit }}</div>
@@ -113,7 +117,7 @@
         <div class="slds-truncate" title="{{ build.get_time_end }}">{{ build.get_time_end }}</div>
       </td>
     </tr>
-  {% endfor %}
+    {% endfor %}
   </tbody>
 </table>
 {% include 'build/build_pagination.html' %}
