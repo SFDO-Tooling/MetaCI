@@ -16,6 +16,8 @@ from metaci.conftest import (
     RepositoryFactory,
     ScratchOrgInstanceFactory,
 )
+from metaci.cumulusci.config import MetaCIUniversalConfig
+from metaci.release.models import Release
 
 
 @pytest.mark.django_db
@@ -145,6 +147,27 @@ class TestBuildFlow:
         build_flow.flow_instance = mock.Mock()
         build_flow.set_commit_status()
         assert build_flow.build.commit_status == "4"
+
+    def test_set_build_with_release(self):
+
+        build_flow = BuildFlowFactory()
+        build_flow.build.plan.role = "release"
+        build_flow.flow_instance = mock.Mock()
+        project_config = MetaCIUniversalConfig()
+        project_config.config_project = {}
+        project_config.config_project["flows"] = {
+            "rida": {
+                "description": "Generates documentation for robot framework libraries",
+                "steps": {1: {"task": "robot_libdoc"}, 2: {"task": "robot_testdoc"}},
+            }
+        }
+        build_flow.run_flow(
+            project_config=project_config,
+            org_config=ScratchOrgInstanceFactory(),
+        )
+        assert build_flow.build.commit_status == "4"
+        build_flow.build.release = Release(repo=RepositoryFactory())
+        breakpoint()
 
 
 def detach_logger(model):
