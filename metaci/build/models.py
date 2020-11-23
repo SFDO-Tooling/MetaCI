@@ -262,6 +262,10 @@ class Build(models.Model):
     def get_error_message(self):
         return self.get_build_attr("error_message")
 
+    def get_commit(self):
+        """Return the first 6 characters of the commit sha, followed by an elipsis"""
+        return f"{self.commit[:6]}..."
+
     def get_qa_comment(self):
         return self.get_build_attr("qa_comment")
 
