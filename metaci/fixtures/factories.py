@@ -1,5 +1,6 @@
 import datetime
 import numbers
+import random
 
 import factory
 import factory.fuzzy
@@ -113,6 +114,7 @@ class BuildFactory(factory.django.DjangoModelFactory):
         lambda build: BranchFactory(repo=build.planrepo.repo)
     )
     status = factory.fuzzy.FuzzyChoice(BUILD_STATUS_NAMES)
+    commit = str(random.getrandbits(128))
 
 
 class BuildFlowFactory(factory.django.DjangoModelFactory):
