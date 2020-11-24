@@ -2,7 +2,11 @@
 
 {% block layout_parent_link %}<a href="/repos/{{ branch.repo.owner }}/{{ branch.repo.name }}">{{ branch.repo }}</a>{% endblock %}
 
-{% block layout_header_text %}{{ commit }}{% endblock %}
+{% block layout_header_text %}
+
+Commit SHA: {{ commit }}
+
+{% endblock %}
 
 {% block layout_header_details %}
   <ul class="slds-grid slds-page-header__detail-row">
