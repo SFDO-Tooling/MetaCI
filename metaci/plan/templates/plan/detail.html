@@ -1,8 +1,13 @@
 {% extends 'layout_full.html' %}
 
-{% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
-
-{% block layout_header_text %}Latest Builds for {{ plan.name }}{% endblock %}
+{% block layout_header_text %}
+<div class="slds-page-header__row">
+    <div class="slds-text-body_regular">
+      Plan
+    </div>
+  </div>
+  {{ plan.name }}
+{% endblock %}
 
 {% block layout_header_details %}
 <ul class="slds-grid slds-page-header__detail-row">
