@@ -662,12 +662,7 @@ class BuildFlow(models.Model):
 
         # If it's a release build, pass the dates in
         options = {}
-        if self.build.plan.role == "release" and self.build.release:
-            options["github_release_notes"] = {
-                "sandbox_date": self.build.release.sandbox_push_date,
-                "production_date": self.build.release.production_push_date,
-                "trial_info": self.build.release.trialforce_id,
-            }
+        options = self.set_release_dates(options)
 
         callbacks = None
         if settings.METACI_FLOW_CALLBACK_ENABLED:
@@ -686,6 +681,15 @@ class BuildFlow(models.Model):
 
         # Run the flow
         return self.flow_instance.run(org_config)
+
+    def set_release_dates(self, options):
+        if self.build.plan.role == "release" and self.build.release:
+            options["github_release_notes"] = {
+                "sandbox_date": self.build.release.sandbox_push_date,
+                "production_date": self.build.release.production_push_date,
+                "trial_info": self.build.release.trialforce_id,
+            }
+        return options
 
     def set_commit_status(self):
         if self.build.plan.commit_status_template:
