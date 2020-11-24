@@ -140,7 +140,7 @@ class TestBuild:
         build = BuildFactory()
         commit_sha = build.commit
         truncated_commit = build.get_commit()
-        assert f"{commit_sha[:8]}..." == truncated_commit
+        assert f"{commit_sha[:8]}" == truncated_commit
 
 
 @pytest.mark.django_db
