@@ -155,7 +155,7 @@ class TestBuildFlow:
         build_flow.flow_instance = mock.Mock()
         build_flow.build.release = Release(repo=RepositoryFactory())
         options = {}
-        build_flow.set_release_dates(options)
+        build_flow._get_flow_options(options)
         assert "github_release_notes" in options
         assert "sandbox_date" in options["github_release_notes"]
         assert options["github_release_notes"]["sandbox_date"] == datetime.date.today()
@@ -163,8 +163,6 @@ class TestBuildFlow:
         assert options["github_release_notes"][
             "production_date"
         ] == datetime.date.today() + datetime.timedelta(days=6)
-        assert "trial_info" in options["github_release_notes"]
-        assert options["github_release_notes"]["trial_info"] is None
 
 
 def detach_logger(model):
