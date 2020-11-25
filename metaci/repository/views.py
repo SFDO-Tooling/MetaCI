@@ -129,7 +129,7 @@ def branch_detail(request, owner, name, branch):
     branch = get_object_or_404(Branch, repo=repo, name=branch)
     query = {"branch": branch}
     builds = view_queryset(request, query)
-    context = {"branch": branch, "builds": builds}
+    context = {"branch": branch, "builds": builds, "repo": repo}
     return render(request, "repository/branch_detail.html", context=context)
 
 
