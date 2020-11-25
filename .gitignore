@@ -74,7 +74,7 @@ metaci/media/
 # MailHog binary
 mailhog
 
-
+# Production dirs
 staticfiles/
 dist/
 
