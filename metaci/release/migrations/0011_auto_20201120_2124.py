@@ -8,7 +8,7 @@ import metaci.release.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("release", "0010_auto_20201120_2109"),
+        ("release", "0006_add_change_case_template"),
     ]
 
     operations = [
