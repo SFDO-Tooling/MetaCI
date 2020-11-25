@@ -1,3 +1,4 @@
+import datetime
 import os
 from pathlib import Path
 from unittest import mock
@@ -16,6 +17,7 @@ from metaci.conftest import (
     RepositoryFactory,
     ScratchOrgInstanceFactory,
 )
+from metaci.release.models import Release
 
 
 @pytest.mark.django_db
@@ -138,6 +140,12 @@ class TestBuild:
         build = BuildFactory()
         assert build.worker_id == "faker.1"
 
+    def test_get_commit(self):
+        build = BuildFactory()
+        commit_sha = build.commit
+        truncated_commit = build.get_commit()
+        assert f"{commit_sha[:8]}" == truncated_commit
+
 
 @pytest.mark.django_db
 class TestBuildFlow:
@@ -147,6 +155,16 @@ class TestBuildFlow:
         build_flow.flow_instance = mock.Mock()
         build_flow.set_commit_status()
         assert build_flow.build.commit_status == "4"
+
+    def test_get_flow_options(self):
+        build_flow = BuildFlowFactory()
+        build_flow.build.plan.role = "release"
+        build_flow.build.release = Release(repo=RepositoryFactory())
+        options = build_flow._get_flow_options()
+        assert options["github_release_notes"]["sandbox_date"] == datetime.date.today()
+        assert options["github_release_notes"][
+            "production_date"
+        ] == datetime.date.today() + datetime.timedelta(days=6)
 
 
 def detach_logger(model):

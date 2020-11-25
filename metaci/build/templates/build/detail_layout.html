@@ -22,35 +22,61 @@
     {% endif %}
 {% endblock %}
 
-{% block layout_parent_link %}<a href="/builds">Builds</a>{% endblock %}
-
 {% block layout_header_text %}
   {% if rebuild %}
-    <a href="{{ build.get_absolute_url }}">Build #{{ build.id }}</a>, Rebuild #{{ rebuild.id }}
+  <ul class="slds-list_horizontal">
+    <li>
+      <a href="{{ build.get_absolute_url }}">
+      <div class="slds-page-header__row">
+        <div class="slds-text-body_regular">
+          Build #
+        </div>
+      </div>
+      {{ build.id }}
+      </a>
+    </li>
+    <li class="slds-p-left_large">
+      <div class="slds-page-header__row">
+        <div class="slds-text-body_regular">
+          Rebuild #
+        </div>
+      </div>
+      {{ rebuild.id }}
+    </li>
+  </ul>
   {% elif original_build %}
-    <a href="{{ build.get_absolute_url }}">Build #{{ build.id }}</a>, Original Build
+    <a href="{{ build.get_absolute_url }}">
+   <div class="slds-page-header__row">
+    <div class="slds-text-body_regular">
+      Build #
+    </div>
+  </div> 
+  {{ build.id }}</a>, Original Build
   {% else %}
-    Build #{{ build.id }}
+    <div class="slds-page-header__row">
+      <div class="slds-text-body_regular">
+        Build #
+      </div>
+    </div>
+    {{ build.id }}
   {% endif %}
 {% endblock %}
 
 {% block layout_header_buttons %}
 {% if obj_perms.rebuild_builds %}
-
-<div class="slds-button-group" role="group">
-{% if build.get_status == 'error' or build.get_status == 'fail' %}
-  <a href="{{ build.get_absolute_url }}/rebuild">
-    <button class="slds-button slds-button--neutral">
-      Rebuild
-    </button>
-  </a>
-{% endif %}
+  <div class="slds-button-group" role="group">
+  {% if build.get_status == 'error' or build.get_status == 'fail' %}
+    <a href="{{ build.get_absolute_url }}/rebuild">
+      <button class="slds-button slds-button--neutral">
+        Rebuild
+      </button>
+    </a>
+  {% endif %}
 
 {% if obj_perms.org_login and org_instance and not org_instance.deleted %}
-<a href="{{ org_instance.get_absolute_url }}/login" target="_blank">
-  <button class="slds-button slds-button--brand">Log In to Org</button>
-</a>
-
+  <a href="{{ org_instance.get_absolute_url }}/login" target="_blank">
+    <button class="slds-button slds-button--brand">Log In to Org</button>
+  </a>
 {% endif %}
 </div>
 

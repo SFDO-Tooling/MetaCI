@@ -283,6 +283,9 @@ class Build(models.Model):
     def get_time_qa_end(self):
         return self.get_build_attr("time_qa_end")
 
+    def get_commit(self):
+        return f"{self.commit[:8]}"
+
     def set_status(self, status):
         build = self.get_build()
         build.status = status
@@ -652,6 +655,9 @@ class BuildFlow(models.Model):
 
         flow_config = project_config.get_flow(self.flow)
 
+        # If it's a release build, pass the dates in
+        options = self._get_flow_options()
+
         callbacks = None
         if settings.METACI_FLOW_CALLBACK_ENABLED:
             from metaci.build.flows import MetaCIFlowCallback
@@ -660,11 +666,24 @@ class BuildFlow(models.Model):
 
         # Create the flow and handle initialization exceptions
         self.flow_instance = FlowCoordinator(
-            project_config, flow_config, name=self.flow, callbacks=callbacks
+            project_config,
+            flow_config,
+            name=self.flow,
+            options=options,
+            callbacks=callbacks,
         )
 
         # Run the flow
         return self.flow_instance.run(org_config)
+
+    def _get_flow_options(self) -> dict:
+        options = {}
+        if self.build.plan.role == "release" and self.build.release:
+            options["github_release_notes"] = {
+                "sandbox_date": self.build.release.sandbox_push_date,
+                "production_date": self.build.release.production_push_date,
+            }
+        return options
 
     def set_commit_status(self):
         if self.build.plan.commit_status_template:
