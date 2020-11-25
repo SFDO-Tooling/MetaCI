@@ -49,15 +49,17 @@ class TestBuild:
         build = Build(repo=repo, plan=plan)
         assert build.planrepo == planrepo
 
-    @mock.patch("metaci.repository.models.Repository.github_api")
+    @mock.patch("metaci.repository.models.Repository.get_github_api")
     @mock.patch("metaci.cumulusci.keychain.MetaCIProjectKeychain.get_org")
-    def test_run(self, get_org, gh):
+    def test_run(self, get_org, get_gh_api):
         # mock github zipball
         def archive(format, zip_content, ref):
             with open(Path(__file__).parent / "testproject.zip", "rb") as f:
                 zip_content.write(f.read())
 
-        gh.archive.side_effect = archive
+        mock_api = mock.Mock()
+        mock_api.archive.side_effect = archive
+        get_gh_api.return_value = mock_api
 
         # mock org config
         org_config = OrgConfig({}, "test")

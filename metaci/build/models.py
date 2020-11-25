@@ -436,7 +436,8 @@ class Build(models.Model):
     def checkout(self):
         # get the ref
         zip_content = BytesIO()
-        self.repo.github_api.archive("zipball", zip_content, ref=self.commit)
+        gh = self.repo.get_github_api()
+        gh.archive("zipball", zip_content, ref=self.commit)
         build_dir = tempfile.mkdtemp()
         self.logger.info(f"-- Extracting zip to temp dir {build_dir}")
         self.save()
