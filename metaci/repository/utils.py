@@ -3,6 +3,9 @@ def create_status(build):
         # skip setting Github status if the context field is empty
         return
 
+    state = None
+    target_url = None
+    description = None
     repo = build.repo.github_api
 
     if build.get_status() == "queued":
@@ -16,33 +19,31 @@ def create_status(build):
         description = "The build is running"
     if build.get_status() == "qa":
         state = "pending"
-        description = "{} is testing".format(build.user)
+        description = f"{build.user} is testing"
     if build.get_status() == "success":
         state = "success"
         if build.commit_status:
             description = build.commit_status
         elif build.plan.role == "qa":
-            description = "{} approved. See details for QA comments".format(
-                build.qa_user
-            )
+            description = f"{build.qa_user} approved. See details for QA comments"
         else:
             description = "The build was successful"
     elif build.get_status() == "error":
         state = "error"
-        description = "An error occurred during build"
+        description = "💥 An error occurred during build"
     elif build.get_status() == "fail":
         state = "failure"
         if build.plan.role == "qa":
-            description = "{} rejected. See details for QA comments".format(
-                build.qa_user
-            )
+            description = f"{build.qa_user} rejected. See details for QA comments"
         else:
-            description = "Tests failed"
+            plural = build.tests_fail != 1
+            description = f"⚠ ️There were {build.tests_fail} test{'s' if plural else ''} that failed this check."
+            target_url = f"{build.get_external_url()}/tests"
 
     response = repo.create_status(
         sha=build.commit,
         state=state,
-        target_url=build.get_external_url(),
+        target_url=target_url or build.get_external_url(),
         description=description,
         context=build.plan.context,
     )
