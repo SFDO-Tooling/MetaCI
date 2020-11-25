@@ -232,7 +232,7 @@ class Build(models.Model):
                 self.planrepo = matching_repo[0]
 
     def __str__(self):
-        return "{}: {} - {}".format(self.id, self.repo, self.commit)
+        return f"{self.id}: {self.repo} - {self.commit}"
 
     def get_log_html(self):
         if self.log:
@@ -242,7 +242,7 @@ class Build(models.Model):
         return reverse("build_detail", kwargs={"build_id": str(self.id)})
 
     def get_external_url(self):
-        url = "{}{}".format(settings.SITE_URL, self.get_absolute_url())
+        url = f"{settings.SITE_URL}{self.get_absolute_url()}"
         return url
 
     def get_build(self):
@@ -308,9 +308,7 @@ class Build(models.Model):
 
         if self.schedule:
             self.logger.info(
-                "Build triggered by {} schedule #{}".format(
-                    self.schedule.schedule, self.schedule.id
-                )
+                f"Build triggered by {self.schedule.schedule} schedule #{self.schedule.id}"
             )
 
         try:
@@ -355,7 +353,7 @@ class Build(models.Model):
             flows = [flow.strip() for flow in self.plan.flows.split(",")]
             for flow in flows:
                 self.logger = init_logger(self)
-                self.logger.info("Running flow: {}".format(flow))
+                self.logger.info(f"Running flow: {flow}")
                 self.save()
 
                 build_flow = BuildFlow(
@@ -367,14 +365,10 @@ class Build(models.Model):
                 if build_flow.status != "success":
                     self.logger = init_logger(self)
                     self.logger.error(
-                        "Build flow {} completed with status {}".format(
-                            flow, build_flow.status
-                        )
+                        f"Build flow {flow} completed with status {build_flow.status}"
                     )
                     self.logger.error(
-                        "    {}: {}".format(
-                            build_flow.exception, build_flow.error_message
-                        )
+                        f"    {build_flow.exception}: {build_flow.error_message}"
                     )
                     set_build_info(
                         build,
@@ -390,9 +384,7 @@ class Build(models.Model):
                     return
                 else:
                     self.logger = init_logger(self)
-                    self.logger.info(
-                        "Build flow {} completed successfully".format(flow)
-                    )
+                    self.logger.info(f"Build flow {flow} completed successfully")
                     self.flush_log()
                     self.save()
 
@@ -446,13 +438,13 @@ class Build(models.Model):
         zip_content = BytesIO()
         self.repo.github_api.archive("zipball", zip_content, ref=self.commit)
         build_dir = tempfile.mkdtemp()
-        self.logger.info("-- Extracting zip to temp dir {}".format(build_dir))
+        self.logger.info(f"-- Extracting zip to temp dir {build_dir}")
         self.save()
         zip_file = zipfile.ZipFile(zip_content)
         zip_file.extractall(build_dir)
         # assume the zipfile has a single child dir with the repo
         build_dir = os.path.join(build_dir, os.listdir(build_dir)[0])
-        self.logger.info("-- Commit extracted to build dir: {}".format(build_dir))
+        self.logger.info(f"-- Commit extracted to build dir: {build_dir}")
         self.save()
 
         if self.plan.sfdx_config:
@@ -490,7 +482,7 @@ class Build(models.Model):
                     self.logger.warning(str(e))
                     self.logger.info(
                         "Retrying create scratch org "
-                        + "(retry {} of {})".format(attempt, retries)
+                        + f"(retry {attempt} of {retries})"
                     )
                     attempt += 1
                     continue
@@ -563,7 +555,7 @@ class Build(models.Model):
 
     def delete_build_dir(self):
         if hasattr(self, "build_dir"):
-            self.logger.info("Deleting build dir {}".format(self.build_dir))
+            self.logger.info(f"Deleting build dir {self.build_dir}")
             shutil.rmtree(self.build_dir)
             self.save()
 
@@ -596,14 +588,13 @@ class BuildFlow(models.Model):
     asset_hash = models.CharField(max_length=64, unique=True, default=generate_hash)
 
     def __str__(self):
-        return "{}: {} - {} - {}".format(
-            self.build.id, self.build.repo, self.build.commit, self.flow
-        )
+        return f"{self.build.id}: {self.build.repo} - {self.build.commit} - {self.flow}"
 
     def get_absolute_url(self):
-        return reverse(
-            "build_detail", kwargs={"build_id": str(self.build.id)}
-        ) + "#flow-{}".format(self.flow)
+        return (
+            reverse("build_detail", kwargs={"build_id": str(self.build.id)})
+            + f"#flow-{self.flow}"
+        )
 
     def get_log_html(self):
         if self.log:
@@ -689,7 +680,7 @@ class BuildFlow(models.Model):
     def load_test_results(self):
         has_results = False
 
-        root_dir_robot_path = "{}/output.xml".format(self.root_dir)
+        root_dir_robot_path = f"{self.root_dir}/output.xml"
         # Load robotframework's output.xml if found
         if os.path.isfile("output.xml"):
             has_results = True
@@ -712,9 +703,7 @@ class BuildFlow(models.Model):
                 results.extend(self.load_junit(filename))
             if not results:
                 self.logger.warning(
-                    "No results found at JUnit path {}".format(
-                        self.build.plan.junit_path
-                    )
+                    f"No results found at JUnit path {self.build.plan.junit_path}"
                 )
         if results:
             has_results = True
@@ -867,7 +856,7 @@ class FlowTask(models.Model):
     objects = FlowTaskManager()
 
     def __str__(self):
-        return "{}: {} - {}".format(self.build_flow_id, self.stepnum, self.path)
+        return f"{self.build_flow_id}: {self.stepnum} - {self.path}"
 
     class Meta:
         ordering = ["-build_flow", "stepnum"]
