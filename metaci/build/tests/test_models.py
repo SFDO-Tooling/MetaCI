@@ -138,6 +138,12 @@ class TestBuild:
         build = BuildFactory()
         assert build.worker_id == "faker.1"
 
+    def test_get_commit(self):
+        build = BuildFactory()
+        commit_sha = build.commit
+        truncated_commit = build.get_commit()
+        assert f"{commit_sha[:8]}" == truncated_commit
+
 
 @pytest.mark.django_db
 class TestBuildFlow:
