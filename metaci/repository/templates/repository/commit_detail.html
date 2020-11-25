@@ -8,18 +8,14 @@ Commit SHA: {{ commit }}
 
 {% endblock %}
 
-{% block layout_header_details %}
-  <ul class="slds-grid slds-page-header__detail-row">
-    <li class="slds-page-header__detail-block">
-      <a href="{{ repo.url }}/commit/{{ commit }}" target="_blank">
-        <button class="slds-button slds-button_neutral">View Commit in GitHub</button>
-      </a>
-    </li>
-  </ul>
+{% block layout_header_buttons %}
+  <a href="{{ repo.url }}/commit/{{ commit }}" target="_blank">
+    <button class="slds-button slds-button_neutral">View Commit in GitHub</button>
+  </a>
 {% endblock %}
 
 {% block layout_body %}
 
-{% include 'build/build_table.html' with builds=builds%}
+{% include 'build/build_table.html' %}
 
 {% endblock %}
