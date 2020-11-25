@@ -148,18 +148,12 @@ class TestBuildFlow:
         build_flow.set_commit_status()
         assert build_flow.build.commit_status == "4"
 
-    def test_set_build_with_release(self):
-
+    def test_get_flow_options(self):
         build_flow = BuildFlowFactory()
         build_flow.build.plan.role = "release"
-        build_flow.flow_instance = mock.Mock()
         build_flow.build.release = Release(repo=RepositoryFactory())
-        options = {}
-        build_flow._get_flow_options(options)
-        assert "github_release_notes" in options
-        assert "sandbox_date" in options["github_release_notes"]
+        options = build_flow._get_flow_options()
         assert options["github_release_notes"]["sandbox_date"] == datetime.date.today()
-        assert "production_date" in options["github_release_notes"]
         assert options["github_release_notes"][
             "production_date"
         ] == datetime.date.today() + datetime.timedelta(days=6)
