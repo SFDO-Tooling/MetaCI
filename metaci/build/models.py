@@ -283,6 +283,9 @@ class Build(models.Model):
     def get_time_qa_end(self):
         return self.get_build_attr("time_qa_end")
 
+    def get_commit(self):
+        return f"{self.commit[:8]}"
+
     def set_status(self, status):
         build = self.get_build()
         build.status = status
