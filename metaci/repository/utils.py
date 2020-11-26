@@ -16,15 +16,13 @@ def create_status(build):
         description = "The build is running"
     if build.get_status() == "qa":
         state = "pending"
-        description = "{} is testing".format(build.user)
+        description = f"{build.user} is testing"
     if build.get_status() == "success":
         state = "success"
         if build.commit_status:
             description = build.commit_status
         elif build.plan.role == "qa":
-            description = "{} approved. See details for QA comments".format(
-                build.qa_user
-            )
+            description = f"{build.qa_user} approved. See details for QA comments"
         else:
             description = "The build was successful"
     elif build.get_status() == "error":
@@ -33,9 +31,7 @@ def create_status(build):
     elif build.get_status() == "fail":
         state = "failure"
         if build.plan.role == "qa":
-            description = "{} rejected. See details for QA comments".format(
-                build.qa_user
-            )
+            description = f"{build.qa_user} rejected. See details for QA comments"
         else:
             description = "Tests failed"
 

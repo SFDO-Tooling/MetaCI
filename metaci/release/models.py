@@ -91,7 +91,7 @@ class Release(StatusModel):
         unique_together = ("repo", "git_tag")
 
     def __str__(self):
-        return "{}: {}".format(self.repo, self.version_name)
+        return f"{self.repo}: {self.version_name}"
 
     def update_from_github(self):
         update_release_from_github(self)

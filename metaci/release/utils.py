@@ -22,12 +22,10 @@ def update_release_from_github(release, repo_api=None):
     if not release.git_tag:
         logger.info("Cannot update release, no git_tag specified")
         return
-    ref = repo_api.ref("tags/{}".format(release.git_tag))
+    ref = repo_api.ref(f"tags/{release.git_tag}")
     if not ref:
         logger.info(
-            "Cannot update release, ref tags/{} not found in Github".format(
-                release.git_tag
-            )
+            f"Cannot update release, ref tags/{release.git_tag} not found in Github"
         )
         return
     gh_release = repo_api.release_by_tag_name(release.git_tag)

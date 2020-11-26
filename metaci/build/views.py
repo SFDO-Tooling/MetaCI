@@ -159,13 +159,11 @@ def build_rebuild(request, build_id):
     if not build.log:
         build.log = ""
 
-    build.log += "\n=== Build restarted at {} by {} ===\n".format(
-        timezone.now(), request.user.username
-    )
+    build.log += f"\n=== Build restarted at {timezone.now()} by {request.user.username} ===\n"
     build.current_rebuild = rebuild
     build.save()
 
-    return HttpResponseRedirect("/builds/{}".format(build.id))
+    return HttpResponseRedirect(f"/builds/{build.id}")
 
 
 @permission_required("build.search_builds")

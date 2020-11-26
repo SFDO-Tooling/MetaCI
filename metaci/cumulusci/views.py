@@ -95,7 +95,7 @@ def org_login(request, org_id, instance_id=None):
         return HttpResponseRedirect(
             urljoin(
                 str(session["instance_url"]),
-                "secur/frontdoor.jsp?sid={}".format(session["access_token"]),
+                f"secur/frontdoor.jsp?sid={session['access_token']}",
             )
         )
 
