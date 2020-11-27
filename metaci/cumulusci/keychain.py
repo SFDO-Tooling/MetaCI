@@ -19,7 +19,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
     def _load_keychain_services(self):
         for key, value in settings.__dict__["_wrapped"].__dict__.items():
             if key.startswith("CUMULUSCI_SERVICE_"):
-                print(f"%%% DEBUG %%%: {key[len('CUMULUSCI_SERVICE_' :)]}")
+                print(f"%%% DEBUG %%%: {key[len('CUMULUSCI_SERVICE_') :]}")
                 self.services[key[len("CUMULUSCI_SERVICE_") :]] = ServiceConfig(
                     json.loads(value)
                 )
