@@ -3,20 +3,38 @@
 {% block layout_header_text %}
   <div class="slds-page-header__row">
     <div class="slds-text-body_regular">
-      Branch
+      {% if branch.is_tag %}
+        Tag
+      {% else %}
+        Branch
+      {% endif %}
     </div>
   </div>
-  {{ branch.name }}
+  {% if branch.is_tag %}
+    {{ branch.name|cut:"tag: " }}
+  {% else %}
+    {{ branch.name }}
+  {% endif %}
 {% endblock %}
 
 {% block layout_header_buttons %}
-  <ul class="slds-button-group-list">
-    <li>
-      <a href="{{ repo.url }}/tree/{{ branch.name }}" target="_blank">
-        <button class="slds-button slds-button_outline-brand">View Branch in GitHub</button>
-      </a>
-    </li>
-  </ul>
+    <ul class="slds-button-group-list">
+      <li>
+        {% if branch.is_tag %}
+          <a href="{{ repo.url }}/releases/tag/{{ branch.name|cut:"tag: " }}" target="_blank">
+            <button class="slds-button slds-button_outline-brand">
+              View Tag in GitHub
+            </button>
+          </a
+        {% else %}
+          <a href="{{ repo.url }}/tree/{{ branch.name }}" target="_blank">
+            <button class="slds-button slds-button_outline-brand">
+              View Branch in GitHub
+            </button>
+          </a
+        {% endif %}
+      </li>
+    </ul>
 {% endblock %}
 
 {% block layout_header_details %}
