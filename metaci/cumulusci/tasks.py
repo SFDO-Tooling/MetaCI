@@ -18,4 +18,4 @@ def prune_orgs():
     count = pruneing_qs.update(
         deleted=True, time_deleted=timezone.now(), delete_error="Org is expired."
     )
-    return "pruned {} orgs".format(count)
+    return f"pruned {count} orgs"

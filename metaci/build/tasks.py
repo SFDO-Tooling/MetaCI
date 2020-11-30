@@ -124,7 +124,7 @@ def check_queued_build(build_id):
     try:
         org = build.org or Org.objects.get(name=build.plan.org, repo=build.repo)
     except Org.DoesNotExist:
-        message = "Could not find org configuration for org {}".format(build.plan.org)
+        message = f"Could not find org configuration for org {build.plan.org}"
         build.log = message
         build.set_status("error")
         build.save()
@@ -144,7 +144,7 @@ def check_queued_build(build_id):
         res_run = start_build(build)
         return (
             "DevHub has scratch org capacity, running the build "
-            + "as task {}".format(res_run.id)
+            + f"as task {res_run.id}"
         )
     else:
         # For persistent orgs, use the cache to lock the org
@@ -153,20 +153,16 @@ def check_queued_build(build_id):
         if status is True:
             # Lock successful, run the build
             res_run = start_build(build, org.lock_id)
-            return "Got a lock on the org, running as task {}".format(res_run.id)
+            return f"Got a lock on the org, running as task {res_run.id}"
         else:
             # Failed to get lock, queue next check
             build.task_id_check = None
             build.set_status("waiting")
-            build.log = "Waiting on build #{} to complete".format(
-                cache.get(org.lock_id)
-            )
+            build.log = f"Waiting on build #{cache.get(org.lock_id)} to complete"
             build.save()
             return (
                 "Failed to get lock on org. "
-                + "{} has the org locked. Queueing next check.".format(
-                    cache.get(org.lock_id)
-                )
+                + f"{cache.get(org.lock_id)} has the org locked. Queueing next check."
             )
 
 
@@ -184,7 +180,7 @@ def check_waiting_builds():
         build.save()
 
     if builds:
-        return "Checked waiting builds: {}".format(builds)
+        return f"Checked waiting builds: {builds}"
     else:
         return "No queued builds to check"
 
@@ -215,7 +211,7 @@ def delete_scratch_orgs():
     if not count:
         return "No orgs found to delete"
 
-    return "Scheduled deletion attempts for {} orgs".format(count)
+    return f"Scheduled deletion attempts for {count} orgs"
 
 
 @django_rq.job("short")
@@ -226,12 +222,10 @@ def delete_scratch_org(org_instance_id):
     try:
         org = ScratchOrgInstance.objects.get(id=org_instance_id)
     except ScratchOrgInstance.DoesNotExist:
-        return "Failed: could not find ScratchOrgInstance with id {}".format(
-            org_instance_id
-        )
+        return f"Failed: could not find ScratchOrgInstance with id {org_instance_id}"
 
     org.delete_org()
     if org.deleted:
-        return "Deleted org instance #{}".format(org.id)
+        return f"Deleted org instance #{org.id}"
     else:
-        return "Failed to delete org instance #{}".format(org.id)
+        return f"Failed to delete org instance #{ord.id}"

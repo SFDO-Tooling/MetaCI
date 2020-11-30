@@ -387,7 +387,9 @@ class Build(models.Model):
                     return
                 else:
                     self.logger = init_logger(self)
-                    self.logger.info(f"Build flow {flow} completed successfully")
+                    self.logger.info(
+                        f"Build flow {flow} completed successfully"
+                    )
                     self.flush_log()
                     self.save()
 
@@ -595,10 +597,9 @@ class BuildFlow(models.Model):
         return f"{self.build.id}: {self.build.repo} - {self.build.commit} - {self.flow}"
 
     def get_absolute_url(self):
-        return (
-            reverse("build_detail", kwargs={"build_id": str(self.build.id)})
-            + f"#flow-{self.flow}"
-        )
+        return reverse(
+            "build_detail", kwargs={"build_id": str(self.build.id)}
+        ) + f"#flow-{self.flow}"
 
     def get_log_html(self):
         if self.log:

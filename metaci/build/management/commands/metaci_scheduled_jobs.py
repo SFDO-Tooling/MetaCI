@@ -21,14 +21,13 @@ class Command(BaseCommand):
         if created:
             self.stdout.write(
                 self.style.SUCCESS(
-                    "Created job check_waiting_builds with id {}".format(job.id)
+                    f"Created job check_waiting_builds with id {job.id}"
                 )
             )
         else:
             self.stdout.write(
                 self.style.SUCCESS(
-                    "Scheduled job check_waiting_builds with id {} already exists and is {}.".format(
-                        job.id, "enabled" if job.enabled else "disabled"
-                    )
+                    f"Scheduled job check_waiting_builds with id {job.id} "
+                    + f"already exists and is {'enabled' if job.enabled else 'disabled'}."
                 )
             )

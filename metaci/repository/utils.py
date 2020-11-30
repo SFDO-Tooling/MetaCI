@@ -30,6 +30,7 @@ def create_status(build):
         description = f"{build.user} is testing"
 
     elif build_status == "success":
+
         state = "success"
         if build.commit_status:
             description = build.commit_status

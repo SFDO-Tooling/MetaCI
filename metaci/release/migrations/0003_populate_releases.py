@@ -47,7 +47,7 @@ def populate_build_release(apps, schema_editor):
                 repo=build.repo, git_tag=build.branch.name.replace("tag: ", "")
             )
         except ObjectDoesNotExist:
-            logger.error("Couldn't find Release for build #{}".format(build.id))
+            logger.error(f"Couldn't find Release for build #{build.id}")
             continue
         build.release = rel
         if build.plan.role == "release":

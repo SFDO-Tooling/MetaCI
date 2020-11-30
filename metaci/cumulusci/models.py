@@ -63,7 +63,7 @@ class Org(models.Model):
         ordering = ["name", "repo__owner", "repo__name"]
 
     def __str__(self):
-        return "{}: {}".format(self.repo.name, self.name)
+        return f"{self.repo.name}: {self.name}"
 
     def get_absolute_url(self):
         return reverse("org_detail", kwargs={"org_id": self.id})
@@ -76,7 +76,7 @@ class Org(models.Model):
     @property
     def lock_id(self):
         if not self.scratch:
-            return "metaci-org-lock-{}".format(self.id)
+            return f"metaci-org-lock-{self.id}"
 
     @property
     def is_locked(self):
@@ -140,7 +140,7 @@ class ScratchOrgInstance(models.Model):
             return self.username
         if self.sf_org_id:
             return self.sf_org_id
-        return "{}: {}".format(self.org, self.id)
+        return f"{self.org}: {self.id}"
 
     def get_absolute_url(self):
         return reverse(
@@ -188,9 +188,7 @@ class ScratchOrgInstance(models.Model):
             sf = sf_session(sfjwt)
             # query ActiveScratchOrg via OrgId
             asos = sf.query(
-                "SELECT ID FROM ActiveScratchOrg WHERE ScratchOrg='{}'".format(
-                    self.sf_org_id
-                )
+                f"SELECT ID FROM ActiveScratchOrg WHERE ScratchOrg='{self.sf_org_id}'"
             )
             if asos["totalSize"] > 0:
                 aso = asos["records"][0]["Id"]
