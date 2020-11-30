@@ -93,6 +93,10 @@ class Branch(SoftDeletableModel):
     def __str__(self):
         return f"{self.repo.name}: {self.name}"
 
+    def is_tag(self):
+        """Returns True if this branch is related to a tag in GitHub"""
+        return self.name.startswith("tag: ")
+
     @property
     def github_api(self):
         try:
