@@ -106,7 +106,7 @@ AWS_DEFAULT_ACL = None
 
 # URL that handles the media served from MEDIA_ROOT, used for managing
 # stored files.
-MEDIA_URL = f"https://s3.amazonaws.com/{AWS_STORGAE_BUCKET_NAME}/"
+MEDIA_URL = f"https://s3.amazonaws.com/{AWS_STORAGE_BUCKET_NAME}/"
 DEFAULT_FILE_STORAGE = "config.settings.storage_backends.MediaStorage"
 
 # Static Assets
