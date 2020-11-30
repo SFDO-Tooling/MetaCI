@@ -42,7 +42,7 @@ def import_robot_test_results(build_flow, path):
 
     suite_screenshots = {}
     for result in parse_robot_output(path):
-        class_and_method = "{}.{}".format(result["suite"]["name"], result["name"])
+        class_and_method = f"{result['suite']['name']}.{result['name']}"
 
         testclass = classes.get(result["suite"]["name"], None)
         if not testclass:
@@ -60,7 +60,7 @@ def import_robot_test_results(build_flow, path):
                 continue
             screenshot_path = screenshot
             if dirname:
-                screenshot_path = "{}/{}".format(dirname, screenshot)
+                screenshot_path = f"{dirname}/{screenshot}"
             with open(screenshot_path, "rb") as f:
                 asset = BuildFlowAsset(
                     build_flow=build_flow,
@@ -97,7 +97,7 @@ def import_robot_test_results(build_flow, path):
             for screenshot in result["screenshots"]:
                 screenshot_path = screenshot
                 if dirname:
-                    screenshot_path = "{}/{}".format(dirname, screenshot)
+                    screenshot_path = f"{dirname}/{screenshot}"
                 with open(screenshot_path, "rb") as f:
                     asset = TestResultAsset(
                         result=testresult, asset=ContentFile(f.read(), screenshot)

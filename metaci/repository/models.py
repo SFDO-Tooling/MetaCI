@@ -48,7 +48,7 @@ class Repository(models.Model):
         return reverse("repo_detail", kwargs={"owner": self.owner, "name": self.name})
 
     def __str__(self):
-        return "{}/{}".format(self.owner, self.name)
+        return f"{self.owner}/{self.name}"
 
     def get_github_api(self):
         gh = get_github_api_for_repo(GitHubSettingsKeychain(), self.owner, self.name)

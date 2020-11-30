@@ -133,15 +133,15 @@ def test_result_detail(request, result_id):
             }
         )
         for stat in stats:
-            used = getattr(result, "{}_used".format(stat), None)
+            used = getattr(result, f"{stat}_used", None)
             if not used:
                 continue
             test_stats.append(
                 {
                     "limit": STATS_MAP[stat],
                     "used": used,
-                    "allowed": getattr(result, "{}_allowed".format(stat), None),
-                    "percent": getattr(result, "{}_percent".format(stat), None),
+                    "allowed": getattr(result, f"{stat}_allowed", None),
+                    "percent": getattr(result, f"{stat}_percent", None),
                 }
             )
         data["test_stats"] = test_stats

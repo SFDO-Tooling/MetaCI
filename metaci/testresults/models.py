@@ -75,7 +75,7 @@ class TestResultManager(models.Manager):
                     results[cls][method] = {}
 
                 for limit in result.get_limit_types():
-                    test_limit = "test_{}_used".format(limit)
+                    test_limit = f"test_{limit}_used"
 
                     if test_limit not in results[cls][method]:
                         results[cls][method][test_limit] = OrderedDict()

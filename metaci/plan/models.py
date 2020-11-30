@@ -52,7 +52,7 @@ def validate_yaml_field(value):
     try:
         yaml.safe_load(value)
     except yaml.YAMLError as err:
-        raise ValidationError("Error parsing additional YAML: {}".format(err))
+        raise ValidationError(f"Error parsing additional YAML: {err}")
 
 
 class PlanQuerySet(models.QuerySet):
@@ -231,7 +231,7 @@ class PlanRepository(models.Model):
         )
 
     def __str__(self):
-        return "[{}] {}".format(self.repo, self.plan)
+        return f"[{self.repo}] {self.plan}"
 
     def get_absolute_url(self):
         return reverse(

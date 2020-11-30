@@ -246,7 +246,7 @@ ROOT_URLCONF = "config.urls"
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin")
-ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
+ADMIN_URL_ROUTE = rf"^{ADMIN_URL}/"
 
 # Forward-compatible alias for use with IP-checking middleware
 ADMIN_AREA_PREFIX = ADMIN_URL
