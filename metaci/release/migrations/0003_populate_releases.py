@@ -26,7 +26,7 @@ def populate_releases(apps, schema_editor):
         repos[build.branch.repo.id]["tags"].add(build.branch.name.replace("tag: ", ""))
 
     for info in repos.values():
-        repo_api = info["repo"].github_api
+        repo_api = info["repo"].get_github_api()
         for tag in info["tags"]:
             existing = Release.objects.filter(repo=info["repo"], git_tag=tag)
             if existing.exists():

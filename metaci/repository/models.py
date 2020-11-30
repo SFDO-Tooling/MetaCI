@@ -50,8 +50,7 @@ class Repository(models.Model):
     def __str__(self):
         return f"{self.owner}/{self.name}"
 
-    @property
-    def github_api(self):
+    def get_github_api(self):
         gh = get_github_api_for_repo(GitHubSettingsKeychain(), self.owner, self.name)
         repo = gh.repository(self.owner, self.name)
         return repo
@@ -97,7 +96,7 @@ class Branch(SoftDeletableModel):
     @property
     def github_api(self):
         try:
-            branch = self.repo.github_api.branch(self.name)
+            branch = self.repo.get_github_api().branch(self.name)
         except github3.exceptions.NotFoundError:
             branch = None
         return branch

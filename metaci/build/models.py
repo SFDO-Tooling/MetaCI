@@ -441,7 +441,8 @@ class Build(models.Model):
     def checkout(self):
         # get the ref
         zip_content = BytesIO()
-        self.repo.github_api.archive("zipball", zip_content, ref=self.commit)
+        gh = self.repo.get_github_api()
+        gh.archive("zipball", zip_content, ref=self.commit)
         build_dir = tempfile.mkdtemp()
         self.logger.info(f"-- Extracting zip to temp dir {build_dir}")
         self.save()
@@ -594,6 +595,7 @@ class BuildFlow(models.Model):
 
     def __str__(self):
         return f"{self.build.id}: {self.build.repo} - {self.build.commit} - {self.flow}"
+
     def get_absolute_url(self):
         return reverse(
             "build_detail", kwargs={"build_id": str(self.build.id)}
