@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def update_release_from_github(release, repo_api=None):
     if not repo_api:
-        repo_api = release.repo.github_api
+        repo_api = release.repo.get_github_api()
     if not release.git_tag:
         logger.info("Cannot update release, no git_tag specified")
         return

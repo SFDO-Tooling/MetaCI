@@ -271,7 +271,7 @@ class PlanRepositoryTrigger(models.Model):
         verbose_name_plural = "Plan Repository Triggers"
 
     def _get_commit(self):
-        repo = self.target_plan_repo.repo.github_api
+        repo = self.target_plan_repo.repo.get_github_api()
         branch = repo.branch(self.branch)
         commit = branch.commit.sha
         return commit
@@ -308,7 +308,7 @@ class PlanSchedule(models.Model):
             repo=self.branch.repo,
             plan=self.plan,
             branch=self.branch,
-            commit=self.branch.github_api.commit.sha,
+            commit=self.branch.get_github_api().commit.sha,
             schedule=self,
             build_type="scheduled",
         )
