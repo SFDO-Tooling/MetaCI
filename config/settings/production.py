@@ -168,7 +168,7 @@ DATABASES["default"] = env.db("DATABASE_URL")
 # ------------------------------------------------------------------------------
 
 REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=2)
-REDIS_LOCATION = f"{env("REDUS_URL", default="redis://127.0.0.1:6379")}/0"
+REDIS_LOCATION = f"{env('REDIS_URL', default='redis://127.0.0.1:6379')}/0"
 # Heroku URL does not pass the DB number, so we parse it in
 CACHES = {
     "default": {
