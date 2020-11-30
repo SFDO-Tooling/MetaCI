@@ -21,7 +21,7 @@
     <ul class="slds-button-group-list">
       <li>
         {% if branch.is_tag %}
-          <a href="{{ repo.url }}/releases/tag/{{ branch.name }}" target="_blank">
+          <a href="{{ repo.url }}/releases/tag/{{ branch.name|cut:"tag: " }}" target="_blank">
             <button class="slds-button slds-button_outline-brand">
               View Tag in GitHub
             </button>
