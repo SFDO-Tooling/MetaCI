@@ -41,7 +41,7 @@ def create_status(build):
 
     elif build_status == "error":
         state = "error"
-        description = "💥  An error occurred during the build"
+        description = "An error occurred during the build"
 
     elif build_status == "fail":
         state = "failure"

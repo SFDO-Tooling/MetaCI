@@ -136,7 +136,7 @@ def test_create_status__error():
         sha=build.commit,
         state="error",
         target_url=f"initech.co/builds/{build.id}",
-        description="💥  An error occurred during the build",
+        description="An error occurred during the build",
         context=build.plan.context,
     )
 
