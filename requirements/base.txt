@@ -19,7 +19,7 @@ django-crispy-forms==1.10.0
 django_filter==2.4.0
 
 # Models
-django-model-utils==4.0.0
+django-model-utils==4.1.1
 
 # Per Object Permissions
 django-guardian==2.3.0
