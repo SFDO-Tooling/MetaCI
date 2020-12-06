@@ -1,37 +1,32 @@
 from django.contrib import admin
-from metaci.notification.models import RepositoryNotification
-from metaci.notification.models import BranchNotification
-from metaci.notification.models import PlanNotification
-from metaci.notification.models import PlanRepositoryNotification
+
+from metaci.notification.models import (
+    BranchNotification,
+    PlanNotification,
+    PlanRepositoryNotification,
+    RepositoryNotification,
+)
 
 
+@admin.register(RepositoryNotification)
 class RepositoryNotificationAdmin(admin.ModelAdmin):
     list_display = ("target", "user")
     list_filter = ("target", "user")
 
 
-admin.site.register(RepositoryNotification, RepositoryNotificationAdmin)
-
-
+@admin.register(BranchNotification)
 class BranchNotificationAdmin(admin.ModelAdmin):
     list_display = ("target", "user")
     list_filter = ("target__repo", "user")
 
 
-admin.site.register(BranchNotification, BranchNotificationAdmin)
-
-
+@admin.register(PlanNotification)
 class PlanNotificationAdmin(admin.ModelAdmin):
     list_display = ("target", "user")
     list_filter = ("target__repos", "user")
 
 
-admin.site.register(PlanNotification, PlanNotificationAdmin)
-
-
+@admin.register(PlanRepositoryNotification)
 class PlanRepositoryNotificationAdmin(admin.ModelAdmin):
     list_display = ("target", "user")
     list_filter = ("target__repo", "user")
-
-
-admin.site.register(PlanRepositoryNotification, PlanRepositoryNotificationAdmin)
