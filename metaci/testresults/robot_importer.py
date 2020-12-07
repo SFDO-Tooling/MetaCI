@@ -1,76 +1,91 @@
 import os
-import pathlib
 import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from cumulusci.utils import elementtree_parse_file
 from django.core.files.base import ContentFile
-from django.utils import timezone
 
+from metaci.build.exceptions import BuildError
 from metaci.testresults.models import TestClass, TestMethod, TestResult, TestResultAsset
 
 
-def import_robot_test_results(build_flow, path):
+def import_robot_test_results(flowtask, test_results_path: str) -> None:
+    """Given a StepSpec and a FlowTask object, this method:
+
+    (1) Determines if the given task is a robot task
+    (2) Locates the test result output file (output.xml)
+    (3) Parses the test result output file
+    (4) Create the following records and save them to the DB:
+        (a) A TestClass for each class in the output file (if they don't already exist)
+        (b) A BuildFlowAsset record for any screenshots created during test setup/teardown.
+        (c) TestMethod for each method in the class (if they don't already exist)
+        (d) TestResult associated with the BuildFlow, TestMethod, and FlowTask
+        (e) TestResultAsset for any screenshots in the TestResult
+
+    @param1 stepspec (StepSpec) The step associated with the given flowtask
+    @param2 flowtask (FlowTask) The task associated
+    """
+    if not Path(test_results_path).is_file():
+        raise BuildError(
+            f"Given Robot test result file is not a file: {test_results_path}"
+        )
+
     # import is here to avoid import cycle
     from metaci.build.models import BuildFlowAsset
 
-    path = pathlib.Path(path)
-
-    # find the robot task that generated the log file so
-    # that we can access the task options when rendering
-    # the log file
-    mtime = timezone.make_aware(
-        datetime.fromtimestamp(path.stat().st_mtime), timezone.get_current_timezone()
-    )
-    robot_task = None
-    for task in build_flow.tasks.order_by("-time_end"):
-        if task.time_start <= mtime <= task.time_end:
-            robot_task = task
-            break
-
-    classes = {}
-    methods = {}
-
-    with open(path, "rb") as f:
+    with open(test_results_path, "rb") as f:
+        print(f"> test_results_path: {test_results_path}")
         asset = BuildFlowAsset(
-            build_flow=build_flow,
+            build_flow=flowtask.build_flow,
             asset=ContentFile(f.read(), "output.xml"),
             category="robot-output",
         )
         asset.save()
+        print(f">1 BuildFlowAsset saved: {asset.id}")
 
+    classes = {}
+    methods = {}
     suite_screenshots = {}
-    for result in parse_robot_output(path):
-        class_and_method = f"{result['suite']['name']}.{result['name']}"
-
+    for result in parse_robot_output(test_results_path):
         testclass = classes.get(result["suite"]["name"], None)
         if not testclass:
             testclass, created = TestClass.objects.get_or_create(
                 name=result["suite"]["name"],
-                repo=build_flow.build.repo,
+                repo=flowtask.build_flow.build.repo,
                 test_type="Robot",
             )
             classes[result["suite"]["name"]] = testclass
 
-        # Attach suite screenshots to buildflow
-        dirname = os.path.dirname(path)
+        # Create screenshot assets for corresponding BuildFlow
+        dirname = test_results_path.parent
+        print(f"parent dirname: {dirname}")
         for screenshot in result["suite"]["screenshots"]:
+
             if screenshot in suite_screenshots:
                 continue
-            screenshot_path = screenshot
+
             if dirname:
-                screenshot_path = f"{dirname}/{screenshot}"
+                screenshot_path = Path(f"{dirname}/{screenshot}")
+            else:
+                screenshot_path = Path(screenshot)
+
+            print(f"> screenshot for buildflow found: {screenshot_path}")
             with open(screenshot_path, "rb") as f:
                 asset = BuildFlowAsset(
-                    build_flow=build_flow,
+                    build_flow=flowtask.build_flow,
                     asset=ContentFile(f.read(), screenshot),
                     category="robot-screenshot",
                 )
                 asset.save()
+                print(f">2 BuildFlowAsset saved: {asset.id}")
                 suite_screenshots[screenshot] = asset.id
-            os.remove(screenshot_path)
+            screenshot_path.unlink()
 
+        # Set TestMethod in `method` dict, and associate it
+        # with the corresponding TestClass
+        class_and_method = f"{result['suite']['name']}.{result['name']}"
         method = methods.get(class_and_method, None)
         if not method:
             method, created = TestMethod.objects.get_or_create(
@@ -78,8 +93,10 @@ def import_robot_test_results(build_flow, path):
             )
             methods[class_and_method] = method
 
+        # Create TestResult associated with the BuildFlow,
+        # TestMethod, and FlowTask
         testresult = TestResult(
-            build_flow=build_flow,
+            build_flow=flowtask.build_flow,
             method=method,
             duration=result["duration"],
             outcome=result["status"],
@@ -88,30 +105,32 @@ def import_robot_test_results(build_flow, path):
             robot_keyword=result["failing_keyword"],
             robot_xml=result["xml"],
             robot_tags=result["robot_tags"],
-            task=robot_task,
+            task=flowtask,
         )
         testresult.save()
 
-        # attach test case screenshots to test result
+        # Attach test case screenshots to test result
         if result["screenshots"] or suite_screenshots:
             for screenshot in result["screenshots"]:
-                screenshot_path = screenshot
+                screenshot_path = Path(screenshot)
                 if dirname:
-                    screenshot_path = f"{dirname}/{screenshot}"
+                    screenshot_path = Path(f"{dirname}/{screenshot}")
+                print(f"> Test case screenshot path: {screenshot_path}")
                 with open(screenshot_path, "rb") as f:
                     asset = TestResultAsset(
                         result=testresult, asset=ContentFile(f.read(), screenshot)
                     )
                     asset.save()
+                    print(f">3 TestResultAsset saved: {asset.id}")
                     # replace references to local files with TestResultAsset ids
                     testresult.robot_xml = testresult.robot_xml.replace(
-                        '"{}"'.format(screenshot), '"asset://{}"'.format(asset.id)
+                        f'"{screenshot}"', f'"asset://{asset.id}"'
                     )
-                os.remove(screenshot_path)
+                screenshot_path.unlink()
             # replace references to suite screenshots with BuildFlowAsset ids
             for screenshot, asset_id in suite_screenshots.items():
                 testresult.robot_xml = testresult.robot_xml.replace(
-                    '"{}"'.format(screenshot), '"buildflowasset://{}"'.format(asset_id)
+                    f'"{screenshot}"', f'"buildflowasset://{asset_id}"'
                 )
             testresult.save()
 
