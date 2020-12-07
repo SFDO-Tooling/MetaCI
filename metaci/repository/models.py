@@ -97,8 +97,7 @@ class Branch(SoftDeletableModel):
         """Returns True if this branch is related to a tag in GitHub"""
         return self.name.startswith("tag: ")
 
-    @property
-    def github_api(self):
+    def get_github_api(self):
         try:
             branch = self.repo.get_github_api().branch(self.name)
         except github3.exceptions.NotFoundError:
