@@ -12,20 +12,20 @@ from metaci.testresults.models import TestClass, TestMethod, TestResult, TestRes
 
 
 def import_robot_test_results(flowtask, test_results_path: str) -> None:
-    """Given a StepSpec and a FlowTask object, this method:
+    """Given a flowtask for a robot task, and a path to the
+    test results output file:
 
-    (1) Determines if the given task is a robot task
-    (2) Locates the test result output file (output.xml)
-    (3) Parses the test result output file
-    (4) Create the following records and save them to the DB:
-        (a) A TestClass for each class in the output file (if they don't already exist)
-        (b) A BuildFlowAsset record for any screenshots created during test setup/teardown.
-        (c) TestMethod for each method in the class (if they don't already exist)
-        (d) TestResult associated with the BuildFlow, TestMethod, and FlowTask
-        (e) TestResultAsset for any screenshots in the TestResult
+    (1) Parse the test result output file
+    (2) Create the following records and save them to the DB:
+        (a) A BuildFlowAsset of the output.xml file associated with the build_flow
+        (b) A TestClass for each class in the output file (if they don't already exist)
+        (c) A BuildFlowAsset record for any screenshots created during test setup/teardown.
+        (d) TestMethod for each method in the class (if they don't already exist)
+        (e) TestResult associated with the BuildFlow, TestMethod, and FlowTask
+        (f) TestResultAsset for any screenshots in the TestResult
 
-    @param1 stepspec (StepSpec) The step associated with the given flowtask
-    @param2 flowtask (FlowTask) The task associated
+    @param1 (FlowTask) The flowtask associated with the robot task
+    @param1 (str) The filepath to the robot results
     """
     if not Path(test_results_path).is_file():
         raise BuildError(

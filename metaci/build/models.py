@@ -9,6 +9,7 @@ import traceback
 import zipfile
 from glob import iglob
 from io import BytesIO
+from pathlib import Path
 
 from cumulusci import __version__ as cumulusci_version
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
@@ -39,7 +40,6 @@ from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
 from metaci.release.utils import send_release_webhook
 from metaci.testresults.importer import import_test_results
-from metaci.testresults.robot_importer import import_robot_test_results
 from metaci.utils import generate_hash
 
 BUILD_STATUSES = (
@@ -387,9 +387,7 @@ class Build(models.Model):
                     return
                 else:
                     self.logger = init_logger(self)
-                    self.logger.info(
-                        f"Build flow {flow} completed successfully"
-                    )
+                    self.logger.info(f"Build flow {flow} completed successfully")
                     self.flush_log()
                     self.save()
 
@@ -597,9 +595,10 @@ class BuildFlow(models.Model):
         return f"{self.build.id}: {self.build.repo} - {self.build.commit} - {self.flow}"
 
     def get_absolute_url(self):
-        return reverse(
-            "build_detail", kwargs={"build_id": str(self.build.id)}
-        ) + f"#flow-{self.flow}"
+        return (
+            reverse("build_detail", kwargs={"build_id": str(self.build.id)})
+            + f"#flow-{self.flow}"
+        )
 
     def get_log_html(self):
         if self.log:
@@ -701,21 +700,19 @@ class BuildFlow(models.Model):
     def load_test_results(self):
         has_results = False
 
-        root_dir_robot_path = f"{self.root_dir}/output.xml"
-        # Load robotframework's output.xml if found
-        if os.path.isfile("output.xml"):
+        root_dir_robot_path = Path(f"{self.root_dir}/output.xml")
+        if Path("output.xml").is_file():
+            # robot test results already created after task execution
+            # see: metaci.build.flows.MetaCIFlowCallback.post_task()
             has_results = True
-            import_robot_test_results(self, "output.xml")
 
-        elif os.path.isfile(root_dir_robot_path):
+        elif root_dir_robot_path.is_file():
             # FIXME: Not sure why robot stopped writing into the cwd
             # (build temp dir) but this should handle it so long as
             # only one build runs at a time
             has_results = True
-            try:
-                import_robot_test_results(self, root_dir_robot_path)
-            finally:
-                os.remove(root_dir_robot_path)
+            # import_robot_test_results(self, root_dir_robot_path)
+            root_dir_robot_path.unlink()
 
         # Load JUnit
         results = []

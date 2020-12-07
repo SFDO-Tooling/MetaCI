@@ -9,13 +9,12 @@ from django.utils import timezone
 from metaci.build.exceptions import BuildError
 from metaci.conftest import FlowTaskFactory
 from metaci.testresults import models, robot_importer
-from metaci.testresults.robot_importer import import_robot_test_results
 
 
 @pytest.mark.django_db
 def test_invalid_test_result_filepath():
     with pytest.raises(BuildError):
-        import_robot_test_results(mock.Mock, "invalid/file/path")
+        robot_importer.import_robot_test_results(mock.Mock, "invalid/file/path")
 
 
 @pytest.mark.django_db
