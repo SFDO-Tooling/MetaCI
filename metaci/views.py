@@ -9,7 +9,6 @@ from django.conf import settings
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from django.http import HttpResponseForbidden
-from django.template import TemplateDoesNotExist
 
 
 class AboutView(TemplateView):
@@ -17,10 +16,14 @@ class AboutView(TemplateView):
         context = super(AboutView, self).get_context_data(**kwargs)
 
         # django (major.minor.micro)
-        context["DJANGO_VERSION"] = f"{django.VERSION[0]}.{django.VERSION[1]}.{django.VERSION[2]}"
+        context[
+            "DJANGO_VERSION"
+        ] = f"{django.VERSION[0]}.{django.VERSION[1]}.{django.VERSION[2]}"
 
         # python
-        context["PYTHON_VERSION"] = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+        context[
+            "PYTHON_VERSION"
+        ] = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
         # Salesforce DX
         out = subprocess.check_output(["sfdx", "--version"])
@@ -52,4 +55,3 @@ class AboutView(TemplateView):
 def custom_403(request, exception):
     """Always redirect users to login via GitHub"""
     return HttpResponseForbidden(render(request, "account/login.html"))
-
