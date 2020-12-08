@@ -698,21 +698,6 @@ class BuildFlow(models.Model):
         self.save()
 
     def load_test_results(self):
-        has_results = False
-
-        root_dir_robot_path = Path(f"{self.root_dir}/output.xml")
-        if Path("output.xml").is_file():
-            # robot test results already created after task execution
-            # see: metaci.build.flows.MetaCIFlowCallback.post_task()
-            has_results = True
-
-        elif root_dir_robot_path.is_file():
-            # FIXME: Not sure why robot stopped writing into the cwd
-            # (build temp dir) but this should handle it so long as
-            # only one build runs at a time
-            has_results = True
-            # import_robot_test_results(self, root_dir_robot_path)
-            root_dir_robot_path.unlink()
 
         # Load JUnit
         results = []
@@ -724,7 +709,6 @@ class BuildFlow(models.Model):
                     f"No results found at JUnit path {self.build.plan.junit_path}"
                 )
         if results:
-            has_results = True
             import_test_results(self, results, "JUnit")
 
         # Load from test_results.json
@@ -743,16 +727,14 @@ class BuildFlow(models.Model):
                 pass
 
         if results:
-            has_results = True
             import_test_results(self, results, "Apex")
 
-        if has_results:
-            self.tests_total = self.test_results.count()
-            self.tests_pass = self.test_results.filter(outcome="Pass").count()
-            self.tests_fail = self.test_results.filter(
-                outcome__in=["Fail", "CompileFail"]
-            ).count()
-            self.save()
+        self.tests_total = self.test_results.count()
+        self.tests_pass = self.test_results.filter(outcome="Pass").count()
+        self.tests_fail = self.test_results.filter(
+            outcome__in=["Fail", "CompileFail"]
+        ).count()
+        self.save()
 
     def load_junit(self, filename):
         results = []
