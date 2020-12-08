@@ -97,9 +97,7 @@ def send_notification_message(build_id, user_id):
 
     context = {"build": build, "log_lines": log_lines}
 
-    subject = (
-        f"[{build.repo.name}] Build #{build.id} of {build.branch.name} {build.plan.name} - {build.get_status().upper()}"
-    )
+    subject = f"[{build.repo.name}] Build #{build.id} of {build.branch.name} {build.plan.name} - {build.get_status().upper()}"
     message = template_txt.render(context)
     html_message = template_html.render(context)
 
