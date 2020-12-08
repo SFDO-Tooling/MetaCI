@@ -33,8 +33,7 @@ class MetaCIFlowCallback(FlowCallback):
         flowtask.result = result.result
         flowtask.return_values = result.return_values
 
-        # Parse and
-        if str(step.task_class) == Robot:
+        if step.task_class == Robot:
             import_robot_test_results(flowtask, "output.xml")
 
         if result.exception:

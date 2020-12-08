@@ -7,6 +7,7 @@ import pytest
 from django.utils import timezone
 
 from metaci.build.exceptions import BuildError
+from metaci.build.models import BuildFlowAsset
 from metaci.conftest import FlowTaskFactory
 from metaci.testresults import models, robot_importer
 
@@ -83,9 +84,7 @@ def test_field_robot_task():
         time_end = output_xml_mtime + timedelta(seconds=end_offset)
 
         task = FlowTaskFactory(
-            build_flow=flowtask.build_flow,
-            time_start=time_start,
-            time_end=time_end,
+            build_flow=flowtask.build_flow, time_start=time_start, time_end=time_end,
         )
         task.save()
 
@@ -175,3 +174,19 @@ def test_execution_errors():
         "Error in file 'example.robot' on line 3: Resource setting requires value.",
     ]
     assert len(error_messages) == len(expected_error_messages)
+
+
+@pytest.mark.django_db
+def test_suite_setup_screenshots():
+    """Verify that robot tags are added to the database"""
+    flowtask = FlowTaskFactory()
+    path = PurePath(__file__).parent / "robot_screenshots.xml"
+    robot_importer.import_robot_test_results(flowtask, path)
+
+    test_result = models.TestResult.objects.last()
+
+    # output.xml asset created
+    assert 1 == BuildFlowAsset.objects.filter(category="robot-output").count()
+    num = BuildFlowAsset.objects.count()
+    # suite setup screenshot asset created
+    assert 1 == BuildFlowAsset.objects.filter(category="robot-screenshot-1").count()

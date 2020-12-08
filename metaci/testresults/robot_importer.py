@@ -27,7 +27,8 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
     @param1 (FlowTask) The flowtask associated with the robot task
     @param1 (str) The filepath to the robot results
     """
-    if not Path(test_results_path).is_file():
+    test_results_path = Path(test_results_path)
+    if not test_results_path.is_file():
         raise BuildError(
             f"Given Robot test result file is not a file: {test_results_path}"
         )
@@ -36,14 +37,12 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
     from metaci.build.models import BuildFlowAsset
 
     with open(test_results_path, "rb") as f:
-        print(f"> test_results_path: {test_results_path}")
         asset = BuildFlowAsset(
             build_flow=flowtask.build_flow,
             asset=ContentFile(f.read(), "output.xml"),
             category="robot-output",
         )
         asset.save()
-        print(f">1 BuildFlowAsset saved: {asset.id}")
 
     classes = {}
     methods = {}
@@ -59,9 +58,9 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
             classes[result["suite"]["name"]] = testclass
 
         # Create screenshot assets for corresponding BuildFlow
+        # These screenshots are created during suite setup/teardown
         dirname = test_results_path.parent
-        print(f"parent dirname: {dirname}")
-        for screenshot in result["suite"]["screenshots"]:
+        for i, screenshot in enumerate(result["suite"]["screenshots"]):
 
             if screenshot in suite_screenshots:
                 continue
@@ -71,15 +70,13 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
             else:
                 screenshot_path = Path(screenshot)
 
-            print(f"> screenshot for buildflow found: {screenshot_path}")
             with open(screenshot_path, "rb") as f:
                 asset = BuildFlowAsset(
                     build_flow=flowtask.build_flow,
                     asset=ContentFile(f.read(), screenshot),
-                    category="robot-screenshot",
+                    category=f"robot-screenshot-{i+1}",
                 )
                 asset.save()
-                print(f">2 BuildFlowAsset saved: {asset.id}")
                 suite_screenshots[screenshot] = asset.id
             screenshot_path.unlink()
 
@@ -115,13 +112,11 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
                 screenshot_path = Path(screenshot)
                 if dirname:
                     screenshot_path = Path(f"{dirname}/{screenshot}")
-                print(f"> Test case screenshot path: {screenshot_path}")
                 with open(screenshot_path, "rb") as f:
                     asset = TestResultAsset(
                         result=testresult, asset=ContentFile(f.read(), screenshot)
                     )
                     asset.save()
-                    print(f">3 TestResultAsset saved: {asset.id}")
                     # replace references to local files with TestResultAsset ids
                     testresult.robot_xml = testresult.robot_xml.replace(
                         f'"{screenshot}"', f'"asset://{asset.id}"'
