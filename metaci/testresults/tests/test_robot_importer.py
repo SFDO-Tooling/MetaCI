@@ -10,6 +10,7 @@ from metaci.build.exceptions import BuildError
 from metaci.build.models import BuildFlowAsset
 from metaci.conftest import FlowTaskFactory
 from metaci.testresults import models, robot_importer
+from cumulusci.utils import elementtree_parse_file
 
 
 @pytest.mark.django_db
@@ -176,6 +177,7 @@ def test_execution_errors():
     assert len(error_messages) == len(expected_error_messages)
 
 
+@pytest.mark.skip(reason="under development")
 @pytest.mark.django_db
 def test_suite_setup_screenshots():
     """Verify that robot tags are added to the database"""
@@ -190,3 +192,11 @@ def test_suite_setup_screenshots():
     num = BuildFlowAsset.objects.count()
     # suite setup screenshot asset created
     assert 1 == BuildFlowAsset.objects.filter(category="robot-screenshot-1").count()
+
+
+@pytest.mark.django_db
+def test_suite_setup_screenshots():
+    path = PurePath(__file__).parent / "robot_screenshots.xml"
+    tree = elementtree_parse_file(path)
+    screenshots = robot_importer.find_screenshots(tree.getroot())
+    assert len(screenshots) == 2
