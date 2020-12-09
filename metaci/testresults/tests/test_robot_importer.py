@@ -195,7 +195,7 @@ def test_suite_setup_screenshots():
 
 
 @pytest.mark.django_db
-def test_suite_setup_screenshots():
+def test_find_screenshots():
     path = PurePath(__file__).parent / "robot_screenshots.xml"
     tree = elementtree_parse_file(path)
     screenshots = robot_importer.find_screenshots(tree.getroot())
