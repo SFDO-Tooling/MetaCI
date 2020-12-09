@@ -254,13 +254,7 @@
                     <kw name="Capture Page Screenshot" library="SeleniumLibrary">
                         <doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
                         <msg timestamp="20201208 16:39:56.628" level="INFO" html="yes">
-                            </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3">
-                                    <a href="selenium-screenshot-1.png">
-                                        <img src="selenium-screenshot-1.png" width="800px" />
-                                    </a>
+                            &lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot;&gt;&lt;a href=&quot;selenium-screenshot-1.png&quot;&gt;&lt;img src=&quot;selenium-screenshot-1.png&quot; width=&quot;800px&quot;&gt;&lt;/a&gt;
                         </msg>
                         <status status="PASS" starttime="20201208 16:39:55.926" endtime="20201208 16:39:56.629" />
                     </kw>
@@ -424,13 +418,7 @@
                     <kw name="Capture Page Screenshot" library="SeleniumLibrary">
                         <doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
                         <msg timestamp="20201208 16:40:05.046" level="INFO" html="yes">
-                            </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3">
-                                    <a href="selenium-screenshot-2.png">
-                                        <img src="selenium-screenshot-2.png" width="800px" />
-                                    </a>
+                            &lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot;&gt;&lt;a href=&quot;selenium-screenshot-2.png&quot;&gt;&lt;img src=&quot;selenium-screenshot-2.png&quot; width=&quot;800px&quot;&gt;&lt;/a&gt;
                         </msg>
                         <status status="PASS" starttime="20201208 16:40:04.454" endtime="20201208 16:40:05.047" />
                     </kw>

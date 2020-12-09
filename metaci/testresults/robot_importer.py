@@ -58,7 +58,7 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
             classes[result["suite"]["name"]] = testclass
 
         # Create screenshot assets for corresponding BuildFlow
-        # These screenshots are created during suite setup/teardown
+        # These screenshots are generated during robot test suite setup/teardown
         dirname = test_results_path.parent
         for i, screenshot in enumerate(result["suite"]["screenshots"]):
 
@@ -228,7 +228,7 @@ def find_screenshots(root):
     screenshots = []
     for msg in root.findall(".//msg[@html='yes']"):
         txt = "".join([text for text in msg.itertext()])
-        for screenshot in re.findall(r'href="([\w.-]+)-\d">', txt):
+        for screenshot in re.findall(r'href="([\w.-]+)">', txt):
             screenshots.append(screenshot)
     return screenshots
 

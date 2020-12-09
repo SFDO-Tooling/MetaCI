@@ -4,13 +4,13 @@ from pathlib import Path, PurePath
 from unittest import mock
 
 import pytest
+from cumulusci.utils import elementtree_parse_file
 from django.utils import timezone
 
 from metaci.build.exceptions import BuildError
 from metaci.build.models import BuildFlowAsset
 from metaci.conftest import FlowTaskFactory
 from metaci.testresults import models, robot_importer
-from cumulusci.utils import elementtree_parse_file
 
 
 @pytest.mark.django_db
@@ -85,7 +85,9 @@ def test_field_robot_task():
         time_end = output_xml_mtime + timedelta(seconds=end_offset)
 
         task = FlowTaskFactory(
-            build_flow=flowtask.build_flow, time_start=time_start, time_end=time_end,
+            build_flow=flowtask.build_flow,
+            time_start=time_start,
+            time_end=time_end,
         )
         task.save()
 
@@ -177,21 +179,39 @@ def test_execution_errors():
     assert len(error_messages) == len(expected_error_messages)
 
 
-@pytest.mark.skip(reason="under development")
 @pytest.mark.django_db
-def test_suite_setup_screenshots():
-    """Verify that robot tags are added to the database"""
+def test_screenshots_generated():
+    """Verify that screenshots were created properly.
+    For the robot_screenshot.xml output file, there should be:
+    * A BuildFlowAsset created for the output.xml file
+    * A BuildFlowAsset created for the screenshot taken during suite setup
+    * A TestResultAsset created for the 'Via UI' robot test
+    """
     flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_screenshots.xml"
-    robot_importer.import_robot_test_results(flowtask, path)
+    path = PurePath(__file__).parent
+    robot_output = path / "robot_screenshots.xml"
+    ss_1_path = Path(path / "selenium-screenshot-1.png")
+    ss_2_path = Path(path / "selenium-screenshot-2.png")
 
-    test_result = models.TestResult.objects.last()
+    with open(ss_1_path, mode="w+"):
+        with open(ss_2_path, mode="w+"):
+            robot_importer.import_robot_test_results(flowtask, robot_output)
+            # output.xml asset created
+            assert 1 == BuildFlowAsset.objects.filter(category="robot-output").count()
+            # suite setup screenshot assets created
+            assert (
+                1
+                == BuildFlowAsset.objects.filter(category="robot-screenshot-1").count()
+            )
+            # No screenshots created for 'Via API' test
+            tr_method = models.TestMethod.objects.get(name="Via API")
+            test_api = models.TestResult.objects.get(method=tr_method, task=flowtask)
+            assert 0 == test_api.assets.count()
 
-    # output.xml asset created
-    assert 1 == BuildFlowAsset.objects.filter(category="robot-output").count()
-    num = BuildFlowAsset.objects.count()
-    # suite setup screenshot asset created
-    assert 1 == BuildFlowAsset.objects.filter(category="robot-screenshot-1").count()
+            # One screenshot created for 'Via UI' test
+            tr_method = models.TestMethod.objects.get(name="Via UI")
+            test_ui = models.TestResult.objects.get(method=tr_method, task=flowtask)
+            assert 1 == test_ui.assets.count()
 
 
 @pytest.mark.django_db
