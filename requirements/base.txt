@@ -1,7 +1,7 @@
 setuptools==50.3.2
 
 # CumulusCI
-cumulusci==3.24.1
+cumulusci==3.25.0
 
 # SFDO Template Helpers for authorization middleware and other helpers
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
@@ -19,7 +19,7 @@ django-crispy-forms==1.10.0
 django_filter==2.4.0
 
 # Models
-django-model-utils==4.0.0
+django-model-utils==4.1.1
 
 # Per Object Permissions
 django-guardian==2.3.0
@@ -38,7 +38,7 @@ django-redis==4.12.1
 redis==3.5.3
 
 # Django RQ
-rq==1.6.1
+rq==1.7.0
 rq-scheduler==0.10.0
 django-rq==2.4.0
 django-rq-scheduler==1.1.3
@@ -69,7 +69,7 @@ django-log-request-id==1.6.0
 psycopg2-binary==2.8.6
 
 # django-storages for S3
-boto3==1.16.25
+boto3==1.16.30
 django-storages==1.10.1
 
 # JSON web token
