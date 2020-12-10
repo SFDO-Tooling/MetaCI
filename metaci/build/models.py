@@ -387,9 +387,7 @@ class Build(models.Model):
                     return
                 else:
                     self.logger = init_logger(self)
-                    self.logger.info(
-                        f"Build flow {flow} completed successfully"
-                    )
+                    self.logger.info(f"Build flow {flow} completed successfully")
                     self.flush_log()
                     self.save()
 
@@ -597,9 +595,10 @@ class BuildFlow(models.Model):
         return f"{self.build.id}: {self.build.repo} - {self.build.commit} - {self.flow}"
 
     def get_absolute_url(self):
-        return reverse(
-            "build_detail", kwargs={"build_id": str(self.build.id)}
-        ) + f"#flow-{self.flow}"
+        return (
+            reverse("build_detail", kwargs={"build_id": str(self.build.id)})
+            + f"#flow-{self.flow}"
+        )
 
     def get_log_html(self):
         if self.log:
@@ -658,6 +657,24 @@ class BuildFlow(models.Model):
 
         # If it's a release build, pass the dates in
         options = self._get_flow_options()
+        if (
+            self.build.plan.role == "release_test"
+            and self.build.release
+            and self.build.release.github_release is None
+        ):
+            self.build.release.github_release = (
+                f"https://github.com/{self.build.repo}/releases/tag/{self.build.tag}"
+            )
+
+        if (
+            self.build.plan.role == "release"
+            and self.build.release
+            and self.build.release.created_from_commit is None
+        ):
+            self.build.release.created_from_commit = self.build.commit
+
+        self.build.release.save()
+        breakpoint()
 
         callbacks = None
         if settings.METACI_FLOW_CALLBACK_ENABLED:
@@ -673,7 +690,6 @@ class BuildFlow(models.Model):
             options=options,
             callbacks=callbacks,
         )
-
         # Run the flow
         return self.flow_instance.run(org_config)
 
