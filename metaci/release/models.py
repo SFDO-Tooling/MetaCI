@@ -85,7 +85,7 @@ class Release(StatusModel):
 
     class Meta:
         get_latest_by = "production_push_date"
-        ordering = ["-github_release"]
+        ordering = ["-git_tag"]
         verbose_name = _("release")
         verbose_name_plural = _("releases")
         unique_together = ("repo", "git_tag")
