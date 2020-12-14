@@ -1,5 +1,4 @@
 from cumulusci.core.flowrunner import FlowCallback
-from cumulusci.tasks.robotframework.robotframework import Robot
 from django.utils import timezone
 
 from metaci.testresults.robot_importer import import_robot_test_results
@@ -33,8 +32,8 @@ class MetaCIFlowCallback(FlowCallback):
         flowtask.result = result.result
         flowtask.return_values = result.return_values
 
-        if step.task_class == Robot:
-            import_robot_test_results(flowtask, "output.xml")
+        if "robot_outputdir" in result.return_values:
+            import_robot_test_results(flowtask, result.return_values["robot_outputdir"])
 
         if result.exception:
             flowtask.exception = result.exception.__class__
