@@ -32,9 +32,6 @@ class MetaCIFlowCallback(FlowCallback):
         flowtask.result = result.result
         flowtask.return_values = result.return_values
 
-        if "robot_outputdir" in result.return_values:
-            import_robot_test_results(flowtask, result.return_values["robot_outputdir"])
-
         if result.exception:
             flowtask.exception = result.exception.__class__
             flowtask.status = "error"
@@ -42,3 +39,6 @@ class MetaCIFlowCallback(FlowCallback):
             flowtask.status = "complete"
 
         flowtask.save()
+
+        if "robot_outputdir" in result.return_values:
+            import_robot_test_results(flowtask, result.return_values["robot_outputdir"])

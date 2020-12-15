@@ -1,37 +1,83 @@
-import pytest
-from unittest import mock
 from pathlib import Path, PurePath
+from unittest import mock
 
-from cumulusci.core.flowrunner import StepSpec
+import pytest
+from cumulusci.core.flowrunner import StepResult, StepSpec
+from cumulusci.tasks.robotframework.robotframework import Robot
 
-from metaci.build.models import BuildFlow, BuildFlowAsset
 from metaci.build.flows import MetaCIFlowCallback
-from metaci.conftest import FlowTaskFactory
+from metaci.build.models import BuildFlowAsset, FlowTask
 from metaci.fixtures.factories import BuildFlowFactory
 from metaci.testresults.models import TestMethod, TestResult, TestResultAsset
 
 
+@pytest.fixture
+def get_result():
+    def func(num, name="test-task", ret_vals={}, exception=None):
+        return StepResult(
+            step_num=num,
+            task_name=name,
+            path=None,
+            result="something",
+            return_values=ret_vals,
+            exception=exception,
+        )
+
+    return func
+
+
+@pytest.fixture
+def get_spec():
+    def func(num, name="test-task", cls=None):
+        return StepSpec(
+            step_num=num,
+            task_name=name,
+            task_config=mock.Mock(),
+            task_class=cls,
+            project_config=mock.Mock(),
+        )
+
+    return func
+
+
 @pytest.mark.django_db
-def test_post_flow__multiple_robot_output_files():
+def test_post_flow__result_complete(get_spec, get_result):
+    step_result = get_result("1")
+    step_spec = get_spec("1")
+
     build_flow = BuildFlowFactory()
-    build_flow.save()
-    flowtask1 = FlowTaskFactory(build_flow=build_flow)
-    flowtask1.save()
-    flowtask2 = FlowTaskFactory(build_flow=build_flow)
-    flowtask2.save()
-    path = PurePath(__file__).parent.parent.parent
-
-    output_1 = path / "testresults/tests/robot_1.xml"
-
-    output_2 = path / "testresults" / "tests" / "robot_screenshots.xml"
-    ss_1_path = Path(path / "selenium-screenshot-1.png")
-    ss_2_path = Path(path / "selenium-screenshot-2.png")
-
-    result = mock.Mock(return_values={"robot_outputdir": str(output_1)})
-    step_spec = mock.Mock(path="test_flow_name.Robot", step_num="1.1")
-
     metaci_callbacks = MetaCIFlowCallback(build_flow.id)
-    metaci_callbacks.post_task(step_spec, result)
+    metaci_callbacks.post_task(step_spec, step_result)
+
+    ft = FlowTask.objects.get(build_flow=build_flow)
+    assert ft.status == "complete"
+
+
+@pytest.mark.django_db
+def test_post_flow__result_has_exception(get_spec, get_result):
+    step_spec = get_spec("1")
+    step_result = get_result("1", exception=TestException)
+
+    build_flow = BuildFlowFactory()
+    metaci_callbacks = MetaCIFlowCallback(build_flow.id)
+    metaci_callbacks.post_task(step_spec, step_result)
+
+    flowtask = FlowTask.objects.get(build_flow=build_flow)
+    assert flowtask.exception == str(TestException.__class__)
+    assert flowtask.status == "error"
+
+
+@pytest.mark.django_db
+def test_post_flow__multiple_robot_output_files(get_spec, get_result):
+    path = PurePath(__file__).parent.parent.parent / "testresults/tests"
+    step_result = get_result(
+        "1", name="Robot", ret_vals={"robot_outputdir": str(path / "robot_1.xml")}
+    )
+    step_spec = get_spec("1", name="Robot", cls=Robot)
+
+    build_flow = BuildFlowFactory()
+    metaci_callbacks = MetaCIFlowCallback(build_flow.id)
+    metaci_callbacks.post_task(step_spec, step_result)
 
     # For output_1 we should have a single BuildFlowAsset,
     # a single TestResult, and no TestResultAssets (screenshots)
@@ -41,13 +87,19 @@ def test_post_flow__multiple_robot_output_files():
             category="robot-output", build_flow=build_flow
         ).count()
     )
-    assert 1 == models.TestResult.objects.all().count()
-    assert 0 == models.TestResultAsset.objects.all().count()
+    assert 1 == TestResult.objects.all().count()
+    assert 0 == TestResultAsset.objects.all().count()
 
-    with open(ss_1_path, mode="w+"):
-        with open(ss_2_path, mode="w+"):
-            metaci_callbacks.post_task(step, result)
+    step_result = get_result(
+        num="2",
+        name="Robot",
+        ret_vals={"robot_outputdir": str(path / "robot_screenshots.xml")},
+    )
+    step_spec = get_spec("2", name="Robot", cls=Robot)
 
+    with open(Path(path / "selenium-screenshot-1.png"), mode="w+"):
+        with open(Path(path / "selenium-screenshot-2.png"), mode="w+"):
+            metaci_callbacks.post_task(step_spec, step_result)
             # There should now be two output files for the buildflow
             assert (
                 2
@@ -55,20 +107,24 @@ def test_post_flow__multiple_robot_output_files():
                     category="robot-output", build_flow=build_flow
                 ).count()
             )
-            # suite setup screenshot assets created
+            # There should be a screenshot created during suite setup
             assert (
                 1
                 == BuildFlowAsset.objects.filter(category="robot-screenshot-1").count()
             )
             # No screenshots created for 'Via API' test
-            tr_method = models.TestMethod.objects.get(name="Via API")
-            test_api = models.TestResult.objects.get(method=tr_method, task=flowtask2)
+            tr_method = TestMethod.objects.get(name="Via API")
+            test_api = TestResult.objects.get(method=tr_method)
             assert 0 == test_api.assets.count()
 
             # One screenshot created for 'Via UI' test
-            tr_method = models.TestMethod.objects.get(name="Via UI")
-            test_ui = models.TestResult.objects.get(method=tr_method, task=flowtask2)
+            tr_method = TestMethod.objects.get(name="Via UI")
+            test_ui = TestResult.objects.get(method=tr_method)
             assert 1 == test_ui.assets.count()
 
     # Three tests total between the two output files
-    assert 3 == models.TestMethod.objects.all().count()
+    assert 3 == TestMethod.objects.all().count()
+
+
+class TestException(Exception):
+    pass
