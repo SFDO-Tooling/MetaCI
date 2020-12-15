@@ -10,7 +10,6 @@ from django.utils import timezone
 from metaci.build.exceptions import BuildError
 from metaci.build.models import BuildFlowAsset
 from metaci.conftest import FlowTaskFactory
-from metaci.fixtures.factories import BuildFlowFactory
 from metaci.testresults import models, robot_importer
 
 
@@ -178,61 +177,6 @@ def test_execution_errors():
         "Error in file 'example.robot' on line 3: Resource setting requires value.",
     ]
     assert len(error_messages) == len(expected_error_messages)
-
-
-@pytest.mark.django_db
-def test_multiple_robot_tasks():
-    """Verify that executing import_robot_test_results() with
-    multiple Robot task outputfiles generates the expected records."""
-    build_flow = BuildFlowFactory()
-    flowtask1 = FlowTaskFactory(build_flow=build_flow)
-    flowtask2 = FlowTaskFactory(build_flow=build_flow)
-    path = PurePath(__file__).parent
-    output_1 = path / "robot_1.xml"
-    output_2 = path / "robot_screenshots.xml"
-    ss_1_path = Path(path / "selenium-screenshot-1.png")
-    ss_2_path = Path(path / "selenium-screenshot-2.png")
-
-    robot_importer.import_robot_test_results(flowtask1, output_1)
-
-    # For output_1 we should have a single BuildFlowAsset,
-    # a single TestResult, and no TestResultAssets (screenshots)
-    assert (
-        1
-        == BuildFlowAsset.objects.filter(
-            category="robot-output", build_flow=build_flow
-        ).count()
-    )
-    assert 1 == models.TestResult.objects.all().count()
-    assert 0 == models.TestResultAsset.objects.all().count()
-
-    with open(ss_1_path, mode="w+"):
-        with open(ss_2_path, mode="w+"):
-            robot_importer.import_robot_test_results(flowtask2, output_2)
-            # There should now be two output files for the buildflow
-            assert (
-                2
-                == BuildFlowAsset.objects.filter(
-                    category="robot-output", build_flow=build_flow
-                ).count()
-            )
-            # suite setup screenshot assets created
-            assert (
-                1
-                == BuildFlowAsset.objects.filter(category="robot-screenshot-1").count()
-            )
-            # No screenshots created for 'Via API' test
-            tr_method = models.TestMethod.objects.get(name="Via API")
-            test_api = models.TestResult.objects.get(method=tr_method, task=flowtask2)
-            assert 0 == test_api.assets.count()
-
-            # One screenshot created for 'Via UI' test
-            tr_method = models.TestMethod.objects.get(name="Via UI")
-            test_ui = models.TestResult.objects.get(method=tr_method, task=flowtask2)
-            assert 1 == test_ui.assets.count()
-
-    # Three tests total between the two output files
-    assert 3 == models.TestMethod.objects.all().count()
 
 
 @pytest.mark.django_db
