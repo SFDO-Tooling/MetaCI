@@ -41,7 +41,7 @@ def get_spec():
 
 
 @pytest.mark.django_db
-def test_post_flow__result_complete(get_spec, get_result):
+def test_post_task__result_complete(get_spec, get_result):
     step_result = get_result("1")
     step_spec = get_spec("1")
 
@@ -54,7 +54,7 @@ def test_post_flow__result_complete(get_spec, get_result):
 
 
 @pytest.mark.django_db
-def test_post_flow__result_has_exception(get_spec, get_result):
+def test_post_task__result_has_exception(get_spec, get_result):
     step_spec = get_spec("1")
     step_result = get_result("1", exception=TestException)
 
@@ -68,7 +68,7 @@ def test_post_flow__result_has_exception(get_spec, get_result):
 
 
 @pytest.mark.django_db
-def test_post_flow__multiple_robot_output_files(get_spec, get_result):
+def test_post_task__multiple_robot_output_files(get_spec, get_result):
     path = PurePath(__file__).parent.parent.parent / "testresults/tests"
     step_result = get_result(
         "1", name="Robot", ret_vals={"robot_outputdir": str(path / "robot_1.xml")}
