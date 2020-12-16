@@ -63,7 +63,6 @@ THIRD_PARTY_APPS = (
     "guardian",  # Per Object Permissions via django-guardian
     "rest_framework",  # API
     "rest_framework.authtoken",
-    "scheduler",  # django-rq-scheduler
     "watson",  # Full text search
 )
 

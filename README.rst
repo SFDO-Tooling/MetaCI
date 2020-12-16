@@ -153,7 +153,6 @@ To configure autoscaling:
     3. worker_type - The name of the worker dynos allocated for the given queues.
     4. max_workers - See METACI_MAX_WORKERS
     5. worker_reserve - See METACI_WORKER_RESERVE
-6. Add a RepeatableJob with Callable = ``metaci.build.autoscaling.autoscale``, Queue = ``short``, and Interval = ``1 minute``.
 
 
 Email Server
