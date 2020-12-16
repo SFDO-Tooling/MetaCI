@@ -12,21 +12,6 @@ from metaci.testresults.models import TestMethod, TestResult, TestResultAsset
 
 
 @pytest.fixture
-def get_result():
-    def func(num, name="test-task", ret_vals={}, exception=None):
-        return StepResult(
-            step_num=num,
-            task_name=name,
-            path=None,
-            result="something",
-            return_values=ret_vals,
-            exception=exception,
-        )
-
-    return func
-
-
-@pytest.fixture
 def get_spec():
     def func(num, name="test-task", cls=None):
         return StepSpec(
@@ -41,9 +26,16 @@ def get_spec():
 
 
 @pytest.mark.django_db
-def test_post_task__result_complete(get_spec, get_result):
-    step_result = get_result("1")
+def test_post_task__result_complete(get_spec):
     step_spec = get_spec("1")
+    step_result = StepResult(
+        step_num="1",
+        task_name="test-task",
+        path="test-task",
+        result="something",
+        return_values={},
+        exception=None,
+    )
 
     build_flow = BuildFlowFactory()
     metaci_callbacks = MetaCIFlowCallback(build_flow.id)
@@ -54,9 +46,16 @@ def test_post_task__result_complete(get_spec, get_result):
 
 
 @pytest.mark.django_db
-def test_post_task__result_has_exception(get_spec, get_result):
+def test_post_task__result_has_exception(get_spec):
     step_spec = get_spec("1")
-    step_result = get_result("1", exception=TestException)
+    step_result = StepResult(
+        step_num="1",
+        task_name="test-task",
+        path="test-task",
+        result="something",
+        return_values={},
+        exception=TestException,
+    )
 
     build_flow = BuildFlowFactory()
     metaci_callbacks = MetaCIFlowCallback(build_flow.id)
@@ -68,12 +67,17 @@ def test_post_task__result_has_exception(get_spec, get_result):
 
 
 @pytest.mark.django_db
-def test_post_task__multiple_robot_output_files(get_spec, get_result):
+def test_post_task__multiple_robot_output_files(get_spec):
     path = PurePath(__file__).parent.parent.parent / "testresults/tests"
-    step_result = get_result(
-        "1", name="Robot", ret_vals={"robot_outputdir": str(path / "robot_1.xml")}
-    )
     step_spec = get_spec("1", name="Robot", cls=Robot)
+    step_result = StepResult(
+        step_num="1",
+        task_name="Robot",
+        path="Robot",
+        result="something",
+        return_values={"robot_outputdir": str(path / "robot_1.xml")},
+        exception=None,
+    )
 
     build_flow = BuildFlowFactory()
     metaci_callbacks = MetaCIFlowCallback(build_flow.id)
@@ -90,12 +94,15 @@ def test_post_task__multiple_robot_output_files(get_spec, get_result):
     assert 1 == TestResult.objects.all().count()
     assert 0 == TestResultAsset.objects.all().count()
 
-    step_result = get_result(
-        num="2",
-        name="Robot",
-        ret_vals={"robot_outputdir": str(path / "robot_screenshots.xml")},
-    )
     step_spec = get_spec("2", name="Robot", cls=Robot)
+    step_result = StepResult(
+        step_num="2",
+        task_name="Robot",
+        path="Robot",
+        result="something",
+        return_values={"robot_outputdir": str(path / "robot_screenshots.xml")},
+        exception=None,
+    )
 
     with open(Path(path / "selenium-screenshot-1.png"), mode="w+"):
         with open(Path(path / "selenium-screenshot-2.png"), mode="w+"):
