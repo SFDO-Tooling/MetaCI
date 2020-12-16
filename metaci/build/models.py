@@ -698,7 +698,10 @@ class BuildFlow(models.Model):
         self.save()
 
     def load_test_results(self):
-
+        """Import results from JUnit or test_results.json.
+        
+        Robot Framework results are imported in MetaCIFlowCallback.post_task
+        """
         # Load JUnit
         results = []
         if self.build.plan.junit_path:
