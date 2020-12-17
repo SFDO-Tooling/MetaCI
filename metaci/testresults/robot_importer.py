@@ -73,8 +73,10 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
             with open(screenshot_path, "rb") as f:
                 asset = BuildFlowAsset(
                     build_flow=flowtask.build_flow,
-                    asset=ContentFile(f.read(), screenshot),
-                    category=f"robot-screenshot-{i+1}",
+                    asset=ContentFile(
+                        f.read(), f"step-{flowtask.stepnum}-{screenshot}"
+                    ),
+                    category=f"robot-screenshot",
                 )
                 asset.save()
                 suite_screenshots[screenshot] = asset.id

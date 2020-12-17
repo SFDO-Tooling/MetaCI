@@ -177,11 +177,13 @@ def test_post_task__multiple_robot_tasks(get_spec):
         output_files = BuildFlowAsset.objects.filter(
             category="robot-output", build_flow=build_flow
         )
-        # There should now be two output files for the buildflow
+        # There should now be two output files,
+        # one for each Robot task that has executed
         assert len(output_files) == 2
 
-        # There should be a screenshot created during suite setup
-        assert 1 == BuildFlowAsset.objects.filter(category="robot-screenshot-1").count()
+        # There should be one screenshot created during suite setup
+        assert 1 == BuildFlowAsset.objects.filter(category="robot-screenshot").count()
+
         # No screenshots created for 'Via API' test
         tr_method = TestMethod.objects.get(name="Via API")
         test_api = TestResult.objects.get(method=tr_method)
