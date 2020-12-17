@@ -11,7 +11,7 @@ from metaci.build.exceptions import BuildError
 from metaci.testresults.models import TestClass, TestMethod, TestResult, TestResultAsset
 
 
-def import_robot_test_results(flowtask, test_results_path: str) -> None:
+def import_robot_test_results(flowtask, results_dir: str) -> None:
     """Given a flowtask for a robot task, and a path to the
     test results output file:
 
@@ -27,19 +27,23 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
     @param1 (FlowTask) The flowtask associated with the robot task
     @param1 (str) The filepath to the robot results
     """
-    test_results_path = Path(test_results_path)
-    if not test_results_path.is_file():
+    results_dir = Path(results_dir)
+    results_file = results_dir / "output.xml"  # robot output filename
+
+    if not results_dir.is_dir():
         raise BuildError(
-            f"Given Robot test result file is not a file: {test_results_path}"
+            f"Given Robot results directory is not a directory: {results_dir}"
         )
+    if not results_file.is_file():
+        raise BuildError(f"File {results_file} does not exist.")
 
     # import is here to avoid import cycle
     from metaci.build.models import BuildFlowAsset
 
-    with open(test_results_path, "rb") as f:
+    with open(results_file, "rb") as f:
         asset = BuildFlowAsset(
             build_flow=flowtask.build_flow,
-            asset=ContentFile(f.read(), "output.xml"),
+            asset=ContentFile(f.read(), f"step-{flowtask.stepnum}-output.xml"),
             category="robot-output",
         )
         asset.save()
@@ -47,7 +51,7 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
     classes = {}
     methods = {}
     suite_screenshots = {}
-    for result in parse_robot_output(test_results_path):
+    for result in parse_robot_output(results_file):
         testclass = classes.get(result["suite"]["name"], None)
         if not testclass:
             testclass, created = TestClass.objects.get_or_create(
@@ -59,16 +63,12 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
 
         # Create screenshot assets for corresponding BuildFlow
         # These screenshots are generated during robot test suite setup/teardown
-        dirname = test_results_path.parent
         for i, screenshot in enumerate(result["suite"]["screenshots"]):
 
             if screenshot in suite_screenshots:
                 continue
 
-            if dirname:
-                screenshot_path = Path(f"{dirname}/{screenshot}")
-            else:
-                screenshot_path = Path(screenshot)
+            screenshot_path = results_dir / screenshot
 
             with open(screenshot_path, "rb") as f:
                 asset = BuildFlowAsset(
@@ -109,9 +109,7 @@ def import_robot_test_results(flowtask, test_results_path: str) -> None:
         # Attach test case screenshots to test result
         if result["screenshots"] or suite_screenshots:
             for screenshot in result["screenshots"]:
-                screenshot_path = Path(screenshot)
-                if dirname:
-                    screenshot_path = Path(f"{dirname}/{screenshot}")
+                screenshot_path = results_dir / screenshot
                 with open(screenshot_path, "rb") as f:
                     asset = TestResultAsset(
                         result=testresult, asset=ContentFile(f.read(), screenshot)
