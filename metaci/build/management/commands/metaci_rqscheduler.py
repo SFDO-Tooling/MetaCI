@@ -7,30 +7,40 @@ from django_rq.management.commands import rqscheduler
 logger = logging.getLogger(__name__)
 
 
-def register_scheduled_jobs():
-    scheduler = django_rq.get_scheduler("short")
+def register_cron_jobs(jobs, queue_name="short"):
+    """Replace the existing cron jobs for the specified rq queue.
+
+    Removes all existing scheduled jobs, then adds new ones.
+
+    `jobs` should be a dict:
+    - keys are strings identifying the jobs
+    - values are a dict to pass to scheduler.cron(), with at least:
+        - `func` (dotted path to callable)
+        - `cron_string` (schedule in cron format)
+    """
+    scheduler = django_rq.get_scheduler(queue_name)
 
     # Cancel existing jobs
-    for job in scheduler.get_jobs():
+    for job in list(scheduler.get_jobs()):
         scheduler.cancel(job)
 
     # Schedule jobs from settings
-    for job_id, kwargs in settings.CRON_JOBS.items():
+    for job_id, kwargs in jobs.items():
         for key in ("cron_string", "func"):
             if key not in kwargs:
-                raise TypeError(f"CRON_JOBS['{job_id}'] is missing {key}")
-        kwargs["queue_name"] = kwargs.get("queue_name") or "short"
+                raise TypeError(f"Scheduled job {job_id} is missing {key}")
+        kwargs["queue_name"] = queue_name
         kwargs["use_local_timezone"] = True
         scheduler.cron(**kwargs)
         logger.info(f"Scheduled job {job_id}: {kwargs})")
 
 
 class Command(rqscheduler.Command):
-    """Update scheduled jobs in redis, then run rqscheduler
+    """Update scheduled rq jobs, then run rqscheduler
 
     Extends django-rq's rqscheduler command.
     """
 
     def handle(self, *args, **kw):
-        register_scheduled_jobs()
+        register_cron_jobs(settings.CRON_JOBS)
         super(Command, self).handle(*args, **kw)
