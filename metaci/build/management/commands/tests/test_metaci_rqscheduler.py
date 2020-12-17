@@ -35,4 +35,4 @@ def test_Command_schedules_jobs(super_handle):
 
 def test_register_cron_jobs__missing_keys():
     with pytest.raises(TypeError, match="is missing cron_string"):
-        register_cron_jobs({"test": {"func": "test"}})
+        register_cron_jobs({"test": {"func": "test"}}, "short")
