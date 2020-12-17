@@ -31,11 +31,9 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
     results_file = results_dir / "output.xml"  # robot output filename
 
     if not results_dir.is_dir():
-        raise BuildError(
-            f"Given Robot results directory is not a directory: {results_dir}"
-        )
+        raise BuildError(f"Robot results directory is not a directory: {results_dir}")
     if not results_file.is_file():
-        raise BuildError(f"File {results_file} does not exist.")
+        raise BuildError(f"File does not exist: {results_file}")
 
     # import is here to avoid import cycle
     from metaci.build.models import BuildFlowAsset
