@@ -112,7 +112,7 @@
     "django:serve": "python manage.py runserver 0.0.0.0:8000",
     "redis:clear": "redis-cli FLUSHALL",
     "rq:work": "python manage.py metaci_rqworker short",
-    "rq:scheduler": "python manage.py rqscheduler --queue short",
+    "rq:scheduler": "python manage.py metaci_rqscheduler --queue short",
     "serve": "run-p django:serve webpack:serve rq:work rq:scheduler",
     "prettier": "prettier --write 'src/js/**/*.ts' 'src/sass/**/*.scss'",
     "eslint": "eslint '*.js' src/js src/test --ext .js,.ts,.jsx,.tsx --fix",

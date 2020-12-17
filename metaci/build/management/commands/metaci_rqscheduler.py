@@ -7,7 +7,7 @@ from django_rq.management.commands import rqscheduler
 logger = logging.getLogger(__name__)
 
 
-def register_cron_jobs(jobs, queue_name="short"):
+def register_cron_jobs(jobs: dict, queue_name: str):
     """Replace the existing cron jobs for the specified rq queue.
 
     Removes all existing scheduled jobs, then adds new ones.
@@ -42,5 +42,6 @@ class Command(rqscheduler.Command):
     """
 
     def handle(self, *args, **kw):
-        register_cron_jobs(settings.CRON_JOBS)
+        queue_name = kw.get("queue") or "short"
+        register_cron_jobs(settings.CRON_JOBS, queue_name)
         super(Command, self).handle(*args, **kw)
