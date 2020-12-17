@@ -4,13 +4,14 @@ from pathlib import Path, PurePath
 from unittest import mock
 
 import pytest
-from cumulusci.utils import elementtree_parse_file
+from cumulusci.utils import elementtree_parse_file, temporary_dir
 from django.utils import timezone
 
 from metaci.build.exceptions import BuildError
 from metaci.build.models import BuildFlowAsset
 from metaci.conftest import FlowTaskFactory
 from metaci.testresults import models, robot_importer
+from metaci.build.tests.test_flows import copy_file, TEST_ROBOT_OUTPUT_FILES
 
 
 @pytest.mark.django_db
@@ -21,10 +22,15 @@ def test_invalid_test_result_filepath():
 
 @pytest.mark.django_db
 def test_nested_suites():
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_with_nested_suites.xml"
+    with temporary_dir() as output_dir:
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_nested_suites.xml",
+            Path(output_dir) / "output.xml",
+        )
 
-    robot_importer.import_robot_test_results(flowtask, path)
+        flowtask = FlowTaskFactory()
+        robot_importer.import_robot_test_results(flowtask, output_dir)
+
     assert models.TestResult.objects.all(), "Test results should have been created"
     test_result = models.TestResult.objects.get(method__name__contains="AAAAA")
     assert test_result.duration == 0.25
@@ -34,18 +40,26 @@ def test_nested_suites():
 
 @pytest.mark.django_db
 def test_basic_parsing():
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_1.xml"
-    robot_importer.import_robot_test_results(flowtask, path)
+    with temporary_dir() as output_dir:
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_1.xml", Path(output_dir) / "output.xml",
+        )
+
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
+
     test_results = models.TestResult.objects.filter(method__name="FakeTestResult")
     assert test_results
 
 
 @pytest.mark.django_db
 def test_duration_calculations():
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_with_setup_teardown.xml"
-    robot_importer.import_robot_test_results(flowtask, path)
+    with temporary_dir() as output_dir:
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_setup_teardown.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
+
     correct = 14.002
     duration = models.TestResult.objects.get(method__name="FakeTestResult2").duration
     assert duration == correct
@@ -75,23 +89,31 @@ def test_field_robot_task():
     file. That task should get saved with the test result.
     """
 
-    path = Path(__file__).parent / "robot_with_setup_teardown.xml"
-    output_xml_mtime = timezone.make_aware(datetime.fromtimestamp(path.stat().st_mtime))
-    flowtask = FlowTaskFactory(stepnum=2)
-    time_offsets = ((-60, -30), (-29, +1), (+2, +10))
-    FlowTaskFactory.reset_sequence(value=1)
-    for (start_offset, end_offset) in time_offsets:
-        time_start = output_xml_mtime + timedelta(seconds=start_offset)
-        time_end = output_xml_mtime + timedelta(seconds=end_offset)
-
-        task = FlowTaskFactory(
-            build_flow=flowtask.build_flow,
-            time_start=time_start,
-            time_end=time_end,
+    with temporary_dir() as output_dir:
+        output_dir = Path(output_dir)
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_setup_teardown.xml",
+            output_dir / "output.xml",
         )
-        task.save()
+        output_xml_mtime = timezone.make_aware(
+            datetime.fromtimestamp(output_dir.stat().st_mtime)
+        )
+        flowtask = FlowTaskFactory(stepnum=2)
+        time_offsets = ((-60, -30), (-29, +1), (+2, +10))
+        FlowTaskFactory.reset_sequence(value=1)
+        for (start_offset, end_offset) in time_offsets:
+            time_start = output_xml_mtime + timedelta(seconds=start_offset)
+            time_end = output_xml_mtime + timedelta(seconds=end_offset)
 
-    robot_importer.import_robot_test_results(flowtask, path)
+            task = FlowTaskFactory(
+                build_flow=flowtask.build_flow,
+                time_start=time_start,
+                time_end=time_end,
+            )
+            task.save()
+
+        robot_importer.import_robot_test_results(flowtask, output_dir)
+
     for result in models.TestResult.objects.all():
         assert result.task is not None
         assert result.task.stepnum == "2"
@@ -100,9 +122,13 @@ def test_field_robot_task():
 @pytest.mark.django_db
 def test_import_all_tests():
     """Verifies that we import all tests in a suite"""
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_with_failures.xml"
-    robot_importer.import_robot_test_results(flowtask, path)
+    with temporary_dir() as output_dir:
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
+
     failing_test_results = models.TestResult.objects.filter(outcome="Fail")
     passing_test_results = models.TestResult.objects.filter(outcome="Pass")
     assert len(failing_test_results) == 3
@@ -112,9 +138,12 @@ def test_import_all_tests():
 @pytest.mark.django_db
 def test_field_keyword_and_message():
     """Verify that the keyword and message fields are populated"""
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_with_failures.xml"
-    robot_importer.import_robot_test_results(flowtask, path)
+    with temporary_dir() as output_dir:
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
 
     test_result = models.TestResult.objects.get(method__name="Failing test 1")
     assert test_result.message == "Danger, Will Robinson!"
@@ -124,9 +153,12 @@ def test_field_keyword_and_message():
 @pytest.mark.django_db
 def test_field_keyword_and_message_nested_keywords():
     """Verify that the keyword and message fields are set when failure is in a nested keyword"""
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_with_failures.xml"
-    robot_importer.import_robot_test_results(flowtask, path)
+    with temporary_dir() as output_dir:
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
 
     test_result = models.TestResult.objects.get(method__name="Failing test 2")
     assert test_result.message == "I'm sorry, Dave. I'm afraid I can't do that."
@@ -136,9 +168,12 @@ def test_field_keyword_and_message_nested_keywords():
 @pytest.mark.django_db
 def test_field_keyword_and_message_passing_test():
     """Verify that the failing_keyword field is set correctly for passing tests"""
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_with_failures.xml"
-    robot_importer.import_robot_test_results(flowtask, path)
+    with temporary_dir() as output_dir:
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
 
     test_result = models.TestResult.objects.get(method__name="Passing test")
     assert test_result.message == "Life is good, yo."
@@ -148,9 +183,11 @@ def test_field_keyword_and_message_passing_test():
 @pytest.mark.django_db
 def test_import_robot_tags():
     """Verify that robot tags are added to the database"""
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_1.xml"
-    robot_importer.import_robot_test_results(flowtask, path)
+    with temporary_dir() as output_dir:
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_1.xml", Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
     test_results = models.TestResult.objects.filter(method__name="FakeTestResult")
     assert test_results[0].robot_tags == "tag with spaces,w-123456"
 
@@ -163,9 +200,12 @@ def test_execution_errors():
     errors) these errors were being thrown away. This test verifies
     that execution errors appear in imported test results.
     """
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent / "robot_with_import_errors.xml"
-    robot_importer.import_robot_test_results(flowtask, path)
+    with temporary_dir() as output_dir:
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_import_errors.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
 
     test_result = models.TestResult.objects.last()
     root = ET.fromstring(test_result.robot_xml)
@@ -187,31 +227,31 @@ def test_screenshots_generated():
     * A BuildFlowAsset created for the screenshot taken during suite setup
     * A TestResultAsset created for the 'Via UI' robot test
     """
-    flowtask = FlowTaskFactory()
-    path = PurePath(__file__).parent
-    robot_output = path / "robot_screenshots.xml"
-    ss_1_path = Path(path / "selenium-screenshot-1.png")
-    ss_2_path = Path(path / "selenium-screenshot-2.png")
+    with temporary_dir() as output_dir:
+        output_dir = Path(output_dir)
+        copy_file(
+            TEST_ROBOT_OUTPUT_FILES / "robot_screenshots.xml",
+            output_dir / "output.xml",
+        )
+        open(output_dir / "selenium-screenshot-1.png", mode="w+")
+        open(output_dir / "selenium-screenshot-2.png", mode="w+")
 
-    with open(ss_1_path, mode="w+"):
-        with open(ss_2_path, mode="w+"):
-            robot_importer.import_robot_test_results(flowtask, robot_output)
-            # output.xml asset created
-            assert 1 == BuildFlowAsset.objects.filter(category="robot-output").count()
-            # suite setup screenshot assets created
-            assert (
-                1
-                == BuildFlowAsset.objects.filter(category="robot-screenshot-1").count()
-            )
-            # No screenshots created for 'Via API' test
-            tr_method = models.TestMethod.objects.get(name="Via API")
-            test_api = models.TestResult.objects.get(method=tr_method, task=flowtask)
-            assert 0 == test_api.assets.count()
+        flowtask = FlowTaskFactory()
+        robot_importer.import_robot_test_results(flowtask, output_dir)
 
-            # One screenshot created for 'Via UI' test
-            tr_method = models.TestMethod.objects.get(name="Via UI")
-            test_ui = models.TestResult.objects.get(method=tr_method, task=flowtask)
-            assert 1 == test_ui.assets.count()
+        # output.xml asset created
+        assert 1 == BuildFlowAsset.objects.filter(category="robot-output").count()
+        # suite setup screenshot assets created
+        assert 1 == BuildFlowAsset.objects.filter(category="robot-screenshot").count()
+        # No screenshots created for 'Via API' test
+        tr_method = models.TestMethod.objects.get(name="Via API")
+        test_api = models.TestResult.objects.get(method=tr_method, task=flowtask)
+        assert 0 == test_api.assets.count()
+
+        # One screenshot created for 'Via UI' test
+        tr_method = models.TestMethod.objects.get(name="Via UI")
+        test_ui = models.TestResult.objects.get(method=tr_method, task=flowtask)
+        assert 1 == test_ui.assets.count()
 
 
 @pytest.mark.django_db
