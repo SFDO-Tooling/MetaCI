@@ -104,7 +104,7 @@ def test_post_task__single_robot_task(get_spec):
         ).count()
     )
     # There should be a screenshot created during suite setup
-    assert 1 == BuildFlowAsset.objects.filter(category="robot-screenshot-1").count()
+    assert 1 == BuildFlowAsset.objects.filter(category="robot-screenshot").count()
     # No screenshots created for 'Via API' test
     tr_method = TestMethod.objects.get(name="Via API")
     test_api = TestResult.objects.get(method=tr_method)
