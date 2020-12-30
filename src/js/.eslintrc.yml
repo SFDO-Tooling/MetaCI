@@ -1,5 +1,4 @@
 # http://eslint.org/docs/rules/
-# copied from https://raw.githubusercontent.com/SFDO-Tooling/MetaShare/master/src/js/.eslintrc.yml
 
 parser: '@typescript-eslint/parser'
 parserOptions:
