@@ -37,6 +37,7 @@ def url_prefix_list(val: str) -> List[str]:
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
+WHITENOISE_APPS = ("whitenoise.runserver_nostatic",)
 DJANGO_APPS = (
     # Default Django apps:
     "django.contrib.auth",
@@ -83,7 +84,7 @@ LOCAL_APPS = (
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = WHITENOISE_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -99,6 +100,7 @@ ALLOWED_HOSTS = [
 MIDDLEWARE = (
     "log_request_id.middleware.RequestIDMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
