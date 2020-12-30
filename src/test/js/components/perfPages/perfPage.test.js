@@ -4,8 +4,8 @@ import { MemoryRouter } from 'react-router-dom';
 
 import PerfPage from '@/components/perfPages/perfPage';
 
-import testmethod_perf_UI_data from '../../api/testmethod_perf_UI.json';
 import testmethod_perf_data from '../../api/testmethod_perf.json';
+import testmethod_perf_UI_data from '../../api/testmethod_perf_UI.json';
 import { renderWithRedux, storeWithApi } from '../../utils';
 
 const initialStoreState = {
