@@ -1,1396 +1,1396 @@
 {
-   "buildflow_filters": [
-       {
-           "name": "repo",
-           "label": "Repo Name",
-           "field_type": "ChoiceField",
-           "field_module": "django_filters.fields",
-           "lookup_expr": "exact",
-           "choices": [
-               [
-                   "Affiliations",
-                   "Affiliations"
-               ],
-               [
-                   "CampaignTools",
-                   "CampaignTools"
-               ],
-               [
-                   "Contacts_and_Organizations",
-                   "Contacts_and_Organizations"
-               ],
-               [
-                   "Cumulus",
-                   "Cumulus"
-               ],
-               [
-                   "CumulusCI-Test",
-                   "CumulusCI-Test"
-               ],
-               [
-                   "HEDAP",
-                   "HEDAP"
-               ],
-               [
-                   "Households",
-                   "Households"
-               ],
-               [
-                   "Recurring_Donations",
-                   "Recurring_Donations"
-               ],
-               [
-                   "Relationships",
-                   "Relationships"
-               ],
-               [
-                   "Volunteers-for-Salesforce",
-                   "Volunteers-for-Salesforce"
-               ]
-           ]
-       },
-       {
-           "name": "branch",
-           "label": "Branch Name",
-           "field_type": "ChoiceField",
-           "field_module": "django_filters.fields",
-           "lookup_expr": "exact",
-           "choices": [
-               [
-                   "BGE-edge-bug-demo",
-                   "BGE-edge-bug-demo"
-               ],
-               [
-                   "CumulusCI",
-                   "CumulusCI"
-               ],
-               [
-                   "Edge-bug-object-expected",
-                   "Edge-bug-object-expected"
-               ],
-               [
-                   "add_browsertest_flow",
-                   "add_browsertest_flow"
-               ],
-               [
-                   "add_browsertests_to_repo",
-                   "add_browsertests_to_repo"
-               ],
-               [
-                   "cdcarter-patch-1",
-                   "cdcarter-patch-1"
-               ],
-               [
-                   "config_scratch_org",
-                   "config_scratch_org"
-               ],
-               [
-                   "dashattuck-patch-1",
-                   "dashattuck-patch-1"
-               ],
-               [
-                   "df18-robot-demo",
-                   "df18-robot-demo"
-               ],
-               [
-                   "df18/booth-demo",
-                   "df18/booth-demo"
-               ],
-               [
-                   "do-not-merge/BGE",
-                   "do-not-merge/BGE"
-               ],
-               [
-                   "do-not-merge/BGE-LC__Refactor_BDI_field_mappings_as_Custom_Metadata_Types",
-                   "do-not-merge/BGE-LC__Refactor_BDI_field_mappings_as_Custom_Metadata_Types"
-               ],
-               [
-                   "do-not-merge/BGE-LC__Refactor_BDI_field_mappings_as_Custom_Metadata_Types_with_references",
-                   "do-not-merge/BGE-LC__Refactor_BDI_field_mappings_as_Custom_Metadata_Types_with_references"
-               ],
-               [
-                   "do-not-merge/BGE-LC__pilot-2018OCT",
-                   "do-not-merge/BGE-LC__pilot-2018OCT"
-               ],
-               [
-                   "do-not-merge/autocomplete-lightning-component-examples",
-                   "do-not-merge/autocomplete-lightning-component-examples"
-               ],
-               [
-                   "do-not-merge/bge-template-ui-poc",
-                   "do-not-merge/bge-template-ui-poc"
-               ],
-               [
-                   "do-not-merge/fake-data-generator",
-                   "do-not-merge/fake-data-generator"
-               ],
-               [
-                   "enablerecord",
-                   "enablerecord"
-               ],
-               [
-                   "feature/1592-ui-text-changes",
-                   "feature/1592-ui-text-changes"
-               ],
-               [
-                   "feature/93-clone",
-                   "feature/93-clone"
-               ],
-               [
-                   "feature/989-misc-updates-djh",
-                   "feature/989-misc-updates-djh"
-               ],
-               [
-                   "feature/BGE-Wizard-Order_Opportunity_Payment_fields_getting_inverted-Sorting_alphabetically",
-                   "feature/BGE-Wizard-Order_Opportunity_Payment_fields_getting_inverted-Sorting_alphabetically"
-               ],
-               [
-                   "feature/BGE-unresponsive-scroll",
-                   "feature/BGE-unresponsive-scroll"
-               ],
-               [
-                   "feature/KJ_ContactJobMassEdit",
-                   "feature/KJ_ContactJobMassEdit"
-               ],
-               [
-                   "feature/add-RecurringDonations_AddDonationsBTN",
-                   "feature/add-RecurringDonations_AddDonationsBTN"
-               ],
-               [
-                   "feature/add-class-to-fix-2.x-upgrades",
-                   "feature/add-class-to-fix-2.x-upgrades"
-               ],
-               [
-                   "feature/always_rollup_label_helptext",
-                   "feature/always_rollup_label_helptext"
-               ],
-               [
-                   "feature/bamboo",
-                   "feature/bamboo"
-               ],
-               [
-                   "feature/bge-any-lookup",
-                   "feature/bge-any-lookup"
-               ],
-               [
-                   "feature/bge-apply-new-payment",
-                   "feature/bge-apply-new-payment"
-               ],
-               [
-                   "feature/bge-apply-new-payment-test-refactor",
-                   "feature/bge-apply-new-payment-test-refactor"
-               ],
-               [
-                   "feature/bge-campaign-lookup",
-                   "feature/bge-campaign-lookup"
-               ],
-               [
-                   "feature/bge-perms-mock-refactor",
-                   "feature/bge-perms-mock-refactor"
-               ],
-               [
-                   "feature/bge-record-type-unmapped-fix",
-                   "feature/bge-record-type-unmapped-fix"
-               ],
-               [
-                   "feature/browsertest-css-fix",
-                   "feature/browsertest-css-fix"
-               ],
-               [
-                   "feature/cci2cleanup",
-                   "feature/cci2cleanup"
-               ],
-               [
-                   "feature/cciflowsyntax",
-                   "feature/cciflowsyntax"
-               ],
-               [
-                   "feature/ccikeyout",
-                   "feature/ccikeyout"
-               ],
-               [
-                   "feature/ceiroa/template-update",
-                   "feature/ceiroa/template-update"
-               ],
-               [
-                   "feature/code-owners-test",
-                   "feature/code-owners-test"
-               ],
-               [
-                   "feature/cumulusci-cleanup",
-                   "feature/cumulusci-cleanup"
-               ],
-               [
-                   "feature/cumulusci2",
-                   "feature/cumulusci2"
-               ],
-               [
-                   "feature/delete-reports",
-                   "feature/delete-reports"
-               ],
-               [
-                   "feature/dev_site",
-                   "feature/dev_site"
-               ],
-               [
-                   "feature/emoji-test",
-                   "feature/emoji-test"
-               ],
-               [
-                   "feature/failing-robot-with-screenshot",
-                   "feature/failing-robot-with-screenshot"
-               ],
-               [
-                   "feature/fieldsetfix",
-                   "feature/fieldsetfix"
-               ],
-               [
-                   "feature/fix-component-deletion",
-                   "feature/fix-component-deletion"
-               ],
-               [
-                   "feature/fix-deleted-reference-translation",
-                   "feature/fix-deleted-reference-translation"
-               ],
-               [
-                   "feature/fix-task-util-import",
-                   "feature/fix-task-util-import"
-               ],
-               [
-                   "feature/j",
-                   "feature/j"
-               ],
-               [
-                   "feature/jbrandolini/rebrandAdvancementToGEM",
-                   "feature/jbrandolini/rebrandAdvancementToGEM"
-               ],
-               [
-                   "feature/jbrandolini/updateForSettingsChangesInGEM",
-                   "feature/jbrandolini/updateForSettingsChangesInGEM"
-               ],
-               [
-                   "feature/jbury-english-translation",
-                   "feature/jbury-english-translation"
-               ],
-               [
-                   "feature/jbury-german-translation",
-                   "feature/jbury-german-translation"
-               ],
-               [
-                   "feature/jbury-japanese-translation",
-                   "feature/jbury-japanese-translation"
-               ],
-               [
-                   "feature/jen-async-contact-merge",
-                   "feature/jen-async-contact-merge"
-               ],
-               [
-                   "feature/jen-async-contact-merge__acct-crlp",
-                   "feature/jen-async-contact-merge__acct-crlp"
-               ],
-               [
-                   "feature/jen-async-contact-merge__queueable",
-                   "feature/jen-async-contact-merge__queueable"
-               ],
-               [
-                   "feature/jen-disable-reports",
-                   "feature/jen-disable-reports"
-               ],
-               [
-                   "feature/jen-dutch-updates",
-                   "feature/jen-dutch-updates"
-               ],
-               [
-                   "feature/jen-fix-dutch",
-                   "feature/jen-fix-dutch"
-               ],
-               [
-                   "feature/joy-translation-update-aff",
-                   "feature/joy-translation-update-aff"
-               ],
-               [
-                   "feature/joy-translation-update-hh",
-                   "feature/joy-translation-update-hh"
-               ],
-               [
-                   "feature/joy-translation-update-rd",
-                   "feature/joy-translation-update-rd"
-               ],
-               [
-                   "feature/joy-translation-update-rel",
-                   "feature/joy-translation-update-rel"
-               ],
-               [
-                   "feature/kj-triggertest",
-                   "feature/kj-triggertest"
-               ],
-               [
-                   "feature/kofi-deprecated_components_removal",
-                   "feature/kofi-deprecated_components_removal"
-               ],
-               [
-                   "feature/laura-bdi-data-import-service-refactor",
-                   "feature/laura-bdi-data-import-service-refactor"
-               ],
-               [
-                   "feature/mbci-demo",
-                   "feature/mbci-demo"
-               ],
-               [
-                   "feature/mblanski/totalRequiredCredits",
-                   "feature/mblanski/totalRequiredCredits"
-               ],
-               [
-                   "feature/metadeploy-test-flows",
-                   "feature/metadeploy-test-flows"
-               ],
-               [
-                   "feature/mike-2324-deprecate-campaign-household-mailing-list-report",
-                   "feature/mike-2324-deprecate-campaign-household-mailing-list-report"
-               ],
-               [
-                   "feature/msmith/crlp-api-get-rollup-defs",
-                   "feature/msmith/crlp-api-get-rollup-defs"
-               ],
-               [
-                   "feature/msmith/crlp-ldv-batch-query-proof-of-concept",
-                   "feature/msmith/crlp-ldv-batch-query-proof-of-concept"
-               ],
-               [
-                   "feature/msmith/crlp-validation-script-updates",
-                   "feature/msmith/crlp-validation-script-updates"
-               ],
-               [
-                   "feature/msmith/parallel-test-jan2019",
-                   "feature/msmith/parallel-test-jan2019"
-               ],
-               [
-                   "feature/msmith/test-not-insert-tdtm-for-unit-tests",
-                   "feature/msmith/test-not-insert-tdtm-for-unit-tests"
-               ],
-               [
-                   "feature/newtesttask",
-                   "feature/newtesttask"
-               ],
-               [
-                   "feature/nina-alloc-del-msg",
-                   "feature/nina-alloc-del-msg"
-               ],
-               [
-                   "feature/org-deffos",
-                   "feature/org-deffos"
-               ],
-               [
-                   "feature/parent",
-                   "feature/parent"
-               ],
-               [
-                   "feature/parent-child-test",
-                   "feature/parent-child-test"
-               ],
-               [
-                   "feature/parent__child1",
-                   "feature/parent__child1"
-               ],
-               [
-                   "feature/payment-allocations",
-                   "feature/payment-allocations"
-               ],
-               [
-                   "feature/payment-allocations__customizable-rollups",
-                   "feature/payment-allocations__customizable-rollups"
-               ],
-               [
-                   "feature/payment-allocations__pmt-to-opp-sync",
-                   "feature/payment-allocations__pmt-to-opp-sync"
-               ],
-               [
-                   "feature/podname",
-                   "feature/podname"
-               ],
-               [
-                   "feature/portland-sprint",
-                   "feature/portland-sprint"
-               ],
-               [
-                   "feature/preflight",
-                   "feature/preflight"
-               ],
-               [
-                   "feature/prince-bge-grid-save-button-bug",
-                   "feature/prince-bge-grid-save-button-bug"
-               ],
-               [
-                   "feature/radmila-override-soft-credit-automation",
-                   "feature/radmila-override-soft-credit-automation"
-               ],
-               [
-                   "feature/remove-RecurringDonations_AddDonationsBTN",
-                   "feature/remove-RecurringDonations_AddDonationsBTN"
-               ],
-               [
-                   "feature/remove-unused-static-resources",
-                   "feature/remove-unused-static-resources"
-               ],
-               [
-                   "feature/require-npe01-3.8",
-                   "feature/require-npe01-3.8"
-               ],
-               [
-                   "feature/revert-signup-link",
-                   "feature/revert-signup-link"
-               ],
-               [
-                   "feature/robot",
-                   "feature/robot"
-               ],
-               [
-                   "feature/robot__automation-session-records-cleanup",
-                   "feature/robot__automation-session-records-cleanup"
-               ],
-               [
-                   "feature/robot__bge-automation",
-                   "feature/robot__bge-automation"
-               ],
-               [
-                   "feature/rwatson/facilityMetadata",
-                   "feature/rwatson/facilityMetadata"
-               ],
-               [
-                   "feature/rwatson/fixBulkPreferred",
-                   "feature/rwatson/fixBulkPreferred"
-               ],
-               [
-                   "feature/rwatson/updatePEAffiliationStatusBugFix",
-                   "feature/rwatson/updatePEAffiliationStatusBugFix"
-               ],
-               [
-                   "feature/settings-string-review",
-                   "feature/settings-string-review"
-               ],
-               [
-                   "feature/shackle-breaker",
-                   "feature/shackle-breaker"
-               ],
-               [
-                   "feature/something",
-                   "feature/something"
-               ],
-               [
-                   "feature/spanish-translation-update",
-                   "feature/spanish-translation-update"
-               ],
-               [
-                   "feature/spelak/W-030505",
-                   "feature/spelak/W-030505"
-               ],
-               [
-                   "feature/test-cumulusci-feature-build",
-                   "feature/test-cumulusci-feature-build"
-               ],
-               [
-                   "feature/test-fail",
-                   "feature/test-fail"
-               ],
-               [
-                   "feature/waitlist",
-                   "feature/waitlist"
-               ],
-               [
-                   "feature/wei/multipletribute",
-                   "feature/wei/multipletribute"
-               ],
-               [
-                   "gh-pages",
-                   "gh-pages"
-               ],
-               [
-                   "installpreflight",
-                   "installpreflight"
-               ],
-               [
-                   "master",
-                   "master"
-               ],
-               [
-                   "msmith/field-history-tracking-unmanaged-app",
-                   "msmith/field-history-tracking-unmanaged-app"
-               ],
-               [
-                   "msmith/save-for-now-2684-sandbox-scheduled-jobs-issue",
-                   "msmith/save-for-now-2684-sandbox-scheduled-jobs-issue"
-               ],
-               [
-                   "msmith/save/parallel-unit-tests-june2017",
-                   "msmith/save/parallel-unit-tests-june2017"
-               ],
-               [
-                   "opp-hierarchy-sprint-project",
-                   "opp-hierarchy-sprint-project"
-               ],
-               [
-                   "parallel-test-scratch-org",
-                   "parallel-test-scratch-org"
-               ],
-               [
-                   "recreate_email_templates",
-                   "recreate_email_templates"
-               ],
-               [
-                   "recurring-donation-allocation-test",
-                   "recurring-donation-allocation-test"
-               ],
-               [
-                   "shared-autocomplete",
-                   "shared-autocomplete"
-               ],
-               [
-                   "spike/ben/formlayout",
-                   "spike/ben/formlayout"
-               ],
-               [
-                   "tag: beta/1.7-Beta_544",
-                   "tag: beta/1.7-Beta_544"
-               ],
-               [
-                   "tag: beta/1.7-Beta_545",
-                   "tag: beta/1.7-Beta_545"
-               ],
-               [
-                   "tag: beta/1.7-Beta_546",
-                   "tag: beta/1.7-Beta_546"
-               ],
-               [
-                   "tag: beta/1.7-Beta_547",
-                   "tag: beta/1.7-Beta_547"
-               ],
-               [
-                   "tag: beta/1.7-Beta_548",
-                   "tag: beta/1.7-Beta_548"
-               ],
-               [
-                   "tag: beta/1.7-Beta_549",
-                   "tag: beta/1.7-Beta_549"
-               ],
-               [
-                   "tag: beta/1.7-Beta_550",
-                   "tag: beta/1.7-Beta_550"
-               ],
-               [
-                   "tag: beta/1.7-Beta_551",
-                   "tag: beta/1.7-Beta_551"
-               ],
-               [
-                   "tag: beta/1.7-Beta_552",
-                   "tag: beta/1.7-Beta_552"
-               ],
-               [
-                   "tag: beta/1.7-Beta_553",
-                   "tag: beta/1.7-Beta_553"
-               ],
-               [
-                   "tag: beta/3.110-Beta_1",
-                   "tag: beta/3.110-Beta_1"
-               ],
-               [
-                   "tempBranchForDocs",
-                   "tempBranchForDocs"
-               ],
-               [
-                   "updateqalist",
-                   "updateqalist"
-               ]
-           ]
-       },
-       {
-           "name": "plan",
-           "label": "Plan Name",
-           "field_type": "ChoiceField",
-           "field_module": "django_filters.fields",
-           "lookup_expr": "exact",
-           "choices": [
-               [
-                   "Beta Test",
-                   "Beta Test"
-               ],
-               [
-                   "Beta Test - Robot",
-                   "Beta Test - Robot"
-               ],
-               [
-                   "Beta Test: Browsertest",
-                   "Beta Test: Browsertest"
-               ],
-               [
-                   "Beta Test: Browsertest Nightly",
-                   "Beta Test: Browsertest Nightly"
-               ],
-               [
-                   "Beta Test: Lightning",
-                   "Beta Test: Lightning"
-               ],
-               [
-                   "Beta Test: Middlename/Suffix",
-                   "Beta Test: Middlename/Suffix"
-               ],
-               [
-                   "Beta Test: Multicurrency",
-                   "Beta Test: Multicurrency"
-               ],
-               [
-                   "Beta Test: Offset Fiscal",
-                   "Beta Test: Offset Fiscal"
-               ],
-               [
-                   "Beta Test: Person Accounts",
-                   "Beta Test: Person Accounts"
-               ],
-               [
-                   "Beta Test: State/Country Picklist",
-                   "Beta Test: State/Country Picklist"
-               ],
-               [
-                   "Deploy to ldv100k",
-                   "Deploy to ldv100k"
-               ],
-               [
-                   "Deploy to ldv1k",
-                   "Deploy to ldv1k"
-               ],
-               [
-                   "Feature Browser Test",
-                   "Feature Browser Test"
-               ],
-               [
-                   "Feature Test",
-                   "Feature Test"
-               ],
-               [
-                   "Feature Test - HEDA",
-                   "Feature Test - HEDA"
-               ],
-               [
-                   "Feature Test - Namespaced",
-                   "Feature Test - Namespaced"
-               ],
-               [
-                   "Feature Test Parallel",
-                   "Feature Test Parallel"
-               ],
-               [
-                   "Feature Test: Robot",
-                   "Feature Test: Robot"
-               ],
-               [
-                   "Feature Test: Robot Unstable",
-                   "Feature Test: Robot Unstable"
-               ],
-               [
-                   "Release Deploy",
-                   "Release Deploy"
-               ],
-               [
-                   "Release Test",
-                   "Release Test"
-               ],
-               [
-                   "Upload Beta",
-                   "Upload Beta"
-               ],
-               [
-                   "Upload Release",
-                   "Upload Release"
-               ]
-           ]
-       },
-       {
-           "name": "flow",
-           "label": "Flow Name",
-           "field_type": "ChoiceField",
-           "field_module": "django_filters.fields",
-           "lookup_expr": "exact",
-           "choices": [
-               [
-                   "ci_beta",
-                   "ci_beta"
-               ],
-               [
-                   "ci_beta_install",
-                   "ci_beta_install"
-               ],
-               [
-                   "ci_browsertests_chrome",
-                   "ci_browsertests_chrome"
-               ],
-               [
-                   "ci_browsertests_unmanaged_firefox",
-                   "ci_browsertests_unmanaged_firefox"
-               ],
-               [
-                   "ci_feature",
-                   "ci_feature"
-               ],
-               [
-                   "ci_master",
-                   "ci_master"
-               ],
-               [
-                   "ci_release",
-                   "ci_release"
-               ],
-               [
-                   "config_multicurrency",
-                   "config_multicurrency"
-               ],
-               [
-                   "config_offsetfiscal",
-                   "config_offsetfiscal"
-               ],
-               [
-                   "dev_org",
-                   "dev_org"
-               ],
-               [
-                   "install_beta",
-                   "install_beta"
-               ],
-               [
-                   "qa_org",
-                   "qa_org"
-               ],
-               [
-                   "release_beta",
-                   "release_beta"
-               ],
-               [
-                   "release_prod",
-                   "release_prod"
-               ],
-               [
-                   "robot",
-                   "robot"
-               ],
-               [
-                   "robot_unstable",
-                   "robot_unstable"
-               ],
-               [
-                   "test_data_1k",
-                   "test_data_1k"
-               ],
-               [
-                   "uninstall_managed",
-                   "uninstall_managed"
-               ],
-               [
-                   "unmanaged_ee",
-                   "unmanaged_ee"
-               ]
-           ]
-       },
-       {
-           "name": "daterange",
-           "label": "Date range",
-           "field_type": "DateRangeField",
-           "field_module": "django_filters.fields",
-           "lookup_expr": "exact"
-       }
-   ],
-   "testmethod_perf": {
-       "includable_fields": [
-           [
-               "duration_average",
-               "Duration: Average"
-           ],
-           [
-               "duration_slow",
-               "Duration: Slow"
-           ],
-           [
-               "duration_fast",
-               "Duration: Fast"
-           ],
-           [
-               "duration_stddev",
-               "Duration: Stddev"
-           ],
-           [
-               "duration_coefficient_var",
-               "Duration: VarCoef"
-           ],
-           [
-               "cpu_usage_average",
-               "CPU Usage: Average"
-           ],
-           [
-               "cpu_usage_low",
-               "CPU Usage: Low"
-           ],
-           [
-               "cpu_usage_high",
-               "CPU Usage: High"
-           ],
-           [
-               "count",
-               "Count"
-           ],
-           [
-               "failures",
-               "Failures"
-           ],
-           [
-               "assertion_failures",
-               "Assertion Failures"
-           ],
-           [
-               "DML_failures",
-               "DML Failures"
-           ],
-           [
-               "Other_failures",
-               "Other Failures"
-           ],
-           [
-               "success_percentage",
-               "Success Percentage"
-           ],
-           [
-               "repo",
-               "repo"
-           ],
-           [
-               "plan",
-               "plan"
-           ],
-           [
-               "branch",
-               "branch"
-           ],
-           [
-               "flow",
-               "flow"
-           ]
-       ],
-       "filters": [
-           {
-               "name": "build_flows_limit",
-               "label": "Build Flows Limit (default: 100)",
-               "field_type": "DecimalField",
-               "field_module": "django.forms.fields",
-               "lookup_expr": "exact",
-               "initial": 100
-           },
-           {
-               "name": "success_percentage_gt",
-               "label": "Success percentage above",
-               "field_type": "DecimalField",
-               "field_module": "django.forms.fields",
-               "lookup_expr": "gt"
-           },
-           {
-               "name": "success_percentage_lt",
-               "label": "Success percentage below",
-               "field_type": "DecimalField",
-               "field_module": "django.forms.fields",
-               "lookup_expr": "lt"
-           },
-           {
-               "name": "count_gt",
-               "label": "Count above",
-               "field_type": "DecimalField",
-               "field_module": "django.forms.fields",
-               "lookup_expr": "gt"
-           },
-           {
-               "name": "count_lt",
-               "label": "Count below",
-               "field_type": "DecimalField",
-               "field_module": "django.forms.fields",
-               "lookup_expr": "lt"
-           },
-           {
-               "name": "method_name",
-               "label": "Method Name",
-               "field_type": "CharField",
-               "field_module": "django.forms.fields",
-               "lookup_expr": "icontains"
-           },
-           {
-               "name": "include_fields",
-               "label": "Include (multi-select okay)",
-               "field_type": "MultipleChoiceField",
-               "field_module": "django_filters.fields",
-               "lookup_expr": "exact",
-               "choices": [
-                   [
-                       "duration_average",
-                       "Duration: Average"
-                   ],
-                   [
-                       "duration_slow",
-                       "Duration: Slow"
-                   ],
-                   [
-                       "duration_fast",
-                       "Duration: Fast"
-                   ],
-                   [
-                       "duration_stddev",
-                       "Duration: Stddev"
-                   ],
-                   [
-                       "duration_coefficient_var",
-                       "Duration: VarCoef"
-                   ],
-                   [
-                       "cpu_usage_average",
-                       "CPU Usage: Average"
-                   ],
-                   [
-                       "cpu_usage_low",
-                       "CPU Usage: Low"
-                   ],
-                   [
-                       "cpu_usage_high",
-                       "CPU Usage: High"
-                   ],
-                   [
-                       "count",
-                       "Count"
-                   ],
-                   [
-                       "failures",
-                       "Failures"
-                   ],
-                   [
-                       "assertion_failures",
-                       "Assertion Failures"
-                   ],
-                   [
-                       "DML_failures",
-                       "DML Failures"
-                   ],
-                   [
-                       "Other_failures",
-                       "Other Failures"
-                   ],
-                   [
-                       "success_percentage",
-                       "Success Percentage"
-                   ],
-                   [
-                       "repo",
-                       "repo"
-                   ],
-                   [
-                       "plan",
-                       "plan"
-                   ],
-                   [
-                       "branch",
-                       "branch"
-                   ],
-                   [
-                       "flow",
-                       "flow"
-                   ]
-               ],
-               "initial": [
-                   "repo",
-                   "duration_average"
-               ]
-           },
-           {
-               "name": "o",
-               "label": "Ordering",
-               "field_type": "ChoiceExactField",
-               "field_module": "django_filters.filters",
-               "lookup_expr": "exact",
-               "choices": [
-                   [
-                       "duration_average",
-                       "Duration average"
-                   ],
-                   [
-                       "-duration_average",
-                       "Duration average (descending)"
-                   ],
-                   [
-                       "duration_slow",
-                       "Duration slow"
-                   ],
-                   [
-                       "-duration_slow",
-                       "Duration slow (descending)"
-                   ],
-                   [
-                       "duration_fast",
-                       "Duration fast"
-                   ],
-                   [
-                       "-duration_fast",
-                       "Duration fast (descending)"
-                   ],
-                   [
-                       "duration_stddev",
-                       "Duration stddev"
-                   ],
-                   [
-                       "-duration_stddev",
-                       "Duration stddev (descending)"
-                   ],
-                   [
-                       "duration_coefficient_var",
-                       "Duration coefficient var"
-                   ],
-                   [
-                       "-duration_coefficient_var",
-                       "Duration coefficient var (descending)"
-                   ],
-                   [
-                       "cpu_usage_average",
-                       "Cpu usage average"
-                   ],
-                   [
-                       "-cpu_usage_average",
-                       "Cpu usage average (descending)"
-                   ],
-                   [
-                       "cpu_usage_low",
-                       "Cpu usage low"
-                   ],
-                   [
-                       "-cpu_usage_low",
-                       "Cpu usage low (descending)"
-                   ],
-                   [
-                       "cpu_usage_high",
-                       "Cpu usage high"
-                   ],
-                   [
-                       "-cpu_usage_high",
-                       "Cpu usage high (descending)"
-                   ],
-                   [
-                       "count",
-                       "Count"
-                   ],
-                   [
-                       "-count",
-                       "Count (descending)"
-                   ],
-                   [
-                       "failures",
-                       "Failures"
-                   ],
-                   [
-                       "-failures",
-                       "Failures (descending)"
-                   ],
-                   [
-                       "assertion_failures",
-                       "Assertion failures"
-                   ],
-                   [
-                       "-assertion_failures",
-                       "Assertion failures (descending)"
-                   ],
-                   [
-                       "DML_failures",
-                       "Dml failures"
-                   ],
-                   [
-                       "-DML_failures",
-                       "Dml failures (descending)"
-                   ],
-                   [
-                       "Other_failures",
-                       "Other failures"
-                   ],
-                   [
-                       "-Other_failures",
-                       "Other failures (descending)"
-                   ],
-                   [
-                       "success_percentage",
-                       "Success percentage"
-                   ],
-                   [
-                       "-success_percentage",
-                       "Success percentage (descending)"
-                   ],
-                   [
-                       "repo",
-                       "Repo"
-                   ],
-                   [
-                       "-repo",
-                       "Repo (descending)"
-                   ],
-                   [
-                       "plan",
-                       "Plan"
-                   ],
-                   [
-                       "-plan",
-                       "Plan (descending)"
-                   ],
-                   [
-                       "branch",
-                       "Branch"
-                   ],
-                   [
-                       "-branch",
-                       "Branch (descending)"
-                   ],
-                   [
-                       "flow",
-                       "Flow"
-                   ],
-                   [
-                       "-flow",
-                       "Flow (descending)"
-                   ],
-                   [
-                       "method_name",
-                       "Method name"
-                   ],
-                   [
-                       "-method_name",
-                       "Method name (descending)"
-                   ]
-               ]
-           }
-       ],
-       "defaults": {
-           "build_flows_limit": 100,
-           "page_size": 50,
-           "max_page_size": 100
-       }
-   },
-   "testmethod_results": {
-       "includable_fields": [
-           [
-               "method_name",
-               "Method Name"
-           ],
-           [
-               "duration",
-               "Duration"
-           ],
-           [
-               "cpu_usage",
-               "CPU Usage"
-           ],
-           [
-               "outcome",
-               "Failures"
-           ],
-           [
-               "id",
-               "Id"
-           ],
-           [
-               "date",
-               "Date"
-           ],
-           [
-               "type",
-               "Type"
-           ],
-           [
-               "repo",
-               "repo"
-           ],
-           [
-               "plan",
-               "plan"
-           ],
-           [
-               "branch",
-               "branch"
-           ],
-           [
-               "flow",
-               "flow"
-           ]
-       ],
-       "filters": [
-           {
-               "name": "build_flows_limit",
-               "label": "Build Flows Limit (default: 100)",
-               "field_type": "DecimalField",
-               "field_module": "django.forms.fields",
-               "lookup_expr": "exact",
-               "initial": 100
-           },
-           {
-               "name": "method_name",
-               "label": "Method Name",
-               "field_type": "CharField",
-               "field_module": "django.forms.fields",
-               "lookup_expr": "icontains"
-           },
-           {
-               "name": "include_fields",
-               "label": "Include (multi-select okay)",
-               "field_type": "MultipleChoiceField",
-               "field_module": "django_filters.fields",
-               "lookup_expr": "exact",
-               "choices": [
-                   [
-                       "method_name",
-                       "Method Name"
-                   ],
-                   [
-                       "duration",
-                       "Duration"
-                   ],
-                   [
-                       "cpu_usage",
-                       "CPU Usage"
-                   ],
-                   [
-                       "outcome",
-                       "Failures"
-                   ],
-                   [
-                       "id",
-                       "Id"
-                   ],
-                   [
-                       "date",
-                       "Date"
-                   ],
-                   [
-                       "type",
-                       "Type"
-                   ],
-                   [
-                       "repo",
-                       "repo"
-                   ],
-                   [
-                       "plan",
-                       "plan"
-                   ],
-                   [
-                       "branch",
-                       "branch"
-                   ],
-                   [
-                       "flow",
-                       "flow"
-                   ]
-               ],
-               "initial": [
-                   "repo",
-                   "duration"
-               ]
-           },
-           {
-               "name": "o",
-               "label": "Ordering",
-               "field_type": "ChoiceExactField",
-               "field_module": "django_filters.filters",
-               "lookup_expr": "exact",
-               "choices": [
-                   [
-                       "method_name",
-                       "Method name"
-                   ],
-                   [
-                       "-method_name",
-                       "Method name (descending)"
-                   ],
-                   [
-                       "duration",
-                       "Duration"
-                   ],
-                   [
-                       "-duration",
-                       "Duration (descending)"
-                   ],
-                   [
-                       "cpu_usage",
-                       "Cpu usage"
-                   ],
-                   [
-                       "-cpu_usage",
-                       "Cpu usage (descending)"
-                   ],
-                   [
-                       "outcome",
-                       "Outcome"
-                   ],
-                   [
-                       "-outcome",
-                       "Outcome (descending)"
-                   ],
-                   [
-                       "id",
-                       "Id"
-                   ],
-                   [
-                       "-id",
-                       "Id (descending)"
-                   ],
-                   [
-                       "date",
-                       "Date"
-                   ],
-                   [
-                       "-date",
-                       "Date (descending)"
-                   ],
-                   [
-                       "type",
-                       "Type"
-                   ],
-                   [
-                       "-type",
-                       "Type (descending)"
-                   ],
-                   [
-                       "repo",
-                       "Repo"
-                   ],
-                   [
-                       "-repo",
-                       "Repo (descending)"
-                   ],
-                   [
-                       "plan",
-                       "Plan"
-                   ],
-                   [
-                       "-plan",
-                       "Plan (descending)"
-                   ],
-                   [
-                       "branch",
-                       "Branch"
-                   ],
-                   [
-                       "-branch",
-                       "Branch (descending)"
-                   ],
-                   [
-                       "flow",
-                       "Flow"
-                   ],
-                   [
-                       "-flow",
-                       "Flow (descending)"
-                   ]
-               ]
-           }
-       ],
-       "defaults": {
-           "build_flows_limit": 100,
-           "page_size": 50,
-           "max_page_size": 100
-       }
-   },
-   "debug": true
+    "buildflow_filters": [
+        {
+            "name": "repo",
+            "label": "Repo Name",
+            "field_type": "ChoiceField",
+            "field_module": "django_filters.fields",
+            "lookup_expr": "exact",
+            "choices": [
+                [
+                    "Affiliations",
+                    "Affiliations"
+                ],
+                [
+                    "CampaignTools",
+                    "CampaignTools"
+                ],
+                [
+                    "Contacts_and_Organizations",
+                    "Contacts_and_Organizations"
+                ],
+                [
+                    "Cumulus",
+                    "Cumulus"
+                ],
+                [
+                    "CumulusCI-Test",
+                    "CumulusCI-Test"
+                ],
+                [
+                    "HEDAP",
+                    "HEDAP"
+                ],
+                [
+                    "Households",
+                    "Households"
+                ],
+                [
+                    "Recurring_Donations",
+                    "Recurring_Donations"
+                ],
+                [
+                    "Relationships",
+                    "Relationships"
+                ],
+                [
+                    "Volunteers-for-Salesforce",
+                    "Volunteers-for-Salesforce"
+                ]
+            ]
+        },
+        {
+            "name": "branch",
+            "label": "Branch Name",
+            "field_type": "ChoiceField",
+            "field_module": "django_filters.fields",
+            "lookup_expr": "exact",
+            "choices": [
+                [
+                    "BGE-edge-bug-demo",
+                    "BGE-edge-bug-demo"
+                ],
+                [
+                    "CumulusCI",
+                    "CumulusCI"
+                ],
+                [
+                    "Edge-bug-object-expected",
+                    "Edge-bug-object-expected"
+                ],
+                [
+                    "add_browsertest_flow",
+                    "add_browsertest_flow"
+                ],
+                [
+                    "add_browsertests_to_repo",
+                    "add_browsertests_to_repo"
+                ],
+                [
+                    "cdcarter-patch-1",
+                    "cdcarter-patch-1"
+                ],
+                [
+                    "config_scratch_org",
+                    "config_scratch_org"
+                ],
+                [
+                    "dashattuck-patch-1",
+                    "dashattuck-patch-1"
+                ],
+                [
+                    "df18-robot-demo",
+                    "df18-robot-demo"
+                ],
+                [
+                    "df18/booth-demo",
+                    "df18/booth-demo"
+                ],
+                [
+                    "do-not-merge/BGE",
+                    "do-not-merge/BGE"
+                ],
+                [
+                    "do-not-merge/BGE-LC__Refactor_BDI_field_mappings_as_Custom_Metadata_Types",
+                    "do-not-merge/BGE-LC__Refactor_BDI_field_mappings_as_Custom_Metadata_Types"
+                ],
+                [
+                    "do-not-merge/BGE-LC__Refactor_BDI_field_mappings_as_Custom_Metadata_Types_with_references",
+                    "do-not-merge/BGE-LC__Refactor_BDI_field_mappings_as_Custom_Metadata_Types_with_references"
+                ],
+                [
+                    "do-not-merge/BGE-LC__pilot-2018OCT",
+                    "do-not-merge/BGE-LC__pilot-2018OCT"
+                ],
+                [
+                    "do-not-merge/autocomplete-lightning-component-examples",
+                    "do-not-merge/autocomplete-lightning-component-examples"
+                ],
+                [
+                    "do-not-merge/bge-template-ui-poc",
+                    "do-not-merge/bge-template-ui-poc"
+                ],
+                [
+                    "do-not-merge/fake-data-generator",
+                    "do-not-merge/fake-data-generator"
+                ],
+                [
+                    "enablerecord",
+                    "enablerecord"
+                ],
+                [
+                    "feature/1592-ui-text-changes",
+                    "feature/1592-ui-text-changes"
+                ],
+                [
+                    "feature/93-clone",
+                    "feature/93-clone"
+                ],
+                [
+                    "feature/989-misc-updates-djh",
+                    "feature/989-misc-updates-djh"
+                ],
+                [
+                    "feature/BGE-Wizard-Order_Opportunity_Payment_fields_getting_inverted-Sorting_alphabetically",
+                    "feature/BGE-Wizard-Order_Opportunity_Payment_fields_getting_inverted-Sorting_alphabetically"
+                ],
+                [
+                    "feature/BGE-unresponsive-scroll",
+                    "feature/BGE-unresponsive-scroll"
+                ],
+                [
+                    "feature/KJ_ContactJobMassEdit",
+                    "feature/KJ_ContactJobMassEdit"
+                ],
+                [
+                    "feature/add-RecurringDonations_AddDonationsBTN",
+                    "feature/add-RecurringDonations_AddDonationsBTN"
+                ],
+                [
+                    "feature/add-class-to-fix-2.x-upgrades",
+                    "feature/add-class-to-fix-2.x-upgrades"
+                ],
+                [
+                    "feature/always_rollup_label_helptext",
+                    "feature/always_rollup_label_helptext"
+                ],
+                [
+                    "feature/bamboo",
+                    "feature/bamboo"
+                ],
+                [
+                    "feature/bge-any-lookup",
+                    "feature/bge-any-lookup"
+                ],
+                [
+                    "feature/bge-apply-new-payment",
+                    "feature/bge-apply-new-payment"
+                ],
+                [
+                    "feature/bge-apply-new-payment-test-refactor",
+                    "feature/bge-apply-new-payment-test-refactor"
+                ],
+                [
+                    "feature/bge-campaign-lookup",
+                    "feature/bge-campaign-lookup"
+                ],
+                [
+                    "feature/bge-perms-mock-refactor",
+                    "feature/bge-perms-mock-refactor"
+                ],
+                [
+                    "feature/bge-record-type-unmapped-fix",
+                    "feature/bge-record-type-unmapped-fix"
+                ],
+                [
+                    "feature/browsertest-css-fix",
+                    "feature/browsertest-css-fix"
+                ],
+                [
+                    "feature/cci2cleanup",
+                    "feature/cci2cleanup"
+                ],
+                [
+                    "feature/cciflowsyntax",
+                    "feature/cciflowsyntax"
+                ],
+                [
+                    "feature/ccikeyout",
+                    "feature/ccikeyout"
+                ],
+                [
+                    "feature/ceiroa/template-update",
+                    "feature/ceiroa/template-update"
+                ],
+                [
+                    "feature/code-owners-test",
+                    "feature/code-owners-test"
+                ],
+                [
+                    "feature/cumulusci-cleanup",
+                    "feature/cumulusci-cleanup"
+                ],
+                [
+                    "feature/cumulusci2",
+                    "feature/cumulusci2"
+                ],
+                [
+                    "feature/delete-reports",
+                    "feature/delete-reports"
+                ],
+                [
+                    "feature/dev_site",
+                    "feature/dev_site"
+                ],
+                [
+                    "feature/emoji-test",
+                    "feature/emoji-test"
+                ],
+                [
+                    "feature/failing-robot-with-screenshot",
+                    "feature/failing-robot-with-screenshot"
+                ],
+                [
+                    "feature/fieldsetfix",
+                    "feature/fieldsetfix"
+                ],
+                [
+                    "feature/fix-component-deletion",
+                    "feature/fix-component-deletion"
+                ],
+                [
+                    "feature/fix-deleted-reference-translation",
+                    "feature/fix-deleted-reference-translation"
+                ],
+                [
+                    "feature/fix-task-util-import",
+                    "feature/fix-task-util-import"
+                ],
+                [
+                    "feature/j",
+                    "feature/j"
+                ],
+                [
+                    "feature/jbrandolini/rebrandAdvancementToGEM",
+                    "feature/jbrandolini/rebrandAdvancementToGEM"
+                ],
+                [
+                    "feature/jbrandolini/updateForSettingsChangesInGEM",
+                    "feature/jbrandolini/updateForSettingsChangesInGEM"
+                ],
+                [
+                    "feature/jbury-english-translation",
+                    "feature/jbury-english-translation"
+                ],
+                [
+                    "feature/jbury-german-translation",
+                    "feature/jbury-german-translation"
+                ],
+                [
+                    "feature/jbury-japanese-translation",
+                    "feature/jbury-japanese-translation"
+                ],
+                [
+                    "feature/jen-async-contact-merge",
+                    "feature/jen-async-contact-merge"
+                ],
+                [
+                    "feature/jen-async-contact-merge__acct-crlp",
+                    "feature/jen-async-contact-merge__acct-crlp"
+                ],
+                [
+                    "feature/jen-async-contact-merge__queueable",
+                    "feature/jen-async-contact-merge__queueable"
+                ],
+                [
+                    "feature/jen-disable-reports",
+                    "feature/jen-disable-reports"
+                ],
+                [
+                    "feature/jen-dutch-updates",
+                    "feature/jen-dutch-updates"
+                ],
+                [
+                    "feature/jen-fix-dutch",
+                    "feature/jen-fix-dutch"
+                ],
+                [
+                    "feature/joy-translation-update-aff",
+                    "feature/joy-translation-update-aff"
+                ],
+                [
+                    "feature/joy-translation-update-hh",
+                    "feature/joy-translation-update-hh"
+                ],
+                [
+                    "feature/joy-translation-update-rd",
+                    "feature/joy-translation-update-rd"
+                ],
+                [
+                    "feature/joy-translation-update-rel",
+                    "feature/joy-translation-update-rel"
+                ],
+                [
+                    "feature/kj-triggertest",
+                    "feature/kj-triggertest"
+                ],
+                [
+                    "feature/kofi-deprecated_components_removal",
+                    "feature/kofi-deprecated_components_removal"
+                ],
+                [
+                    "feature/laura-bdi-data-import-service-refactor",
+                    "feature/laura-bdi-data-import-service-refactor"
+                ],
+                [
+                    "feature/mbci-demo",
+                    "feature/mbci-demo"
+                ],
+                [
+                    "feature/mblanski/totalRequiredCredits",
+                    "feature/mblanski/totalRequiredCredits"
+                ],
+                [
+                    "feature/metadeploy-test-flows",
+                    "feature/metadeploy-test-flows"
+                ],
+                [
+                    "feature/mike-2324-deprecate-campaign-household-mailing-list-report",
+                    "feature/mike-2324-deprecate-campaign-household-mailing-list-report"
+                ],
+                [
+                    "feature/msmith/crlp-api-get-rollup-defs",
+                    "feature/msmith/crlp-api-get-rollup-defs"
+                ],
+                [
+                    "feature/msmith/crlp-ldv-batch-query-proof-of-concept",
+                    "feature/msmith/crlp-ldv-batch-query-proof-of-concept"
+                ],
+                [
+                    "feature/msmith/crlp-validation-script-updates",
+                    "feature/msmith/crlp-validation-script-updates"
+                ],
+                [
+                    "feature/msmith/parallel-test-jan2019",
+                    "feature/msmith/parallel-test-jan2019"
+                ],
+                [
+                    "feature/msmith/test-not-insert-tdtm-for-unit-tests",
+                    "feature/msmith/test-not-insert-tdtm-for-unit-tests"
+                ],
+                [
+                    "feature/newtesttask",
+                    "feature/newtesttask"
+                ],
+                [
+                    "feature/nina-alloc-del-msg",
+                    "feature/nina-alloc-del-msg"
+                ],
+                [
+                    "feature/org-deffos",
+                    "feature/org-deffos"
+                ],
+                [
+                    "feature/parent",
+                    "feature/parent"
+                ],
+                [
+                    "feature/parent-child-test",
+                    "feature/parent-child-test"
+                ],
+                [
+                    "feature/parent__child1",
+                    "feature/parent__child1"
+                ],
+                [
+                    "feature/payment-allocations",
+                    "feature/payment-allocations"
+                ],
+                [
+                    "feature/payment-allocations__customizable-rollups",
+                    "feature/payment-allocations__customizable-rollups"
+                ],
+                [
+                    "feature/payment-allocations__pmt-to-opp-sync",
+                    "feature/payment-allocations__pmt-to-opp-sync"
+                ],
+                [
+                    "feature/podname",
+                    "feature/podname"
+                ],
+                [
+                    "feature/portland-sprint",
+                    "feature/portland-sprint"
+                ],
+                [
+                    "feature/preflight",
+                    "feature/preflight"
+                ],
+                [
+                    "feature/prince-bge-grid-save-button-bug",
+                    "feature/prince-bge-grid-save-button-bug"
+                ],
+                [
+                    "feature/radmila-override-soft-credit-automation",
+                    "feature/radmila-override-soft-credit-automation"
+                ],
+                [
+                    "feature/remove-RecurringDonations_AddDonationsBTN",
+                    "feature/remove-RecurringDonations_AddDonationsBTN"
+                ],
+                [
+                    "feature/remove-unused-static-resources",
+                    "feature/remove-unused-static-resources"
+                ],
+                [
+                    "feature/require-npe01-3.8",
+                    "feature/require-npe01-3.8"
+                ],
+                [
+                    "feature/revert-signup-link",
+                    "feature/revert-signup-link"
+                ],
+                [
+                    "feature/robot",
+                    "feature/robot"
+                ],
+                [
+                    "feature/robot__automation-session-records-cleanup",
+                    "feature/robot__automation-session-records-cleanup"
+                ],
+                [
+                    "feature/robot__bge-automation",
+                    "feature/robot__bge-automation"
+                ],
+                [
+                    "feature/rwatson/facilityMetadata",
+                    "feature/rwatson/facilityMetadata"
+                ],
+                [
+                    "feature/rwatson/fixBulkPreferred",
+                    "feature/rwatson/fixBulkPreferred"
+                ],
+                [
+                    "feature/rwatson/updatePEAffiliationStatusBugFix",
+                    "feature/rwatson/updatePEAffiliationStatusBugFix"
+                ],
+                [
+                    "feature/settings-string-review",
+                    "feature/settings-string-review"
+                ],
+                [
+                    "feature/shackle-breaker",
+                    "feature/shackle-breaker"
+                ],
+                [
+                    "feature/something",
+                    "feature/something"
+                ],
+                [
+                    "feature/spanish-translation-update",
+                    "feature/spanish-translation-update"
+                ],
+                [
+                    "feature/spelak/W-030505",
+                    "feature/spelak/W-030505"
+                ],
+                [
+                    "feature/test-cumulusci-feature-build",
+                    "feature/test-cumulusci-feature-build"
+                ],
+                [
+                    "feature/test-fail",
+                    "feature/test-fail"
+                ],
+                [
+                    "feature/waitlist",
+                    "feature/waitlist"
+                ],
+                [
+                    "feature/wei/multipletribute",
+                    "feature/wei/multipletribute"
+                ],
+                [
+                    "gh-pages",
+                    "gh-pages"
+                ],
+                [
+                    "installpreflight",
+                    "installpreflight"
+                ],
+                [
+                    "main",
+                    "main"
+                ],
+                [
+                    "msmith/field-history-tracking-unmanaged-app",
+                    "msmith/field-history-tracking-unmanaged-app"
+                ],
+                [
+                    "msmith/save-for-now-2684-sandbox-scheduled-jobs-issue",
+                    "msmith/save-for-now-2684-sandbox-scheduled-jobs-issue"
+                ],
+                [
+                    "msmith/save/parallel-unit-tests-june2017",
+                    "msmith/save/parallel-unit-tests-june2017"
+                ],
+                [
+                    "opp-hierarchy-sprint-project",
+                    "opp-hierarchy-sprint-project"
+                ],
+                [
+                    "parallel-test-scratch-org",
+                    "parallel-test-scratch-org"
+                ],
+                [
+                    "recreate_email_templates",
+                    "recreate_email_templates"
+                ],
+                [
+                    "recurring-donation-allocation-test",
+                    "recurring-donation-allocation-test"
+                ],
+                [
+                    "shared-autocomplete",
+                    "shared-autocomplete"
+                ],
+                [
+                    "spike/ben/formlayout",
+                    "spike/ben/formlayout"
+                ],
+                [
+                    "tag: beta/1.7-Beta_544",
+                    "tag: beta/1.7-Beta_544"
+                ],
+                [
+                    "tag: beta/1.7-Beta_545",
+                    "tag: beta/1.7-Beta_545"
+                ],
+                [
+                    "tag: beta/1.7-Beta_546",
+                    "tag: beta/1.7-Beta_546"
+                ],
+                [
+                    "tag: beta/1.7-Beta_547",
+                    "tag: beta/1.7-Beta_547"
+                ],
+                [
+                    "tag: beta/1.7-Beta_548",
+                    "tag: beta/1.7-Beta_548"
+                ],
+                [
+                    "tag: beta/1.7-Beta_549",
+                    "tag: beta/1.7-Beta_549"
+                ],
+                [
+                    "tag: beta/1.7-Beta_550",
+                    "tag: beta/1.7-Beta_550"
+                ],
+                [
+                    "tag: beta/1.7-Beta_551",
+                    "tag: beta/1.7-Beta_551"
+                ],
+                [
+                    "tag: beta/1.7-Beta_552",
+                    "tag: beta/1.7-Beta_552"
+                ],
+                [
+                    "tag: beta/1.7-Beta_553",
+                    "tag: beta/1.7-Beta_553"
+                ],
+                [
+                    "tag: beta/3.110-Beta_1",
+                    "tag: beta/3.110-Beta_1"
+                ],
+                [
+                    "tempBranchForDocs",
+                    "tempBranchForDocs"
+                ],
+                [
+                    "updateqalist",
+                    "updateqalist"
+                ]
+            ]
+        },
+        {
+            "name": "plan",
+            "label": "Plan Name",
+            "field_type": "ChoiceField",
+            "field_module": "django_filters.fields",
+            "lookup_expr": "exact",
+            "choices": [
+                [
+                    "Beta Test",
+                    "Beta Test"
+                ],
+                [
+                    "Beta Test - Robot",
+                    "Beta Test - Robot"
+                ],
+                [
+                    "Beta Test: Browsertest",
+                    "Beta Test: Browsertest"
+                ],
+                [
+                    "Beta Test: Browsertest Nightly",
+                    "Beta Test: Browsertest Nightly"
+                ],
+                [
+                    "Beta Test: Lightning",
+                    "Beta Test: Lightning"
+                ],
+                [
+                    "Beta Test: Middlename/Suffix",
+                    "Beta Test: Middlename/Suffix"
+                ],
+                [
+                    "Beta Test: Multicurrency",
+                    "Beta Test: Multicurrency"
+                ],
+                [
+                    "Beta Test: Offset Fiscal",
+                    "Beta Test: Offset Fiscal"
+                ],
+                [
+                    "Beta Test: Person Accounts",
+                    "Beta Test: Person Accounts"
+                ],
+                [
+                    "Beta Test: State/Country Picklist",
+                    "Beta Test: State/Country Picklist"
+                ],
+                [
+                    "Deploy to ldv100k",
+                    "Deploy to ldv100k"
+                ],
+                [
+                    "Deploy to ldv1k",
+                    "Deploy to ldv1k"
+                ],
+                [
+                    "Feature Browser Test",
+                    "Feature Browser Test"
+                ],
+                [
+                    "Feature Test",
+                    "Feature Test"
+                ],
+                [
+                    "Feature Test - HEDA",
+                    "Feature Test - HEDA"
+                ],
+                [
+                    "Feature Test - Namespaced",
+                    "Feature Test - Namespaced"
+                ],
+                [
+                    "Feature Test Parallel",
+                    "Feature Test Parallel"
+                ],
+                [
+                    "Feature Test: Robot",
+                    "Feature Test: Robot"
+                ],
+                [
+                    "Feature Test: Robot Unstable",
+                    "Feature Test: Robot Unstable"
+                ],
+                [
+                    "Release Deploy",
+                    "Release Deploy"
+                ],
+                [
+                    "Release Test",
+                    "Release Test"
+                ],
+                [
+                    "Upload Beta",
+                    "Upload Beta"
+                ],
+                [
+                    "Upload Release",
+                    "Upload Release"
+                ]
+            ]
+        },
+        {
+            "name": "flow",
+            "label": "Flow Name",
+            "field_type": "ChoiceField",
+            "field_module": "django_filters.fields",
+            "lookup_expr": "exact",
+            "choices": [
+                [
+                    "ci_beta",
+                    "ci_beta"
+                ],
+                [
+                    "ci_beta_install",
+                    "ci_beta_install"
+                ],
+                [
+                    "ci_browsertests_chrome",
+                    "ci_browsertests_chrome"
+                ],
+                [
+                    "ci_browsertests_unmanaged_firefox",
+                    "ci_browsertests_unmanaged_firefox"
+                ],
+                [
+                    "ci_feature",
+                    "ci_feature"
+                ],
+                [
+                    "ci_master",
+                    "ci_master"
+                ],
+                [
+                    "ci_release",
+                    "ci_release"
+                ],
+                [
+                    "config_multicurrency",
+                    "config_multicurrency"
+                ],
+                [
+                    "config_offsetfiscal",
+                    "config_offsetfiscal"
+                ],
+                [
+                    "dev_org",
+                    "dev_org"
+                ],
+                [
+                    "install_beta",
+                    "install_beta"
+                ],
+                [
+                    "qa_org",
+                    "qa_org"
+                ],
+                [
+                    "release_beta",
+                    "release_beta"
+                ],
+                [
+                    "release_prod",
+                    "release_prod"
+                ],
+                [
+                    "robot",
+                    "robot"
+                ],
+                [
+                    "robot_unstable",
+                    "robot_unstable"
+                ],
+                [
+                    "test_data_1k",
+                    "test_data_1k"
+                ],
+                [
+                    "uninstall_managed",
+                    "uninstall_managed"
+                ],
+                [
+                    "unmanaged_ee",
+                    "unmanaged_ee"
+                ]
+            ]
+        },
+        {
+            "name": "daterange",
+            "label": "Date range",
+            "field_type": "DateRangeField",
+            "field_module": "django_filters.fields",
+            "lookup_expr": "exact"
+        }
+    ],
+    "testmethod_perf": {
+        "includable_fields": [
+            [
+                "duration_average",
+                "Duration: Average"
+            ],
+            [
+                "duration_slow",
+                "Duration: Slow"
+            ],
+            [
+                "duration_fast",
+                "Duration: Fast"
+            ],
+            [
+                "duration_stddev",
+                "Duration: Stddev"
+            ],
+            [
+                "duration_coefficient_var",
+                "Duration: VarCoef"
+            ],
+            [
+                "cpu_usage_average",
+                "CPU Usage: Average"
+            ],
+            [
+                "cpu_usage_low",
+                "CPU Usage: Low"
+            ],
+            [
+                "cpu_usage_high",
+                "CPU Usage: High"
+            ],
+            [
+                "count",
+                "Count"
+            ],
+            [
+                "failures",
+                "Failures"
+            ],
+            [
+                "assertion_failures",
+                "Assertion Failures"
+            ],
+            [
+                "DML_failures",
+                "DML Failures"
+            ],
+            [
+                "Other_failures",
+                "Other Failures"
+            ],
+            [
+                "success_percentage",
+                "Success Percentage"
+            ],
+            [
+                "repo",
+                "repo"
+            ],
+            [
+                "plan",
+                "plan"
+            ],
+            [
+                "branch",
+                "branch"
+            ],
+            [
+                "flow",
+                "flow"
+            ]
+        ],
+        "filters": [
+            {
+                "name": "build_flows_limit",
+                "label": "Build Flows Limit (default: 100)",
+                "field_type": "DecimalField",
+                "field_module": "django.forms.fields",
+                "lookup_expr": "exact",
+                "initial": 100
+            },
+            {
+                "name": "success_percentage_gt",
+                "label": "Success percentage above",
+                "field_type": "DecimalField",
+                "field_module": "django.forms.fields",
+                "lookup_expr": "gt"
+            },
+            {
+                "name": "success_percentage_lt",
+                "label": "Success percentage below",
+                "field_type": "DecimalField",
+                "field_module": "django.forms.fields",
+                "lookup_expr": "lt"
+            },
+            {
+                "name": "count_gt",
+                "label": "Count above",
+                "field_type": "DecimalField",
+                "field_module": "django.forms.fields",
+                "lookup_expr": "gt"
+            },
+            {
+                "name": "count_lt",
+                "label": "Count below",
+                "field_type": "DecimalField",
+                "field_module": "django.forms.fields",
+                "lookup_expr": "lt"
+            },
+            {
+                "name": "method_name",
+                "label": "Method Name",
+                "field_type": "CharField",
+                "field_module": "django.forms.fields",
+                "lookup_expr": "icontains"
+            },
+            {
+                "name": "include_fields",
+                "label": "Include (multi-select okay)",
+                "field_type": "MultipleChoiceField",
+                "field_module": "django_filters.fields",
+                "lookup_expr": "exact",
+                "choices": [
+                    [
+                        "duration_average",
+                        "Duration: Average"
+                    ],
+                    [
+                        "duration_slow",
+                        "Duration: Slow"
+                    ],
+                    [
+                        "duration_fast",
+                        "Duration: Fast"
+                    ],
+                    [
+                        "duration_stddev",
+                        "Duration: Stddev"
+                    ],
+                    [
+                        "duration_coefficient_var",
+                        "Duration: VarCoef"
+                    ],
+                    [
+                        "cpu_usage_average",
+                        "CPU Usage: Average"
+                    ],
+                    [
+                        "cpu_usage_low",
+                        "CPU Usage: Low"
+                    ],
+                    [
+                        "cpu_usage_high",
+                        "CPU Usage: High"
+                    ],
+                    [
+                        "count",
+                        "Count"
+                    ],
+                    [
+                        "failures",
+                        "Failures"
+                    ],
+                    [
+                        "assertion_failures",
+                        "Assertion Failures"
+                    ],
+                    [
+                        "DML_failures",
+                        "DML Failures"
+                    ],
+                    [
+                        "Other_failures",
+                        "Other Failures"
+                    ],
+                    [
+                        "success_percentage",
+                        "Success Percentage"
+                    ],
+                    [
+                        "repo",
+                        "repo"
+                    ],
+                    [
+                        "plan",
+                        "plan"
+                    ],
+                    [
+                        "branch",
+                        "branch"
+                    ],
+                    [
+                        "flow",
+                        "flow"
+                    ]
+                ],
+                "initial": [
+                    "repo",
+                    "duration_average"
+                ]
+            },
+            {
+                "name": "o",
+                "label": "Ordering",
+                "field_type": "ChoiceExactField",
+                "field_module": "django_filters.filters",
+                "lookup_expr": "exact",
+                "choices": [
+                    [
+                        "duration_average",
+                        "Duration average"
+                    ],
+                    [
+                        "-duration_average",
+                        "Duration average (descending)"
+                    ],
+                    [
+                        "duration_slow",
+                        "Duration slow"
+                    ],
+                    [
+                        "-duration_slow",
+                        "Duration slow (descending)"
+                    ],
+                    [
+                        "duration_fast",
+                        "Duration fast"
+                    ],
+                    [
+                        "-duration_fast",
+                        "Duration fast (descending)"
+                    ],
+                    [
+                        "duration_stddev",
+                        "Duration stddev"
+                    ],
+                    [
+                        "-duration_stddev",
+                        "Duration stddev (descending)"
+                    ],
+                    [
+                        "duration_coefficient_var",
+                        "Duration coefficient var"
+                    ],
+                    [
+                        "-duration_coefficient_var",
+                        "Duration coefficient var (descending)"
+                    ],
+                    [
+                        "cpu_usage_average",
+                        "Cpu usage average"
+                    ],
+                    [
+                        "-cpu_usage_average",
+                        "Cpu usage average (descending)"
+                    ],
+                    [
+                        "cpu_usage_low",
+                        "Cpu usage low"
+                    ],
+                    [
+                        "-cpu_usage_low",
+                        "Cpu usage low (descending)"
+                    ],
+                    [
+                        "cpu_usage_high",
+                        "Cpu usage high"
+                    ],
+                    [
+                        "-cpu_usage_high",
+                        "Cpu usage high (descending)"
+                    ],
+                    [
+                        "count",
+                        "Count"
+                    ],
+                    [
+                        "-count",
+                        "Count (descending)"
+                    ],
+                    [
+                        "failures",
+                        "Failures"
+                    ],
+                    [
+                        "-failures",
+                        "Failures (descending)"
+                    ],
+                    [
+                        "assertion_failures",
+                        "Assertion failures"
+                    ],
+                    [
+                        "-assertion_failures",
+                        "Assertion failures (descending)"
+                    ],
+                    [
+                        "DML_failures",
+                        "Dml failures"
+                    ],
+                    [
+                        "-DML_failures",
+                        "Dml failures (descending)"
+                    ],
+                    [
+                        "Other_failures",
+                        "Other failures"
+                    ],
+                    [
+                        "-Other_failures",
+                        "Other failures (descending)"
+                    ],
+                    [
+                        "success_percentage",
+                        "Success percentage"
+                    ],
+                    [
+                        "-success_percentage",
+                        "Success percentage (descending)"
+                    ],
+                    [
+                        "repo",
+                        "Repo"
+                    ],
+                    [
+                        "-repo",
+                        "Repo (descending)"
+                    ],
+                    [
+                        "plan",
+                        "Plan"
+                    ],
+                    [
+                        "-plan",
+                        "Plan (descending)"
+                    ],
+                    [
+                        "branch",
+                        "Branch"
+                    ],
+                    [
+                        "-branch",
+                        "Branch (descending)"
+                    ],
+                    [
+                        "flow",
+                        "Flow"
+                    ],
+                    [
+                        "-flow",
+                        "Flow (descending)"
+                    ],
+                    [
+                        "method_name",
+                        "Method name"
+                    ],
+                    [
+                        "-method_name",
+                        "Method name (descending)"
+                    ]
+                ]
+            }
+        ],
+        "defaults": {
+            "build_flows_limit": 100,
+            "page_size": 50,
+            "max_page_size": 100
+        }
+    },
+    "testmethod_results": {
+        "includable_fields": [
+            [
+                "method_name",
+                "Method Name"
+            ],
+            [
+                "duration",
+                "Duration"
+            ],
+            [
+                "cpu_usage",
+                "CPU Usage"
+            ],
+            [
+                "outcome",
+                "Failures"
+            ],
+            [
+                "id",
+                "Id"
+            ],
+            [
+                "date",
+                "Date"
+            ],
+            [
+                "type",
+                "Type"
+            ],
+            [
+                "repo",
+                "repo"
+            ],
+            [
+                "plan",
+                "plan"
+            ],
+            [
+                "branch",
+                "branch"
+            ],
+            [
+                "flow",
+                "flow"
+            ]
+        ],
+        "filters": [
+            {
+                "name": "build_flows_limit",
+                "label": "Build Flows Limit (default: 100)",
+                "field_type": "DecimalField",
+                "field_module": "django.forms.fields",
+                "lookup_expr": "exact",
+                "initial": 100
+            },
+            {
+                "name": "method_name",
+                "label": "Method Name",
+                "field_type": "CharField",
+                "field_module": "django.forms.fields",
+                "lookup_expr": "icontains"
+            },
+            {
+                "name": "include_fields",
+                "label": "Include (multi-select okay)",
+                "field_type": "MultipleChoiceField",
+                "field_module": "django_filters.fields",
+                "lookup_expr": "exact",
+                "choices": [
+                    [
+                        "method_name",
+                        "Method Name"
+                    ],
+                    [
+                        "duration",
+                        "Duration"
+                    ],
+                    [
+                        "cpu_usage",
+                        "CPU Usage"
+                    ],
+                    [
+                        "outcome",
+                        "Failures"
+                    ],
+                    [
+                        "id",
+                        "Id"
+                    ],
+                    [
+                        "date",
+                        "Date"
+                    ],
+                    [
+                        "type",
+                        "Type"
+                    ],
+                    [
+                        "repo",
+                        "repo"
+                    ],
+                    [
+                        "plan",
+                        "plan"
+                    ],
+                    [
+                        "branch",
+                        "branch"
+                    ],
+                    [
+                        "flow",
+                        "flow"
+                    ]
+                ],
+                "initial": [
+                    "repo",
+                    "duration"
+                ]
+            },
+            {
+                "name": "o",
+                "label": "Ordering",
+                "field_type": "ChoiceExactField",
+                "field_module": "django_filters.filters",
+                "lookup_expr": "exact",
+                "choices": [
+                    [
+                        "method_name",
+                        "Method name"
+                    ],
+                    [
+                        "-method_name",
+                        "Method name (descending)"
+                    ],
+                    [
+                        "duration",
+                        "Duration"
+                    ],
+                    [
+                        "-duration",
+                        "Duration (descending)"
+                    ],
+                    [
+                        "cpu_usage",
+                        "Cpu usage"
+                    ],
+                    [
+                        "-cpu_usage",
+                        "Cpu usage (descending)"
+                    ],
+                    [
+                        "outcome",
+                        "Outcome"
+                    ],
+                    [
+                        "-outcome",
+                        "Outcome (descending)"
+                    ],
+                    [
+                        "id",
+                        "Id"
+                    ],
+                    [
+                        "-id",
+                        "Id (descending)"
+                    ],
+                    [
+                        "date",
+                        "Date"
+                    ],
+                    [
+                        "-date",
+                        "Date (descending)"
+                    ],
+                    [
+                        "type",
+                        "Type"
+                    ],
+                    [
+                        "-type",
+                        "Type (descending)"
+                    ],
+                    [
+                        "repo",
+                        "Repo"
+                    ],
+                    [
+                        "-repo",
+                        "Repo (descending)"
+                    ],
+                    [
+                        "plan",
+                        "Plan"
+                    ],
+                    [
+                        "-plan",
+                        "Plan (descending)"
+                    ],
+                    [
+                        "branch",
+                        "Branch"
+                    ],
+                    [
+                        "-branch",
+                        "Branch (descending)"
+                    ],
+                    [
+                        "flow",
+                        "Flow"
+                    ],
+                    [
+                        "-flow",
+                        "Flow (descending)"
+                    ]
+                ]
+            }
+        ],
+        "defaults": {
+            "build_flows_limit": 100,
+            "page_size": 50,
+            "max_page_size": 100
+        }
+    },
+    "debug": true
 }
