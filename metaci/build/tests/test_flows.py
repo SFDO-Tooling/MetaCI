@@ -1,6 +1,8 @@
 import contextlib
 from pathlib import Path, PurePath
+from shutil import copyfile
 from unittest import mock
+
 
 import pytest
 from cumulusci.utils import temporary_dir, touch
@@ -78,7 +80,7 @@ def test_post_task__single_robot_task(get_spec):
         touch(output_dir / "selenium-screenshot-1.png")
         touch(output_dir / "selenium-screenshot-2.png")
 
-        copy_file(
+        copyfile(
             (TEST_ROBOT_OUTPUT_FILES / "robot_screenshots.xml"),
             (output_dir / "output.xml"),
         )
@@ -124,7 +126,7 @@ def test_post_task__multiple_robot_tasks(get_spec):
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
 
-        copy_file(
+        copyfile(
             (TEST_ROBOT_OUTPUT_FILES / "robot_1.xml"), (output_dir / "output.xml"),
         )
 
@@ -166,7 +168,7 @@ def test_post_task__multiple_robot_tasks(get_spec):
         touch(output_dir / "selenium-screenshot-1.png")
         touch(output_dir / "selenium-screenshot-2.png")
 
-        copy_file(
+        copyfile(
             (TEST_ROBOT_OUTPUT_FILES / "robot_screenshots.xml"),
             (output_dir / "output.xml"),
         )
@@ -195,13 +197,6 @@ def test_post_task__multiple_robot_tasks(get_spec):
 
         # Three tests total between the two output files
         assert 3 == TestMethod.objects.all().count()
-
-
-def copy_file(input_file, output_file):
-    """Copy contents of input_file to output_file"""
-    with open(input_file) as in_file:
-        with open(output_file, mode="w+") as out_file:
-            out_file.writelines(in_file.readlines())
 
 
 class TestException(Exception):
