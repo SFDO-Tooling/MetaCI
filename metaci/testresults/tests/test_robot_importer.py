@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
 from unittest import mock
+from shutil import copyfile
 
 import pytest
 from cumulusci.utils import elementtree_parse_file, temporary_dir
@@ -11,7 +12,7 @@ from metaci.build.exceptions import BuildError
 from metaci.build.models import BuildFlowAsset
 from metaci.conftest import FlowTaskFactory
 from metaci.testresults import models, robot_importer
-from metaci.build.tests.test_flows import copy_file, TEST_ROBOT_OUTPUT_FILES
+from metaci.build.tests.test_flows import TEST_ROBOT_OUTPUT_FILES
 
 
 @pytest.mark.django_db
@@ -23,7 +24,7 @@ def test_invalid_test_result_filepath():
 @pytest.mark.django_db
 def test_nested_suites():
     with temporary_dir() as output_dir:
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_nested_suites.xml",
             Path(output_dir) / "output.xml",
         )
@@ -41,7 +42,7 @@ def test_nested_suites():
 @pytest.mark.django_db
 def test_basic_parsing():
     with temporary_dir() as output_dir:
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_1.xml", Path(output_dir) / "output.xml",
         )
 
@@ -54,7 +55,7 @@ def test_basic_parsing():
 @pytest.mark.django_db
 def test_duration_calculations():
     with temporary_dir() as output_dir:
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_setup_teardown.xml",
             Path(output_dir) / "output.xml",
         )
@@ -91,7 +92,7 @@ def test_field_robot_task():
 
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_setup_teardown.xml",
             output_dir / "output.xml",
         )
@@ -123,7 +124,7 @@ def test_field_robot_task():
 def test_import_all_tests():
     """Verifies that we import all tests in a suite"""
     with temporary_dir() as output_dir:
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
             Path(output_dir) / "output.xml",
         )
@@ -139,7 +140,7 @@ def test_import_all_tests():
 def test_field_keyword_and_message():
     """Verify that the keyword and message fields are populated"""
     with temporary_dir() as output_dir:
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
             Path(output_dir) / "output.xml",
         )
@@ -154,7 +155,7 @@ def test_field_keyword_and_message():
 def test_field_keyword_and_message_nested_keywords():
     """Verify that the keyword and message fields are set when failure is in a nested keyword"""
     with temporary_dir() as output_dir:
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
             Path(output_dir) / "output.xml",
         )
@@ -169,7 +170,7 @@ def test_field_keyword_and_message_nested_keywords():
 def test_field_keyword_and_message_passing_test():
     """Verify that the failing_keyword field is set correctly for passing tests"""
     with temporary_dir() as output_dir:
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
             Path(output_dir) / "output.xml",
         )
@@ -184,7 +185,7 @@ def test_field_keyword_and_message_passing_test():
 def test_import_robot_tags():
     """Verify that robot tags are added to the database"""
     with temporary_dir() as output_dir:
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_1.xml", Path(output_dir) / "output.xml",
         )
         robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
@@ -201,7 +202,7 @@ def test_execution_errors():
     that execution errors appear in imported test results.
     """
     with temporary_dir() as output_dir:
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_import_errors.xml",
             Path(output_dir) / "output.xml",
         )
@@ -229,7 +230,7 @@ def test_screenshots_generated():
     """
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
-        copy_file(
+        copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_screenshots.xml",
             output_dir / "output.xml",
         )
