@@ -3,7 +3,7 @@ from pathlib import Path, PurePath
 from unittest import mock
 
 import pytest
-from cumulusci.utils import temporary_dir
+from cumulusci.utils import temporary_dir, touch
 from cumulusci.core.flowrunner import StepResult, StepSpec
 from cumulusci.tasks.robotframework.robotframework import Robot
 
@@ -75,9 +75,9 @@ def test_post_task__result_has_exception(get_spec):
 def test_post_task__single_robot_task(get_spec):
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
-        open((output_dir / "selenium-screenshot-1.png"), mode="w+")
-        open((output_dir / "selenium-screenshot-2.png"), mode="w+")
-        # copy sample test file to output.xml file being used in the test
+        touch(output_dir / "selenium-screenshot-1.png")
+        touch(output_dir / "selenium-screenshot-2.png")
+
         copy_file(
             (TEST_ROBOT_OUTPUT_FILES / "robot_screenshots.xml"),
             (output_dir / "output.xml"),
@@ -123,7 +123,7 @@ def test_post_task__multiple_robot_tasks(get_spec):
     assets are created and associated with the correct related objects."""
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
-        # copy sample test file to output.xml file being used in the test
+
         copy_file(
             (TEST_ROBOT_OUTPUT_FILES / "robot_1.xml"), (output_dir / "output.xml"),
         )
@@ -163,10 +163,9 @@ def test_post_task__multiple_robot_tasks(get_spec):
             exception=None,
         )
 
-        # create screenshots for the robot_screenshots.xml
-        open((output_dir / "selenium-screenshot-1.png"), mode="w+")
-        open((output_dir / "selenium-screenshot-2.png"), mode="w+")
-        # copy sample test file to output.xml file being used in the test
+        touch(output_dir / "selenium-screenshot-1.png")
+        touch(output_dir / "selenium-screenshot-2.png")
+
         copy_file(
             (TEST_ROBOT_OUTPUT_FILES / "robot_screenshots.xml"),
             (output_dir / "output.xml"),
