@@ -1,6 +1,6 @@
-import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 import BrandBand from '@salesforce/design-system-react/components/brand-band';
 import Illustration from '@salesforce/design-system-react/components/illustration';
+import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
 import svgPath from 'images/broken.svg';
 import get from 'lodash/get';
 import * as React from 'react';

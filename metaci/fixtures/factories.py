@@ -99,7 +99,7 @@ class BranchFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Branch
 
-    name = factory.fuzzy.FuzzyChoice(["master", "branch1", "branch2"])
+    name = factory.fuzzy.FuzzyChoice(["main", "branch1", "branch2"])
     repo = factory.SubFactory(RepositoryFactory)
 
 

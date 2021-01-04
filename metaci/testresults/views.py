@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.clickjacking import xframe_options_exempt
 from robot import rebot
 
-from metaci.build.models import Build, BuildFlow
+from metaci.build.models import Build, BuildFlow, BuildFlowAsset
 from metaci.build.utils import paginate
 from metaci.testresults.filters import BuildFlowFilter
 from metaci.testresults.importer import STATS_MAP
@@ -311,9 +311,7 @@ def test_method_trend(request, method_id):
     return render(request, "testresults/test_method_trend.html", data)
 
 
-def build_flow_compare(
-    request,
-):
+def build_flow_compare(request,):
     """ compare two buildflows for their limits usage """
     execution1_id = request.GET.get("buildflow1", None)
     execution2_id = request.GET.get("buildflow2", None)
@@ -347,7 +345,7 @@ def build_flow_compare_to(request, build_id, flow):
     return render(request, "testresults/build_flow_compare_to.html", data)
 
 
-def build_flow_download_asset(request, build_id, flow, category):
+def build_flow_download_asset(request, build_id, flow, build_flow_asset_id):
     build_flow = find_buildflow(request, build_id, flow)
-    asset = build_flow.assets.get(category=category)
+    asset = build_flow.assets.get(id=build_flow_asset_id)
     return redirect(asset.asset.url)
