@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
+import json
 from ipaddress import IPv4Network
 from pathlib import Path
 from typing import List
@@ -64,7 +65,6 @@ THIRD_PARTY_APPS = (
     "guardian",  # Per Object Permissions via django-guardian
     "rest_framework",  # API
     "rest_framework.authtoken",
-    "scheduler",  # django-rq-scheduler
     "watson",  # Full text search
 )
 
@@ -339,6 +339,50 @@ RQ_QUEUES = {
     },
 }
 RQ_EXCEPTION_HANDLERS = ["metaci.build.exceptions.maybe_requeue_job"]
+CRON_JOBS = {
+    "autoscale": {
+        "func": "metaci.build.autoscaling.autoscale",
+        "cron_string": "* * * * *",
+    },
+    "check_waiting_builds": {
+        "func": "metaci.build.tasks.check_waiting_builds",
+        "cron_string": "* * * * *",
+    },
+    "daily_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_daily",
+        "cron_string": "0 0 * * *",
+    },
+    "hourly_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_hourly",
+        "cron_string": "0 * * * *",
+    },
+    "generate_summaries_job": {
+        "func": "metaci.testresults.tasks.generate_summaries",
+        "cron_string": "0,30 * * * *",
+    },
+    "prune_branches": {
+        "func": "metaci.repository.tasks.prune_branches",
+        "cron_string": "0 * * * *",
+    },
+}
+# There is a default dict of cron jobs,
+# and the cron_string can be optionally overridden
+# using JSON in the CRON_SCHEDULE environment variable.
+# CRON_SCHEDULE is a mapping from a name identifying the job
+# to a cron string specifying the schedule for the job,
+# or null to disable the job.
+cron_overrides = json.loads(env("CRON_SCHEDULE", default="{}"))
+if not isinstance(cron_overrides, dict):
+    raise TypeError("CRON_SCHEDULE must be a JSON object")
+for key, cron_string in cron_overrides.items():
+    if key in CRON_JOBS:
+        if cron_string is None:
+            del CRON_JOBS[key]
+        else:
+            CRON_JOBS[key]["cron_string"] = cron_string
+    else:
+        raise KeyError(key)
+
 
 # Site URL
 SITE_URL = None

@@ -98,10 +98,6 @@ data:
 
     ./manage.py populate_db
 
-Run this command to create a necessary repeatable django-rq job in the database::
-
-    ./manage.py metaci_scheduled_jobs
-
 
 Creating A Superuser
 ====================
