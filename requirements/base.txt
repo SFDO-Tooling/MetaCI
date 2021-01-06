@@ -25,7 +25,7 @@ django-model-utils==4.1.1
 django-guardian==2.3.0
 
 # Images
-Pillow==8.0.1
+Pillow==8.1.0
 
 # For user registration, either via email or social
 django-allauth==0.44.0
