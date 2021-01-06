@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import re_path
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 
@@ -34,4 +34,4 @@ router.register(r"robot", RobotTestResultViewSet, basename="robot")
 urlpatterns = router.urls
 
 schema_view = get_schema_view(title="MetaCI API")
-urlpatterns += (url(r"^schema/$", schema_view),)
+urlpatterns += (re_path(r"^schema/$", schema_view),)
