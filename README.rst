@@ -54,7 +54,7 @@ You can also fork the CumulusCI-Test repository and use that as a demo since it 
 Getting Started
 ---------------
 MetaCI can be run locally or configured for use on Heroku.
-For local setup see :ref: `running`.
+For local setup see `running <https://github.com/SFDO-Tooling/MetaCI/blob/main/docs/running.rst>`_.
 
 You can also reference `this session <https://www.youtube.com/watch?v=TN-e785MqBA>`_ from TrailheadDX '18 showing a live demo of how to configure `CumulusCI` and `MetaCI` for projects.
 
