@@ -56,13 +56,9 @@ Getting Started
 MetaCI can be run locally or configured for use on Heroku.
 For local setup see `running <https://github.com/SFDO-Tooling/MetaCI/blob/main/docs/running.rst>`_.
 
-You can also reference `this session <https://www.youtube.com/watch?v=TN-e785MqBA>`_ from TrailheadDX '18 showing a live demo of how to configure `CumulusCI` and `MetaCI` for projects.
-
-Or, if you feel like deploying manually and configuring through the Admin interface:
-
-.. image:: https://www.herokucdn.com/deploy/button.svg
-   :target: https://heroku.com/deploy
-
+We're currently working on improving our documentation for deploying MetaCI on Heroku.
+If you have questions about production setup, please reach out to the SFDO Release Engineering Team,
+or post a question on the `CumulusCI Trailblazer Community Group <https://trailblazers.salesforce.com/_ui/core/chatter/groups/GroupProfilePage?g=0F9300000009M9Z>`_.
 RQ Worker
 ^^^^^^^^^
 
