@@ -23,7 +23,7 @@ urlpatterns = [
         mbci_views.AboutView.as_view(template_name="pages/about.html"),
         name="about",
     ),
-    # Django Admin, use {%  re_path 'admin:index' %}
+    # Django Admin, use {%  url 'admin:index' %}
     re_path(settings.ADMIN_URL_ROUTE, admin.site.urls),
     # User management
     re_path(r"^users/", include("metaci.users.urls", namespace="users")),
@@ -49,7 +49,7 @@ handler403 = "metaci.views.custom_403"
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
-    # these  re_path in browser to see how these error pages look like.
+    # these paths in the browser to see how these error pages look.
     urlpatterns += [
         re_path(
             r"^400/$",
