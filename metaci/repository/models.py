@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import github3.exceptions
 from cumulusci.core.github import get_github_api_for_repo
 from django.apps import apps

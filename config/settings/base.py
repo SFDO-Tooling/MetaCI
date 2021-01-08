@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Django settings for metaci project.
 
@@ -8,8 +7,6 @@ https://docs.djangoproject.com/en/dev/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
-from __future__ import absolute_import, unicode_literals
-
 import json
 from ipaddress import IPv4Network
 from pathlib import Path
