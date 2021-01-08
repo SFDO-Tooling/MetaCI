@@ -23,7 +23,7 @@ urlpatterns = [
         mbci_views.AboutView.as_view(template_name="pages/about.html"),
         name="about",
     ),
-    # Django Admin, use {%  re_path 'admin:index' %}
+    # Django Admin, use {%  url 'admin:index' %}
     re_path(settings.ADMIN_URL_ROUTE, admin.site.urls),
     # User management
     re_path(r"^users/", include("metaci.users.urls", namespace="users")),
