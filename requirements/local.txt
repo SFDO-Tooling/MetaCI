@@ -2,9 +2,9 @@
 -r test.txt
 
 black==20.8b1
-isort==5.6.4
+isort==5.7.0
 
-Sphinx==3.4.1
+Sphinx==3.4.3
 django-extensions==3.1.0
 Werkzeug==1.0.1
 
