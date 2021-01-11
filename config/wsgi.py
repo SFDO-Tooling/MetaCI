@@ -29,6 +29,13 @@ if (
 # os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings.production"
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 
+try:
+    import gunicorn
+except ImportError:
+    pass
+else:
+    gunicorn.SERVER_SOFTWARE = "MetaCI"
+
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
