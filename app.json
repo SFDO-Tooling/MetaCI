@@ -100,19 +100,19 @@
   "formation": {
     "web": {
       "quantity": 1,
-      "size": "free"
+      "size": "hobby"
     },
     "dev_worker": {
       "quantity": 1,
-      "size": "free"
+      "size": "hobby"
     },
     "worker": {
       "quantity": 0,
-      "size": "free"
+      "size": "hobby"
     },
     "worker_short": {
       "quantity": 0,
-      "size": "free"
+      "size": "hobby"
     }
   },
   "scripts": {
