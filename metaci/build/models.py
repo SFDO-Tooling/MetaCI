@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 import os
 import shutil
@@ -9,7 +7,6 @@ import traceback
 import zipfile
 from glob import iglob
 from io import BytesIO
-from pathlib import Path
 
 from cumulusci import __version__ as cumulusci_version
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
@@ -349,7 +346,7 @@ class Build(models.Model):
         try:
             self.org_api_version = org_config.latest_api_version
         except Exception as e:
-            self.logger.warn(f"Could not retrieve salesforce API version: {e}")
+            self.logger.warning(f"Could not retrieve salesforce API version: {e}")
 
         # Run flows
         try:
@@ -699,7 +696,7 @@ class BuildFlow(models.Model):
 
     def load_test_results(self):
         """Import results from JUnit or test_results.json.
-        
+
         Robot Framework results are imported in MetaCIFlowCallback.post_task
         """
         # Load JUnit

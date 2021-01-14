@@ -34,6 +34,9 @@ class TestClass(models.Model):
     def __str__(self):
         return self.name
 
+    # pytest: this is not a test
+    __test__ = False
+
 
 class TestMethod(models.Model):
     name = models.CharField(max_length=255, db_index=True)
@@ -48,6 +51,9 @@ class TestMethod(models.Model):
 
     def __str__(self):
         return self.name
+
+    # pytest: This is not a test
+    __test__ = False
 
 
 class TestResultManager(models.Manager):
@@ -270,6 +276,9 @@ class TestResultAsset(models.Model):
         TestResult, related_name="assets", on_delete=models.CASCADE
     )
     asset = models.FileField(upload_to=asset_upload_to)
+
+    # pytest: This is not a test
+    __test__ = False
 
 
 FieldType = namedtuple("FieldType", ["label", "aggregation"])

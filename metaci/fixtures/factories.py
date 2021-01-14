@@ -1,9 +1,9 @@
-import datetime
 import numbers
 import random
 
 import factory
 import factory.fuzzy
+from django.utils import timezone
 
 from metaci.build.models import (
     BUILD_FLOW_STATUSES,
@@ -126,12 +126,7 @@ class BuildFlowFactory(factory.django.DjangoModelFactory):
 
     flow = factory.fuzzy.FuzzyChoice(["rida", "andebb", "ttank", "tleft"])
     status = factory.fuzzy.FuzzyChoice(BUILD_FLOW_STATUS_NAMES)
-    time_end = (
-        datetime.datetime.utcnow()
-        .replace(tzinfo=datetime.timezone.utc)
-        .isoformat()
-        .split("T")[0]  # Area before the split
-    )
+    time_end = timezone.now()
 
 
 class TestClassFactory(factory.django.DjangoModelFactory):

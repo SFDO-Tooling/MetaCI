@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # flake8: noqa: F405
 """
 Local settings

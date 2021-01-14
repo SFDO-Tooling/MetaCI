@@ -1,13 +1,11 @@
-import contextlib
-from pathlib import Path, PurePath
+from pathlib import Path
 from shutil import copyfile
 from unittest import mock
 
-
 import pytest
-from cumulusci.utils import temporary_dir, touch
 from cumulusci.core.flowrunner import StepResult, StepSpec
 from cumulusci.tasks.robotframework.robotframework import Robot
+from cumulusci.utils import temporary_dir, touch
 
 from metaci.build.flows import MetaCIFlowCallback
 from metaci.build.models import BuildFlowAsset, FlowTask
@@ -127,7 +125,8 @@ def test_post_task__multiple_robot_tasks(get_spec):
         output_dir = Path(output_dir)
 
         copyfile(
-            (TEST_ROBOT_OUTPUT_FILES / "robot_1.xml"), (output_dir / "output.xml"),
+            (TEST_ROBOT_OUTPUT_FILES / "robot_1.xml"),
+            (output_dir / "output.xml"),
         )
 
         step_spec = get_spec("1", name="Robot", cls=Robot)
@@ -200,4 +199,5 @@ def test_post_task__multiple_robot_tasks(get_spec):
 
 
 class TestException(Exception):
-    pass
+    # pytest: This is not a test
+    __test__ = False
