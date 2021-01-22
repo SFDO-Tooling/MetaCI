@@ -1,7 +1,7 @@
-setuptools==51.1.2
+setuptools==51.3.1
 
 # CumulusCI
-cumulusci==3.26.0
+cumulusci==3.27.0
 
 # SFDO Template Helpers for authorization middleware and other helpers
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
@@ -68,7 +68,7 @@ django-log-request-id==1.6.0
 psycopg2-binary==2.8.6
 
 # django-storages for S3
-boto3==1.16.51
+boto3==1.16.56
 django-storages==1.11.1
 
 # JSON web token
