@@ -1,5 +1,6 @@
 import hmac
 import json
+import logging
 import re
 from hashlib import sha1
 
@@ -14,6 +15,8 @@ from metaci.build.models import Build
 from metaci.build.utils import view_queryset
 from metaci.release.models import Release
 from metaci.repository.models import Branch, Repository
+
+logger = logging.getLogger(__name__)
 
 TAG_BRANCH_PREFIX = "refs/tags/"
 
@@ -216,6 +219,11 @@ def create_builds(event, payload, repo, branch, release):
     for pr in repo.planrepository_set.should_run().filter(
         plan__trigger__in=["commit", "tag", "status"]
     ):
+        if not pr.plan.regex:
+            logger.warn(
+                f"Skipping build creation for Plan without regex: {pr.plan.name}"
+            )
+            continue
         plan = pr.plan
         run_build, commit, commit_message = plan.check_github_event(event, payload)
         if run_build:
