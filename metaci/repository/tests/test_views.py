@@ -9,6 +9,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 
+from metaci.build.models import Build
 from metaci.conftest import (
     BranchFactory,
     BuildFactory,
@@ -430,3 +431,13 @@ class TestRepositoryViews(TestCase):
 
         tag_name = views.get_tag_name_from_ref(test_ref)
         assert tag_name == tagged_release
+
+    @pytest.mark.django_db
+    def test_create_builds(self):
+        """A plan without a regex, that has a trigger of 'commit',
+        'tag', or 'status', should fail to create a build"""
+        self.plan.regex = None
+        self.plan.save()
+        builds_before = len(Build.objects.all())
+        views.create_builds("push", None, self.repo, self.branch, None)
+        assert builds_before == len(Build.objects.all())
