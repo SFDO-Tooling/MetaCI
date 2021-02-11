@@ -220,7 +220,7 @@ def create_builds(event, payload, repo, branch, release):
         plan__trigger__in=["commit", "tag", "status"]
     ):
         if not pr.plan.regex:
-            logger.warn(
+            logger.warning(
                 f"Skipping build creation for Plan without regex: {pr.plan.name}"
             )
             continue
