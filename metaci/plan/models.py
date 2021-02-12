@@ -115,6 +115,12 @@ class Plan(models.Model):
     class Meta:
         ordering = ["name", "active", "context"]
 
+    def clean(self):
+        if self.trigger != "manual" and not self.regex:
+            raise ValidationError(
+                "Plans with a non-manual trigger type must also specify a regex."
+            )
+
     def get_absolute_url(self):
         return reverse("plan_detail", kwargs={"plan_id": self.id})
 

@@ -1,3 +1,5 @@
+import pytest
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from metaci.plan.models import Plan
@@ -106,3 +108,11 @@ class PlanTestCase(TestCase):
         )
         run_build, commit, commit_message = plan.check_github_event("status", payload)
         assert not run_build
+
+    def test_plan_saved_without_regex(self):
+        self.commit_plan.regex = None
+        with pytest.raises(
+            ValidationError,
+            match="Plans with a non-manual trigger type must also specify a regex.",
+        ):
+            self.commit_plan.clean()
