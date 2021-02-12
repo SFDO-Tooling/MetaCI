@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.contrib import admin
 
 from metaci.release.models import ChangeCaseTemplate, Release
 
 
+@admin.register(Release)
 class ReleaseAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("repo", ("version_name", "version_number"), "status")}),
@@ -44,4 +42,3 @@ class ReleaseAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ChangeCaseTemplate)
-admin.site.register(Release, ReleaseAdmin)

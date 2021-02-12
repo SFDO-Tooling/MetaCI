@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # flake8: noqa: F405
 """
 Local settings
@@ -42,7 +41,7 @@ EMAIL_BACKEND = env(
 
 # CACHING
 # ------------------------------------------------------------------------------
-REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=1)
+REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=2)
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -97,7 +96,7 @@ INSTALLED_APPS += ("django_extensions",)
 
 # URL that handles the media served from MEDIA_ROOT, used for managing
 # stored files.
-# MEDIA_URL = 'https://s3.amazonaws.com/{}/'.format(AWS_STORAGE_BUCKET_NAME)
+# MEDIA_URL = f'https://s3.amazonaws.com/{AWS_STORAGE_BUCKET_NAME}/'
 # DEFAULT_FILE_STORAGE = 'config.settings.storage_backends.MediaStorage'
 
 # TESTING

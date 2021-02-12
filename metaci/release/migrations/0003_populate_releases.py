@@ -26,7 +26,7 @@ def populate_releases(apps, schema_editor):
         repos[build.branch.repo.id]["tags"].add(build.branch.name.replace("tag: ", ""))
 
     for info in repos.values():
-        repo_api = info["repo"].github_api
+        repo_api = info["repo"].get_github_api()
         for tag in info["tags"]:
             existing = Release.objects.filter(repo=info["repo"], git_tag=tag)
             if existing.exists():
@@ -47,7 +47,7 @@ def populate_build_release(apps, schema_editor):
                 repo=build.repo, git_tag=build.branch.name.replace("tag: ", "")
             )
         except ObjectDoesNotExist:
-            logger.error("Couldn't find Release for build #{}".format(build.id))
+            logger.error(f"Couldn't find Release for build #{build.id}")
             continue
         build.release = rel
         if build.plan.role == "release":

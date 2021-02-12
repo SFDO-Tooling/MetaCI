@@ -92,7 +92,7 @@ class TestResultRobotView(BaseRobotResultsTestCase):
 
         assert response.status_code == 200
         (args, kwargs) = mock_rebot.call_args
-        self.assertDictContainsSubset(task_options, kwargs)
+        assert set(task_options.items()).issubset(set(kwargs.items()))
 
     @mock.patch("metaci.testresults.views.rebot")
     def test_result_robot_no_options(self, mock_rebot):

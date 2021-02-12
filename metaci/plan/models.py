@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import re
 
 import yaml
@@ -52,7 +50,7 @@ def validate_yaml_field(value):
     try:
         yaml.safe_load(value)
     except yaml.YAMLError as err:
-        raise ValidationError("Error parsing additional YAML: {}".format(err))
+        raise ValidationError(f"Error parsing additional YAML: {err}")
 
 
 class PlanQuerySet(models.QuerySet):
@@ -116,6 +114,12 @@ class Plan(models.Model):
 
     class Meta:
         ordering = ["name", "active", "context"]
+
+    def clean(self):
+        if self.trigger != "manual" and not self.regex:
+            raise ValidationError(
+                "Plans with a non-manual trigger type must also specify a regex."
+            )
 
     def get_absolute_url(self):
         return reverse("plan_detail", kwargs={"plan_id": self.id})
@@ -231,7 +235,7 @@ class PlanRepository(models.Model):
         )
 
     def __str__(self):
-        return "[{}] {}".format(self.repo, self.plan)
+        return f"[{self.repo}] {self.plan}"
 
     def get_absolute_url(self):
         return reverse(
@@ -271,7 +275,7 @@ class PlanRepositoryTrigger(models.Model):
         verbose_name_plural = "Plan Repository Triggers"
 
     def _get_commit(self):
-        repo = self.target_plan_repo.repo.github_api
+        repo = self.target_plan_repo.repo.get_github_api()
         branch = repo.branch(self.branch)
         commit = branch.commit.sha
         return commit
@@ -308,7 +312,7 @@ class PlanSchedule(models.Model):
             repo=self.branch.repo,
             plan=self.plan,
             branch=self.branch,
-            commit=self.branch.github_api.commit.sha,
+            commit=self.branch.get_github_api().commit.sha,
             schedule=self,
             build_type="scheduled",
         )

@@ -2,13 +2,13 @@
 -r test.txt
 
 black==20.8b1
-isort==5.6.4
+isort==5.7.0
 
-Sphinx==3.3.0
-django-extensions==3.0.9
+Sphinx==3.4.3
+django-extensions==3.1.0
 Werkzeug==1.0.1
 
-django-debug-toolbar==3.1.1
+django-debug-toolbar==3.2
 
 # improved REPL
 ipdb==0.13.4

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Django settings for metaci project.
 
@@ -8,10 +7,9 @@ https://docs.djangoproject.com/en/dev/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
-from __future__ import absolute_import, unicode_literals
-
-import os
+import json
 from ipaddress import IPv4Network
+from pathlib import Path
 from typing import List
 
 import environ
@@ -37,6 +35,7 @@ def url_prefix_list(val: str) -> List[str]:
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
+WHITENOISE_APPS = ("whitenoise.runserver_nostatic",)
 DJANGO_APPS = (
     # Default Django apps:
     "django.contrib.auth",
@@ -63,7 +62,6 @@ THIRD_PARTY_APPS = (
     "guardian",  # Per Object Permissions via django-guardian
     "rest_framework",  # API
     "rest_framework.authtoken",
-    "scheduler",  # django-rq-scheduler
     "watson",  # Full text search
 )
 
@@ -83,7 +81,7 @@ LOCAL_APPS = (
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = WHITENOISE_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -99,6 +97,7 @@ ALLOWED_HOSTS = [
 MIDDLEWARE = (
     "log_request_id.middleware.RequestIDMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -168,7 +167,8 @@ USE_TZ = True
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#templates
-if os.path.exists(str(ROOT_DIR.path("dist", "prod"))):
+production_app_path = Path(ROOT_DIR.path("dist", "prod"))
+if production_app_path.exists():
     TEMPLATE_DIRS = [
         str(ROOT_DIR.path("dist", "prod")),
         str(APPS_DIR.path("templates")),
@@ -231,6 +231,8 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
+WHITENOISE_ALLOW_ALL_ORIGINS = False
+
 # MEDIA CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
@@ -245,7 +247,7 @@ ROOT_URLCONF = "config.urls"
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin")
-ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
+ADMIN_URL_ROUTE = rf"^{ADMIN_URL}/"
 
 # Forward-compatible alias for use with IP-checking middleware
 ADMIN_AREA_PREFIX = ADMIN_URL
@@ -334,6 +336,50 @@ RQ_QUEUES = {
     },
 }
 RQ_EXCEPTION_HANDLERS = ["metaci.build.exceptions.maybe_requeue_job"]
+CRON_JOBS = {
+    "autoscale": {
+        "func": "metaci.build.autoscaling.autoscale",
+        "cron_string": "* * * * *",
+    },
+    "check_waiting_builds": {
+        "func": "metaci.build.tasks.check_waiting_builds",
+        "cron_string": "* * * * *",
+    },
+    "daily_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_daily",
+        "cron_string": "0 0 * * *",
+    },
+    "hourly_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_hourly",
+        "cron_string": "0 * * * *",
+    },
+    "generate_summaries_job": {
+        "func": "metaci.testresults.tasks.generate_summaries",
+        "cron_string": "0,30 * * * *",
+    },
+    "prune_branches": {
+        "func": "metaci.repository.tasks.prune_branches",
+        "cron_string": "0 * * * *",
+    },
+}
+# There is a default dict of cron jobs,
+# and the cron_string can be optionally overridden
+# using JSON in the CRON_SCHEDULE environment variable.
+# CRON_SCHEDULE is a mapping from a name identifying the job
+# to a cron string specifying the schedule for the job,
+# or null to disable the job.
+cron_overrides = json.loads(env("CRON_SCHEDULE", default="{}"))
+if not isinstance(cron_overrides, dict):
+    raise TypeError("CRON_SCHEDULE must be a JSON object")
+for key, cron_string in cron_overrides.items():
+    if key in CRON_JOBS:
+        if cron_string is None:
+            del CRON_JOBS[key]
+        else:
+            CRON_JOBS[key]["cron_string"] = cron_string
+    else:
+        raise KeyError(key)
+
 
 # Site URL
 SITE_URL = None

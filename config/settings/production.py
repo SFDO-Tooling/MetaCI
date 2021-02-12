@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Production Configurations
 
@@ -10,8 +9,6 @@ Production Configurations
 
 
 """
-from __future__ import absolute_import, unicode_literals
-
 import json
 
 from .base import *  # noqa
@@ -36,8 +33,6 @@ INSTALLED_APPS += ("defender",)
 
 # Use Whitenoise to serve static files
 # See: https://whitenoise.readthedocs.io/
-WHITENOISE_MIDDLEWARE = ("whitenoise.middleware.WhiteNoiseMiddleware",)
-MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
 RAVEN_MIDDLEWARE = (
     "raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware",
 )
@@ -66,6 +61,7 @@ SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 X_FRAME_OPTIONS = "DENY"
+LANGUAGE_COOKIE_HTTPONLY = True
 
 # SITE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -106,7 +102,7 @@ AWS_DEFAULT_ACL = None
 
 # URL that handles the media served from MEDIA_ROOT, used for managing
 # stored files.
-MEDIA_URL = "https://s3.amazonaws.com/{}/".format(AWS_STORAGE_BUCKET_NAME)
+MEDIA_URL = f"https://s3.amazonaws.com/{AWS_STORAGE_BUCKET_NAME}/"
 DEFAULT_FILE_STORAGE = "config.settings.storage_backends.MediaStorage"
 
 # Static Assets
@@ -168,7 +164,7 @@ DATABASES["default"] = env.db("DATABASE_URL")
 # ------------------------------------------------------------------------------
 
 REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=2)
-REDIS_LOCATION = "{0}/{1}".format(env("REDIS_URL", default="redis://127.0.0.1:6379"), 0)
+REDIS_LOCATION = f"{env('REDIS_URL', default='redis://127.0.0.1:6379')}/0"
 # Heroku URL does not pass the DB number, so we parse it in
 CACHES = {
     "default": {

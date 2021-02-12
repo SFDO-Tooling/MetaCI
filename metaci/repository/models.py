@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import github3.exceptions
 from cumulusci.core.github import get_github_api_for_repo
 from django.apps import apps
@@ -48,10 +46,9 @@ class Repository(models.Model):
         return reverse("repo_detail", kwargs={"owner": self.owner, "name": self.name})
 
     def __str__(self):
-        return "{}/{}".format(self.owner, self.name)
+        return f"{self.owner}/{self.name}"
 
-    @property
-    def github_api(self):
+    def get_github_api(self):
         gh = get_github_api_for_repo(GitHubSettingsKeychain(), self.owner, self.name)
         repo = gh.repository(self.owner, self.name)
         return repo
@@ -94,10 +91,13 @@ class Branch(SoftDeletableModel):
     def __str__(self):
         return f"{self.repo.name}: {self.name}"
 
-    @property
-    def github_api(self):
+    def is_tag(self):
+        """Returns True if this branch is related to a tag in GitHub"""
+        return self.name.startswith("tag: ")
+
+    def get_github_api(self):
         try:
-            branch = self.repo.github_api.branch(self.name)
+            branch = self.repo.get_github_api().branch(self.name)
         except github3.exceptions.NotFoundError:
             branch = None
         return branch

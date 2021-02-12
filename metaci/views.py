@@ -16,17 +16,15 @@ class AboutView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AboutView, self).get_context_data(**kwargs)
 
-        # django
-        context["DJANGO_VERSION"] = "{}.{}.{}".format(
-            django.VERSION[0],  # major
-            django.VERSION[1],  # minor
-            django.VERSION[2],  # micro
-        )
+        # django (major.minor.micro)
+        context[
+            "DJANGO_VERSION"
+        ] = f"{django.VERSION[0]}.{django.VERSION[1]}.{django.VERSION[2]}"
 
         # python
-        context["PYTHON_VERSION"] = "{}.{}.{}".format(
-            sys.version_info.major, sys.version_info.minor, sys.version_info.micro
-        )
+        context[
+            "PYTHON_VERSION"
+        ] = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
         # Salesforce DX
         out = subprocess.check_output(["sfdx", "--version"])
@@ -58,4 +56,3 @@ class AboutView(TemplateView):
 def custom_403(request, exception):
     """Always redirect users to login via GitHub"""
     return HttpResponseForbidden(render(request, "account/login.html"))
-

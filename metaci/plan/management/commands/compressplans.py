@@ -67,9 +67,7 @@ class Command(BaseCommand):
                 for build in plan2.builds.select_for_update():
                     self.stdout.write(
                         self.style.WARNING(
-                            "Overwriting Plan ({} --> {}) for Build {}".format(
-                                build.plan, plan1, build
-                            )
+                            f"Overwriting Plan ({build.plan} --> {plan1}) for Build {build}"
                         )
                     )
                     build.plan = plan1
@@ -81,22 +79,18 @@ class Command(BaseCommand):
                     PlanRepository.objects.get(plan=plan1, repo=repo)
                 except PlanRepository.DoesNotExist:
                     self.stdout.write(
-                        self.style.WARNING(
-                            "Linking Repository {} to Plan {}".format(repo, plan1)
-                        )
+                        self.style.WARNING(f"Linking Repository {repo} to Plan {plan1}")
                     )
                     if not options["dry_run"]:
                         PlanRepository.objects.create(plan=plan1, repo=repo)
             # delete/deactivate plan
             invalid_plans.add(plan2.pk)
             if options["delete"]:
-                self.stdout.write(self.style.WARNING("Deleting Plan {}".format(plan2)))
+                self.stdout.write(self.style.WARNING(f"Deleting Plan {plan2}"))
                 if not options["dry_run"]:
                     plan2.delete()
             else:
-                self.stdout.write(
-                    self.style.WARNING("Deactivating Plan {}".format(plan2))
-                )
+                self.stdout.write(self.style.WARNING(f"Deactivating Plan {plan2}"))
                 plan2.active = False
                 if not options["dry_run"]:
                     plan2.save()

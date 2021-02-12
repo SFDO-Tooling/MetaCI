@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import logging
 import re
 import urllib.parse
@@ -18,16 +15,14 @@ logger = logging.getLogger(__name__)
 
 def update_release_from_github(release, repo_api=None):
     if not repo_api:
-        repo_api = release.repo.github_api
+        repo_api = release.repo.get_github_api()
     if not release.git_tag:
         logger.info("Cannot update release, no git_tag specified")
         return
-    ref = repo_api.ref("tags/{}".format(release.git_tag))
+    ref = repo_api.ref(f"tags/{release.git_tag}")
     if not ref:
         logger.info(
-            "Cannot update release, ref tags/{} not found in Github".format(
-                release.git_tag
-            )
+            f"Cannot update release, ref tags/{release.git_tag} not found in Github"
         )
         return
     gh_release = repo_api.release_by_tag_name(release.git_tag)
@@ -84,7 +79,7 @@ def send_release_webhook(project_config, release):
     response = requests.post(
         settings.METACI_RELEASE_WEBHOOK_URL,
         json=payload,
-        headers={"Authorization": f"Bearer {token.decode('latin1')}"},
+        headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
     if result["success"]:

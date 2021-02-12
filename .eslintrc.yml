@@ -52,10 +52,10 @@ rules:
       arrowParens: always
 
   # Import
+  import/named: 1
   import/order:
     - 1
     - newlines-between: always
-  import/named: 1
 
   # Possible Errors
   getter-return: 2

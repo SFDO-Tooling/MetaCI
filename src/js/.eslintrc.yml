@@ -1,5 +1,4 @@
 # http://eslint.org/docs/rules/
-# copied from https://raw.githubusercontent.com/SFDO-Tooling/MetaShare/master/src/js/.eslintrc.yml
 
 parser: '@typescript-eslint/parser'
 parserOptions:
@@ -27,7 +26,7 @@ rules:
   '@typescript-eslint/no-use-before-define': 2
 
   # Import
-  simple-import-sort/sort: 1
+  simple-import-sort/imports: 1
   import/default: 0
   import/order: 0
 

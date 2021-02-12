@@ -1,8 +1,9 @@
-import datetime
 import numbers
+import random
 
 import factory
 import factory.fuzzy
+from django.utils import timezone
 
 from metaci.build.models import (
     BUILD_FLOW_STATUSES,
@@ -98,7 +99,7 @@ class BranchFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Branch
 
-    name = factory.fuzzy.FuzzyChoice(["master", "branch1", "branch2"])
+    name = factory.fuzzy.FuzzyChoice(["main", "branch1", "branch2"])
     repo = factory.SubFactory(RepositoryFactory)
 
 
@@ -113,6 +114,7 @@ class BuildFactory(factory.django.DjangoModelFactory):
         lambda build: BranchFactory(repo=build.planrepo.repo)
     )
     status = factory.fuzzy.FuzzyChoice(BUILD_STATUS_NAMES)
+    commit = str(random.getrandbits(128))
 
 
 class BuildFlowFactory(factory.django.DjangoModelFactory):
@@ -124,12 +126,7 @@ class BuildFlowFactory(factory.django.DjangoModelFactory):
 
     flow = factory.fuzzy.FuzzyChoice(["rida", "andebb", "ttank", "tleft"])
     status = factory.fuzzy.FuzzyChoice(BUILD_FLOW_STATUS_NAMES)
-    time_end = (
-        datetime.datetime.utcnow()
-        .replace(tzinfo=datetime.timezone.utc)
-        .isoformat()
-        .split("T")[0]  # Area before the split
-    )
+    time_end = timezone.now()
 
 
 class TestClassFactory(factory.django.DjangoModelFactory):

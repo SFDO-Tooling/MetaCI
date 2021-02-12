@@ -47,7 +47,7 @@
           <td>{{ pr.plan.flows }}</td>
           <td><div class="slds-shrink-none">
             <div class="slds-button-group" role="group">
-              <a href="{% url 'plan_run_repo' pr.plan.id pr.repo.owner pr.repo.name %}?keep_org=True&branch=master"><button class="slds-button slds-button--neutral">Go</button></a>
+              <a href="{% url 'plan_run_repo' pr.plan.id pr.repo.owner pr.repo.name %}?keep_org=True"><button class="slds-button slds-button--neutral">Go</button></a>
             </div>
           </div></td>
         </tr>

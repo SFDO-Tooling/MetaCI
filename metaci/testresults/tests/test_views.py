@@ -132,7 +132,7 @@ class TestTestResultsViews:
             kwargs={
                 "build_id": data["build"].id,
                 "flow": data["buildflow"].flow,
-                "category": "test",
+                "build_flow_asset_id": asset.id,
             },
         )
         response = self.client.get(url)

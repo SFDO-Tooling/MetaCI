@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+import datetime
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-
+from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
-from model_utils.models import StatusModel
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
+from model_utils.models import StatusModel
 
 from metaci.release.utils import update_release_from_github
 
@@ -20,6 +18,12 @@ class ChangeCaseTemplate(models.Model):
 
 
 class Release(StatusModel):
+    def get_sandbox_date():
+        return datetime.date.today()
+
+    def get_production_date():
+        return datetime.date.today() + datetime.timedelta(days=6)
+
     STATUS = Choices("draft", "published", "hidden")
     created = AutoCreatedField(_("created"))
     modified = AutoLastModifiedField(_("modified"))
@@ -46,11 +50,22 @@ class Release(StatusModel):
     )
 
     release_creation_date = models.DateField(
-        _("release creation date"), null=True, blank=True
+        _("release creation date"),
+        null=True,
+        blank=True,
+        default=get_sandbox_date,
     )
-    sandbox_push_date = models.DateField(_("sandbox push date"), null=True, blank=True)
+    sandbox_push_date = models.DateField(
+        _("sandbox push date"),
+        null=True,
+        blank=True,
+        default=get_sandbox_date,
+    )
     production_push_date = models.DateField(
-        _("production push date"), null=True, blank=True
+        _("production push date"),
+        null=True,
+        blank=True,
+        default=get_production_date,
     )
     created_from_commit = models.CharField(
         _("created from commit"), max_length=1024, null=True, blank=True
@@ -66,14 +81,14 @@ class Release(StatusModel):
     )
 
     class Meta:
-        get_latest_by = "production_push_date"
-        ordering = ["-production_push_date"]
+        get_latest_by = "created"
+        ordering = ["-created"]
         verbose_name = _("release")
         verbose_name_plural = _("releases")
         unique_together = ("repo", "git_tag")
 
     def __str__(self):
-        return "{}: {}".format(self.repo, self.version_name)
+        return f"{self.repo}: {self.version_name}"
 
     def update_from_github(self):
         update_release_from_github(self)
