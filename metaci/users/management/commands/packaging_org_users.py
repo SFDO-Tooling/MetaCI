@@ -17,6 +17,7 @@ class Command(BaseCommand):
     def handle(
         self,
         *args,
+        stream=sys.stdout,
         **options,
     ):
         packaging_orgs = Org.objects.filter(name="packaging").order_by("repo__name")
@@ -28,7 +29,7 @@ class Command(BaseCommand):
             "orgs": good_orgs,
             "errors": bad_orgs,
         }
-        json.dump(data, sys.stdout, indent=1)
+        json.dump(data, stream, indent=1)
 
 
 def _handle_packaging_org(org):
