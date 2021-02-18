@@ -9071,10 +9071,10 @@ react-highlighter@^0.4.3:
     escape-string-regexp "^1.0.5"
     prop-types "^15.6.0"
 
-react-i18next@^11.8.2:
-  version "11.8.2"
-  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-11.8.2.tgz#7a06b7d42c80f9b21126bf46c2c0d1de4fc7c038"
-  integrity sha512-xWHNkqz6gr1ohk5gdPsJ9Nzzn8d98E+QxuqPlXI9VzsbOytKZ1m2BqmbHukFCcUCE8S152gjvSLyMgBJ2BDu4Q==
+react-i18next@^11.8.5:
+  version "11.8.7"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-11.8.7.tgz#845f31e01e2aa92a3954c374ebcc4bd54df1cace"
+  integrity sha512-IDK/a73cJN4J2C6yTqmDS/r8iikwKaN283hltqps8UiRaFVTvlSxE85HkamEFD6lULG4hFZExecXJ/hA27DW3Q==
   dependencies:
     "@babel/runtime" "^7.3.1"
     html-parse-stringify2 "2.0.1"
