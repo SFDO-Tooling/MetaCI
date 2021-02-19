@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Production Configurations
 
@@ -10,8 +9,6 @@ Production Configurations
 
 
 """
-from __future__ import absolute_import, unicode_literals
-
 import json
 
 from .base import *  # noqa
@@ -36,8 +33,6 @@ INSTALLED_APPS += ("defender",)
 
 # Use Whitenoise to serve static files
 # See: https://whitenoise.readthedocs.io/
-WHITENOISE_MIDDLEWARE = ("whitenoise.middleware.WhiteNoiseMiddleware",)
-MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
 RAVEN_MIDDLEWARE = (
     "raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware",
 )
@@ -66,6 +61,7 @@ SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 X_FRAME_OPTIONS = "DENY"
+LANGUAGE_COOKIE_HTTPONLY = True
 
 # SITE CONFIGURATION
 # ------------------------------------------------------------------------------

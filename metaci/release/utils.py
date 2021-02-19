@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import logging
 import re
 import urllib.parse
@@ -82,7 +79,7 @@ def send_release_webhook(project_config, release):
     response = requests.post(
         settings.METACI_RELEASE_WEBHOOK_URL,
         json=payload,
-        headers={"Authorization": f"Bearer {token.decode('latin1')}"},
+        headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
     if result["success"]:

@@ -191,7 +191,7 @@ def get_autoscaler(app_name):
 def autoscale():
     """Apply autoscaling.
 
-    This is meant to run frequently as a RepeatableJob.
+    This is meant to run frequently via rqscheduler.
     """
     scaling_info = {}
     for app_name in settings.AUTOSCALERS.keys():

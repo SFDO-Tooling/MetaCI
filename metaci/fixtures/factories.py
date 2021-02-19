@@ -1,9 +1,10 @@
-import datetime
 import numbers
 import random
 
 import factory
 import factory.fuzzy
+from django.utils import timezone
+from faker import Faker
 
 from metaci.build.models import (
     BUILD_FLOW_STATUSES,
@@ -30,6 +31,8 @@ BUILD_STATUS_NAMES = (
 )  # weighted towards success!
 BUILD_FLOW_STATUS_NAMES = (name for (name, label) in BUILD_FLOW_STATUSES)
 
+fake = Faker()
+
 
 def do_logs():
     """Call this function at the module level to get more insight
@@ -46,8 +49,7 @@ def fake_name(prefix=None):
     from outside of the factory if you have a preference when you instantiate
     the class."""
     return factory.LazyAttribute(
-        lambda a: (getattr(a, "name_prefix", None) or prefix or "")
-        + factory.Faker("word").generate({})
+        lambda a: (getattr(a, "name_prefix", None) or prefix or "") + fake.word()
     )
 
 
@@ -99,7 +101,7 @@ class BranchFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Branch
 
-    name = factory.fuzzy.FuzzyChoice(["master", "branch1", "branch2"])
+    name = factory.fuzzy.FuzzyChoice(["main", "branch1", "branch2"])
     repo = factory.SubFactory(RepositoryFactory)
 
 
@@ -126,12 +128,7 @@ class BuildFlowFactory(factory.django.DjangoModelFactory):
 
     flow = factory.fuzzy.FuzzyChoice(["rida", "andebb", "ttank", "tleft"])
     status = factory.fuzzy.FuzzyChoice(BUILD_FLOW_STATUS_NAMES)
-    time_end = (
-        datetime.datetime.utcnow()
-        .replace(tzinfo=datetime.timezone.utc)
-        .isoformat()
-        .split("T")[0]  # Area before the split
-    )
+    time_end = timezone.now()
 
 
 class TestClassFactory(factory.django.DjangoModelFactory):

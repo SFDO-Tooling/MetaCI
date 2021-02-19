@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 import os
 import shutil
@@ -39,7 +37,6 @@ from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
 from metaci.release.utils import send_release_webhook
 from metaci.testresults.importer import import_test_results
-from metaci.testresults.robot_importer import import_robot_test_results
 from metaci.utils import generate_hash
 
 BUILD_STATUSES = (
@@ -349,7 +346,7 @@ class Build(models.Model):
         try:
             self.org_api_version = org_config.latest_api_version
         except Exception as e:
-            self.logger.warn(f"Could not retrieve salesforce API version: {e}")
+            self.logger.warning(f"Could not retrieve salesforce API version: {e}")
 
         # Run flows
         try:
@@ -715,24 +712,10 @@ class BuildFlow(models.Model):
         self.save()
 
     def load_test_results(self):
-        has_results = False
+        """Import results from JUnit or test_results.json.
 
-        root_dir_robot_path = f"{self.root_dir}/output.xml"
-        # Load robotframework's output.xml if found
-        if os.path.isfile("output.xml"):
-            has_results = True
-            import_robot_test_results(self, "output.xml")
-
-        elif os.path.isfile(root_dir_robot_path):
-            # FIXME: Not sure why robot stopped writing into the cwd
-            # (build temp dir) but this should handle it so long as
-            # only one build runs at a time
-            has_results = True
-            try:
-                import_robot_test_results(self, root_dir_robot_path)
-            finally:
-                os.remove(root_dir_robot_path)
-
+        Robot Framework results are imported in MetaCIFlowCallback.post_task
+        """
         # Load JUnit
         results = []
         if self.build.plan.junit_path:
@@ -743,7 +726,6 @@ class BuildFlow(models.Model):
                     f"No results found at JUnit path {self.build.plan.junit_path}"
                 )
         if results:
-            has_results = True
             import_test_results(self, results, "JUnit")
 
         # Load from test_results.json
@@ -762,16 +744,14 @@ class BuildFlow(models.Model):
                 pass
 
         if results:
-            has_results = True
             import_test_results(self, results, "Apex")
 
-        if has_results:
-            self.tests_total = self.test_results.count()
-            self.tests_pass = self.test_results.filter(outcome="Pass").count()
-            self.tests_fail = self.test_results.filter(
-                outcome__in=["Fail", "CompileFail"]
-            ).count()
-            self.save()
+        self.tests_total = self.test_results.count()
+        self.tests_pass = self.test_results.filter(outcome="Pass").count()
+        self.tests_fail = self.test_results.filter(
+            outcome__in=["Fail", "CompileFail"]
+        ).count()
+        self.save()
 
     def load_junit(self, filename):
         results = []

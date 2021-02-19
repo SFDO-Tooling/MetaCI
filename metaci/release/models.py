@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from model_utils.models import StatusModel
@@ -84,8 +81,8 @@ class Release(StatusModel):
     )
 
     class Meta:
-        get_latest_by = "production_push_date"
-        ordering = ["-production_push_date"]
+        get_latest_by = "created"
+        ordering = ["-created"]
         verbose_name = _("release")
         verbose_name_plural = _("releases")
         unique_together = ("repo", "git_tag")

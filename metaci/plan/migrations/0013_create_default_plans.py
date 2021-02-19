@@ -31,7 +31,7 @@ def create_default_plans(apps, schema_editor):
             "version, and create a GitHub release with release notes"
         ),
         type="commit",
-        regex="master",
+        regex="main",
         flows="ci_master,release_beta",
         org="packaging",
         context="Upload Beta",
