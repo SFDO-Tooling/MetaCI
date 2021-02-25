@@ -19,7 +19,7 @@ class ChangeCaseTemplate(models.Model):
 
 class ImplementationStep(models.Model):
     description = models.ForeignKey(
-        "plan.Plan.name", on_delete=models.CASCADE, related_name="plans"
+        "plan.Plan", on_delete=models.CASCADE, related_name="name"
     )
     release = models.ForeignKey(
         "release.Release", on_delete=models.CASCADE, related_name="releases"
