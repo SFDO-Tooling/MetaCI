@@ -17,6 +17,28 @@ class ChangeCaseTemplate(models.Model):
         return self.name
 
 
+class ImplementationStep(models.Model):
+    description = models.ForeignKey(
+        "plan.Plan.name", on_delete=models.CASCADE, related_name="plans"
+    )
+    release = models.ForeignKey(
+        "release.Release", on_delete=models.CASCADE, related_name="releases"
+    )
+    plan = models.ForeignKey(
+        "plan.Plan", on_delete=models.CASCADE, related_name="plans"
+    )
+    start_time = models.DateField(
+        _("start_time"),
+        null=True,
+        blank=True,
+        default=None,
+    )
+    stop_time = models.DateField(_("stop_time"), null=True, blank=True, default=None)
+
+    def __str__(self):
+        return self.description
+
+
 class Release(StatusModel):
     def get_sandbox_date():
         return datetime.date.today()
