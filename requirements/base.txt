@@ -1,4 +1,4 @@
-setuptools==53.0.0
+setuptools==53.1.0
 
 # CumulusCI
 cumulusci==3.29.0
@@ -7,7 +7,7 @@ cumulusci==3.29.0
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
 
 # Django
-django==3.1.6
+django==3.1.7
 
 # Configuration
 django-environ==0.4.5
@@ -15,7 +15,7 @@ whitenoise==5.2.0
 
 
 # Forms
-django-crispy-forms==1.11.0
+django-crispy-forms==1.11.1
 django_filter==2.4.0
 
 # Models
@@ -68,7 +68,7 @@ django-log-request-id==1.6.0
 psycopg2-binary==2.8.6
 
 # django-storages for S3
-boto3==1.17.7
+boto3==1.17.17
 django-storages==1.11.1
 
 # JSON web token
