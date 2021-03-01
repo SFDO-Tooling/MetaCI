@@ -30,9 +30,6 @@ Pillow==8.1.0
 # For user registration, either via email or social
 django-allauth==0.44.0
 
-# Unicode slugification
-awesome-slugify==1.6.5
-
 # Redis support
 django-redis==4.12.1
 redis==3.5.3
