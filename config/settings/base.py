@@ -302,9 +302,6 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 LOGIN_URL = "account_login"
 
-# SLUGLIFIER
-AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
-
 # django-rq
 REDIS_URL = env("REDIS_URL", default="redis://localhost:6379")
 REDIS_URL += "/0"
