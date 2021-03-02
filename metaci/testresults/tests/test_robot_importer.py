@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
-from unittest import mock
 from shutil import copyfile
+from unittest import mock
 
 import pytest
 from cumulusci.utils import elementtree_parse_file, temporary_dir
@@ -10,9 +10,9 @@ from django.utils import timezone
 
 from metaci.build.exceptions import BuildError
 from metaci.build.models import BuildFlowAsset
+from metaci.build.tests.test_flows import TEST_ROBOT_OUTPUT_FILES
 from metaci.conftest import FlowTaskFactory
 from metaci.testresults import models, robot_importer
-from metaci.build.tests.test_flows import TEST_ROBOT_OUTPUT_FILES
 
 
 @pytest.mark.django_db
