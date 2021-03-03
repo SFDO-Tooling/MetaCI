@@ -22,7 +22,7 @@ class ImplementationStep(models.Model):
         "release.Release", on_delete=models.CASCADE, related_name="releases"
     )
     plan = models.ForeignKey(
-        "plan.Plan", on_delete=models.CASCADE, related_name="plans"
+        "plan.Plan", on_delete=models.CASCADE, related_name="implementation_steps"
     )
     start_time = models.DateField(
         _("start_time"),
