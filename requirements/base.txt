@@ -1,7 +1,7 @@
 setuptools==53.1.0
 
 # CumulusCI
-cumulusci==3.29.0
+cumulusci==3.30.0
 
 # SFDO Template Helpers for authorization middleware and other helpers
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
