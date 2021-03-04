@@ -342,6 +342,14 @@ CRON_JOBS = {
         "func": "metaci.build.tasks.check_waiting_builds",
         "cron_string": "* * * * *",
     },
+    "monthly_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_monthly",
+        "cron_string": "0 0 1 * *",
+    },
+    "weekly_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_weekly",
+        "cron_string": "0 0 * * 0",
+    },
     "daily_builds_job": {
         "func": "metaci.plan.tasks.run_scheduled_daily",
         "cron_string": "0 0 * * *",

@@ -193,7 +193,12 @@ class Plan(models.Model):
         return run_build, commit, commit_message
 
 
-SCHEDULE_CHOICES = (("daily", "Daily"), ("hourly", "Hourly"))
+SCHEDULE_CHOICES = (
+    ("daily", "Daily"),
+    ("hourly", "Hourly"),
+    ("weekly", "Weekly"),
+    ("monthly", "Monthly"),
+)
 
 
 class PlanRepositoryQuerySet(models.QuerySet):
