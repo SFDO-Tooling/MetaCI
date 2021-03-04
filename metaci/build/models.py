@@ -35,7 +35,11 @@ from metaci.build.utils import format_log, set_build_info
 from metaci.cumulusci.config import MetaCIUniversalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
-from metaci.release.utils import send_release_webhook
+from metaci.release.utils import (
+    send_release_webhook,
+    send_start_webhook,
+    send_stop_webhook,
+)
 from metaci.testresults.importer import import_test_results
 from metaci.utils import generate_hash
 
@@ -312,6 +316,7 @@ class Build(models.Model):
             )
 
         try:
+
             # Extract the repo to a temp build dir
             self.build_dir = self.checkout()
             self.root_dir = os.getcwd()
@@ -321,7 +326,21 @@ class Build(models.Model):
 
             # Initialize the project config
             project_config = self.get_project_config()
-
+            if self.plan.role == "push_sandbox" or self.plan.role == "push_production":
+                try:
+                    send_start_webhook(project_config, self.release, self.plan.role)
+                except Exception as err:
+                    message = (
+                        f"Error while sending implementation stop step webhook: {err}"
+                    )
+                    self.logger.error(message)
+                    set_build_info(
+                        build,
+                        status="error",
+                        exception=message,
+                        time_end=timezone.now(),
+                    )
+                    return
             # Set the sentry context for build errors
             sentry_environment = "metaci"
             project_config.config["sentry_environment"] = sentry_environment
@@ -417,6 +436,17 @@ class Build(models.Model):
                 send_release_webhook(project_config, self.release)
             except Exception as err:
                 message = f"Error while sending release webhook: {err}"
+                self.logger.error(message)
+                set_build_info(
+                    build, status="error", exception=message, time_end=timezone.now()
+                )
+                return
+
+        if self.plan.role == "push_sandbox":
+            try:
+                send_stop_webhook(project_config, self.release, self.plan.role)
+            except Exception as err:
+                message = f"Error while sending implementation stop step webhook: {err}"
                 self.logger.error(message)
                 set_build_info(
                     build, status="error", exception=message, time_end=timezone.now()

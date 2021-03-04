@@ -19,7 +19,7 @@ class ChangeCaseTemplate(models.Model):
 
 class ImplementationStep(models.Model):
     release = models.ForeignKey(
-        "release.Release", on_delete=models.CASCADE, related_name="releases"
+        "release.Release", on_delete=models.CASCADE, related_name="implementation_steps"
     )
     plan = models.ForeignKey(
         "plan.Plan", on_delete=models.CASCADE, related_name="implementation_steps"
@@ -31,13 +31,12 @@ class ImplementationStep(models.Model):
         default=None,
     )
     stop_time = models.DateField(_("stop_time"), null=True, blank=True, default=None)
-    title = plan.name
     implementation_step_id = models.CharField(
         _("implementation step"), max_length=255, null=True, blank=True
     )
 
     def __str__(self):
-        return self.description
+        return self.plan.name
 
 
 class Release(StatusModel):
@@ -101,12 +100,6 @@ class Release(StatusModel):
     )
     change_case_link = models.URLField(
         _("change case link"), max_length=1024, null=True, blank=True
-    )
-    sandbox_implemention_step = models.ForeignKey(
-        "release.ImplementationStep",
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="releases",
     )
 
     class Meta:

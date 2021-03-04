@@ -83,10 +83,101 @@ def send_release_webhook(project_config, release):
     )
     result = response.json()
     if result["success"]:
+        #######################################################################
+        # PARSE RESULT HERE FOR IMPLMENTATION ID's when GUS SANDBOX is ready! #
+        #######################################################################
         with transaction.atomic():
+            release.implementation_steps.filter(plan__role="push_sandbox").update(
+                implementation_step_id="12345"
+            )
+            release.implementation_steps.filter(plan__role="push_production").update(
+                implementation_step_id="54321111"
+            )
             case_id = result["id"]
             case_url = settings.METACI_CHANGE_CASE_URL_TEMPLATE.format(case_id=case_id)
             release.change_case_link = case_url
+            release.save()
+    else:
+        raise Exception("\n".join(err["message"] for err in result["errors"]))
+
+
+def send_start_webhook(project_config, release, role):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
+        return
+    logger.info(
+        f"Sending start webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+    )
+    if role == "push_sandbox":
+        implementation_step_id = release.implementation_steps.get(
+            plan__role="push_sandbox"
+        ).implementation_step_id
+    if role == "push_production":
+        implementation_step_id = release.implementation_steps.get(
+            plan__role="push_production"
+        ).implementation_step_id
+    payload = {
+        "implementation_step_id": f"{implementation_step_id}",
+    }
+    token = jwt.encode(
+        {
+            "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
+            "exp": timegm(datetime.utcnow().utctimetuple()),
+        },
+        settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
+        algorithm="HS256",
+    )
+    response = requests.post(
+        f"http://0.0.0.0:8001/implementation_step_id/{implementation_step_id}/start/",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    result = response.json()
+    if result["success"]:
+        #######################################################################
+        # PARSE RESULT HERE FOR IMPLMENTATION ID's when GUS SANDBOX is ready! #
+        #######################################################################
+        with transaction.atomic():
+            release.save()
+    else:
+        raise Exception("\n".join(err["message"] for err in result["errors"]))
+
+
+def send_stop_webhook(project_config, release, role):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
+        return
+    logger.info(
+        f"Sending start webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+    )
+    if role == "push_sandbox":
+        implementation_step_id = release.implementation_steps.get(
+            plan__role="push_sandbox"
+        ).implementation_step_id
+    if role == "push_production":
+        implementation_step_id = release.implementation_steps.get(
+            plan__role="push_production"
+        ).implementation_step_id
+    payload = {
+        "implementation_step_id": f"{implementation_step_id}",
+    }
+    token = jwt.encode(
+        {
+            "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
+            "exp": timegm(datetime.utcnow().utctimetuple()),
+        },
+        settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
+        algorithm="HS256",
+    )
+    response = requests.post(
+        f"http://0.0.0.0:8001/implementation_step_id/{implementation_step_id}/stop/",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    result = response.json()
+    if result["success"]:
+        #######################################################################
+        # PARSE RESULT HERE FOR IMPLMENTATION ID's when GUS SANDBOX is ready! #
+        #######################################################################
+        with transaction.atomic():
             release.save()
     else:
         raise Exception("\n".join(err["message"] for err in result["errors"]))
