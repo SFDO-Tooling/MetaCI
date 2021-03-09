@@ -21,13 +21,13 @@ class Command(BaseCommand):
         tests = [
             (
                 scratch_org_limits,
-                "Devhub seems to be configured",
-                "Devhub is not configured. Scratch org creation will fail",
+                "Dev Hub seems to be configured",
+                "Dev Hub is not configured. Scratch org creation will fail",
             ),
             (
                 test_github,
-                "Github API is configured",
-                "Github API is not configured. Repos cannot be retrieved for builds.",
+                "GitHub API is configured",
+                "GitHub API is not configured. Repos cannot be retrieved for builds.",
             ),
             (
                 test_connected_app,
@@ -47,7 +47,7 @@ class Command(BaseCommand):
                 func()
                 successes.append(good)
             except BaseException as e:
-                errors.append(bad + f": {e}")
+                errors.append(f"{bad}: {e}")
 
         print("")
         print("")

@@ -1,6 +1,6 @@
-===================
-Configuriing MetaCI
-===================
+==================
+Configuring MetaCI
+==================
 
 
 .env File Creation And Variable Declaration
@@ -38,7 +38,7 @@ GITHUB_USERNAME:
 
 GITHUB_PASSWORD:      
     This represents the password or personal access token a user must have to access 
-    their account a `personal access token` will be used when Multi Factor Authentication is enabled.
+    their account. A `personal access token` will be used when Multi Factor Authentication is enabled.
 
 OR
 
