@@ -66,7 +66,6 @@ class Command(BaseCommand):
 
 
 def test_connected_app():
-    # is there a way to test this with no user interaction?
     app = get_connected_app()
     assert app.client_id and isinstance(app.client_id, str)
     assert app.client_secret and isinstance(app.client_secret, str)

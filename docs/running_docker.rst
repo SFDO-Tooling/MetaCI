@@ -207,3 +207,45 @@ For more detailed instructions and options, see the `VS Code documentation`_.
 .. _Remote Development: https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack
 .. _integrated terminal: https://code.visualstudio.com/docs/editor/integrated-terminal
 .. _VS Code documentation: https://code.visualstudio.com/docs/remote/containers
+
+Environment Variables That Modify The Docker Environment
+--------------------------------------------------------
+
+*Note that you very seldom need to change these variables and most have usable defaults.*
+
+CHROMEDRIVER_DIR:
+    This environment variable represents the directory where the chromedriver package resides
+    in the filesystem. CHROMEDRIVER_DIR is set for you in the Dockerfile.
+
+NODE_VERSION: 
+    Environment variable used to set node version for download, this variable is set in the Dockerfile
+
+YARN_VERSION: 
+    Environment variable used to set yarn version for download, this variable is set in the Dockerfile
+
+PYTHONUNBUFFERED: 
+    Environment variable set in Dockerfile used to not write .pyc files to Docker container
+       
+DATABASE_URL:
+    Environment variable set in Dockerfile. Represents the full path of database url.
+
+REDIS_URL: 
+    This represents the url to the location where the redis server, configured for Meta CI. Set in Dockerfile.
+
+DJANGO_HASHID_SALT: 
+    This represents the hashid salt for the django application, currently set to 
+    arbritary string due to non production defaults, can be overridden 
+    in docker-compose.yml. Currently set in Dockerfile.
+    
+Build Arguments
+-------------------------------
+
+BUILD_ENV:
+    Argument used to determine what dependencies and scripts to run when installing
+    dependencies, populating databases, and setting ``DJANGO_SETTINGS_MODULE``. Values:
+    ``local``, ``production``, and ``test``.
+
+CHROMEDRIVER_VERSION:
+    Argument used to override the version of Chromedriver to install, which defaults to
+    the Chromedriver version returned by ``https://chromedriver.storage.googleapis.com/LATEST_RELEASE_X``
+    (where ``X`` is the version number of the installed Chrome version).
