@@ -1,7 +1,7 @@
 setuptools==53.1.0
 
 # CumulusCI
-cumulusci==3.29.0
+cumulusci==3.30.0
 
 # SFDO Template Helpers for authorization middleware and other helpers
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
@@ -25,7 +25,7 @@ django-model-utils==4.1.1
 django-guardian==2.3.0
 
 # Images
-Pillow==8.1.0
+Pillow==8.1.1
 
 # For user registration, either via email or social
 django-allauth==0.44.0

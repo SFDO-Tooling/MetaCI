@@ -18,6 +18,9 @@ export COVERALLS_PARALLEL=true
 export CIRCLECI=true
 export CIRCLE_BUILD_NUM=$HEROKU_TEST_RUN_ID
 
+# Check for missing Django db migrations
+DATABASE_URL=sqlite://:memory: ./manage.py makemigrations --check --dry-run || exit 1
+
 # Run Python tests
 coverage run $(which pytest) metaci --tap-stream
 exit_status=$?
