@@ -106,7 +106,7 @@
     "webpack-merge": "^5.4.1"
   },
   "engines": {
-    "node": "12.20.0",
+    "node": "12.21.0",
     "yarn": "1.22.10"
   },
   "scripts": {
