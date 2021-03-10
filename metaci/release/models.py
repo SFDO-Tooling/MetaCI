@@ -1,11 +1,13 @@
 import datetime
 
 from django.db import models
+from django.utils.timezone import make_aware
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from model_utils.models import StatusModel
 
+from metaci.plan.models import PlanRepository
 from metaci.release.utils import update_release_from_github
 
 
@@ -24,28 +26,29 @@ class ImplementationStep(models.Model):
     plan = models.ForeignKey(
         "plan.Plan", on_delete=models.CASCADE, related_name="implementation_steps"
     )
-    start_time = models.DateField(
-        _("start_time"),
-        null=True,
-        blank=True,
-        default=None,
+    start_time = models.DateTimeField(_("start_time"))
+    stop_time = models.DateTimeField(_("stop_time"))
+    external_id = models.CharField(
+        _("external id"), max_length=255, null=True, blank=True
     )
-    stop_time = models.DateField(_("stop_time"), null=True, blank=True, default=None)
-    implementation_step_id = models.CharField(
-        _("implementation step"), max_length=255, null=True, blank=True
-    )
+
+    class Meta:
+        ordering = ("start_time",)
+        unique_together = ("release", "plan")
 
     def __str__(self):
         return self.plan.name
 
 
+def get_default_sandbox_date():
+    return datetime.date.today()
+
+
+def get_default_production_date():
+    return datetime.date.today() + datetime.timedelta(days=6)
+
+
 class Release(StatusModel):
-    def get_sandbox_date():
-        return datetime.date.today()
-
-    def get_production_date():
-        return datetime.date.today() + datetime.timedelta(days=6)
-
     STATUS = Choices("draft", "published", "hidden")
     created = AutoCreatedField(_("created"))
     modified = AutoLastModifiedField(_("modified"))
@@ -75,19 +78,19 @@ class Release(StatusModel):
         _("release creation date"),
         null=True,
         blank=True,
-        default=get_sandbox_date,
+        default=get_default_sandbox_date,
     )
     sandbox_push_date = models.DateField(
         _("sandbox push date"),
         null=True,
         blank=True,
-        default=get_sandbox_date,
+        default=get_default_sandbox_date,
     )
     production_push_date = models.DateField(
         _("production push date"),
         null=True,
         blank=True,
-        default=get_production_date,
+        default=get_default_production_date,
     )
     created_from_commit = models.CharField(
         _("created from commit"), max_length=1024, null=True, blank=True
@@ -114,3 +117,35 @@ class Release(StatusModel):
 
     def update_from_github(self):
         update_release_from_github(self)
+
+    def save(self, *args, **kw):
+        super().save(*args, **kw)
+        self.create_default_implementation_steps()
+
+    def create_default_implementation_steps(self):
+        """Create default implementation steps"""
+        if not self.implementation_steps.count():
+            try:
+                planrepo = self.repo.planrepository_set.should_run().get(
+                    plan__role="release"
+                )
+            except (
+                PlanRepository.DoesNotExist,
+                PlanRepository.MultipleObjectsReturned,
+            ):
+                pass
+            else:
+                ImplementationStep(
+                    release=self,
+                    plan=planrepo.plan,
+                    start_time=make_aware(
+                        datetime.datetime.combine(
+                            get_default_sandbox_date(), datetime.time(18)
+                        )
+                    ),
+                    stop_time=make_aware(
+                        datetime.datetime.combine(
+                            get_default_sandbox_date(), datetime.time(23, 59)
+                        )
+                    ),
+                ).save()
