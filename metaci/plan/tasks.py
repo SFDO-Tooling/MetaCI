@@ -30,6 +30,16 @@ def run_scheduled(schedule):
 
 
 @django_rq.job("short")
+def run_scheduled_monthly():
+    return run_scheduled("monthly")
+
+
+@django_rq.job("short")
+def run_scheduled_weekly():
+    return run_scheduled("weekly")
+
+
+@django_rq.job("short")
 def run_scheduled_daily():
     return run_scheduled("daily")
 
