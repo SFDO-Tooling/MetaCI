@@ -151,11 +151,11 @@ def send_stop_webhook(project_config, release, role):
     if role == "push_sandbox":
         implementation_step_id = release.implementation_steps.get(
             plan__role="push_sandbox"
-        ).implementation_step_id
+        ).external_id
     if role == "push_production":
         implementation_step_id = release.implementation_steps.get(
             plan__role="push_production"
-        ).implementation_step_id
+        ).external_id
     payload = {
         "implementation_step_id": f"{implementation_step_id}",
     }
