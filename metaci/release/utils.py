@@ -88,10 +88,10 @@ def send_release_webhook(project_config, release):
         #######################################################################
         with transaction.atomic():
             release.implementation_steps.filter(plan__role="push_sandbox").update(
-                implementation_step_id="12345"
+                external_id="12345"
             )
             release.implementation_steps.filter(plan__role="push_production").update(
-                implementation_step_id="54321111"
+                external_id="54321111"
             )
             case_id = result["id"]
             case_url = settings.METACI_CHANGE_CASE_URL_TEMPLATE.format(case_id=case_id)
