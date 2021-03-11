@@ -120,14 +120,43 @@ class Release(StatusModel):
 
     def save(self, *args, **kw):
         super().save(*args, **kw)
-        self.create_default_implementation_steps()
+        self.create_default_implementation_steps(
+            "release_deploy",
+            get_default_sandbox_date(),
+            get_default_sandbox_date(),
+            datetime.time(8),
+            datetime.time(18),
+        )
+        self.create_default_implementation_steps(
+            "release",
+            get_default_sandbox_date(),
+            get_default_sandbox_date(),
+            datetime.time(8),
+            datetime.time(18),
+        )
+        self.create_default_implementation_steps(
+            "push_sandbox",
+            get_default_sandbox_date(),
+            get_default_sandbox_date(),
+            datetime.time(18),
+            datetime.time(23, 59),
+        )  # time will vary depending on product
+        self.create_default_implementation_steps(
+            "push_production",
+            get_default_production_date(),
+            get_default_production_date(),
+            datetime.time(18),
+            datetime.time(23, 59),
+        )  # time will vary depending on product
 
-    def create_default_implementation_steps(self):
+    def create_default_implementation_steps(
+        self, role, start_date=None, end_date=None, start_time=None, stop_time=None
+    ):
         """Create default implementation steps"""
-        if not self.implementation_steps.count():
+        if len(self.implementation_steps.filter(plan__role=f"{role}")) < 1:
             try:
                 planrepo = self.repo.planrepository_set.should_run().get(
-                    plan__role="release"
+                    plan__role=f"{role}"
                 )
             except (
                 PlanRepository.DoesNotExist,
@@ -139,13 +168,9 @@ class Release(StatusModel):
                     release=self,
                     plan=planrepo.plan,
                     start_time=make_aware(
-                        datetime.datetime.combine(
-                            get_default_sandbox_date(), datetime.time(18)
-                        )
+                        datetime.datetime.combine(start_date, start_time)
                     ),
                     stop_time=make_aware(
-                        datetime.datetime.combine(
-                            get_default_sandbox_date(), datetime.time(23, 59)
-                        )
+                        datetime.datetime.combine(end_date, stop_time)
                     ),
                 ).save()
