@@ -88,10 +88,10 @@ def send_release_webhook(project_config, release):
         #######################################################################
         with transaction.atomic():
             release.implementation_steps.filter(plan__role="push_sandbox").update(
-                implementation_step_id="12345"
+                external_id="12345"
             )
             release.implementation_steps.filter(plan__role="push_production").update(
-                implementation_step_id="54321111"
+                external_id="54321111"
             )
             case_id = result["id"]
             case_url = settings.METACI_CHANGE_CASE_URL_TEMPLATE.format(case_id=case_id)
@@ -110,11 +110,11 @@ def send_start_webhook(project_config, release, role):
     if role == "push_sandbox":
         implementation_step_id = release.implementation_steps.get(
             plan__role="push_sandbox"
-        ).implementation_step_id
+        ).external_id
     if role == "push_production":
         implementation_step_id = release.implementation_steps.get(
             plan__role="push_production"
-        ).implementation_step_id
+        ).external_id
     payload = {
         "implementation_step_id": f"{implementation_step_id}",
     }
@@ -151,11 +151,11 @@ def send_stop_webhook(project_config, release, role):
     if role == "push_sandbox":
         implementation_step_id = release.implementation_steps.get(
             plan__role="push_sandbox"
-        ).implementation_step_id
+        ).external_id
     if role == "push_production":
         implementation_step_id = release.implementation_steps.get(
             plan__role="push_production"
-        ).implementation_step_id
+        ).external_id
     payload = {
         "implementation_step_id": f"{implementation_step_id}",
     }

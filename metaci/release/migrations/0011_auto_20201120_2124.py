@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name="production_push_date",
             field=models.DateField(
                 blank=True,
-                default=metaci.release.models.Release.get_production_date,
+                default=metaci.release.models.get_default_production_date,
                 null=True,
                 verbose_name="production push date",
             ),
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             name="release_creation_date",
             field=models.DateField(
                 blank=True,
-                default=metaci.release.models.Release.get_sandbox_date,
+                default=metaci.release.models.get_default_sandbox_date,
                 null=True,
                 verbose_name="release creation date",
             ),
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
             name="sandbox_push_date",
             field=models.DateField(
                 blank=True,
-                default=metaci.release.models.Release.get_sandbox_date,
+                default=metaci.release.models.get_default_sandbox_date,
                 null=True,
                 verbose_name="sandbox push date",
             ),
