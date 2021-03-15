@@ -326,12 +326,19 @@ class Build(models.Model):
 
             # Initialize the project config
             project_config = self.get_project_config()
-            if self.plan.role == "push_sandbox" or self.plan.role == "push_production":
+
+            # Set the sentry context for build errors
+            sentry_environment = "metaci"
+            project_config.config["sentry_environment"] = sentry_environment
+
+            # Look up or spin up the org
+            org_config = self.get_org(project_config)
+            if self.plan.role == "push_sandbox" or self.plan.role == "push_production"  or self.plan.role == "release"  or self.plan.role == "release_deploy":
                 try:
-                    send_start_webhook(project_config, self.release, self.plan.role)
+                    send_start_webhook(project_config, self.release, self.plan.role,self.org.configuration_item)
                 except Exception as err:
                     message = (
-                        f"Error while sending implementation stop step webhook: {err}"
+                        f"Error while sending implementation start step webhook: {err}"
                     )
                     self.logger.error(message)
                     set_build_info(
@@ -341,13 +348,6 @@ class Build(models.Model):
                         time_end=timezone.now(),
                     )
                     return
-            # Set the sentry context for build errors
-            sentry_environment = "metaci"
-            project_config.config["sentry_environment"] = sentry_environment
-
-            # Look up or spin up the org
-            org_config = self.get_org(project_config)
-
         except Exception as e:
             self.logger.error(str(e))
             set_build_info(
@@ -433,7 +433,7 @@ class Build(models.Model):
 
         if self.plan.role == "release":
             try:
-                send_release_webhook(project_config, self.release)
+                send_release_webhook(project_config, self.release,self.org.configuration_item)
             except Exception as err:
                 message = f"Error while sending release webhook: {err}"
                 self.logger.error(message)
@@ -442,9 +442,9 @@ class Build(models.Model):
                 )
                 return
 
-        if self.plan.role == "push_sandbox":
+        if self.plan.role == "push_sandbox" or self.plan.role == "push_production"  or self.plan.role == "release"  or self.plan.role == "release_deploy":
             try:
-                send_stop_webhook(project_config, self.release, self.plan.role)
+                send_stop_webhook(project_config, self.release, self.plan.role,self.org.configuration_item)
             except Exception as err:
                 message = f"Error while sending implementation stop step webhook: {err}"
                 self.logger.error(message)

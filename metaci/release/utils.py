@@ -55,9 +55,9 @@ def update_release_from_github(release, repo_api=None):
     return release
 
 
-def send_release_webhook(project_config, release):
-    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
-        return
+def send_release_webhook(project_config, release, config_item):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL or not settings.GUS_BUS_ENABLED or not config_item:
+        return # should we better error handle this?
     logger.info(
         f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
@@ -67,6 +67,52 @@ def send_release_webhook(project_config, release):
         "package_name": project_config.project__package__name,
         "version": project_config.get_version_for_tag(tag),
         "release_url": f"{release.repo.url}/releases/tag/{urllib.parse.quote(tag)}",
+        "steps": [
+            {
+                "description": "release_deploy",
+                "start_time": release.implementation_steps.get(
+                    plan__role="release_deploy"
+                ).start_time.isoformat(),
+                "end_time": release.implementation_steps.get(
+                    plan__role="release_deploy"
+                ).stop_time.isoformat(),
+                "implementation_steps": "release_deploy",
+                "configuration_item": config_item
+            },
+            {
+                "description": "release",
+                "start_time": release.implementation_steps.get(
+                    plan__role="release"
+                ).start_time.isoformat(),
+                "end_time": release.implementation_steps.get(
+                    plan__role="release"
+                ).stop_time.isoformat(),
+                "implementation_steps": "release",
+                "configuration_item": config_item
+            },
+            {
+                "description": "push_sandbox",
+                "start_time": release.implementation_steps.get(
+                    plan__role="push_sandbox"
+                ).start_time.isoformat(),
+                "end_time": release.implementation_steps.get(
+                    plan__role="push_sandbox"
+                ).stop_time.isoformat(),
+                "implementation_steps": "push_sandbox",
+                "configuration_item": config_item
+            },
+            {
+                "description": "push_production",
+                "start_time": release.implementation_steps.get(
+                    plan__role="push_production"
+                ).start_time.isoformat(),
+                "end_time": release.implementation_steps.get(
+                    plan__role="push_production"
+                ).stop_time.isoformat(),
+                "implementation_steps": "push_production",
+                "configuration_item": config_item
+            },
+        ],
     }
     token = jwt.encode(
         {
@@ -83,15 +129,22 @@ def send_release_webhook(project_config, release):
     )
     result = response.json()
     if result["success"]:
+        # result["implementationSteps"] = ["1", "2", "3", "4"]
         #######################################################################
         # PARSE RESULT HERE FOR IMPLMENTATION ID's when GUS SANDBOX is ready! #
         #######################################################################
         with transaction.atomic():
+            release.implementation_steps.filter(plan__role="release_deploy").update(
+                external_id=result["implementationSteps"][0]
+            )
+            release.implementation_steps.filter(plan__role="release").update(
+                external_id=result["implementationSteps"][1]
+            )
             release.implementation_steps.filter(plan__role="push_sandbox").update(
-                external_id="12345"
+                external_id=result["implementationSteps"][2]
             )
             release.implementation_steps.filter(plan__role="push_production").update(
-                external_id="54321111"
+                external_id=result["implementationSteps"][3]
             )
             case_id = result["id"]
             case_url = settings.METACI_CHANGE_CASE_URL_TEMPLATE.format(case_id=case_id)
@@ -101,20 +154,15 @@ def send_release_webhook(project_config, release):
         raise Exception("\n".join(err["message"] for err in result["errors"]))
 
 
-def send_start_webhook(project_config, release, role):
-    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
+def send_start_webhook(project_config, release, role, config_item):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL or not settings.GUS_BUS_ENABLED or not config_item:
         return
     logger.info(
         f"Sending start webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
-    if role == "push_sandbox":
-        implementation_step_id = release.implementation_steps.get(
-            plan__role="push_sandbox"
-        ).external_id
-    if role == "push_production":
-        implementation_step_id = release.implementation_steps.get(
-            plan__role="push_production"
-        ).external_id
+    implementation_step_id = release.implementation_steps.get(
+        plan__role=role
+    ).external_id
     payload = {
         "implementation_step_id": f"{implementation_step_id}",
     }
@@ -133,29 +181,23 @@ def send_start_webhook(project_config, release, role):
     )
     result = response.json()
     if result["success"]:
-        #######################################################################
-        # PARSE RESULT HERE FOR IMPLMENTATION ID's when GUS SANDBOX is ready! #
-        #######################################################################
-        with transaction.atomic():
-            release.save()
+        self.logger.info(
+            f"Successfully started implementation_step: {implementation_step_id}"
+        )
     else:
         raise Exception("\n".join(err["message"] for err in result["errors"]))
 
 
-def send_stop_webhook(project_config, release, role):
-    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
+def send_stop_webhook(project_config, release, role, config_item):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL or not settings.GUS_BUS_ENABLED or not config_item:
         return
     logger.info(
-        f"Sending start webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+        f"Sending stop webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
-    if role == "push_sandbox":
-        implementation_step_id = release.implementation_steps.get(
-            plan__role="push_sandbox"
-        ).external_id
-    if role == "push_production":
-        implementation_step_id = release.implementation_steps.get(
-            plan__role="push_production"
-        ).external_id
+    implementation_step_id = release.implementation_steps.get(
+        plan__role=role
+    ).external_id
+ 
     payload = {
         "implementation_step_id": f"{implementation_step_id}",
     }
@@ -177,7 +219,8 @@ def send_stop_webhook(project_config, release, role):
         #######################################################################
         # PARSE RESULT HERE FOR IMPLMENTATION ID's when GUS SANDBOX is ready! #
         #######################################################################
-        with transaction.atomic():
-            release.save()
+        self.logger.info(
+            f"Successfully stopped implementation_step: {implementation_step_id}"
+        )
     else:
         raise Exception("\n".join(err["message"] for err in result["errors"]))

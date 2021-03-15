@@ -49,6 +49,7 @@ class OrgQuerySet(models.QuerySet):
 
 class Org(models.Model):
     name = models.CharField(max_length=255)
+    configuration_item = models.CharField(max_length=255, default="Configuration Item Path")
     json = models.TextField()
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey(
