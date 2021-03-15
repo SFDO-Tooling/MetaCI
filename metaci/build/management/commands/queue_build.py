@@ -1,13 +1,10 @@
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from ._utils import do_build, make_build
-
-User = get_user_model()
+from metaci.build.management.commands._utils import make_build
 
 
 class Command(BaseCommand):
-    help = "Runs a build from the command line (on local computer)."
+    help = "Enqueue a build to run on an appropriate dyno."
 
     def add_arguments(self, parser):
         parser.add_argument("repo_name", type=str)
@@ -20,11 +17,6 @@ class Command(BaseCommand):
             action="store_true",
             help="Do not lock the org. Use with extreme caution.",
         )
-        parser.add_argument(
-            "--should-queue",
-            action="store_true",
-            help="Put it in the Plan's appropriate queue instead of running it immediately.",
-        )
 
     def handle(
         self,
@@ -36,13 +28,10 @@ class Command(BaseCommand):
         *args,
         **options,
     ):
-        build = make_build(
+        make_build(
             repo_name,
             branch_name,
             commit,
             plan_name,
             username_or_email,
         )
-        print("Running build", build)
-        rc = do_build(build.id, options["no_lock"])
-        print("Build finished", rc)

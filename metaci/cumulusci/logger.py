@@ -4,6 +4,7 @@
 
 import datetime
 import logging
+import os
 
 import coloredlogs
 from django.utils import timezone
@@ -21,7 +22,9 @@ class LogStream(object):
         self.buffer = ""
         self.last_save_time = timezone.now()
 
-    def flush(self, force=False):
+    # TODO: Force mode seems to be always used.
+    #       Is that intended?
+    def flush(self, force=True):
         if self.model.log is None:
             self.model.log = u""
         self.model.log += self.buffer
@@ -49,14 +52,20 @@ def init_logger(model):
 
     logger = logging.getLogger("cumulusci")
 
-    # Remove existing handlers
-    for handler in list(logger.handlers):
-        handler.stream.flush(force=True)
-        logger.removeHandler(handler)
+    if os.environ.get("LOG_TO_STDERR"):
+        handler = logging.StreamHandler()
+        print("Logging to STDERR")
+        model.log = "Logging to STDERR"
+    else:
+        print("Redirecting Logging")
+        # Remove existing handlers
+        for handler in list(logger.handlers):
+            handler.stream.flush()
+            logger.removeHandler(handler)
+        handler = LogHandler(model)
 
     # Create the custom handler
     formatter = coloredlogs.ColoredFormatter(fmt="%(asctime)s: %(message)s")
-    handler = LogHandler(model)
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(formatter)
 

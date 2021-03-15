@@ -6,13 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plan', '0035_auto_20201016_1935'),
+        ("plan", "0035_auto_20201016_1935"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='planschedule',
-            name='schedule',
-            field=models.CharField(choices=[('daily', 'Daily'), ('hourly', 'Hourly'), ('weekly', 'Weekly'), ('monthly', 'Monthly')], max_length=16),
+            model_name="planschedule",
+            name="schedule",
+            field=models.CharField(
+                choices=[
+                    ("daily", "Daily"),
+                    ("hourly", "Hourly"),
+                    ("weekly", "Weekly"),
+                    ("monthly", "Monthly"),
+                ],
+                max_length=16,
+            ),
         ),
     ]

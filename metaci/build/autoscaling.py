@@ -1,5 +1,7 @@
 import logging
 import subprocess
+import typing as T
+from urllib.error import HTTPError
 
 import django_rq
 import requests
@@ -77,6 +79,9 @@ class Autoscaler(object):
         The default is to do no autoscaling.
         """
 
+    def one_off_build(self, build_id: T.Union[int, str], no_lock: bool):
+        """Run a build outside of the scaling formation"""
+
 
 class NonAutoscaler(Autoscaler):
     """Don't actually autoscale."""
@@ -111,6 +116,23 @@ class LocalAutoscaler(Autoscaler):
                         )
                     )
 
+    def one_off_build(self, build_id: T.Union[int, str], no_lock: bool):
+        """Run a build in a sub-process"""
+        if no_lock:
+            no_lock_arg = ["--no-lock"]
+        else:
+            no_lock_arg = []
+        proc = subprocess.Popen(
+            [
+                "python",
+                "./manage.py",
+                "run_build_from_id",
+                str(build_id),
+            ]
+            + no_lock_arg
+        )
+        return proc.pid
+
 
 class HerokuAutoscaler(Autoscaler):
     """Scale using Heroku worker dynos."""
@@ -131,7 +153,8 @@ class HerokuAutoscaler(Autoscaler):
                 f"'worker_type' not present in autoscaler config:\nFound: {config}"
             )
         self.worker_type = config["worker_type"]
-        self.url = f"{self.API_ROOT}/{config['app_name']}/formation/{self.worker_type}"
+        self.base_url = f"{self.API_ROOT}/{config['app_name']}"
+        self.url = f"{self.base_url}/formation/{self.worker_type}"
         self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
@@ -179,6 +202,31 @@ class HerokuAutoscaler(Autoscaler):
         assert target_workers >= 0
 
         return requests.patch(url, json={"quantity": target_workers}, headers=headers)
+
+    def one_off_build(self, build_id: T.Union[int, str], no_lock: bool):
+        """Run a one-off-build on a new heroku dyno"""
+        if no_lock:
+            no_lock_arg = ["--no-lock"]
+        else:
+            no_lock_arg = []
+        command = " ".join(
+            [
+                "python",
+                "./manage.py",
+                "run_build_from_id",
+                build_id,
+            ]
+            + no_lock_arg
+        )
+        url = f"{self.base_url}/dynos"
+        json = {"command": command, "time_to_live": "86400"}
+
+        resp = requests.post(url, json=json, headers=self.headers)
+        if resp.status_code != 200:
+            msg = f"One-off dyno could not be started: {resp.status_code}: {resp.reason} : {resp.text}"
+            logger.error(msg)
+            raise HTTPError(resp.url, resp.status_code, msg, resp.headers, resp)
+        return resp.json()["id"]
 
 
 def get_autoscaler(app_name):

@@ -1,5 +1,5 @@
-from django import db
 import django_rq
+from django import db
 
 from metaci.plan.models import PlanSchedule
 

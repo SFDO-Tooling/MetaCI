@@ -89,3 +89,5 @@ AUTOSCALERS = {
         "queues": ["default", "medium", "high"],
     }
 }
+
+LONG_RUNNING_BUILD_SCALER = "test-app"
