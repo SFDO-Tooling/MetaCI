@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
@@ -20,7 +20,7 @@ def test_send_release_webhook(mocked_responses, mocker, transactional_db):
     project_config.get_version_for_tag.return_value = "1.0"
     release = ReleaseFactory()
 
-    send_release_webhook(project_config, release, MagicMock())
+    send_release_webhook(project_config, release, "release")
 
     assert release.change_case_link == "2"
 
