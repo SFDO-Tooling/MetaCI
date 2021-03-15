@@ -20,13 +20,13 @@ def test_send_release_webhook(mocked_responses, mocker, transactional_db):
     project_config.get_version_for_tag.return_value = "1.0"
     release = ReleaseFactory()
 
-    send_release_webhook(project_config, release)
+    send_release_webhook(project_config, release, "NA.52.31")
 
     assert release.change_case_link == "2"
 
 
 def test_send_release_webhook__disabled(mocked_responses):
-    send_release_webhook(None, None)
+    send_release_webhook(None, None, None)
     assert len(mocked_responses.calls) == 0
 
 
