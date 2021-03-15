@@ -36,7 +36,7 @@ redis==3.5.3
 
 # Django RQ
 rq==1.7.0
-rq-scheduler==0.10.0
+rq-scheduler==0.11.0
 django-rq==2.4.0
 
 # Salesforce Lightning Design System for Django
