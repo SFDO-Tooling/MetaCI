@@ -48,4 +48,4 @@ def test_send_release_webhook__error(mocked_responses, mocker, transactional_db)
     release = ReleaseFactory()
 
     with pytest.raises(Exception, match="danger"):
-        send_release_webhook(project_config, release)
+        send_release_webhook(project_config, release, None)
