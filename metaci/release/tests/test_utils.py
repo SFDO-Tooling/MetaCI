@@ -40,12 +40,19 @@ def test_send_release_webhook__error(mocked_responses, mocker, transactional_db)
     mocked_responses.add(
         "POST",
         "https://webhook",
-        json={"success": False, "errors": [{"message": "danger"}]},
+        json={
+            "success": False,
+            "errors": [
+                {"message": "ImplementationStep matching query does not exist."}
+            ],
+        },
     )
 
     project_config = Mock(project__package__name="Test Package")
     project_config.get_version_for_tag.return_value = "1.0"
     release = ReleaseFactory()
 
-    with pytest.raises(Exception, match="danger"):
+    with pytest.raises(
+        Exception, match="ImplementationStep matching query does not exist."
+    ):
         send_release_webhook(project_config, release, "foo")
