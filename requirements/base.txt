@@ -76,3 +76,4 @@ django-defender==0.8.0
 
 # Let Javascript refer to Django URLs by name
 django-js-reverse==0.9.1
+urllib3>=1.26.4 # not directly required, pinned by Snyk to avoid a vulnerability
