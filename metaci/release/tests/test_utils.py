@@ -20,7 +20,7 @@ def test_send_release_webhook(mocked_responses, mocker, transactional_db):
     project_config.get_version_for_tag.return_value = "1.0"
     release = ReleaseFactory()
 
-    send_release_webhook(project_config, release, "release")
+    send_release_webhook(project_config, release, "INFRA.instance1")
 
     assert release.change_case_link == "2"
 
@@ -55,4 +55,4 @@ def test_send_release_webhook__error(mocked_responses, mocker, transactional_db)
     with pytest.raises(
         Exception, match="ImplementationStep matching query does not exist."
     ):
-        send_release_webhook(project_config, release, "foo")
+        send_release_webhook(project_config, release, "INFRA.instance1")
