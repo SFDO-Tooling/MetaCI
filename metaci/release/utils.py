@@ -13,6 +13,29 @@ from django.utils.dateparse import parse_date
 logger = logging.getLogger(__name__)
 
 
+def implementation_payload(role, config_item):
+    if role and config_item:
+        return {
+            "description": role,
+            "start_time": role,
+            "end_time": role,
+            "configuration_item": config_item,
+            "implementation_steps": role,
+        }
+    raise Exception("Please check your plan's role and org's configuration item.")
+
+
+def jwt_session():
+    return jwt.encode(
+        {
+            "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
+            "exp": timegm(datetime.utcnow().utctimetuple()),
+        },
+        settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
+        algorithm="HS256",
+    )
+
+
 def update_release_from_github(release, repo_api=None):
     if not repo_api:
         repo_api = release.repo.get_github_api()
@@ -55,73 +78,31 @@ def update_release_from_github(release, repo_api=None):
     return release
 
 
-def send_release_webhook(project_config, release, config_item):
-    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL or not settings.GUS_BUS_ENABLED or not config_item:
-        return # should we better error handle this?
+def send_release_webhook(project_config, release, config_item=None):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
+        return  # should we better error handle this?
     logger.info(
         f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
     tag = release.git_tag
+
+    steps = []
+    if config_item and settings.METACI_START_STOP_WEBHOOK:
+        implementation_steps = release.implementation_steps.all()
+        for implementation_step in implementation_steps:
+            steps = [
+                implementation_payload(implementation_step.plan.role, config_item)
+                for implementation_step in release.implementation_steps.all()
+            ]
+
     payload = {
         "case_template_id": release.change_case_template.case_template_id,
         "package_name": project_config.project__package__name,
         "version": project_config.get_version_for_tag(tag),
         "release_url": f"{release.repo.url}/releases/tag/{urllib.parse.quote(tag)}",
-        "steps": [
-            {
-                "description": "release_deploy",
-                "start_time": release.implementation_steps.get(
-                    plan__role="release_deploy"
-                ).start_time.isoformat(),
-                "end_time": release.implementation_steps.get(
-                    plan__role="release_deploy"
-                ).stop_time.isoformat(),
-                "implementation_steps": "release_deploy",
-                "configuration_item": config_item
-            },
-            {
-                "description": "release",
-                "start_time": release.implementation_steps.get(
-                    plan__role="release"
-                ).start_time.isoformat(),
-                "end_time": release.implementation_steps.get(
-                    plan__role="release"
-                ).stop_time.isoformat(),
-                "implementation_steps": "release",
-                "configuration_item": config_item
-            },
-            {
-                "description": "push_sandbox",
-                "start_time": release.implementation_steps.get(
-                    plan__role="push_sandbox"
-                ).start_time.isoformat(),
-                "end_time": release.implementation_steps.get(
-                    plan__role="push_sandbox"
-                ).stop_time.isoformat(),
-                "implementation_steps": "push_sandbox",
-                "configuration_item": config_item
-            },
-            {
-                "description": "push_production",
-                "start_time": release.implementation_steps.get(
-                    plan__role="push_production"
-                ).start_time.isoformat(),
-                "end_time": release.implementation_steps.get(
-                    plan__role="push_production"
-                ).stop_time.isoformat(),
-                "implementation_steps": "push_production",
-                "configuration_item": config_item
-            },
-        ],
+        "steps": steps,
     }
-    token = jwt.encode(
-        {
-            "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
-            "exp": timegm(datetime.utcnow().utctimetuple()),
-        },
-        settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
-        algorithm="HS256",
-    )
+    token = jwt_session()
     response = requests.post(
         settings.METACI_RELEASE_WEBHOOK_URL,
         json=payload,
@@ -129,23 +110,26 @@ def send_release_webhook(project_config, release, config_item):
     )
     result = response.json()
     if result["success"]:
-        # result["implementationSteps"] = ["1", "2", "3", "4"]
-        #######################################################################
-        # PARSE RESULT HERE FOR IMPLMENTATION ID's when GUS SANDBOX is ready! #
-        #######################################################################
+        result["implementationSteps"] = ["1", "2", "3", "4"]
         with transaction.atomic():
-            release.implementation_steps.filter(plan__role="release_deploy").update(
-                external_id=result["implementationSteps"][0]
-            )
-            release.implementation_steps.filter(plan__role="release").update(
-                external_id=result["implementationSteps"][1]
-            )
-            release.implementation_steps.filter(plan__role="push_sandbox").update(
-                external_id=result["implementationSteps"][2]
-            )
-            release.implementation_steps.filter(plan__role="push_production").update(
-                external_id=result["implementationSteps"][3]
-            )
+            if settings.METACI_START_STOP_WEBHOOK:
+                for i in range(0, len(implementation_steps) - 1):
+                    implementation_steps[i].external_id = result["implementationSteps"][
+                        i
+                    ]
+
+                # release.implementation_steps.filter(plan__role="release_deploy").update(
+                #     external_id=result["implementationSteps"][0]
+                # )
+                # release.implementation_steps.filter(plan__role="release").update(
+                #     external_id=result["implementationSteps"][1]
+                # )
+                # release.implementation_steps.filter(plan__role="push_sandbox").update(
+                #     external_id=result["implementationSteps"][2]
+                # )
+                # release.implementation_steps.filter(plan__role="push_production").update(
+                #     external_id=result["implementationSteps"][3]
+                # )
             case_id = result["id"]
             case_url = settings.METACI_CHANGE_CASE_URL_TEMPLATE.format(case_id=case_id)
             release.change_case_link = case_url
@@ -155,8 +139,16 @@ def send_release_webhook(project_config, release, config_item):
 
 
 def send_start_webhook(project_config, release, role, config_item):
-    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL or not settings.GUS_BUS_ENABLED or not config_item:
+    if (
+        release is None
+        or not settings.METACI_RELEASE_WEBHOOK_URL
+        or not settings.METACI_START_STOP_WEBHOOK
+    ):
         return
+    if not config_item:
+        raise Exception(
+            "Error sending start webhook, please include a configuration item, which can be defined on the org."
+        )
     logger.info(
         f"Sending start webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
@@ -166,14 +158,7 @@ def send_start_webhook(project_config, release, role, config_item):
     payload = {
         "implementation_step_id": f"{implementation_step_id}",
     }
-    token = jwt.encode(
-        {
-            "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
-            "exp": timegm(datetime.utcnow().utctimetuple()),
-        },
-        settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
-        algorithm="HS256",
-    )
+    token = jwt_session()
     response = requests.post(
         f"http://0.0.0.0:8001/implementation_step_id/{implementation_step_id}/start/",
         json=payload,
@@ -181,7 +166,7 @@ def send_start_webhook(project_config, release, role, config_item):
     )
     result = response.json()
     if result["success"]:
-        self.logger.info(
+        logger.info(
             f"Successfully started implementation_step: {implementation_step_id}"
         )
     else:
@@ -189,26 +174,26 @@ def send_start_webhook(project_config, release, role, config_item):
 
 
 def send_stop_webhook(project_config, release, role, config_item):
-    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL or not settings.GUS_BUS_ENABLED or not config_item:
+    if (
+        release is None
+        or not settings.METACI_RELEASE_WEBHOOK_URL
+        or not settings.METACI_START_STOP_WEBHOOK
+    ):
         return
+    if not config_item:
+        raise Exception(
+            "Error sending stop webhook, please include a configuration item, which can be defined on the org."
+        )
     logger.info(
         f"Sending stop webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
     implementation_step_id = release.implementation_steps.get(
         plan__role=role
     ).external_id
- 
     payload = {
         "implementation_step_id": f"{implementation_step_id}",
     }
-    token = jwt.encode(
-        {
-            "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
-            "exp": timegm(datetime.utcnow().utctimetuple()),
-        },
-        settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
-        algorithm="HS256",
-    )
+    token = jwt_session()
     response = requests.post(
         f"http://0.0.0.0:8001/implementation_step_id/{implementation_step_id}/stop/",
         json=payload,
@@ -216,10 +201,7 @@ def send_stop_webhook(project_config, release, role, config_item):
     )
     result = response.json()
     if result["success"]:
-        #######################################################################
-        # PARSE RESULT HERE FOR IMPLMENTATION ID's when GUS SANDBOX is ready! #
-        #######################################################################
-        self.logger.info(
+        logger.info(
             f"Successfully stopped implementation_step: {implementation_step_id}"
         )
     else:

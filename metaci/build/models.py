@@ -334,7 +334,7 @@ class Build(models.Model):
             # Look up or spin up the org
             org_config = self.get_org(project_config)
             if (
-                self.org.name.lower() == "packaging"
+                self.org and self.org.name and self.org.name.lower() == "packaging"
             ):  # Calling for any actions taken against packaging org
                 send_start_webhook(
                     project_config,
@@ -438,9 +438,8 @@ class Build(models.Model):
                     build, status="error", exception=message, time_end=timezone.now()
                 )
                 return
-
         if (
-            self.org.name.lower() == "packaging"
+            self.org and self.org.name and self.org.name.lower() == "packaging"
         ):  # Calling for any actions taken against packaging org
             try:
                 send_stop_webhook(
