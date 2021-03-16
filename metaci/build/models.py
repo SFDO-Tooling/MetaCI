@@ -333,21 +333,16 @@ class Build(models.Model):
 
             # Look up or spin up the org
             org_config = self.get_org(project_config)
-            if self.plan.role == "push_sandbox" or self.plan.role == "push_production"  or self.plan.role == "release"  or self.plan.role == "release_deploy":
-                try:
-                    send_start_webhook(project_config, self.release, self.plan.role,self.org.configuration_item)
-                except Exception as err:
-                    message = (
-                        f"Error while sending implementation start step webhook: {err}"
-                    )
-                    self.logger.error(message)
-                    set_build_info(
-                        build,
-                        status="error",
-                        exception=message,
-                        time_end=timezone.now(),
-                    )
-                    return
+            if (
+                self.org.name.lower() == "packaging"
+            ):  # Calling for any actions taken against packaging org
+                send_start_webhook(
+                    project_config,
+                    self.release,
+                    self.plan.role,
+                    self.org.configuration_item,
+                )
+
         except Exception as e:
             self.logger.error(str(e))
             set_build_info(
@@ -433,7 +428,9 @@ class Build(models.Model):
 
         if self.plan.role == "release":
             try:
-                send_release_webhook(project_config, self.release,self.org.configuration_item)
+                send_release_webhook(
+                    project_config, self.release, self.org.configuration_item
+                )
             except Exception as err:
                 message = f"Error while sending release webhook: {err}"
                 self.logger.error(message)
@@ -442,9 +439,16 @@ class Build(models.Model):
                 )
                 return
 
-        if self.plan.role == "push_sandbox" or self.plan.role == "push_production"  or self.plan.role == "release"  or self.plan.role == "release_deploy":
+        if (
+            self.org.name.lower() == "packaging"
+        ):  # Calling for any actions taken against packaging org
             try:
-                send_stop_webhook(project_config, self.release, self.plan.role,self.org.configuration_item)
+                send_stop_webhook(
+                    project_config,
+                    self.release,
+                    self.plan.role,
+                    self.org.configuration_item,
+                )
             except Exception as err:
                 message = f"Error while sending implementation stop step webhook: {err}"
                 self.logger.error(message)

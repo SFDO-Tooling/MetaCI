@@ -104,7 +104,9 @@ class Release(StatusModel):
     change_case_link = models.URLField(
         _("change case link"), max_length=1024, null=True, blank=True
     )
-    submitted_case = models.BooleanField(_("submitted_case"),default=False, editable=False)
+    submitted_case = models.BooleanField(
+        _("submitted_case"), default=False, editable=False
+    )
 
     class Meta:
         get_latest_by = "created"
@@ -121,28 +123,28 @@ class Release(StatusModel):
 
     def save(self, *args, **kw):
         super().save(*args, **kw)
-        self.create_default_implementation_steps(
+        self.create_default_implementation_step(
             "release_deploy",
             get_default_sandbox_date(),
             get_default_sandbox_date(),
             datetime.time(8),
             datetime.time(18),
         )
-        self.create_default_implementation_steps(
+        self.create_default_implementation_step(
             "release",
             get_default_sandbox_date(),
             get_default_sandbox_date(),
             datetime.time(8),
             datetime.time(18),
         )
-        self.create_default_implementation_steps(
+        self.create_default_implementation_step(
             "push_sandbox",
             get_default_sandbox_date(),
             get_default_sandbox_date(),
             datetime.time(18),
             datetime.time(23, 59),
         )  # time will vary depending on product
-        self.create_default_implementation_steps(
+        self.create_default_implementation_step(
             "push_production",
             get_default_production_date(),
             get_default_production_date(),
@@ -150,7 +152,7 @@ class Release(StatusModel):
             datetime.time(23, 59),
         )  # time will vary depending on product
 
-    def create_default_implementation_steps(
+    def create_default_implementation_step(
         self, role, start_date=None, end_date=None, start_time=None, stop_time=None
     ):
         """Create default implementation steps"""
