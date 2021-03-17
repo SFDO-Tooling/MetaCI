@@ -110,26 +110,12 @@ def send_release_webhook(project_config, release, config_item=None):
     )
     result = response.json()
     if result["success"]:
-        result["implementationSteps"] = ["1", "2", "3", "4"]
         with transaction.atomic():
             if settings.METACI_START_STOP_WEBHOOK:
                 for i in range(0, len(implementation_steps) - 1):
                     implementation_steps[i].external_id = result["implementationSteps"][
                         i
                     ]
-
-                # release.implementation_steps.filter(plan__role="release_deploy").update(
-                #     external_id=result["implementationSteps"][0]
-                # )
-                # release.implementation_steps.filter(plan__role="release").update(
-                #     external_id=result["implementationSteps"][1]
-                # )
-                # release.implementation_steps.filter(plan__role="push_sandbox").update(
-                #     external_id=result["implementationSteps"][2]
-                # )
-                # release.implementation_steps.filter(plan__role="push_production").update(
-                #     external_id=result["implementationSteps"][3]
-                # )
             case_id = result["id"]
             case_url = settings.METACI_CHANGE_CASE_URL_TEMPLATE.format(case_id=case_id)
             release.change_case_link = case_url
