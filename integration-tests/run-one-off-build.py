@@ -19,7 +19,7 @@ from metaci.conftest import (
 @patch("metaci.build.tasks.reset_database_connection", lambda: ...)
 class TestOneOffBuild:
     @patch.dict(environ, {"LOG_TO_STDERR": "True"})
-    def test_one_off_build(self):
+    def test_one_off_build(self, capsys):
         repo = RepositoryFactory(
             name="CumulusCI-Test",
             owner="SFDO-Tooling",
@@ -44,3 +44,5 @@ class TestOneOffBuild:
         )
         c = Command()
         c.handle(build_id=build.id)
+        outerr = capsys.readouterr()
+        assert "ci_test_concurrency" in outerr.err + outerr.out
