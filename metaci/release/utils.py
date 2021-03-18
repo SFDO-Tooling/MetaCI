@@ -89,11 +89,10 @@ def send_release_webhook(project_config, release, config_item=None):
     steps = []
     if config_item and settings.METACI_START_STOP_WEBHOOK:
         implementation_steps = release.implementation_steps.all()
-        for implementation_step in implementation_steps:
-            steps = [
-                implementation_payload(implementation_step.plan.role, config_item)
-                for implementation_step in release.implementation_steps.all()
-            ]
+        steps = [
+            implementation_payload(implementation_step.plan.role, config_item)
+            for implementation_step in implementation_steps
+        ]
 
     payload = {
         "case_template_id": release.change_case_template.case_template_id,
