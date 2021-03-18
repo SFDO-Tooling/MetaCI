@@ -14,7 +14,9 @@ def test_send_release_webhook(mocked_responses, mocker, transactional_db):
         METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
         METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
     )
-    mocked_responses.add("POST", "https://webhook", json={"success": True, "id": "2"})
+    mocked_responses.add(
+        "POST", "https://webhook/release/", json={"success": True, "id": "2"}
+    )
 
     project_config = Mock(project__package__name="Test Package")
     project_config.get_version_for_tag.return_value = "1.0"
@@ -39,7 +41,7 @@ def test_send_release_webhook__error(mocked_responses, mocker, transactional_db)
     )
     mocked_responses.add(
         "POST",
-        "https://webhook",
+        "https://webhook/release/",
         json={
             "success": False,
             "errors": [

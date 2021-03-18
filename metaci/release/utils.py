@@ -146,7 +146,7 @@ def send_start_webhook(project_config, release, role, config_item):
     }
     token = jwt_for_webhook()
     response = requests.post(
-        f"http://{settings.METACI_RELEASE_WEBHOOK_URL}/implementation_step_id/{implementation_step_id}/start/",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/implementation_step_id/{implementation_step_id}/start/",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -181,7 +181,7 @@ def send_stop_webhook(project_config, release, role, config_item):
     }
     token = jwt_for_webhook()
     response = requests.post(
-        f"http://0.0.0.0:8001/implementation_step_id/{implementation_step_id}/stop/",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/implementation_step_id/{implementation_step_id}/stop/",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
