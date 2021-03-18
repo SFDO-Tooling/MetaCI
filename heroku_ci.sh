@@ -24,6 +24,11 @@ DATABASE_URL=sqlite://:memory: ./manage.py makemigrations --check --dry-run || e
 # Run Python tests
 coverage run $(which pytest) metaci --tap-stream
 exit_status=$?
+if [ $exit_status -eq 0 ]
+then
+    $(which pytest) integration-tests --tap-stream
+    exit_status=$?
+fi
 coveralls
 
 # Run JS tests
