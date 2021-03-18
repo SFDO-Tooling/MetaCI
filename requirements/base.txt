@@ -65,7 +65,7 @@ django-log-request-id==1.6.0
 psycopg2-binary==2.8.6
 
 # django-storages for S3
-boto3==1.17.27
+boto3==1.17.31
 django-storages==1.11.1
 
 # JSON web token
