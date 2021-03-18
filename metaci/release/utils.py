@@ -25,7 +25,7 @@ def implementation_payload(role, config_item):
     raise Exception("Please check your plan's role and org's configuration item.")
 
 
-def jwt_session():
+def jwt_for_webhook():
     return jwt.encode(
         {
             "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
@@ -102,20 +102,21 @@ def send_release_webhook(project_config, release, config_item=None):
         "release_url": f"{release.repo.url}/releases/tag/{urllib.parse.quote(tag)}",
         "steps": steps,
     }
-    token = jwt_session()
+    token = jwt_for_webhook()
     response = requests.post(
-        settings.METACI_RELEASE_WEBHOOK_URL,
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/release/",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
     if result["success"]:
         with transaction.atomic():
-            if settings.METACI_START_STOP_WEBHOOK:
-                for i in range(0, len(implementation_steps) - 1):
-                    implementation_steps[i].external_id = result["implementationSteps"][
-                        i
-                    ]
+            if "implementation_steps" in result:
+                for step_model, step_result in zip(
+                    implementation_steps, result["implementationSteps"]
+                ):
+                    step_model.external_id = step_result
+                    step_model.save()
             case_id = result["id"]
             case_url = settings.METACI_CHANGE_CASE_URL_TEMPLATE.format(case_id=case_id)
             release.change_case_link = case_url
@@ -144,9 +145,9 @@ def send_start_webhook(project_config, release, role, config_item):
     payload = {
         "implementation_step_id": f"{implementation_step_id}",
     }
-    token = jwt_session()
+    token = jwt_for_webhook()
     response = requests.post(
-        f"http://0.0.0.0:8001/implementation_step_id/{implementation_step_id}/start/",
+        f"http://{settings.METACI_RELEASE_WEBHOOK_URL}/implementation_step_id/{implementation_step_id}/start/",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -179,7 +180,7 @@ def send_stop_webhook(project_config, release, role, config_item):
     payload = {
         "implementation_step_id": f"{implementation_step_id}",
     }
-    token = jwt_session()
+    token = jwt_for_webhook()
     response = requests.post(
         f"http://0.0.0.0:8001/implementation_step_id/{implementation_step_id}/stop/",
         json=payload,
