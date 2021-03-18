@@ -3,8 +3,8 @@ from django.core.files.base import ContentFile
 from django.test import Client
 from django.urls import reverse
 
-from metaci.testresults import views
 from metaci.build.models import BuildFlowAsset
+from metaci.testresults import views
 
 
 class TestTestResultsViews:
@@ -137,3 +137,6 @@ class TestTestResultsViews:
         )
         response = self.client.get(url)
         assert response.status_code == 302
+
+    def test_failure_1(self, data, superuser):
+        assert 0
