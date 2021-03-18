@@ -46,3 +46,4 @@ class TestOneOffBuild:
         c.handle(build_id=build.id)
         outerr = capsys.readouterr()
         assert "ci_test_concurrency" in outerr.err + outerr.out
+        assert 0
