@@ -90,4 +90,4 @@ AUTOSCALERS = {
     }
 }
 
-LONG_RUNNING_BUILD_SCALER = "test-app"
+METACI_LONG_RUNNING_BUILD_APP = "test-app"

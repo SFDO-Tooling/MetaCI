@@ -271,7 +271,10 @@ def delete_scratch_org(org_instance_id):
 
 def run_one_off_build(build, no_lock: bool):
     """Immediately launch a one-off-build with env-appropriate autoscaler"""
-    auto_scaler_app_name = settings.LONG_RUNNING_BUILD_SCALER
+    auto_scaler_app_name = settings.METACI_LONG_RUNNING_BUILD_APP
+    assert (
+        auto_scaler_app_name
+    ), "Need to define METACI_LONG_RUNNING_BUILD_APP to run one-off-builds"
     autoscaler = get_autoscaler(auto_scaler_app_name)
     try:
         return autoscaler.one_off_build(build.id, no_lock)

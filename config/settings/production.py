@@ -273,8 +273,6 @@ if not AUTOSCALERS and HEROKU_APP_NAME:
         }
     }
 
-LONG_RUNNING_BUILD_SCALER = env("LONG_RUNNING_BUILD_SCALER", default=HEROKU_APP_NAME)
-
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")
 
