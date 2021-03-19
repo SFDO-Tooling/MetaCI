@@ -1,7 +1,6 @@
 import logging
 import subprocess
 import typing as T
-from urllib.error import HTTPError
 
 import django_rq
 import requests
@@ -207,7 +206,7 @@ class HerokuAutoscaler(Autoscaler):
         if resp.status_code != 200:
             msg = f"One-off dyno could not be started: {resp.status_code}: {resp.reason} : {resp.text}"
             logger.error(msg)
-            raise HTTPError(resp.url, resp.status_code, msg, resp.headers, resp)
+            resp.raise_for_status()
         return resp.json()["id"]
 
 
