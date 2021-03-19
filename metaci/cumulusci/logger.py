@@ -22,8 +22,6 @@ class LogStream(object):
         self.buffer = ""
         self.last_save_time = timezone.now()
 
-    # TODO: Force mode seems to be always used.
-    #       Is that intended?
     def flush(self, force=True):
         if self.model.log is None:
             self.model.log = u""
@@ -52,22 +50,19 @@ def init_logger(model):
 
     logger = logging.getLogger("cumulusci")
 
-    if os.environ.get("LOG_TO_STDERR"):
-        handler = logging.StreamHandler()
-        print("Logging to STDERR")
-        model.log = "Logging to STDERR"
-    else:
-        print("Redirecting Logging")
-        # Remove existing handlers
-        for handler in list(logger.handlers):
-            handler.stream.flush()
-            logger.removeHandler(handler)
-        handler = LogHandler(model)
+    # Remove existing handlers
+    for handler in list(logger.handlers):
+        handler.stream.flush()
+        logger.removeHandler(handler)
+    handler = LogHandler(model)
 
     # Create the custom handler
     formatter = coloredlogs.ColoredFormatter(fmt="%(asctime)s: %(message)s")
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(formatter)
+
+    if os.environ.get("LOG_TO_STDERR"):
+        logger.addHandler(logging.StreamHandler())
 
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
