@@ -53,7 +53,6 @@ THIRD_PARTY_APPS = (
     "allauth",  # registration
     "allauth.account",  # registration
     "allauth.socialaccount",  # registration
-    "allauth.socialaccount.providers.github",  # github
     "crispy_forms",  # Form layouts
     "django_filters",  # view helpers for filtering models
     "django_js_reverse",  # allow JS to reverse URLs
@@ -279,6 +278,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# GitHub OAuth2 (for GitHub app or GitHub Oauth App)
+GITHUB_CLIENT_ID = env("GITHUB_CLIENT_ID")
+GITHUB_CLIENT_SECRET = env("GITHUB_CLIENT_SECRET")
+
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = (
@@ -295,6 +298,9 @@ ACCOUNT_EMAIL_VERIFICATION = env("ACCOUNT_EMAIL_VERIFICATION", default="mandator
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 ACCOUNT_ADAPTER = "metaci.users.adapters.AccountAdapter"
 SOCIALACCOUNT_ADAPTER = "metaci.users.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_PROVIDERS = {
+    "github": {"APP": {"client_id": GITHUB_CLIENT_ID, "secret": GITHUB_CLIENT_SECRET}}
+}
 
 # Custom user app defaults
 # Select the correct user model
@@ -390,7 +396,9 @@ for key, cron_string in cron_overrides.items():
 SITE_URL = None
 FROM_EMAIL = "test@mailinator.com"
 
-# Github credentials
+# Github credentials (for CumulusCI flows that use the github service to call GitHub)
+# Instead of username/password, you can supply GITHUB_APP_ID and GITHUB_APP_KEY,
+# and CumulusCI will use those in preference to the username/password.
 GITHUB_USERNAME = env("GITHUB_USERNAME", default=None)
 GITHUB_PASSWORD = env("GITHUB_PASSWORD", default=None)
 GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET", default="")
