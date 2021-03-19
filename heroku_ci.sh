@@ -1,6 +1,8 @@
 #!/bin/bash
 # This script runs the tests on Heroku CI
 
+set -x
+
 # Pretend this is a git repo so that coveralls can find git info
 git clone -b "$HEROKU_TEST_RUN_BRANCH" --single-branch https://github.com/SFDO-Tooling/MetaCI MetaCI_checkout 
 cd MetaCI_checkout
@@ -26,7 +28,7 @@ coverage run $(which pytest) metaci --tap-stream
 exit_status=$?
 if [ $exit_status -eq 0 ]
 then
-    $(which pytest) integration-tests --tap-stream
+    $(which pytest) integration-tests
     exit_status=$?
 fi
 coveralls
