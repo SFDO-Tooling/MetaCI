@@ -110,8 +110,7 @@ def dispatch_one_off_build(build, lock_id: str = None):
         id: T.Any
 
     try:
-        already_locked = lock_id is not None
-        job_id = run_one_off_build(build, no_lock=already_locked)
+        job_id = launch_one_off_build_worker(build, lock_id)
         build.log = build.log or []
         build.log.append(f"\nRunning build in context (dyno) {job_id}\n")
         build.save()
@@ -267,7 +266,7 @@ def delete_scratch_org(org_instance_id):
         return f"Failed to delete org instance #{ord.id}"
 
 
-def run_one_off_build(build, no_lock: bool):
+def launch_one_off_build_worker(build, lock_id: str):
     """Immediately launch a one-off-build with env-appropriate autoscaler"""
     app_name = settings.METACI_LONG_RUNNING_BUILD_APP
     assert (
@@ -276,6 +275,6 @@ def run_one_off_build(build, no_lock: bool):
     autoscaler_class = import_global(settings.METACI_WORKER_AUTOSCALER)
     autoscaler = autoscaler_class(settings.AUTOSCALERS[app_name])
     try:
-        return autoscaler.one_off_build(build.id, no_lock)
+        return autoscaler.one_off_build(build.id, lock_id)
     except Exception as e:
         raise AssertionError(f"Cannot create one-off-build {e}") from e

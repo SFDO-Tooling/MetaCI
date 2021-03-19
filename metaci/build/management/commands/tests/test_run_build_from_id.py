@@ -24,5 +24,5 @@ class TestRunBuild(TestCase):
         build = BuildFactory(repo=repo, plan=plan, org=org)
         PlanRepositoryFactory(repo=repo, plan=plan)
         c = Command()
-        c.handle(build_id=build.id)
+        c.handle(build_id=build.id, lock_id="abcde")
         assert run.mock_calls

@@ -16,7 +16,7 @@ from metaci.conftest import (
 
 @mock.patch("metaci.build.tasks.reset_database_connection")
 class TestRunBuild(TestCase):
-    @mock.patch("metaci.build.management.commands._utils.scratch_org_limits")
+    @mock.patch("metaci.build.management.commands.run_build.scratch_org_limits")
     @mock.patch("metaci.build.tasks.lock_org")
     @mock.patch("metaci.build.models.Build.run")
     def test_lock_set(
@@ -35,7 +35,9 @@ class TestRunBuild(TestCase):
 
 
 @mock.patch("metaci.build.tasks.reset_database_connection", lambda: ...)
-@mock.patch("metaci.build.management.commands._utils.scratch_org_limits", lambda: 100)
+@mock.patch(
+    "metaci.build.management.commands.run_build.scratch_org_limits", lambda: 100
+)
 class TestLongRunningBuild(TestCase):
     @mock.patch("metaci.build.tasks.lock_org")
     @mock.patch("subprocess.Popen")
@@ -54,13 +56,13 @@ class TestLongRunningBuild(TestCase):
         lock_org.side_effect = fake_lock_org
 
         def mock_popen(args):
-            assert args == [
+            assert args[0:4] == [
                 "python",
                 "./manage.py",
                 "run_build_from_id",
                 str(build.id),
-                "--no-lock",
             ]
+            assert args[4].startswith("metaci-org-lock-")
             return mock.MagicMock(pid=5)
 
         popen.side_effect = mock_popen

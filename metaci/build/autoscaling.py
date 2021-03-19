@@ -79,7 +79,7 @@ class Autoscaler(object):
         The default is to do no autoscaling.
         """
 
-    def one_off_build(self, build_id: T.Union[int, str], no_lock: bool):
+    def one_off_build(self, build_id: T.Union[int, str], lock_id: str):
         """Run a build outside of the scaling formation"""
 
 
@@ -116,20 +116,11 @@ class LocalAutoscaler(Autoscaler):
                         )
                     )
 
-    def one_off_build(self, build_id: T.Union[int, str], no_lock: bool):
+    def one_off_build(self, build_id: T.Union[int, str], lock_id: str):
         """Run a build in a sub-process"""
-        if no_lock:
-            no_lock_arg = ["--no-lock"]
-        else:
-            no_lock_arg = []
+        lock_id = lock_id or "none"
         proc = subprocess.Popen(
-            [
-                "python",
-                "./manage.py",
-                "run_build_from_id",
-                str(build_id),
-            ]
-            + no_lock_arg
+            ["python", "./manage.py", "run_build_from_id", str(build_id), lock_id]
         )
         return proc.pid
 
@@ -203,20 +194,11 @@ class HerokuAutoscaler(Autoscaler):
 
         return requests.patch(url, json={"quantity": target_workers}, headers=headers)
 
-    def one_off_build(self, build_id: T.Union[int, str], no_lock: bool):
+    def one_off_build(self, build_id: T.Union[int, str], lock_id: str):
         """Run a one-off-build on a new heroku dyno"""
-        if no_lock:
-            no_lock_arg = ["--no-lock"]
-        else:
-            no_lock_arg = []
+        lock_id = lock_id or "none"
         command = " ".join(
-            [
-                "python",
-                "./manage.py",
-                "run_build_from_id",
-                build_id,
-            ]
-            + no_lock_arg
+            ["python", "./manage.py", "run_build_from_id", build_id, lock_id]
         )
         url = f"{self.base_url}/dynos"
         json = {"command": command, "time_to_live": "86400"}

@@ -43,6 +43,6 @@ class TestOneOffBuild:
             "fake_username",
         )
         c = Command()
-        c.handle(build_id=build.id, lock_id="abcde")
+        c.handle(build_id=build.id)
         outerr = capsys.readouterr()
         assert "ci_test_concurrency" in outerr.err + outerr.out
