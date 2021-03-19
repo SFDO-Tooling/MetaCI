@@ -4,6 +4,7 @@ import typing as T
 from collections import namedtuple
 
 import django_rq
+from cumulusci.core.utils import import_global
 from cumulusci.oauth.salesforce import jwt_session
 from django import db
 from django.conf import settings
@@ -11,7 +12,7 @@ from django.core.cache import cache
 from django.utils import timezone
 from rq.exceptions import ShutDownImminentException
 
-from metaci.build.autoscaling import autoscale, get_autoscaler
+from metaci.build.autoscaling import autoscale
 from metaci.build.exceptions import RequeueJob
 from metaci.build.signals import build_complete
 from metaci.build.utils import set_build_info
@@ -169,9 +170,6 @@ def check_queued_build(build_id):
         # For scratch orgs, we don't need concurrency blocking logic,
         # but we need to check capacity
 
-        # TODO: isn't there a very large race condition relating to
-        # checking for scratch org reserve before we even queue the
-        # build on the worker queue?
         if scratch_org_limits().remaining < settings.SCRATCH_ORG_RESERVE:
             build.task_id_check = None
             build.set_status("waiting")
@@ -271,11 +269,12 @@ def delete_scratch_org(org_instance_id):
 
 def run_one_off_build(build, no_lock: bool):
     """Immediately launch a one-off-build with env-appropriate autoscaler"""
-    auto_scaler_app_name = settings.METACI_LONG_RUNNING_BUILD_APP
+    app_name = settings.METACI_LONG_RUNNING_BUILD_APP
     assert (
-        auto_scaler_app_name
+        app_name
     ), "Need to define METACI_LONG_RUNNING_BUILD_APP to run one-off-builds"
-    autoscaler = get_autoscaler(auto_scaler_app_name)
+    autoscaler_class = import_global(settings.METACI_WORKER_AUTOSCALER)
+    autoscaler = autoscaler_class(settings.AUTOSCALERS[app_name])
     try:
         return autoscaler.one_off_build(build.id, no_lock)
     except Exception as e:
