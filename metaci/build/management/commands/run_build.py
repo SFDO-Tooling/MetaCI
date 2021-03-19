@@ -27,11 +27,6 @@ class Command(BaseCommand):
             action="store_true",
             help="Do not lock the org. Use with extreme caution.",
         )
-        parser.add_argument(
-            "--should-queue",
-            action="store_true",
-            help="Put it in the Plan's appropriate queue instead of running it immediately.",
-        )
 
     def handle(
         self,

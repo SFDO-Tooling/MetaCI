@@ -61,11 +61,14 @@ def init_logger(model):
     handler.setLevel(logging.DEBUG)
     handler.setFormatter(formatter)
 
-    if os.environ.get("LOG_TO_STDERR"):
-        logger.addHandler(logging.StreamHandler())
-
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
+
+    if os.environ.get("LOG_TO_STDERR"):
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
     return logger
