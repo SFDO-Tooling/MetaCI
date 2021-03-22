@@ -9,15 +9,4 @@ class Migration(migrations.Migration):
         ("cumulusci", "0012_org_configuration_item"),
     ]
 
-    operations = [
-        migrations.AlterField(
-            model_name="org",
-            name="configuration_item",
-            field=models.CharField(
-                blank=True,
-                help_text="Set when integrating with an external system for change traffic control.",
-                max_length=255,
-                null=True,
-            ),
-        ),
-    ]
+    operations = []

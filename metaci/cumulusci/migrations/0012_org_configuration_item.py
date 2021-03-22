@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cumulusci', '0011_auto_20200505_1940'),
+        ("cumulusci", "0011_auto_20200505_1940"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='org',
-            name='configuration_item',
-            field=models.CharField(default='Configuration Item Path', max_length=255),
+            model_name="org",
+            name="configuration_item",
+            field=models.CharField(
+                max_length=255,
+                null=True,
+                blank=True,
+                help_text="Set when integrating with an external system for change traffic control.",
+            ),
         ),
     ]
