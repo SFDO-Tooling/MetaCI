@@ -273,7 +273,7 @@ def launch_one_off_build_worker(build, lock_id: str):
         app_name
     ), "Need to define METACI_LONG_RUNNING_BUILD_APP to run one-off-builds"
     autoscaler_class = import_global(settings.METACI_WORKER_AUTOSCALER)
-    autoscaler = autoscaler_class(settings.AUTOSCALERS[app_name])
+    autoscaler = autoscaler_class({"app_name": settings.METACI_LONG_RUNNING_BUILD_APP, "worker_type": "not_used", "queues": [], "max_workers": 0, "worker_reserve": 0})
     try:
         return autoscaler.one_off_build(build.id, lock_id)
     except Exception as e:
