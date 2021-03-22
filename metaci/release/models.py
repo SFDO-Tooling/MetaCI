@@ -104,9 +104,6 @@ class Release(StatusModel):
     change_case_link = models.URLField(
         _("change case link"), max_length=1024, null=True, blank=True
     )
-    submitted_case = models.BooleanField(
-        _("submitted_case"), default=False, editable=False
-    )
 
     class Meta:
         get_latest_by = "created"
