@@ -112,6 +112,16 @@ class Release(StatusModel):
         verbose_name_plural = _("releases")
         unique_together = ("repo", "git_tag")
 
+    def parse_change_case_link(self):
+        if (
+            self
+            and self.change_case_link
+            and len(self.change_case_link.split("500")) > 1
+        ):  # 500 to parse beginning sequence of change case
+            return f"500{self.change_case_link.split('500')[1]}"
+        else:
+            raise Exception("Please provide a valid change case link.")
+
     def __str__(self):
         return f"{self.repo}: {self.version_name}"
 
