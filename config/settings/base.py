@@ -66,6 +66,7 @@ THIRD_PARTY_APPS = (
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
+    "metaci.oauth2.github",
     "metaci.users.apps.UsersConfig",
     "metaci.api.apps.ApiConfig",
     "metaci.build.apps.BuildConfig",

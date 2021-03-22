@@ -29,6 +29,12 @@ POSTGRES_DB:
 DATABASE_URL:
     Used by Django to connect to PostgreSQL. Edit it to make sure the password matches POSTGRES_PASSWORD.
 
+GITHUB_CLIENT_ID:
+    Client Id from a GitHub app used for logging in to MetaCI with a GitHub account.
+
+GITHUB_CLIENT_SECRET:
+    Client Secret from a GitHub app used for logging in to MetaCI with a GitHub account.
+
 MetaCI must authenticate with the GitHub API to fetch repositories and create releases. 
 This can be set up for a GitHub user by setting GITHUB_USERNAME and GITHUB_PASSWORD, 
 or for a GitHub App by setting GITHUB_APP_ID and GITHUB_APP_KEY.
