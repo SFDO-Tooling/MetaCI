@@ -10,6 +10,7 @@ from django.conf import settings
 from django.db import transaction
 from django.utils.dateparse import parse_date
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,7 +79,7 @@ def update_release_from_github(release, repo_api=None):
     return release
 
 
-def send_release_webhook(project_config, release, config_item=None):
+def send_release_webhook(release, config_item=None):
     if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
         return  # should we better error handle this?
     logger.info(
@@ -96,8 +97,8 @@ def send_release_webhook(project_config, release, config_item=None):
 
     payload = {
         "case_template_id": release.change_case_template.case_template_id,
-        "package_name": project_config.project__package__name,
-        "version": project_config.get_version_for_tag(tag),
+        "package_name": release.repo.name,  # Need to figure out.
+        "version": release.version_number,  # Need to see if this is valid.
         "release_url": f"{release.repo.url}/releases/tag/{urllib.parse.quote(tag)}",
         "steps": steps,
     }
