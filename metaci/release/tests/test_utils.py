@@ -14,19 +14,21 @@ def test_send_release_webhook(mocked_responses, mocker, transactional_db):
         METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
         METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
     )
-    mocked_responses.add("POST", "https://webhook", json={"success": True, "id": "2"})
+    mocked_responses.add(
+        "POST", "https://webhook/release/", json={"success": True, "id": "2"}
+    )
 
     project_config = Mock(project__package__name="Test Package")
     project_config.get_version_for_tag.return_value = "1.0"
     release = ReleaseFactory()
 
-    send_release_webhook(project_config, release)
+    send_release_webhook(project_config, release, "INFRA.instance1")
 
     assert release.change_case_link == "2"
 
 
 def test_send_release_webhook__disabled(mocked_responses):
-    send_release_webhook(None, None)
+    send_release_webhook(None, None, None)
     assert len(mocked_responses.calls) == 0
 
 
@@ -39,13 +41,20 @@ def test_send_release_webhook__error(mocked_responses, mocker, transactional_db)
     )
     mocked_responses.add(
         "POST",
-        "https://webhook",
-        json={"success": False, "errors": [{"message": "danger"}]},
+        "https://webhook/release/",
+        json={
+            "success": False,
+            "errors": [
+                {"message": "ImplementationStep matching query does not exist."}
+            ],
+        },
     )
 
     project_config = Mock(project__package__name="Test Package")
     project_config.get_version_for_tag.return_value = "1.0"
     release = ReleaseFactory()
 
-    with pytest.raises(Exception, match="danger"):
-        send_release_webhook(project_config, release)
+    with pytest.raises(
+        Exception, match="ImplementationStep matching query does not exist."
+    ):
+        send_release_webhook(project_config, release, "INFRA.instance1")

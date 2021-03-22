@@ -423,6 +423,9 @@ METACI_CHANGE_CASE_URL_TEMPLATE = env(
     "METACI_CHANGE_CASE_URL_TEMPLATE", default="{case_id}"
 )
 
+# GUS BUS Enablement
+METACI_START_STOP_WEBHOOK = env("METACI_START_STOP_WEBHOOK", default=False)
+
 # Number of scratch orgs to leave available in the org.
 SCRATCH_ORG_RESERVE = env.int("METACI_SCRATCH_ORG_RESERVE", 10)
 
