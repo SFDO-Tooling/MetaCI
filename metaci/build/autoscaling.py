@@ -78,6 +78,11 @@ class Autoscaler(object):
         The default is to do no autoscaling.
         """
 
+
+class OneOffBuilder(object):
+    def __init__(self, config):
+        pass
+
     def one_off_build(self, build_id: T.Union[int, str], lock_id: str):
         """Run a build outside of the scaling formation"""
 
@@ -115,6 +120,8 @@ class LocalAutoscaler(Autoscaler):
                         )
                     )
 
+
+class LocalOneOffBuilder(OneOffBuilder):
     def one_off_build(self, build_id: T.Union[int, str], lock_id: str):
         """Run a build in a sub-process"""
         lock_id = lock_id or "none"
@@ -193,11 +200,25 @@ class HerokuAutoscaler(Autoscaler):
 
         return requests.patch(url, json={"quantity": target_workers}, headers=headers)
 
+
+class HerokuOneOffBuilder(OneOffBuilder):
+    """Build one-off builds Heroku worker dynos."""
+
+    API_ROOT = "https://api.heroku.com/apps"
+
+    def __init__(self, config):
+        self.base_url = f"{self.API_ROOT}/{config['app_name']}"
+        self.headers = {
+            "Accept": "application/vnd.heroku+json; version=3",
+            "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
+        }
+        super().__init__(config)
+
     def one_off_build(self, build_id: T.Union[int, str], lock_id: str):
         """Run a one-off-build on a new heroku dyno"""
         lock_id = lock_id or "none"
         command = " ".join(
-            ["python", "./manage.py", "run_build_from_id", build_id, lock_id]
+            ["python", "./manage.py", "run_build_from_id", str(build_id), lock_id]
         )
         url = f"{self.base_url}/dynos"
         json = {"command": command, "time_to_live": "86400"}

@@ -106,6 +106,8 @@ def dispatch_build(build, lock_id: str = None):
 
 
 def dispatch_one_off_build(build, lock_id: str = None):
+    # parent functions are expecting something in this
+    # shape
     class Result(T.NamedTuple):
         id: T.Any
 
@@ -268,12 +270,12 @@ def delete_scratch_org(org_instance_id):
 
 def launch_one_off_build_worker(build, lock_id: str):
     """Immediately launch a one-off-build with env-appropriate autoscaler"""
-    app_name = settings.METACI_LONG_RUNNING_BUILD_APP
-    assert (
-        app_name
-    ), "Need to define METACI_LONG_RUNNING_BUILD_APP to run one-off-builds"
-    autoscaler_class = import_global(settings.METACI_WORKER_AUTOSCALER)
-    autoscaler = autoscaler_class({"app_name": settings.METACI_LONG_RUNNING_BUILD_APP, "worker_type": "not_used", "queues": [], "max_workers": 0, "worker_reserve": 0})
+    config = settings.METACI_LONG_RUNNING_BUILD_CONFIG
+    assert isinstance(
+        config, dict
+    ), "Need to define METACI_LONG_RUNNING_BUILD_CONFIG to run one-off-builds"
+    autoscaler_class = import_global(settings.METACI_LONG_RUNNING_BUILD_CLASS)
+    autoscaler = autoscaler_class(config)
     try:
         return autoscaler.one_off_build(build.id, lock_id)
     except Exception as e:

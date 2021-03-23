@@ -257,9 +257,13 @@ HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
 
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
+    METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.HerokuOneOffBuilder"
 
 # Autoscalers are defined per METACI_APP
 AUTOSCALERS = json.loads(env("AUTOSCALERS", default="{}"))
+METACI_LONG_RUNNING_BUILD_CONFIG = json.loads(
+    env("METACI_LONG_RUNNING_BUILD_CONFIG", default="{}")
+)
 
 if not AUTOSCALERS and HEROKU_APP_NAME:
     # backwards compatability
