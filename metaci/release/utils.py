@@ -13,6 +13,29 @@ from django.utils.dateparse import parse_date
 logger = logging.getLogger(__name__)
 
 
+def implementation_payload(role, config_item):
+    if role and config_item:
+        return {
+            "description": role,
+            "start_time": role,
+            "end_time": role,
+            "configuration_item": config_item,
+            "implementation_steps": role,
+        }
+    raise Exception("Please check your plan's role and org's configuration item.")
+
+
+def jwt_for_webhook():
+    return jwt.encode(
+        {
+            "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
+            "exp": timegm(datetime.utcnow().utctimetuple()),
+        },
+        settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
+        algorithm="HS256",
+    )
+
+
 def update_release_from_github(release, repo_api=None):
     if not repo_api:
         repo_api = release.repo.get_github_api()
@@ -55,38 +78,117 @@ def update_release_from_github(release, repo_api=None):
     return release
 
 
-def send_release_webhook(project_config, release):
+def send_release_webhook(project_config, release, config_item=None):
     if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
-        return
+        return  # should we better error handle this?
     logger.info(
         f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
     tag = release.git_tag
+
+    steps = []
+    if config_item and settings.METACI_START_STOP_WEBHOOK:
+        implementation_steps = release.implementation_steps.all()
+        steps = [
+            implementation_payload(implementation_step.plan.role, config_item)
+            for implementation_step in implementation_steps
+        ]
+
     payload = {
         "case_template_id": release.change_case_template.case_template_id,
         "package_name": project_config.project__package__name,
         "version": project_config.get_version_for_tag(tag),
         "release_url": f"{release.repo.url}/releases/tag/{urllib.parse.quote(tag)}",
+        "steps": steps,
     }
-    token = jwt.encode(
-        {
-            "iss": settings.METACI_RELEASE_WEBHOOK_ISSUER,
-            "exp": timegm(datetime.utcnow().utctimetuple()),
-        },
-        settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
-        algorithm="HS256",
-    )
+    token = jwt_for_webhook()
     response = requests.post(
-        settings.METACI_RELEASE_WEBHOOK_URL,
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/release/",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
     if result["success"]:
         with transaction.atomic():
+            if "implementation_steps" in result:
+                for step_model, step_result in zip(
+                    implementation_steps, result["implementationSteps"]
+                ):
+                    step_model.external_id = step_result
+                    step_model.save()
             case_id = result["id"]
             case_url = settings.METACI_CHANGE_CASE_URL_TEMPLATE.format(case_id=case_id)
             release.change_case_link = case_url
             release.save()
+    else:
+        raise Exception("\n".join(err["message"] for err in result["errors"]))
+
+
+def send_start_webhook(project_config, release, role, config_item):
+    if (
+        release is None
+        or not settings.METACI_RELEASE_WEBHOOK_URL
+        or not settings.METACI_START_STOP_WEBHOOK
+    ):
+        return
+    if not config_item:
+        raise Exception(
+            "Error sending start webhook, please include a configuration item, which can be defined on the org."
+        )
+    logger.info(
+        f"Sending start webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+    )
+    implementation_step_id = release.implementation_steps.get(
+        plan__role=role
+    ).external_id
+    payload = {
+        "implementation_step_id": f"{implementation_step_id}",
+    }
+    token = jwt_for_webhook()
+    response = requests.post(
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/implementation_step_id/{implementation_step_id}/start/",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    result = response.json()
+    if result["success"]:
+        logger.info(
+            f"Successfully started implementation_step: {implementation_step_id}"
+        )
+    else:
+        raise Exception("\n".join(err["message"] for err in result["errors"]))
+
+
+def send_stop_webhook(project_config, release, role, config_item):
+    if (
+        release is None
+        or not settings.METACI_RELEASE_WEBHOOK_URL
+        or not settings.METACI_START_STOP_WEBHOOK
+    ):
+        return
+    if not config_item:
+        raise Exception(
+            "Error sending stop webhook, please include a configuration item, which can be defined on the org."
+        )
+    logger.info(
+        f"Sending stop webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+    )
+    implementation_step_id = release.implementation_steps.get(
+        plan__role=role
+    ).external_id
+    payload = {
+        "implementation_step_id": f"{implementation_step_id}",
+    }
+    token = jwt_for_webhook()
+    response = requests.post(
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/implementation_step_id/{implementation_step_id}/stop/",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    result = response.json()
+    if result["success"]:
+        logger.info(
+            f"Successfully stopped implementation_step: {implementation_step_id}"
+        )
     else:
         raise Exception("\n".join(err["message"] for err in result["errors"]))

@@ -226,7 +226,10 @@ def parse_test(test, suite, root):
 def duration_from_performance_keywords(test):
     """Try to find the tags injected by Robot performance testing keywords"""
     msgs = test.iter("msg")
-    msg_patterns = (re.match(ELAPSED_TIME_PATTERN, msg.text.strip()) for msg in msgs)
+    msg_patterns = (
+        re.match(ELAPSED_TIME_PATTERN, msg.text.strip()) if msg.text else None
+        for msg in msgs
+    )
     matches = [match for match in msg_patterns if match]
     duration = None
     for match in matches:

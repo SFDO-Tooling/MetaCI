@@ -142,4 +142,10 @@ class RunPlanForm(forms.Form):
 
 
 def is_release_plan(plan):
-    return plan.role in ("release_deploy", "release", "release_test")
+    return plan.role in (
+        "release_deploy",
+        "release",
+        "release_test",
+        "push_sandbox",
+        "push_production",
+    )

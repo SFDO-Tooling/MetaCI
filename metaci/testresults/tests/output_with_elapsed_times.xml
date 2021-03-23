@@ -16,6 +16,7 @@
 <msg timestamp="20210301 14:20:19.553" level="INFO">Inserting Contact with values {'FirstName': 'Dummy1', 'LastName': 'Dummy2', 'EmailBouncedDate': '2030-01-01T00:00:00'}</msg>
 <msg timestamp="20210301 14:20:21.136" level="INFO">Storing Contact 003R000001aWPbLIAW to session records</msg>
 <msg timestamp="20210301 14:20:21.138" level="INFO">${contact_id} = 003R000001aWPbLIAW</msg>
+<msg timestamp="20210301 14:20:21.138" level="INFO" />
 <status status="PASS" starttime="20210301 14:20:19.553" endtime="20210301 14:20:21.138"></status>
 </kw>
 <kw name="Elapsed Time For Last Record" library="cumulusci.robotframework.Salesforce">
