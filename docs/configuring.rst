@@ -89,19 +89,6 @@ SFDX_HUB_KEY:
 SFDX_HUB_USERNAME: 
     This represents the username used to login to your sfdx hub account
 
-CONNECTED_APP_CLIENT_ID:
-    This represents the client id of the connected app that MetaCI will use for authenticating to any persistent org. 
-    It's fine to use the same connected app that is being used for SFDX_CLIENT_ID and SFDX_HUB_KEY.
-
-CONNECTED_APP_CLIENT_SECRET: 
-    This represents the secret of the connected app configured for MetaCI
-
-CONNECTED_APP_CALLBACK_URL:
-    This represents the connected app's callback url 
-
-To acquire the connected_app variables just use the client id, client secret and callback url 
-of the connected app that was created for ``SFDX_CLIENT_ID`` and ``SFDX_HUB_KEY``.
-
 Some rough tests of whether these variables are set can be done using this
 command:
 

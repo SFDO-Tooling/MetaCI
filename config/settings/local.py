@@ -126,11 +126,6 @@ SITE_URL = env("SITE_URL", default="http://localhost:8000")
 # Github credentials
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", False)
 
-# Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID", default=None)
-CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET", default=None)
-CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL", default=None)
-
 AUTOSCALERS = {
     "local-app": {
         "max_workers": METACI_MAX_WORKERS or 1,

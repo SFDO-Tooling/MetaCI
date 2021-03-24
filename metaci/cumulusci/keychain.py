@@ -8,7 +8,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from metaci.cumulusci.logger import init_logger
 from metaci.cumulusci.models import Org, ScratchOrgInstance, Service
-from metaci.cumulusci.utils import get_connected_app
 
 
 class MetaCIProjectKeychain(BaseProjectKeychain):
@@ -26,12 +25,6 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
 
     def change_key(self):
         raise NotImplementedError("change_key is not supported in this keychain")
-
-    def set_connected_app(self):
-        raise NotImplementedError("set_connected_app is not supported in this keychain")
-
-    def get_connected_app(self):
-        return get_connected_app()
 
     def get_service(self, service_name):
         try:

@@ -1,14 +1,12 @@
 import os
 
 from cumulusci.core.github import get_github_api_for_repo
-from cumulusci.oauth.salesforce import CaptureSalesforceOAuth
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from requests.adapters import HTTPAdapter
 
 from metaci.build.tasks import scratch_org_limits
 from metaci.cumulusci.keychain import GitHubSettingsKeychain
-from metaci.cumulusci.utils import get_connected_app
 
 
 class Command(BaseCommand):
@@ -28,11 +26,6 @@ class Command(BaseCommand):
                 test_github,
                 "GitHub API is configured",
                 "GitHub API is not configured. Repos cannot be retrieved for builds.",
-            ),
-            (
-                test_connected_app,
-                "Connected app environment variables allowed oauth",
-                "Connected app is not configured.  Persistent org connection will fail",
             ),
             (
                 test_github_webhook_setting,
@@ -63,26 +56,6 @@ class Command(BaseCommand):
             print("There were errors:")
             print("Check your .env file or environment.")
             print("Please read configuring.rst for more details.")
-
-
-def test_connected_app():
-    app = get_connected_app()
-    assert app.client_id and isinstance(app.client_id, str)
-    assert app.client_secret and isinstance(app.client_secret, str)
-    assert app.callback_url and isinstance(app.callback_url, str)
-    print()
-    print("You can log into any org to test oauth.")
-    print()
-
-    oauth_capture = CaptureSalesforceOAuth(
-        client_id=app.client_id,
-        client_secret=app.client_secret,
-        callback_url=app.callback_url,
-        auth_site=settings.SF_PROD_LOGIN_URL,
-        scope="web full refresh_token",
-    )
-    oauth_capture()
-    print()
 
 
 def test_github():
