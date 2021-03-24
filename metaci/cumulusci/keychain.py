@@ -1,10 +1,7 @@
-import json
-
 from cumulusci.core.config import OrgConfig, ScratchOrgConfig, ServiceConfig
 from cumulusci.core.exceptions import ServiceNotConfigured
 from cumulusci.core.keychain import BaseProjectKeychain
 from django.conf import settings
-from django.core.serializers.json import DjangoJSONEncoder
 
 from metaci.cumulusci.logger import init_logger
 from metaci.cumulusci.models import Org, ScratchOrgInstance, Service
@@ -15,33 +12,24 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         self.build = build
         super(MetaCIProjectKeychain, self).__init__(project_config, key)
 
-    def _load_keychain_services(self):
-        for key, value in settings.__dict__["_wrapped"].__dict__.items():
-            if key.startswith("CUMULUSCI_SERVICE_"):
-                print(f"%%% DEBUG %%%: {key[len('CUMULUSCI_SERVICE_') :]}")
-                self.services[key[len("CUMULUSCI_SERVICE_") :]] = ServiceConfig(
-                    json.loads(value)
-                )
-
     def change_key(self):
         raise NotImplementedError("change_key is not supported in this keychain")
 
     def get_service(self, service_name):
         try:
             service = Service.objects.get(name=service_name)
-            service_config = json.loads(service.json)
-            return ServiceConfig(service_config)
+            return ServiceConfig(service.json)
         except Service.DoesNotExist:
             raise ServiceNotConfigured(service_name)
 
     def set_service(self, service_name, service_config):
         try:
             service = Service.objects.get(name=service_name)
-            service.json = json.dumps(service_config.config)
+            service.json = service_config.config
         except Service.DoesNotExist:
             service = Service(
                 name=service_name,
-                json=json.dumps(service_config.config, cls=DjangoJSONEncoder),
+                json=service_config.config,
             )
         service.save()
 
@@ -61,7 +49,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
 
     def get_org(self, org_name):
         org = Org.objects.get(repo=self.build.repo, name=org_name)
-        org_config = json.loads(org.json)
+        org_config = org.json
 
         if org.scratch:
             config = ScratchOrgConfig(org_config, org.name, keychain=self)
@@ -89,15 +77,13 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         # Create the scratch org and get its info
         info = org_config.scratch_info
 
-        org_json = json.dumps(org_config.config, cls=DjangoJSONEncoder)
-
         # Create a ScratchOrgInstance to store the org info
         instance = ScratchOrgInstance(
             org=org_config.org,
             build=self.build,
             sf_org_id=info["org_id"],
             username=info["username"],
-            json=org_json,
+            json=org_config.config,
             expiration_date=org_config.expires,
             org_note=self.build.org_note,
         )
@@ -107,12 +93,13 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         return org_config
 
     def set_org(self, org_config, global_org=True):
-        org_json = json.dumps(org_config.config, cls=DjangoJSONEncoder)
         try:
             org = Org.objects.get(repo=self.build.repo, name=org_config.name)
-            org.json = org_json
+            org.json = org_config.config
         except Org.DoesNotExist:
-            org = Org(name=org_config.name, json=org_json, repo=self.build.repo)
+            org = Org(
+                name=org_config.name, json=org_config.config, repo=self.build.repo
+            )
 
         org.scratch = isinstance(org_config, ScratchOrgConfig)
         if not org.scratch:
