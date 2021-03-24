@@ -120,7 +120,6 @@ ALLOWED_HOSTS = [
     "0.0.0.0",
 ]
 METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.LocalOneOffBuilder"
-METACI_LONG_RUNNING_BUILD_CONFIG = {}
 # Site URL
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
 

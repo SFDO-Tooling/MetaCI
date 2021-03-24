@@ -1,3 +1,4 @@
+# flake8: noqa: F405
 """
 Production Configurations
 
@@ -12,9 +13,6 @@ Production Configurations
 import json
 
 from .base import *  # noqa
-
-# from django.utils import six
-
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -261,9 +259,6 @@ if HEROKU_TOKEN and HEROKU_APP_NAME:
 
 # Autoscalers are defined per METACI_APP
 AUTOSCALERS = json.loads(env("AUTOSCALERS", default="{}"))
-METACI_LONG_RUNNING_BUILD_CONFIG = json.loads(
-    env("METACI_LONG_RUNNING_BUILD_CONFIG", default="{}")
-)
 
 if not AUTOSCALERS and HEROKU_APP_NAME:
     # backwards compatability
