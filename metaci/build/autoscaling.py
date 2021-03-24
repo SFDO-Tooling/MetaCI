@@ -202,11 +202,14 @@ class HerokuAutoscaler(Autoscaler):
 
 
 class HerokuOneOffBuilder(OneOffBuilder):
-    """Build one-off builds Heroku worker dynos."""
+    """Run a build in a Heroku one-off dyno."""
 
     API_ROOT = "https://api.heroku.com/apps"
 
     def __init__(self, config):
+        assert (
+            "app_name" in config
+        ), "METACI_LONG_RUNNING_BUILD_CONFIG should include app_name"
         self.base_url = f"{self.API_ROOT}/{config['app_name']}"
         self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",

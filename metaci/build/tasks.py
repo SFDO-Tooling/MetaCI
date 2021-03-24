@@ -273,7 +273,7 @@ def launch_one_off_build_worker(build, lock_id: str):
     config = settings.METACI_LONG_RUNNING_BUILD_CONFIG
     assert isinstance(
         config, dict
-    ), "Need to define METACI_LONG_RUNNING_BUILD_CONFIG to run one-off-builds"
+    ), "METACI_LONG_RUNNING_BUILD_CONFIG should be a JSON-format dict"
     autoscaler_class = import_global(settings.METACI_LONG_RUNNING_BUILD_CLASS)
     autoscaler = autoscaler_class(config)
     try:
