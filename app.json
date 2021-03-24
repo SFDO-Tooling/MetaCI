@@ -23,6 +23,10 @@
       "description": "The Client Secret of the Salesforce Connected App. You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
       "value": ""
     },
+    "DB_ENCRYPTION_KEYS": {
+      "description": "Encryption key for secrets stored in the database. Generate a key using cryptography.fernet.Fernet.generate_key()",
+      "value": ""
+    },
     "DJANGO_ALLOWED_HOSTS": {
       "description": "Heroku proxies web requests and Django needs to be configured to allow the forwards",
       "value": ".herokuapp.com"

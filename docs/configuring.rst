@@ -15,6 +15,13 @@ DJANGO_SECRET_KEY:
     This represents the secret key used to sign session cookies for the Django web application.
     Set it to an arbitrary string that is not shared with another Django site.
 
+DB_ENCRYPTION_KEYS:
+    Newline-separated list of keys to use for encrypting secrets in the database.
+    Generate a key using cryptography.fernet.Fernet.generate_key()
+    Data in encrypted fields are encrypted using the first key when they are stored,
+    but can be read as long as the key remains in the list.
+    Rotate the active key by adding a new key at the beginning of the list.
+
 POSTGRES_USER:
     Environment variable set in ``.env``, representing the database username.
     This value defaults to ``metaci``.
