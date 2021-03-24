@@ -33,6 +33,10 @@ def url_prefix_list(val: str) -> List[str]:
     return [url_prefix(url) for url in val.split(",")]
 
 
+def nl_separated_bytes_list(val: str) -> List[bytes]:
+    return [item.encode("latin1") for item in val.split("\n")]
+
+
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
 WHITENOISE_APPS = ("whitenoise.runserver_nostatic",)
@@ -140,6 +144,9 @@ MANAGERS = ADMINS
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///metaci")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
+DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", cast=nl_separated_bytes_list)
+
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------

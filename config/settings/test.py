@@ -5,6 +5,9 @@ Test settings
 """
 
 from .base import *  # noqa
+from cryptography.fernet import Fernet
+
+INSTALLED_APPS += ("metaci.tests",)
 
 # DEBUG
 # ------------------------------------------------------------------------------
@@ -20,6 +23,8 @@ ALLOWED_HOSTS = ["testserver"]
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key only used for development and testing.
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="CHANGEME!!!")
+
+DB_ENCRYPTION_KEYS = [Fernet.generate_key()]
 
 # Mail settings
 # ------------------------------------------------------------------------------
