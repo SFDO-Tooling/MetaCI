@@ -309,6 +309,7 @@ SOCIALACCOUNT_ADAPTER = "metaci.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_PROVIDERS = {
     "github": {"APP": {"client_id": GITHUB_CLIENT_ID, "secret": GITHUB_CLIENT_SECRET}}
 }
+SOCIALACCOUNT_STORE_TOKENS = False
 
 # Custom user app defaults
 # Select the correct user model

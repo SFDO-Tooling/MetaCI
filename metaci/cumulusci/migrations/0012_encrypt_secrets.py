@@ -2,8 +2,9 @@
 
 import json
 
-from django.db import migrations
+from django.db import migrations, models
 from django.db.migrations.operations.special import RunPython
+from django.utils.translation import gettext_lazy as _
 
 import metaci.fields
 
@@ -28,6 +29,12 @@ def decrypt_data(apps, schema_editor):
             record.save()
 
 
+def remove_social_tokens(apps, schema_editor):
+    # we aren't using oauth tokens except for authentication, so we don't need to store them
+    SocialToken = apps.get_model("socialaccount", "SocialToken")
+    SocialToken.objects.all().delete()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -50,6 +57,18 @@ class Migration(migrations.Migration):
             model_name="service",
             name="json_e",
             field=metaci.fields.EncryptedJSONField(null=True),
+        ),
+        # make plaintext fields nullable so that we can run the migration backwards
+        migrations.AlterField(
+            model_name="org", name="json", field=models.TextField(null=True)
+        ),
+        migrations.AlterField(
+            model_name="scratchorginstance",
+            name="json",
+            field=models.TextField(null=True),
+        ),
+        migrations.AlterField(
+            model_name="service", name="json", field=models.TextField(null=True)
         ),
         # copy data
         migrations.RunPython(encrypt_data, decrypt_data),
@@ -77,4 +96,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="service", name="json", field=metaci.fields.EncryptedJSONField()
         ),
+        # remove social tokens (we aren't using them)
+        migrations.RunPython(remove_social_tokens),
     ]
