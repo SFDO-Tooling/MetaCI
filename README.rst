@@ -138,9 +138,7 @@ One-Off Builds
 In some environments, such as Heroku, it is helpful to run builds in
 environments which are spun up for just a single build. In Heroku, builds
 created in this way will not share their finite lifespan (24 hours) with
-previous builds. You might also want single-environment builds for
-security reasons, to ensure that no artifacts from one build can
-be snooped in another.
+previous builds. They also are not restarted when the app is updated.
 
 You can specify the Python class to use for one-off builds with the
 METACI_LONG_RUNNING_BUILD_CLASS environment variable, but the defaults
@@ -154,8 +152,14 @@ For Heroku, this is a dictionary with a single key, like this:
     METACI_LONG_RUNNING_BUILD_CONFIG = {"app_name": "my-app"}
 
 my-app would be replaced with the name of the Heroku App that should
-be used. It could be one of the apps you used for AUTOSCALERS but it
-need not be.
+be used.
+
+Note: We anticipate that you might run into autoscaling logic
+errors if you try to use one of your AUTOSCALERS apps for one-off
+dynos as well because they both eat into the same quota but the
+autoscaler class only knows about the persistent dynos. Perhaps
+if your usage never approaches its quota then this will not
+cause problems for you. This is not a tested or supported configuration.
 
 Email Server
 ^^^^^^^^^^^^
