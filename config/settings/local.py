@@ -28,6 +28,8 @@ SECRET_KEY = env(
     "DJANGO_SECRET_KEY", default="!)_b4xaov6!0b^_=96*wh@p-9si4p0ho-@4&g7eija9gaxhmo!"
 )
 
+DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", cast=nl_separated_bytes_list)
+
 # Mail settings
 # ------------------------------------------------------------------------------
 

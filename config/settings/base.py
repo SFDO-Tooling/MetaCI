@@ -145,7 +145,7 @@ MANAGERS = ADMINS
 DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///metaci")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
-DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", cast=nl_separated_bytes_list)
+DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", default=[], cast=nl_separated_bytes_list)
 
 
 # GENERAL CONFIGURATION

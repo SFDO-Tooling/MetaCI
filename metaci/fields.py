@@ -57,6 +57,7 @@ class EncryptedField(models.Field):
 
     @cached_property
     def keys(self):
+        assert len(settings.DB_ENCRYPTION_KEYS) > 0
         return settings.DB_ENCRYPTION_KEYS
 
     @cached_property
