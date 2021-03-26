@@ -56,11 +56,11 @@
     },
     "GITHUB_CLIENT_ID": {
       "description": "Client ID of your GitHub app",
-      "value": "",
+      "value": ""
     },
     "GITHUB_CLIENT_SECRET": {
       "description": "Client Secret of your GitHub app",
-      "value": "",
+      "value": ""
     },
     "HIREFIRE_TOKEN": {
       "description": "The token for integrating with Hirefire.io for auto-scaling worker dynos based on queued/running builds",
