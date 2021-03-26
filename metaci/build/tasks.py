@@ -113,8 +113,8 @@ def dispatch_one_off_build(build, lock_id: str = None):
 
     try:
         job_id = launch_one_off_build_worker(build, lock_id)
-        build.log = build.log or []
-        build.log.append(f"\nRunning build in context (dyno) {job_id}\n")
+        build.log = build.log or ""
+        build.log += f"\nRunning build in context (dyno) {job_id}\n"
         build.save()
     except Exception as e:
         set_build_info(
