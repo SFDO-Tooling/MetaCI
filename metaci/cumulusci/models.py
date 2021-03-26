@@ -49,6 +49,12 @@ class OrgQuerySet(models.QuerySet):
 
 class Org(models.Model):
     name = models.CharField(max_length=255)
+    configuration_item = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Set when integrating with an external system for change traffic control.",
+    )
     json = EncryptedJSONField(null=True)
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey(

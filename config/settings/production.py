@@ -1,3 +1,4 @@
+# flake8: noqa: F405
 """
 Production Configurations
 
@@ -12,9 +13,6 @@ Production Configurations
 import json
 
 from .base import *  # noqa
-
-# from django.utils import six
-
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -257,6 +255,7 @@ HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
 
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
+    METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.HerokuOneOffBuilder"
 
 # Autoscalers are defined per METACI_APP
 AUTOSCALERS = json.loads(env("AUTOSCALERS", default="{}"))
@@ -272,7 +271,6 @@ if not AUTOSCALERS and HEROKU_APP_NAME:
             "queues": ["default", "medium", "high"],
         }
     }
-
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")

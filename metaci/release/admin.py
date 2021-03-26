@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from metaci.release.models import ChangeCaseTemplate, Release
+from metaci.release.models import ChangeCaseTemplate, ImplementationStep, Release
+
+
+class ImplementationStepInline(admin.TabularInline):
+    model = ImplementationStep
+    extra = 1
 
 
 @admin.register(Release)
@@ -39,6 +44,8 @@ class ReleaseAdmin(admin.ModelAdmin):
     list_select_related = ("repo",)
     search_fields = ["^package_version_id", "^git_tag"]
     empty_value_display = "-empty-"
+    inlines = [ImplementationStepInline]
 
 
 admin.site.register(ChangeCaseTemplate)
+admin.site.register(ImplementationStep)
