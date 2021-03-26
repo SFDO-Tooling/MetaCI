@@ -55,7 +55,7 @@ class Org(models.Model):
         blank=True,
         help_text="Set when integrating with an external system for change traffic control.",
     )
-    json = EncryptedJSONField(null=True)
+    json = EncryptedJSONField()
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey(
         "repository.Repository", related_name="orgs", on_delete=models.CASCADE
@@ -130,7 +130,7 @@ class ScratchOrgInstance(models.Model):
     sf_org_id = models.CharField(max_length=32)
     deleted = models.BooleanField(default=False)
     delete_error = models.TextField(null=True, blank=True)
-    json = EncryptedJSONField(null=True)
+    json = EncryptedJSONField()
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
@@ -213,7 +213,7 @@ class ScratchOrgInstance(models.Model):
 
 class Service(models.Model):
     name = models.CharField(max_length=255)
-    json = EncryptedJSONField(null=True)
+    json = EncryptedJSONField()
 
     def __str__(self):
         return self.name
