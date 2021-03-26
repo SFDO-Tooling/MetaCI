@@ -31,8 +31,12 @@ def decrypt_data(apps, schema_editor):
 
 def remove_social_tokens(apps, schema_editor):
     # we aren't using oauth tokens except for authentication, so we don't need to store them
-    SocialToken = apps.get_model("socialaccount", "SocialToken")
-    SocialToken.objects.all().delete()
+    try:
+        SocialToken = apps.get_model("socialaccount", "SocialToken")
+    except LookupError:
+        pass
+    else:
+        SocialToken.objects.all().delete()
 
 
 class Migration(migrations.Migration):
