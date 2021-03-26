@@ -9,6 +9,7 @@ def set_plan_queues(apps, schema_editor):
     Plan.objects.filter(trigger__in=("manual", "tag")).update(queue="medium")
     # Use high queue for plans that use a packaging org
     Plan.objects.filter(org="packaging").update(queue="high")
+    Plan.objects.filter(name="Performance Test").update(queue="long-running")
 
 
 class Migration(migrations.Migration):

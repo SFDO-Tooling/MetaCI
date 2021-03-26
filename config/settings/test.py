@@ -89,3 +89,6 @@ AUTOSCALERS = {
         "queues": ["default", "medium", "high"],
     }
 }
+
+METACI_LONG_RUNNING_BUILD_CONFIG = {"app_name": "test-app"}
+METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.LocalOneOffBuilder"

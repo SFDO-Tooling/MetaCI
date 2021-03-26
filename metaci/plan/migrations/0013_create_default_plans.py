@@ -87,6 +87,15 @@ def create_default_plans(apps, schema_editor):
         public=False,
     )
 
+    Plan.objects.create(
+        name="Performance Test",
+        description=("Runs the test_performance_scratch flow aginst a scratch org"),
+        type="manual",
+        flows="test_performance_scratch",
+        org="dev",
+        public=False,
+    )
+
 
 class Migration(migrations.Migration):
 

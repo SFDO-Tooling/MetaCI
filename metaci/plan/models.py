@@ -45,6 +45,7 @@ QUEUES = (
     ("medium", "medium priority"),
     ("high", "high priority"),
     ("robot", "robot tests"),
+    ("long-running", "long-running"),
 )
 
 

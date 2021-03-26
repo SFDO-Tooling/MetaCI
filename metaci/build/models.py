@@ -294,7 +294,7 @@ class Build(models.Model):
 
     def flush_log(self):
         for handler in self.logger.handlers:
-            handler.stream.flush(force=True)
+            handler.stream.flush()
 
     @property
     def worker_id(self):
