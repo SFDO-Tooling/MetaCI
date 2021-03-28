@@ -53,7 +53,7 @@ django-watson==1.5.5
 honcho>=0.7.1
 
 # Django REST Framework
-djangorestframework==3.12.2
+djangorestframework==3.12.4
 djangorestframework-filters==1.0.0.dev2
 
 # Core API for DRF schema generation
