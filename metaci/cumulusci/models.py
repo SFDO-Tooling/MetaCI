@@ -1,5 +1,3 @@
-import json
-
 from cumulusci.core.config import OrgConfig, ScratchOrgConfig
 from cumulusci.oauth.salesforce import jwt_session
 from django.apps import apps
@@ -12,6 +10,8 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from simple_salesforce import Salesforce as SimpleSalesforce
 from simple_salesforce.exceptions import SalesforceError
+
+from ..fields import EncryptedJSONField
 
 
 def sf_session(jwt):
@@ -49,8 +49,13 @@ class OrgQuerySet(models.QuerySet):
 
 class Org(models.Model):
     name = models.CharField(max_length=255)
-    configuration_item = models.CharField(max_length=255, null=True, blank=True, help_text="Set when integrating with an external system for change traffic control.")
-    json = models.TextField()
+    configuration_item = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Set when integrating with an external system for change traffic control.",
+    )
+    json = EncryptedJSONField()
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey(
         "repository.Repository", related_name="orgs", on_delete=models.CASCADE
@@ -68,9 +73,7 @@ class Org(models.Model):
         return reverse("org_detail", kwargs={"org_id": self.id})
 
     def get_org_config(self):
-        org_config = json.loads(self.json)
-
-        return OrgConfig(org_config, self.name)
+        return OrgConfig(self.json, self.name)
 
     @property
     def lock_id(self):
@@ -110,6 +113,8 @@ class ExpiredOrgManager(models.Manager):
 
 
 class ScratchOrgInstance(models.Model):
+    id: int
+
     org = models.ForeignKey(
         "cumulusci.Org", related_name="instances", on_delete=models.PROTECT
     )
@@ -125,7 +130,7 @@ class ScratchOrgInstance(models.Model):
     sf_org_id = models.CharField(max_length=32)
     deleted = models.BooleanField(default=False)
     delete_error = models.TextField(null=True, blank=True)
-    json = models.TextField()
+    json = EncryptedJSONField()
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
@@ -159,12 +164,12 @@ class ScratchOrgInstance(models.Model):
         return self._get_org_config()
 
     def _get_org_config(self):
-        org_config = json.loads(self.json)
+        org_config = self.json
         org_config["date_created"] = parse_datetime(org_config["date_created"])
         return ScratchOrgConfig(org_config, self.org.name)
 
     def get_jwt_based_session(self):
-        config = json.loads(self.json)
+        config = self.json
         return jwt_session(
             settings.SFDX_CLIENT_ID,
             settings.SFDX_HUB_KEY,
@@ -208,7 +213,7 @@ class ScratchOrgInstance(models.Model):
 
 class Service(models.Model):
     name = models.CharField(max_length=255)
-    json = models.TextField()
+    json = EncryptedJSONField()
 
     def __str__(self):
         return self.name
