@@ -12,7 +12,7 @@ def update_github_socialapp(apps, schema_editor):
         app = SocialApp.objects.get(provider="github")
     except SocialApp.DoesNotExist:
         app = SocialApp(provider="github")
-    app.name = "github"
+    app.name = "GitHub"
     app.client_id = "-"
     app.secret = ""
     app.save()
