@@ -16,7 +16,6 @@ plugins:
   - '@typescript-eslint'
 extends:
   - plugin:@typescript-eslint/recommended
-  - prettier/@typescript-eslint
 rules:
   # TypeScript
   '@typescript-eslint/camelcase': 0  # may want to tighten this sometime.
