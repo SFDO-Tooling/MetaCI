@@ -24,7 +24,7 @@ settings:
             - node_modules
           alias:
             '@': js
-            '#': images
+            '~img': images
   react:
     version: 'detect'
 plugins:

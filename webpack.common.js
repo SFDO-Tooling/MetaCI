@@ -18,6 +18,9 @@ module.exports = {
   resolve: {
     modules: ['src/js', 'src/sass', 'static', 'node_modules'],
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    alias: {
+      '~img': path.join(__dirname, 'static', 'images'),
+    },
   },
   output: {
     publicPath: '/static/',

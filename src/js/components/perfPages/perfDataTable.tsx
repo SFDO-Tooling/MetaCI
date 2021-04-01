@@ -44,7 +44,7 @@ const PerfDataTable = ({
   items,
   perfState,
   queryparams,
-}: Props): React.ReactNode => {
+}: Props) => {
   if (perfState && perfState.status === 'ERROR') {
     const message =
       get(perfState, 'reason.reason.detail') ||
@@ -135,7 +135,7 @@ const PerfDataTable = ({
   const perfDataColumns = () =>
     columns().map(([name, label]: [string, string]) => {
       let isSorted = false;
-      let sortDirection: string | null = null;
+      let sortDirection: 'desc' | 'asc' | null = null;
 
       if (queryparams.get('o') === name) {
         isSorted = true;

@@ -10,12 +10,7 @@ interface Props {
   tooltip?: string | null;
 }
 
-const TextInput = ({
-  label,
-  defaultValue,
-  onValueUpdate,
-  tooltip,
-}: Props): React.ReactNode => {
+const TextInput = ({ label, defaultValue, onValueUpdate, tooltip }: Props) => {
   // debounce to reduce redraws while typing
   let debouncedCallback = debounce(
     (value: string) => onValueUpdate(value),
