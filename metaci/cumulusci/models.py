@@ -3,6 +3,7 @@ from cumulusci.oauth.salesforce import jwt_session
 from django.apps import apps
 from django.conf import settings
 from django.core.cache import cache
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
@@ -55,7 +56,7 @@ class Org(models.Model):
         blank=True,
         help_text="Set when integrating with an external system for change traffic control.",
     )
-    json = EncryptedJSONField()
+    json = EncryptedJSONField(encoder=DjangoJSONEncoder)
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey(
         "repository.Repository", related_name="orgs", on_delete=models.CASCADE
@@ -130,7 +131,7 @@ class ScratchOrgInstance(models.Model):
     sf_org_id = models.CharField(max_length=32)
     deleted = models.BooleanField(default=False)
     delete_error = models.TextField(null=True, blank=True)
-    json = EncryptedJSONField()
+    json = EncryptedJSONField(encoder=DjangoJSONEncoder)
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
@@ -213,7 +214,7 @@ class ScratchOrgInstance(models.Model):
 
 class Service(models.Model):
     name = models.CharField(max_length=255)
-    json = EncryptedJSONField()
+    json = EncryptedJSONField(encoder=DjangoJSONEncoder)
 
     def __str__(self):
         return self.name
