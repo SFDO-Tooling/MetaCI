@@ -16,11 +16,10 @@ plugins:
   - '@typescript-eslint'
 extends:
   - plugin:@typescript-eslint/recommended
-  - prettier/@typescript-eslint
 rules:
   # TypeScript
   '@typescript-eslint/camelcase': 0  # may want to tighten this sometime.
-  '@typescript-eslint/explicit-function-return-type': 0
+  '@typescript-eslint/explicit-module-boundary-types': 0
   '@typescript-eslint/no-empty-function': 0
   '@typescript-eslint/no-explicit-any': 0
   '@typescript-eslint/no-use-before-define': 2

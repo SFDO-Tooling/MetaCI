@@ -54,7 +54,7 @@ export const UnwrappedPerfPage = ({
   perfUIState,
   testMethodPerfUI,
   perfUIStatus,
-}: ReduxProps & RouteComponentProps & SelfProps): React.ReactNode => {
+}: ReduxProps & RouteComponentProps & SelfProps) => {
   const uiAvailable = perfUIStatus === 'AVAILABLE';
   const queryparams = new QueryParamHelpers(
     get(testMethodPerfUI, 'defaults', {}),

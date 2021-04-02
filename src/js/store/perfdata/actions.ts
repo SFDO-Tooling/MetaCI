@@ -2,6 +2,7 @@ import { assertUIData, UIData } from 'api/testmethod_perf_UI_JSON_schema';
 import { assertPerfData } from 'api/testmethod_perfdata_JSON_schema';
 import { stringify } from 'query-string';
 import { Dispatch } from 'redux';
+import { AppState } from 'store';
 import { PerfData } from 'store/perfdata/reducer';
 
 export const testmethod_perfdata_url = '/api/testmethod_perf';
@@ -57,7 +58,7 @@ export const perfREST_API = ({
   prefix: string;
   url: string;
   checkValid: UntypedFunc;
-}): Promise => {
+}) => {
   dispatch({ type: `${prefix}_DATA_LOADING`, payload: { url } });
   return apiFetch(url, { method: 'GET' }).then((payload: any) => {
     try {
@@ -86,9 +87,9 @@ export const perfRESTFetch = (
   params?: Record<string, unknown>,
 ) => (
   dispatch: Dispatch,
-  _getState: RootState,
-  { apiFetch }: { Function },
-): Promise => {
+  _getState: AppState,
+  { apiFetch }: { apiFetch: UntypedFunc },
+) => {
   if (params) {
     url = `${url}&${stringify(params)}`;
   }
@@ -103,9 +104,9 @@ export const perfRESTFetch = (
 
 export const perfREST_UI_Fetch = (params?: Record<string, unknown>) => (
   dispatch: Dispatch,
-  _getState: RootState,
+  _getState: AppState,
   { apiFetch }: { apiFetch: any },
-): Promise => {
+) => {
   let url = testmethod_perf_UI_url;
   if (params) {
     url = `${url}?${stringify(params)}`;

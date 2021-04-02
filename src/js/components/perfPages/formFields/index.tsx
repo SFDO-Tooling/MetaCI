@@ -104,7 +104,7 @@ export const createField = (
   filterDef: FilterDefinition,
   currentValue: string | null,
   onSubmit: (value) => void,
-): FieldTypes => {
+): Field => {
   const fieldType = FieldTypes[filterDef.field_type];
   if (fieldType) {
     return fieldType(filterDef, currentValue, onSubmit);
@@ -134,11 +134,7 @@ const spacerField = {
   render: () => <span />, // eslint-disable-line react/display-name
 };
 
-export const AllFilters = ({
-  filters,
-}: {
-  filters: Field[];
-}): React.ReactNode => {
+export const AllFilters = ({ filters }: { filters: Field[] }) => {
   // Yes...this is gross. I'm sorry.
   filters.splice(2, 0, spacerField, spacerField);
   filters = filters.filter((x) => x); // get rid of nulls

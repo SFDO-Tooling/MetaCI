@@ -1,8 +1,6 @@
 export const logError = (
   message: string | Error | Response,
-  data: {
-    [Key: string]: unknown;
-  } = {},
+  data: { [key: string]: any } = {},
 ): void => {
   // Raven/sentry is not configured for this project yet.
   window.console.error(message, data);
