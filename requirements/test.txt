@@ -1,7 +1,7 @@
 # Test dependencies go here.
 -r base.txt
 
-pytest==6.2.2
+pytest==6.2.3
 pytest-django==4.1.0
 pytest-factoryboy==2.1.0
 pytest-mock==3.5.1
