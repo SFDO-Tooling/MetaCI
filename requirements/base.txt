@@ -37,7 +37,7 @@ redis==3.5.3
 # Django RQ
 rq==1.7.0
 rq-scheduler==0.11.0
-django-rq==2.4.0
+django-rq==2.4.1
 
 # Salesforce Lightning Design System for Django
 django-slds-crispyforms==0.1.0  # pyup: ignore # there are releases with no package
