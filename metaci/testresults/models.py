@@ -143,15 +143,7 @@ class TestResult(models.Model):
     robot_keyword = models.CharField(
         max_length=255, null=True, blank=True, db_index=True
     )
-    # Maybe robot_tags should be a one-to-many relationship with a tags
-    # table, but that seems like overkill for my immediate needs.
-    # For now, making it a CharField that contains a comma-separated
-    # list of tags is sufficient.
-    robot_tags = models.CharField(
-        max_length=80,
-        null=True,
-        blank=True,
-    )
+    robot_tags = models.TextField(null=True, blank=True)
     robot_xml = models.TextField(null=True, blank=True)
     email_invocations_used = models.IntegerField(null=True, blank=True)
     email_invocations_allowed = models.IntegerField(null=True, blank=True)
