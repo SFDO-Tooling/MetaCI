@@ -165,7 +165,7 @@ class ScratchOrgInstance(models.Model):
         return self._get_org_config()
 
     def _get_org_config(self):
-        org_config = self.json
+        org_config = self.json.copy()
         org_config["date_created"] = parse_datetime(org_config["date_created"])
         return ScratchOrgConfig(org_config, self.org.name)
 
