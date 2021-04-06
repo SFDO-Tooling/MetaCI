@@ -4,6 +4,16 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def add_legacy_change_case_template(apps, schema_editor):
+    ChangeCaseTemplate = apps.get_model("release", "ChangeCaseTemplate")
+    Release = apps.get_model("release", "Release")
+    case_template = ChangeCaseTemplate(name="Legacy Release", case_template_id=1)
+    case_template.save()
+    Release.objects.filter(change_case_template__isnull=True).update(
+        change_case_template=case_template
+    )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -21,11 +31,6 @@ class Migration(migrations.Migration):
         ),
     ]
 
-    def add_legacy_change_case_template(apps, schema_editor):
-        ChangeCaseTemplate = apps.get_model("release", "ChangeCaseTemplate")
-        Release = apps.get_model("release", "Release")
-        case_template = ChangeCaseTemplate(name="Legacy Release", case_template_id=1)
-        case_template.save()
-        Release.objects.filter(change_case_template__isnull=True).update(
-            change_case_template=case_template
-        )
+    operations = [
+        migrations.RunPython(add_legacy_change_case_template),
+    ]
