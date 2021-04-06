@@ -1,3 +1,4 @@
+# flake8: noqa: F405
 """
 Production Configurations
 
@@ -13,15 +14,13 @@ import json
 
 from .base import *  # noqa
 
-# from django.utils import six
-
-
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Raises ImproperlyConfigured exception if DJANGO_SECRET_KEY not in os.environ
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
+DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", cast=nl_separated_bytes_list)
 
 # This ensures that Django will be able to detect a secure connection
 # properly on Heroku.
@@ -257,6 +256,7 @@ HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
 
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
+    METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.HerokuOneOffBuilder"
 
 # Autoscalers are defined per METACI_APP
 AUTOSCALERS = json.loads(env("AUTOSCALERS", default="{}"))
@@ -273,7 +273,6 @@ if not AUTOSCALERS and HEROKU_APP_NAME:
         }
     }
 
-
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")
 
@@ -282,10 +281,6 @@ SITE_URL = env("SITE_URL")
 FROM_EMAIL = env("FROM_EMAIL")
 
 # Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID")
-CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET")
-CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL")
-
 SFDX_CLIENT_ID = env("SFDX_CLIENT_ID")
 SFDX_HUB_KEY = env("SFDX_HUB_KEY")
 SFDX_HUB_USERNAME = env("SFDX_HUB_USERNAME")

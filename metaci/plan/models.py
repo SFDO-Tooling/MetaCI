@@ -25,6 +25,8 @@ BUILD_ROLES = (
     ("feature", "Feature Test"),
     ("feature_robot", "Feature Test Robot"),
     ("other", "Other"),
+    ("push_sandbox", "Push Sandbox"),
+    ("push_production", "Push Production"),
     ("qa", "QA Org"),
     ("release_deploy", "Release Deploy"),
     ("release", "Release"),
@@ -43,6 +45,7 @@ QUEUES = (
     ("medium", "medium priority"),
     ("high", "high priority"),
     ("robot", "robot tests"),
+    ("long-running", "long-running"),
 )
 
 
@@ -193,7 +196,12 @@ class Plan(models.Model):
         return run_build, commit, commit_message
 
 
-SCHEDULE_CHOICES = (("daily", "Daily"), ("hourly", "Hourly"))
+SCHEDULE_CHOICES = (
+    ("daily", "Daily"),
+    ("hourly", "Hourly"),
+    ("weekly", "Weekly"),
+    ("monthly", "Monthly"),
+)
 
 
 class PlanRepositoryQuerySet(models.QuerySet):

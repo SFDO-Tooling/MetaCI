@@ -1,6 +1,8 @@
 #!/bin/bash
 # This script runs the tests on Heroku CI
 
+set -x
+
 # Pretend this is a git repo so that coveralls can find git info
 git clone -b "$HEROKU_TEST_RUN_BRANCH" --single-branch https://github.com/SFDO-Tooling/MetaCI MetaCI_checkout 
 cd MetaCI_checkout
@@ -18,9 +20,17 @@ export COVERALLS_PARALLEL=true
 export CIRCLECI=true
 export CIRCLE_BUILD_NUM=$HEROKU_TEST_RUN_ID
 
+# Check for missing Django db migrations
+DATABASE_URL=sqlite://:memory: ./manage.py makemigrations --check --dry-run || exit 1
+
 # Run Python tests
 coverage run $(which pytest) metaci --tap-stream
 exit_status=$?
+if [ $exit_status -eq 0 ]
+then
+    $(which pytest) integration-tests
+    exit_status=$?
+fi
 coveralls
 
 # Run JS tests

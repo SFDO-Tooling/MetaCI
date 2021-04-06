@@ -1,5 +1,5 @@
-from django import db
 import django_rq
+from django import db
 
 from metaci.plan.models import PlanSchedule
 
@@ -27,6 +27,16 @@ def run_scheduled(schedule):
             log.append(f"Schedule {sched} failed with error:\n{str(e)}")
 
     return "\n".join(log)
+
+
+@django_rq.job("short")
+def run_scheduled_monthly():
+    return run_scheduled("monthly")
+
+
+@django_rq.job("short")
+def run_scheduled_weekly():
+    return run_scheduled("weekly")
 
 
 @django_rq.job("short")

@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
-from unittest import mock
 from shutil import copyfile
+from unittest import mock
 
 import pytest
 from cumulusci.utils import elementtree_parse_file, temporary_dir
@@ -10,9 +10,9 @@ from django.utils import timezone
 
 from metaci.build.exceptions import BuildError
 from metaci.build.models import BuildFlowAsset
+from metaci.build.tests.test_flows import TEST_ROBOT_OUTPUT_FILES
 from metaci.conftest import FlowTaskFactory
 from metaci.testresults import models, robot_importer
-from metaci.build.tests.test_flows import TEST_ROBOT_OUTPUT_FILES
 
 
 @pytest.mark.django_db
@@ -43,7 +43,8 @@ def test_nested_suites():
 def test_basic_parsing():
     with temporary_dir() as output_dir:
         copyfile(
-            TEST_ROBOT_OUTPUT_FILES / "robot_1.xml", Path(output_dir) / "output.xml",
+            TEST_ROBOT_OUTPUT_FILES / "robot_1.xml",
+            Path(output_dir) / "output.xml",
         )
 
         robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
@@ -186,7 +187,8 @@ def test_import_robot_tags():
     """Verify that robot tags are added to the database"""
     with temporary_dir() as output_dir:
         copyfile(
-            TEST_ROBOT_OUTPUT_FILES / "robot_1.xml", Path(output_dir) / "output.xml",
+            TEST_ROBOT_OUTPUT_FILES / "robot_1.xml",
+            Path(output_dir) / "output.xml",
         )
         robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
     test_results = models.TestResult.objects.filter(method__name="FakeTestResult")
@@ -261,3 +263,26 @@ def test_find_screenshots():
     tree = elementtree_parse_file(path)
     screenshots = robot_importer.find_screenshots(tree.getroot())
     assert len(screenshots) == 2
+
+
+@pytest.mark.django_db
+def test_import_perf_results():
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "output_with_elapsed_times.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
+        assert models.TestResult.objects.all(), "Test results should have been created"
+    test_result = models.TestResult.objects.all()
+    durations = {x.method.name: x.duration for x in test_result}
+    assert durations["Test Elapsed Time For Last Record"]
+    for name, value in [
+        ("Test Elapsed Time For Last Record", 278818780.0),
+        ("Test Perf Set Elapsed Time", 11655.9),
+        ("Test Perf Set Elapsed Time Twice", 53.0),
+        ("Test Perf Set Elapsed Time String", 18000.0),
+        ("Test Perf Measure Elapsed", 1.0),
+        ("Set Time and Also Metric", 0.0),
+    ]:
+        assert durations[name] == value

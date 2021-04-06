@@ -1,5 +1,6 @@
 import logging
 import subprocess
+import typing as T
 
 import django_rq
 import requests
@@ -78,6 +79,14 @@ class Autoscaler(object):
         """
 
 
+class OneOffBuilder(object):
+    def __init__(self, config):
+        pass
+
+    def one_off_build(self, build_id: T.Union[int, str], lock_id: str):
+        """Run a build outside of the scaling formation"""
+
+
 class NonAutoscaler(Autoscaler):
     """Don't actually autoscale."""
 
@@ -112,6 +121,16 @@ class LocalAutoscaler(Autoscaler):
                     )
 
 
+class LocalOneOffBuilder(OneOffBuilder):
+    def one_off_build(self, build_id: T.Union[int, str], lock_id: str):
+        """Run a build in a sub-process"""
+        lock_id = lock_id or "none"
+        proc = subprocess.Popen(
+            ["python", "./manage.py", "run_build_from_id", str(build_id), lock_id]
+        )
+        return proc.pid
+
+
 class HerokuAutoscaler(Autoscaler):
     """Scale using Heroku worker dynos."""
 
@@ -131,7 +150,8 @@ class HerokuAutoscaler(Autoscaler):
                 f"'worker_type' not present in autoscaler config:\nFound: {config}"
             )
         self.worker_type = config["worker_type"]
-        self.url = f"{self.API_ROOT}/{config['app_name']}/formation/{self.worker_type}"
+        self.base_url = f"{self.API_ROOT}/{config['app_name']}"
+        self.url = f"{self.base_url}/formation/{self.worker_type}"
         self.headers = {
             "Accept": "application/vnd.heroku+json; version=3",
             "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
@@ -179,6 +199,39 @@ class HerokuAutoscaler(Autoscaler):
         assert target_workers >= 0
 
         return requests.patch(url, json={"quantity": target_workers}, headers=headers)
+
+
+class HerokuOneOffBuilder(OneOffBuilder):
+    """Run a build in a Heroku one-off dyno."""
+
+    API_ROOT = "https://api.heroku.com/apps"
+
+    def __init__(self, config):
+        assert (
+            "app_name" in config
+        ), "METACI_LONG_RUNNING_BUILD_CONFIG should include app_name"
+        self.base_url = f"{self.API_ROOT}/{config['app_name']}"
+        self.headers = {
+            "Accept": "application/vnd.heroku+json; version=3",
+            "Authorization": f"Bearer {settings.HEROKU_TOKEN}",
+        }
+        super().__init__(config)
+
+    def one_off_build(self, build_id: T.Union[int, str], lock_id: str):
+        """Run a one-off-build on a new heroku dyno"""
+        lock_id = lock_id or "none"
+        command = " ".join(
+            ["python", "./manage.py", "run_build_from_id", str(build_id), lock_id]
+        )
+        url = f"{self.base_url}/dynos"
+        json = {"command": command, "time_to_live": "86400"}
+
+        resp = requests.post(url, json=json, headers=self.headers)
+        if resp.status_code != 200:
+            msg = f"One-off dyno could not be started: {resp.status_code}: {resp.reason} : {resp.text}"
+            logger.error(msg)
+            resp.raise_for_status()
+        return resp.json()["id"]
 
 
 def get_autoscaler(app_name):

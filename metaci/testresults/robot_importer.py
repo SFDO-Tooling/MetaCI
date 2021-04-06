@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from cumulusci.utils import elementtree_parse_file
+from cumulusci.utils.xml.robot_xml import pattern as ELAPSED_TIME_PATTERN
 from django.core.files.base import ContentFile
 
 from metaci.build.exceptions import BuildError
@@ -74,7 +75,7 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
                     asset=ContentFile(
                         f.read(), f"step-{flowtask.stepnum}-{screenshot}"
                     ),
-                    category=f"robot-screenshot",
+                    category="robot-screenshot",
                 )
                 asset.save()
                 suite_screenshots[screenshot] = asset.id
@@ -130,7 +131,6 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
 
 def parse_robot_output(path):
     """ Parses a robotframework output.xml file into individual test xml files """
-
     tree = elementtree_parse_file(path)
     root = tree.getroot()
     return get_robot_tests(root, root)
@@ -208,16 +208,36 @@ def parse_test(test, suite, root):
         "failing_keyword": keyword,
         "robot_tags": robot_tags,
     }
-
-    delta = _robot_duration(status)
-    duration = delta - (setup_time + teardown_time)
+    duration = duration_from_performance_keywords(test)
+    if duration is not None:
+        test_info["duration"] = duration
+    else:
+        delta = _robot_duration(status)
+        duration = delta - (setup_time + teardown_time)
+        test_info["duration"] = duration.total_seconds()
 
     # Process screenshots
     test_info["screenshots"] = find_screenshots(test)
-    test_info["duration"] = duration.total_seconds()
 
     test_info["xml"] = render_robot_test_xml(root, test_info)
     return test_info
+
+
+def duration_from_performance_keywords(test):
+    """Try to find the tags injected by Robot performance testing keywords"""
+    msgs = test.iter("msg")
+    msg_patterns = (
+        re.match(ELAPSED_TIME_PATTERN, msg.text.strip()) if msg.text else None
+        for msg in msgs
+    )
+    matches = [match for match in msg_patterns if match]
+    duration = None
+    for match in matches:
+        metric, value = match["metric"], float(match["value"])
+        if metric == "elapsed_time":
+            duration = value
+
+    return duration
 
 
 def find_screenshots(root):
