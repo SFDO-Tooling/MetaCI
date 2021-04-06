@@ -103,7 +103,7 @@ class Release(StatusModel):
         on_delete=models.SET_DEFAULT,
         null=False,
         blank=False,
-        default=38,
+        default=1,
     )
     change_case_link = models.URLField(
         _("change case link"), max_length=1024, null=True, blank=True
