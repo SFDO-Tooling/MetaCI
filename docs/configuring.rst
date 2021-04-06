@@ -15,6 +15,13 @@ DJANGO_SECRET_KEY:
     This represents the secret key used to sign session cookies for the Django web application.
     Set it to an arbitrary string that is not shared with another Django site.
 
+DB_ENCRYPTION_KEYS:
+    Newline-separated list of keys to use for encrypting secrets in the database.
+    Generate a key using cryptography.fernet.Fernet.generate_key()
+    Data in encrypted fields are encrypted using the first key when they are stored,
+    but can be read as long as the key remains in the list.
+    Rotate the active key by adding a new key at the beginning of the list.
+
 POSTGRES_USER:
     Environment variable set in ``.env``, representing the database username.
     This value defaults to ``metaci``.
@@ -28,6 +35,12 @@ POSTGRES_DB:
 
 DATABASE_URL:
     Used by Django to connect to PostgreSQL. Edit it to make sure the password matches POSTGRES_PASSWORD.
+
+GITHUB_CLIENT_ID:
+    Client Id from a GitHub app used for logging in to MetaCI with a GitHub account.
+
+GITHUB_CLIENT_SECRET:
+    Client Secret from a GitHub app used for logging in to MetaCI with a GitHub account.
 
 MetaCI must authenticate with the GitHub API to fetch repositories and create releases. 
 This can be set up for a GitHub user by setting GITHUB_USERNAME and GITHUB_PASSWORD, 
@@ -75,19 +88,6 @@ SFDX_HUB_KEY:
 
 SFDX_HUB_USERNAME: 
     This represents the username used to login to your sfdx hub account
-
-CONNECTED_APP_CLIENT_ID:
-    This represents the client id of the connected app that MetaCI will use for authenticating to any persistent org. 
-    It's fine to use the same connected app that is being used for SFDX_CLIENT_ID and SFDX_HUB_KEY.
-
-CONNECTED_APP_CLIENT_SECRET: 
-    This represents the secret of the connected app configured for MetaCI
-
-CONNECTED_APP_CALLBACK_URL:
-    This represents the connected app's callback url 
-
-To acquire the connected_app variables just use the client id, client secret and callback url 
-of the connected app that was created for ``SFDX_CLIENT_ID`` and ``SFDX_HUB_KEY``.
 
 Some rough tests of whether these variables are set can be done using this
 command:

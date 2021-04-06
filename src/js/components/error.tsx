@@ -1,27 +1,30 @@
 import BrandBand from '@salesforce/design-system-react/components/brand-band';
-import Illustration from '@salesforce/design-system-react/components/illustration';
 import BrandBannerBackground from '@salesforce-ux/design-system/assets/images/themes/oneSalesforce/banner-brand-default.png';
-import svgPath from 'images/broken.svg';
 import get from 'lodash/get';
-import * as React from 'react';
+import React, { Component, ReactNode } from 'react';
 import { Trans } from 'react-i18next';
 import { logError } from 'utils/logging';
 
-const EmptyIllustration = ({ message }: { message: React.ReactNode }) => (
-  <Illustration
-    heading="Yikes! An error occurred!  :("
-    messageBody={message}
-    name="Broken"
-    path={`${svgPath}#broken`}
-    size="large"
-  />
+import brokenSvg from '!raw-loader!~img/broken.svg';
+
+export const EmptyIllustration = ({ message }: { message: ReactNode }) => (
+  <div className="slds-illustration slds-illustration_large">
+    <div
+      className="slds-m-vertical_xx-large"
+      dangerouslySetInnerHTML={{ __html: brokenSvg }}
+    />
+    <h3 className="slds-illustration__header slds-text-heading_medium">
+      ¯\_(ツ)_/¯
+    </h3>
+    <p className="slds-text-body_regular">{message}</p>
+  </div>
 );
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-class ErrorBoundary extends React.Component<
+class ErrorBoundary extends Component<
   Props,
   { hasError: boolean; error?: any; info?: any }
 > {
@@ -31,12 +34,12 @@ class ErrorBoundary extends React.Component<
   }
 
   /* istanbul ignore next */
-  public componentDidCatch(error: Error, info: string): void {
+  public componentDidCatch(error: Error, info: { [key: string]: any }) {
     this.setState({ hasError: true, error, info });
     logError(error, info);
   }
 
-  public render(): React.ReactNode {
+  public render() {
     if (this.state.hasError) {
       return (
         <EmptyIllustration
@@ -71,11 +74,7 @@ class ErrorBoundary extends React.Component<
 
 const gradient = 'linear-gradient(to top, rgba(221, 219, 218, 0) 0, #1B5F9E)';
 
-export const AuthError = ({
-  message,
-}: {
-  message: string;
-}): React.ReactNode => (
+export const AuthError = ({ message }: { message: string }) => (
   <BrandBand
     id="brand-band-lightning-blue"
     className="slds-p-around_small"

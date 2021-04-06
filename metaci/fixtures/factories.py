@@ -79,7 +79,7 @@ class OrgFactory(factory.django.DjangoModelFactory):
         model = Org
 
     repo = factory.SubFactory(RepositoryFactory)
-    json = "{}"
+    json = {}
 
 
 class ScratchOrgInstanceFactory(factory.django.DjangoModelFactory):
@@ -87,6 +87,7 @@ class ScratchOrgInstanceFactory(factory.django.DjangoModelFactory):
         model = ScratchOrgInstance
 
     org = factory.SubFactory(OrgFactory)
+    json = {}
 
 
 class PlanRepositoryFactory(factory.django.DjangoModelFactory):

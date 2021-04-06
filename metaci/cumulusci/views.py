@@ -9,7 +9,6 @@ from django.shortcuts import get_object_or_404, render
 from metaci.build.utils import paginate, view_queryset
 from metaci.cumulusci.forms import OrgLockForm, OrgUnlockForm
 from metaci.cumulusci.models import Org, ScratchOrgInstance
-from metaci.cumulusci.utils import get_connected_app
 
 
 @login_required
@@ -70,8 +69,7 @@ def org_login(request, org_id, instance_id=None):
 
     def get_org_config(org):
         org_config = org.get_org_config()
-
-        org_config.refresh_oauth_token(keychain=None, connected_app=get_connected_app())
+        org_config.refresh_oauth_token(keychain=None)
         return org_config
 
     # For non-scratch orgs, just log into the org

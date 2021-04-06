@@ -1,16 +1,21 @@
 import time
+import traceback
+import typing as T
 from collections import namedtuple
 
 import django_rq
+from cumulusci.core.utils import import_global
 from cumulusci.oauth.salesforce import jwt_session
 from django import db
 from django.conf import settings
 from django.core.cache import cache
+from django.utils import timezone
 from rq.exceptions import ShutDownImminentException
 
 from metaci.build.autoscaling import autoscale
 from metaci.build.exceptions import RequeueJob
 from metaci.build.signals import build_complete
+from metaci.build.utils import set_build_info
 from metaci.cumulusci.models import Org, sf_session
 from metaci.repository.utils import create_status
 
@@ -92,8 +97,40 @@ def run_build(build_id, lock_id=None):
     return build.get_status()
 
 
-def start_build(build, lock_id=None):
-    queue = django_rq.get_queue(build.plan.queue)
+def dispatch_build(build, lock_id: str = None):
+    queue_name = build.plan.queue
+    if queue_name == "long-running":
+        return dispatch_one_off_build(build, lock_id)
+    else:
+        return dispatch_queued_build(build, lock_id)
+
+
+def dispatch_one_off_build(build, lock_id: str = None):
+    # parent functions are expecting something in this
+    # shape
+    class Result(T.NamedTuple):
+        id: T.Any
+
+    try:
+        job_id = launch_one_off_build_worker(build, lock_id)
+        build.log = build.log or ""
+        build.log += f"\nRunning build in context (dyno) {job_id}\n"
+        build.save()
+    except Exception as e:
+        set_build_info(
+            build,
+            status="error",
+            time_end=timezone.now(),
+            error_message=str(e),
+            exception=e.__class__.__name__,
+            traceback="".join(traceback.format_tb(e.__traceback__)),
+        )
+        raise e
+    return Result(job_id)
+
+
+def dispatch_queued_build(build, lock_id: str = None):
+    queue = django_rq.get_queue()
     result = queue.enqueue(
         run_build, build.id, lock_id, job_timeout=build.plan.build_timeout
     )
@@ -141,7 +178,7 @@ def check_queued_build(build_id):
             build.log = msg
             build.save()
             return msg
-        res_run = start_build(build)
+        res_run = dispatch_build(build)
         return (
             "DevHub has scratch org capacity, running the build "
             + f"as task {res_run.id}"
@@ -152,7 +189,7 @@ def check_queued_build(build_id):
 
         if status is True:
             # Lock successful, run the build
-            res_run = start_build(build, org.lock_id)
+            res_run = dispatch_build(build, org.lock_id)
             return f"Got a lock on the org, running as task {res_run.id}"
         else:
             # Failed to get lock, queue next check
@@ -229,3 +266,17 @@ def delete_scratch_org(org_instance_id):
         return f"Deleted org instance #{org.id}"
     else:
         return f"Failed to delete org instance #{ord.id}"
+
+
+def launch_one_off_build_worker(build, lock_id: str):
+    """Immediately launch a one-off-build with env-appropriate autoscaler"""
+    config = settings.METACI_LONG_RUNNING_BUILD_CONFIG
+    assert isinstance(
+        config, dict
+    ), "METACI_LONG_RUNNING_BUILD_CONFIG should be a JSON-format dict"
+    autoscaler_class = import_global(settings.METACI_LONG_RUNNING_BUILD_CLASS)
+    autoscaler = autoscaler_class(config)
+    try:
+        return autoscaler.one_off_build(build.id, lock_id)
+    except Exception as e:
+        raise AssertionError(f"Cannot create one-off-build {e}") from e
