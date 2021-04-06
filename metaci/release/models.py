@@ -100,10 +100,9 @@ class Release(StatusModel):
     )
     change_case_template = models.ForeignKey(
         "release.ChangeCaseTemplate",
-        on_delete=models.SET_DEFAULT,
+        on_delete=models.PROTECT,
         null=False,
         blank=False,
-        default=1,
     )
     change_case_link = models.URLField(
         _("change case link"), max_length=1024, null=True, blank=True
