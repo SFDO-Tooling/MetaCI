@@ -267,7 +267,7 @@ def get_or_create_release(event, tag, repo):
         defaults={
             "created_from_commit": event["head_commit"]["id"],
             "status": "draft",
-            # "change_case_template_id": 1,
+            "change_case_template_id": 1,
         },
     )
     return release
