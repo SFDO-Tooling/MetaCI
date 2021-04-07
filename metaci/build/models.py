@@ -720,7 +720,7 @@ class BuildFlow(models.Model):
                 "version": f"{self.build.release.version_number}",
             }
         if (
-            self.build.plan.role == "push_all" and self.build.release
+            self.build.plan.role == "push_production" and self.build.release
         ):  # override lives in MetaCI
             options["push_all"] = {
                 "version": f"{self.build.release.version_number}",
