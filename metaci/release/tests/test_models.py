@@ -3,13 +3,14 @@ import datetime
 import pytest
 from model_utils import Choices
 
-from metaci.release.models import Release
+from metaci.release.models import ChangeCaseTemplate, Release
+from metaci.repository.models import Repository
 
 
 @pytest.mark.django_db
 class TestRelease:
     def test_empty_release_init(self):
-        release = Release()
+        release = Release(repo=Repository(), change_case_template=ChangeCaseTemplate())
         assert release.release_creation_date == datetime.date.today()
         assert release.sandbox_push_date == datetime.date.today()
         assert (
@@ -27,5 +28,5 @@ class TestRelease:
         assert not release.trialforce_id  # checking default set to None
         assert not release.created_from_commit  # checking default set to None
         assert not release.work_item_link  # checking default set to None
-        assert not release.change_case_template  # checking default set to None
+        assert release.change_case_template  # checking default see not None
         assert not release.change_case_link  # checking default set to None

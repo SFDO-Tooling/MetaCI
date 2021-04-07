@@ -264,7 +264,11 @@ def get_or_create_release(event, tag, repo):
     release, _ = Release.objects.get_or_create(
         repo=repo,
         git_tag=tag,
-        defaults={"created_from_commit": event["head_commit"]["id"], "status": "draft"},
+        defaults={
+            "created_from_commit": event["head_commit"]["id"],
+            "status": "draft",
+            "change_case_template_id": 1,
+        },
     )
     return release
 
