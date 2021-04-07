@@ -184,7 +184,14 @@ def test_field_keyword_and_message_passing_test():
 
 @pytest.mark.django_db
 def test_import_robot_tags():
-    """Verify that robot tags are added to the database"""
+    """Verify that we can store lots of tags
+
+    For a while we had a hard limit of 80 characters for the string of
+    tags. We've since removed that limit, and this test verifies that
+    we can not only store tags, but store more than 80 characters
+    worth of tags.
+
+    """
     with temporary_dir() as output_dir:
         copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_1.xml",
@@ -192,7 +199,26 @@ def test_import_robot_tags():
         )
         robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
     test_results = models.TestResult.objects.filter(method__name="FakeTestResult")
-    assert test_results[0].robot_tags == "tag with spaces,w-123456"
+    actual_tags = test_results[0].robot_tags
+    expected_tags = ",".join(
+        (
+            "Bender",
+            "Bishop",
+            "C-3PO",
+            "Curiosity",
+            "Huey Dewey and Louie",
+            "Johnny 5",
+            "Optimus Prime",
+            "Perserverance",
+            "R2-D2",
+            "Robby",
+            "Rosie",
+            "T-1000",
+            "The Iron Giant",
+            "WALL-E",
+        )
+    )
+    assert actual_tags == expected_tags
 
 
 @pytest.mark.django_db
