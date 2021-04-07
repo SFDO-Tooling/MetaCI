@@ -14,6 +14,11 @@ def add_legacy_change_case_template(apps, schema_editor):
     )
 
 
+def remove_legacy_change_case_template(apps, schema_editor):
+    """Creating a NO-OP function for rollback migration capability."""
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -21,16 +26,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name="release",
-            name="change_case_template",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.PROTECT,
-                to="release.changecasetemplate",
-            ),
+        migrations.RunPython(
+            add_legacy_change_case_template, remove_legacy_change_case_template
         ),
-    ]
-
-    operations = [
-        migrations.RunPython(add_legacy_change_case_template),
     ]
