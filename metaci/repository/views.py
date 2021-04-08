@@ -256,20 +256,7 @@ def get_release_if_applicable(event, repo):
     if is_tag(event["ref"]) and repo.release_tag_regex:
         tag = get_tag_name_from_ref(event["ref"])
         if tag_is_release(tag, repo) and event["head_commit"]:
-            release = get_or_create_release(event, tag, repo)
-    return release
-
-
-def get_or_create_release(event, tag, repo):
-    release, _ = Release.objects.get_or_create(
-        repo=repo,
-        git_tag=tag,
-        defaults={
-            "created_from_commit": event["head_commit"]["id"],
-            "status": "draft",
-            "change_case_template_id": 1,
-        },
-    )
+            release = Release.objects.filter(repo=repo, git_tag=tag).first()
     return release
 
 
