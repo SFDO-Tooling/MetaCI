@@ -156,7 +156,7 @@ class TestBuildFlow:
         build_flow.set_commit_status()
         assert build_flow.build.commit_status == "4"
 
-    def test_get_flow_options(self):
+    def test_get_flow_options_release(self):
         build_flow = BuildFlowFactory()
         build_flow.build.plan.role = "release"
         build_flow.build.release = Release(repo=RepositoryFactory())
@@ -165,6 +165,22 @@ class TestBuildFlow:
         assert options["github_release_notes"][
             "production_date"
         ] == datetime.date.today() + datetime.timedelta(days=6)
+
+    def test_get_flow_options_push_sandbox(self):
+        build_flow = BuildFlowFactory()
+        build_flow.build.plan.role = "push_sandbox"
+        build_flow.build.release = Release(repo=RepositoryFactory())
+        build_flow.build.release.version_number = "1.0"
+        options = build_flow._get_flow_options()
+        assert options["push_sandbox"]["version"] == "1.0"
+
+    def test_get_flow_options_push_production(self):
+        build_flow = BuildFlowFactory()
+        build_flow.build.plan.role = "push_production"
+        build_flow.build.release = Release(repo=RepositoryFactory())
+        build_flow.build.release.version_number = "1.0"
+        options = build_flow._get_flow_options()
+        assert options["push_all"]["version"] == "1.0"
 
 
 def detach_logger(model):
