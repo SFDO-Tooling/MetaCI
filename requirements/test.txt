@@ -2,7 +2,7 @@
 -r base.txt
 
 pytest==6.2.2
-pytest-django==4.1.0
+pytest-django==4.2.0
 pytest-factoryboy==2.1.0
 pytest-mock==3.5.1
 pytest-tap==3.2
