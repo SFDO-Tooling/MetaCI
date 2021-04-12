@@ -1,6 +1,6 @@
 import i18next from 'i18next';
-import i18n_detector from 'i18next-browser-languagedetector';
-import i18n_backend from 'i18next-xhr-backend';
+import i18nDetector from 'i18next-browser-languagedetector';
+import i18nBackend from 'i18next-http-backend';
 import { initReactI18next } from 'react-i18next';
 import { logError } from 'utils/logging';
 
@@ -10,8 +10,8 @@ import { logError } from 'utils/logging';
 
 const init = (cb: (error?: string) => void): Promise<any> =>
   i18next
-    .use(i18n_detector)
-    .use(i18n_backend)
+    .use(i18nDetector)
+    .use(i18nBackend)
     .use(initReactI18next)
     .init(
       {

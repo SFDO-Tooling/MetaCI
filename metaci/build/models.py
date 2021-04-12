@@ -713,6 +713,19 @@ class BuildFlow(models.Model):
                 "sandbox_date": self.build.release.sandbox_push_date,
                 "production_date": self.build.release.production_push_date,
             }
+        if (
+            self.build.plan.role == "push_sandbox" and self.build.release
+        ):  # override lives in MetaCI
+            options["push_sandbox"] = {
+                "version": f"{self.build.release.version_number}",
+            }
+        if (
+            self.build.plan.role == "push_production" and self.build.release
+        ):  # override lives in MetaCI
+            options["push_all"] = {
+                "version": f"{self.build.release.version_number}",
+            }
+
         return options
 
     def set_commit_status(self):

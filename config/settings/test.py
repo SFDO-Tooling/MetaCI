@@ -5,6 +5,9 @@ Test settings
 """
 
 from .base import *  # noqa
+from cryptography.fernet import Fernet
+
+INSTALLED_APPS += ("metaci.tests",)
 
 # DEBUG
 # ------------------------------------------------------------------------------
@@ -20,6 +23,8 @@ ALLOWED_HOSTS = ["testserver"]
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key only used for development and testing.
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="CHANGEME!!!")
+
+DB_ENCRYPTION_KEYS = [Fernet.generate_key()]
 
 # Mail settings
 # ------------------------------------------------------------------------------
@@ -69,11 +74,6 @@ TEMPLATES[0]["OPTIONS"]["loaders"] = [
 ]
 
 GITHUB_USERNAME = "TestUser"
-
-# Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = "1234567890"
-CONNECTED_APP_CLIENT_SECRET = "abcdefg1234567890"
-CONNECTED_APP_CALLBACK_URL = "http://localhost/callback"
 
 HEROKU_TOKEN = "BOGUS"
 HEROKU_APP_NAME = "testapp"

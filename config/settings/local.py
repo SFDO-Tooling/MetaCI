@@ -28,6 +28,8 @@ SECRET_KEY = env(
     "DJANGO_SECRET_KEY", default="!)_b4xaov6!0b^_=96*wh@p-9si4p0ho-@4&g7eija9gaxhmo!"
 )
 
+DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", cast=nl_separated_bytes_list)
+
 # Mail settings
 # ------------------------------------------------------------------------------
 
@@ -125,11 +127,6 @@ SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 # Github credentials
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", False)
-
-# Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID", default=None)
-CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET", default=None)
-CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL", default=None)
 
 AUTOSCALERS = {
     "local-app": {

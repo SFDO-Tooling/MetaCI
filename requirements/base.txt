@@ -1,7 +1,7 @@
-setuptools==54.1.2
+setuptools==54.2.0
 
 # CumulusCI
-cumulusci==3.31.0
+cumulusci==3.32.0
 
 # SFDO Template Helpers for authorization middleware and other helpers
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
@@ -15,7 +15,7 @@ whitenoise==5.2.0
 
 
 # Forms
-django-crispy-forms==1.11.1
+django-crispy-forms==1.11.2
 django_filter==2.4.0
 
 # Models
@@ -53,7 +53,7 @@ django-watson==1.5.5
 honcho>=0.7.1
 
 # Django REST Framework
-djangorestframework==3.12.2
+djangorestframework==3.12.4
 djangorestframework-filters==1.0.0.dev2
 
 # Core API for DRF schema generation
@@ -65,7 +65,7 @@ django-log-request-id==1.6.0
 psycopg2-binary==2.8.6
 
 # django-storages for S3
-boto3==1.17.27
+boto3==1.17.39
 django-storages==1.11.1
 
 # JSON web token

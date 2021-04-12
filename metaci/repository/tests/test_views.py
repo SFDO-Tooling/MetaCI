@@ -15,6 +15,7 @@ from metaci.conftest import (
     BuildFactory,
     PlanFactory,
     PlanRepositoryFactory,
+    ReleaseFactory,
     RepositoryFactory,
     StaffSuperuserFactory,
     UserFactory,
@@ -377,27 +378,13 @@ class TestRepositoryViews(TestCase):
         assert actual is not None
 
     @pytest.mark.django_db
-    def test_get_or_create_release(self):
-        tag = "release-tag"
-        repo = RepositoryFactory(name="Test Repo")
-        push_payload = {"head_commit": {"id": "asdf1234"}}
-
-        actual = views.get_or_create_release(push_payload, tag, repo)
-        assert actual is not None
-
-    @mock.patch("metaci.repository.views.tag_is_release")
-    @mock.patch("metaci.repository.views.get_or_create_release")
-    def test_get_release_if_applicable(self, get_release, tag_is_release):
+    def test_get_release_if_applicable(self):
         payload = {"ref": "refs/tags/release-1", "head_commit": "abc123"}
-        repo = mock.Mock()
-        repo.release_tag_regex = r"refs/tags/release-1"
-
-        get_release.return_value = True
-        tag_is_release.return_value = True
-
-        release = views.get_release_if_applicable(payload, repo)
-
-        assert release
+        repo = RepositoryFactory(name="Test Repo")
+        repo.release_tag_regex = "release-1"
+        release = ReleaseFactory(repo=repo, git_tag="release-1")
+        result = views.get_release_if_applicable(payload, repo)
+        assert result == release
 
     def test_get_release_if_applicable__no_ref(self):
         payload = {}

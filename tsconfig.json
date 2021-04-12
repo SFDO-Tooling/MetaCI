@@ -28,6 +28,16 @@
       ],
       "#/*": [
         "static/images/*"
+      ],
+      // Override buggy React-SLDS type definitions
+      "@salesforce/design-system-react/components/*": [
+        "src/js/@types/design-system-react/component.d.ts"
+      ],
+      "@salesforce/design-system-react/components/settings": [
+        "src/js/@types/design-system-react/settings.d.ts"
+      ],
+      "@salesforce/design-system-react/components/combobox/filter": [
+        "src/js/@types/design-system-react/combobox-filter.d.ts"
       ]
     }
   },
