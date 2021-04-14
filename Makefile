@@ -22,8 +22,19 @@ clean-test:
 test: 
 	pytest
 
+# Use CLASS_PATH to run coverage for a subset of tests. 
+# $ make coverage CLASS_PATH="cumulusci/core/tests"
 coverage: clean-test
-	coverage run --source metaci -m pytest
+	coverage run --source metaci -m pytest $(CLASS_PATH)
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
+
+update-deps:
+	pip-compile --upgrade --allow-unsafe requirements/base.in	
+	pip-compile --upgrade --allow-unsafe requirements/prod.in
+	pip-compile --upgrade --allow-unsafe requirements/local.in	
+	pip-compile --upgrade --allow-unsafe requirements/test.in	
+
+install-dev:
+	pip-sync requirements/*.txt
