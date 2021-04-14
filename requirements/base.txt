@@ -1,4 +1,4 @@
-setuptools==54.2.0
+setuptools==56.0.0
 
 # CumulusCI
 cumulusci==3.32.0
@@ -7,7 +7,7 @@ cumulusci==3.32.0
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
 
 # Django
-django==3.1.7
+django==3.2
 
 # Configuration
 django-environ==0.4.5
@@ -25,7 +25,7 @@ django-model-utils==4.1.1
 django-guardian==2.3.0
 
 # Images
-Pillow==8.1.2
+Pillow==8.2.0
 
 # For user registration, either via email or social
 django-allauth==0.44.0
@@ -35,9 +35,9 @@ django-redis==4.12.1
 redis==3.5.3
 
 # Django RQ
-rq==1.7.0
+rq==1.8.0
 rq-scheduler==0.11.0
-django-rq==2.4.0
+django-rq==2.4.1
 
 # Salesforce Lightning Design System for Django
 django-slds-crispyforms==0.1.0  # pyup: ignore # there are releases with no package
@@ -65,7 +65,7 @@ django-log-request-id==1.6.0
 psycopg2-binary==2.8.6
 
 # django-storages for S3
-boto3==1.17.39
+boto3==1.17.49
 django-storages==1.11.1
 
 # JSON web token
