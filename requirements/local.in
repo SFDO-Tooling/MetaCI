@@ -1,9 +1,0 @@
--c test.txt
--c base.txt
-black==20.8b1
-django-debug-toolbar==3.2
-django-extensions==3.1.1
-ipdb==0.13.7
-isort==5.8.0
-Sphinx==3.5.3
-Werkzeug==1.0.1
