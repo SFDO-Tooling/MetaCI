@@ -31,12 +31,9 @@ coverage: clean-test
 	$(BROWSER) htmlcov/index.html
 
 update-deps:
-	pip-compile --upgrade --allow-unsafe requirements/base.in	
+	pip-compile --upgrade --allow-unsafe requirements/dev.in	
 	pip-compile --upgrade --allow-unsafe requirements/prod.in
-	pip-compile --upgrade --allow-unsafe requirements/local.in	
-	pip-compile --upgrade --allow-unsafe requirements/test.in	
 
 dev-install:
-	pip-sync requirements/base.txt
-	pip-sync requirements/test.txt
-	pip-sync requirements/local.txt
+	pip-sync requirements/dev.txt
+	pip-sync requirements/prod.txt
