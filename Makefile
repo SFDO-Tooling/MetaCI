@@ -36,5 +36,7 @@ update-deps:
 	pip-compile --upgrade --allow-unsafe requirements/local.in	
 	pip-compile --upgrade --allow-unsafe requirements/test.in	
 
-install-dev:
-	pip-sync requirements/*.txt
+dev-install:
+	pip-sync requirements/base.txt
+	pip-sync requirements/test.txt
+	pip-sync requirements/local.txt
