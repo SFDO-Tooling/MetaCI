@@ -1,0 +1,10 @@
+coverage==5.5
+coveralls==3.0.1
+factory_boy==3.2.0
+flake8==3.9.0
+pytest-django==4.1.0
+pytest-factoryboy==2.1.0
+pytest-mock==3.5.1
+pytest-tap==3.2
+pytest==6.2.2
+responses==0.13.1
