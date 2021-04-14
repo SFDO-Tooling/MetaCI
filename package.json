@@ -62,7 +62,7 @@
     "chokidar": "^3.5.1",
     "core-js": "^3.8.3",
     "coveralls": "^3.1.0",
-    "css-loader": "^5.2.0",
+    "css-loader": "^5.2.1",
     "css-minimizer-webpack-plugin": "^1.1.5",
     "eslint": "~7.23.0",
     "eslint-config-prettier": "^8.1.0",
