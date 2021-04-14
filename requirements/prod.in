@@ -19,7 +19,7 @@ django-storages
 django-watson
 djangorestframework
 djangorestframework-filters
-django_filter
+django-filter
 gunicorn
 honcho>=0.7.1
 junitparser>=0.8

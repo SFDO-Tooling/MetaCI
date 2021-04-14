@@ -35,5 +35,4 @@ update-deps:
 	pip-compile --upgrade --allow-unsafe requirements/prod.in
 
 dev-install:
-	pip-sync requirements/dev.txt
-	pip-sync requirements/prod.txt
+	pip-sync requirements/*.txt
