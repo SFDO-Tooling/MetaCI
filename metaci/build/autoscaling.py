@@ -227,7 +227,7 @@ class HerokuOneOffBuilder(OneOffBuilder):
         json = {"command": command, "time_to_live": "86400"}
 
         resp = requests.post(url, json=json, headers=self.headers)
-        if resp.status_code != 200:
+        if not (200 <= resp.status_code < 300):
             msg = f"One-off dyno could not be started: {resp.status_code}: {resp.reason} : {resp.text}"
             logger.error(msg)
             resp.raise_for_status()
