@@ -2,9 +2,12 @@
 {% load i18n admin_urls static admin_modify %}
 {% block submit_buttons_bottom %}
 {% submit_row %}
+
 <div class="submit-row">
     <input type="submit" value="Create Change Case" name="_create-change-case">
+    {% if METACI_START_STOP_WEBHOOK %}
     <input type="submit" value="Submit Change Case" name="_submit-change-case">
+    {% endif %}
 </div>
 
 {% endblock %}
