@@ -130,7 +130,7 @@ def dispatch_one_off_build(build, lock_id: str = None):
 
 
 def dispatch_queued_build(build, lock_id: str = None):
-    queue = django_rq.get_queue()
+    queue = django_rq.get_queue(build.plan.queue)
     result = queue.enqueue(
         run_build, build.id, lock_id, job_timeout=build.plan.build_timeout
     )
