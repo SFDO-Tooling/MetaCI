@@ -12,26 +12,22 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
         self.build = build
         super(MetaCIProjectKeychain, self).__init__(project_config, key)
 
-    def change_key(self):
-        raise NotImplementedError("change_key is not supported in this keychain")
-
-    def get_service(self, service_name):
+    def get_service(self, service_type, alias=None):
+        if alias is not None:
+            raise ValueError(
+                f"CumulusCI tried to get {service_type} service named {alias} "
+                "but MetaCI does not yet support named services."
+            )
         try:
-            service = Service.objects.get(name=service_name)
+            service = Service.objects.get(name=service_type)
             return ServiceConfig(service.json)
         except Service.DoesNotExist:
-            raise ServiceNotConfigured(service_name)
+            raise ServiceNotConfigured(service_type)
 
-    def set_service(self, service_name, service_config):
-        try:
-            service = Service.objects.get(name=service_name)
-            service.json = service_config.config
-        except Service.DoesNotExist:
-            service = Service(
-                name=service_name,
-                json=service_config.config,
-            )
-        service.save()
+    def set_service(self, service_type, alias, service_config):
+        raise NotImplementedError(
+            f"CumulusCI tried to store {service_type} service named {alias} but MetaCI does not support this."
+        )
 
     def list_orgs(self):
         orgs = (
