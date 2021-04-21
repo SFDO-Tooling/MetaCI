@@ -21,7 +21,7 @@ djangorestframework
 djangorestframework-filters==1.0.0.dev2
 django-filter
 gunicorn
-honcho>=0.7.1
+honcho
 junitparser>=0.8
 Pillow
 psycopg2-binary
