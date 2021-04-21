@@ -7,7 +7,7 @@ cumulusci==3.33.1
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
 
 # Django
-django==3.1.8
+django==3.2
 
 # Configuration
 django-environ==0.4.5
