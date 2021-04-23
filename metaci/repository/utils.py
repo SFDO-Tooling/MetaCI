@@ -50,7 +50,7 @@ def create_status(build):
         else:
             total_tests = 0
             failed_tests = 0
-            for bf in build.flows.all():
+            for bf in build.flows.filter(rebuild=build.current_rebuild):
                 if bf.tests_fail:
                     failed_tests += bf.tests_fail
                 if bf.tests_total:
