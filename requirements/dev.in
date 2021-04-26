@@ -1,0 +1,18 @@
+-c prod.txt
+black
+coverage
+coveralls
+django-debug-toolbar
+django-extensions
+factory_boy
+flake8
+ipdb
+isort
+pytest
+pytest-django
+pytest-factoryboy
+pytest-mock
+pytest-tap
+responses
+Sphinx
+Werkzeug
