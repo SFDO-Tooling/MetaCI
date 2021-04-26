@@ -142,7 +142,7 @@
         "heroku-redis:in-dyno"
       ],
       "scripts": {
-        "test-setup": "pip install --upgrade -r requirements/test.txt",
+        "test-setup": "pip install --upgrade -r requirements/dev.txt",
         "test": "./heroku_ci.sh"
       },
       "env": {
