@@ -110,7 +110,9 @@ def send_release_webhook(release, config_item=None):
     payload = {
         "case_template_id": release.change_case_template.case_template_id,
         "package_name": release.repo.name,  # Need to figure out.
-        "version": release.version_number,  # Need to see if this is valid.
+        "version": release.repo.latest_release.git_tag.strip(
+            f"{release.repo.release_tag_regex}"
+        ),  # Need to see if this is valid.
         "release_url": f"{release.repo.url}/releases/tag/{urllib.parse.quote(tag)}",
         "steps": steps,
     }
@@ -120,6 +122,15 @@ def send_release_webhook(release, config_item=None):
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
+    release.version_name = release.repo.latest_release.git_tag.strip(
+        f"{release.repo.release_tag_regex}"
+    )
+    release.version_number = release.repo.latest_release.git_tag.strip(
+        f"{release.repo.release_tag_regex}"
+    )
+    release.save()
+    breakpoint()
+
     result = response.json()
     if result["success"]:
         with transaction.atomic():
