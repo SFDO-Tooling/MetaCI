@@ -18,11 +18,11 @@ asgiref==3.3.4
     #   django
 attrs==20.3.0
     # via pytest
-babel==2.9.0
+babel==2.9.1
     # via sphinx
 backcall==0.2.0
     # via ipython
-black==20.8b1
+black==21.4b2
     # via -r requirements/dev.in
 certifi==2020.12.5
     # via
@@ -138,7 +138,7 @@ pytest-django==4.2.0
     # via -r requirements/dev.in
 pytest-factoryboy==2.1.0
     # via -r requirements/dev.in
-pytest-mock==3.5.1
+pytest-mock==3.6.0
     # via -r requirements/dev.in
 pytest-tap==3.2
     # via -r requirements/dev.in
@@ -166,7 +166,7 @@ requests==2.25.1
     #   coveralls
     #   responses
     #   sphinx
-responses==0.13.2
+responses==0.13.3
     # via -r requirements/dev.in
 six==1.15.0
     # via
@@ -207,12 +207,6 @@ toml==0.10.2
     #   pytest
 traitlets==5.0.5
     # via ipython
-typed-ast==1.4.3
-    # via black
-typing-extensions==3.7.4.3
-    # via
-    #   -c requirements/prod.txt
-    #   black
 urllib3==1.26.4
     # via
     #   -c requirements/prod.txt

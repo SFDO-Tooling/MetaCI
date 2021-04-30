@@ -311,8 +311,10 @@ def test_method_trend(request, method_id):
     return render(request, "testresults/test_method_trend.html", data)
 
 
-def build_flow_compare(request,):
-    """ compare two buildflows for their limits usage """
+def build_flow_compare(
+    request,
+):
+    """compare two buildflows for their limits usage"""
     execution1_id = request.GET.get("buildflow1", None)
     execution2_id = request.GET.get("buildflow2", None)
     execution1 = get_object_or_404(BuildFlow, id=execution1_id)
@@ -325,7 +327,7 @@ def build_flow_compare(request,):
 
 
 def build_flow_compare_to(request, build_id, flow):
-    """ allows the user to select a build_flow to compare against the one they are on. """
+    """allows the user to select a build_flow to compare against the one they are on."""
     build_flow = find_buildflow(request, build_id, flow)
     # get a list of build_flows that could be compared to
     possible_comparisons = (

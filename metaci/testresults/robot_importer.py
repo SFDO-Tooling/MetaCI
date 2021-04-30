@@ -130,7 +130,7 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
 
 
 def parse_robot_output(path):
-    """ Parses a robotframework output.xml file into individual test xml files """
+    """Parses a robotframework output.xml file into individual test xml files"""
     tree = elementtree_parse_file(path)
     root = tree.getroot()
     return get_robot_tests(root, root)
