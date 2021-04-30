@@ -34,7 +34,7 @@ class _TestingHelpers:
         return self.route + "?" + params
 
     def find_first(self, fieldname, objs, value):
-        """ Find objects in JSON result sets that match a value """
+        """Find objects in JSON result sets that match a value"""
         if type(objs) == dict:
             objs = objs.get("results", objs)
         return next((x for x in objs if x[fieldname] == value), None)
