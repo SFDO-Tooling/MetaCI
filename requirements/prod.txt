@@ -18,9 +18,9 @@ authlib==0.15.3
     #   simple-salesforce
 bleach==3.3.0
     # via sfdo-template-helpers
-boto3==1.17.55
+boto3==1.17.60
     # via -r requirements/prod.in
-botocore==1.20.55
+botocore==1.20.60
     # via
     #   boto3
     #   s3transfer
@@ -52,7 +52,7 @@ cryptography==3.4.7
     #   jwcrypto
     #   pyjwt
     #   sfdo-template-helpers
-cumulusci==3.33.1
+cumulusci==3.34.0
     # via -r requirements/prod.in
 defusedxml==0.7.1
     # via python3-openid
@@ -62,7 +62,7 @@ django-anymail==8.2
     # via -r requirements/prod.in
 django-crispy-forms==1.11.2
     # via -r requirements/prod.in
-django-defender==0.8.0
+django-defender==0.9.0
     # via -r requirements/prod.in
 django-environ==0.4.5
     # via -r requirements/prod.in
@@ -261,7 +261,7 @@ rq==1.8.0
     #   rq-scheduler
 rst2ansi==0.1.5
     # via cumulusci
-s3transfer==0.4.1
+s3transfer==0.4.2
     # via boto3
 salesforce-bulk==2.2.0
     # via cumulusci
