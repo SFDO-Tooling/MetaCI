@@ -11,6 +11,7 @@ Production Configurations
 
 """
 import json
+import ssl
 
 from .base import *  # noqa
 
@@ -162,26 +163,6 @@ DATABASES["default"] = env.db("DATABASE_URL")
 # CACHING
 # ------------------------------------------------------------------------------
 
-REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=2)
-REDIS_LOCATION = f"{env('REDIS_URL', default='redis://127.0.0.1:6379')}/0"
-# Heroku URL does not pass the DB number, so we parse it in
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_LOCATION,
-        "OPTIONS": {
-            "CONNECTION_POOL_CLASS": "redis.BlockingConnectionPool",
-            "CONNECTION_POOL_KWARGS": {
-                "max_connections": REDIS_MAX_CONNECTIONS,
-                "timeout": 20,
-            },
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
-            # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-        },
-    }
-}
-
 
 # Logging configuration, heroku logfmt
 # 12FA logs to stdout only.
@@ -287,3 +268,9 @@ SFDX_HUB_USERNAME = env("SFDX_HUB_USERNAME")
 
 # django-defender configuration
 DEFENDER_REDIS_NAME = "default"
+
+if REDIS_LOCATION.startswith("rediss://"):
+    # Fix Redis errors with Heroku self-signed certificates
+    # See:
+    #   - https://github.com/jazzband/django-redis/issues/353
+    CACHES["default"]["OPTIONS"]["CONNECTION_POOL_KWARGS"] = {"ssl_cert_reqs": False}

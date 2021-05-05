@@ -317,9 +317,25 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 LOGIN_URL = "account_login"
 
-# django-rq
+# Redis configuration
 REDIS_URL = env("REDIS_URL", default="redis://localhost:6379")
-REDIS_URL += "/0"
+REDIS_LOCATION = f"{REDIS_URL}/0"
+REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=2)
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_LOCATION,
+        "OPTIONS": {
+            "CONNECTION_POOL_CLASS": "redis.BlockingConnectionPool",
+            "CONNECTION_POOL_KWARGS": {
+                "max_connections": REDIS_MAX_CONNECTIONS,
+                "timeout": 20,
+            },
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        },
+    }
+}
 RQ_QUEUES = {
     "default": {
         "USE_REDIS_CACHE": "default",

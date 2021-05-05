@@ -35,25 +35,6 @@ EMAIL_PORT = 1025
 # for unit testing purposes
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
-# CACHING
-# ------------------------------------------------------------------------------
-# Speed advantages of in-memory caching without having to run Memcached
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "",
-    }
-}
-
-# Use Redis for RQ queues instead of cache which uses LocMemCache
-RQ_QUEUES = {
-    "default": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
-    "high": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
-    "medium": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
-    "short": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 500, "AUTOCOMMIT": False},
-    "robot": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
-}
-
 
 # PASSWORD HASHING
 # ------------------------------------------------------------------------------
