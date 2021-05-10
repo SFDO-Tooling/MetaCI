@@ -1,0 +1,78 @@
+setuptools==56.0.0
+
+# CumulusCI
+cumulusci==3.34.1
+
+# SFDO Template Helpers for authorization middleware and other helpers
+https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
+
+# Django
+django==3.1.8
+
+# Configuration
+django-environ==0.4.5
+whitenoise==5.2.0
+
+
+# Forms
+django-crispy-forms==1.11.2
+django_filter==2.4.0
+
+# Models
+django-model-utils==4.1.1
+
+# Per Object Permissions
+django-guardian==2.3.0
+
+# Images
+Pillow==8.2.0
+
+# For user registration, either via email or social
+django-allauth==0.44.0
+
+# Redis support
+django-redis==4.12.1
+redis==3.5.3
+
+# Django RQ
+rq==1.8.0
+rq-scheduler==0.11.0
+django-rq==2.4.1
+
+# Salesforce Lightning Design System for Django
+django-slds-crispyforms==0.1.0  # pyup: ignore # there are releases with no package
+
+ansi2html==1.6.0
+
+junitparser>=0.8
+
+# Full text search
+django-watson==1.5.5
+
+# Honcho: python foreman clone
+honcho>=0.7.1
+
+# Django REST Framework
+djangorestframework==3.12.4
+djangorestframework-filters==1.0.0.dev2
+
+# Core API for DRF schema generation
+coreapi==2.3.3
+
+# log-request-id for X-Request-Id header
+django-log-request-id==1.6.0
+
+psycopg2-binary==2.8.6
+
+# django-storages for S3
+boto3==1.17.49
+django-storages==1.11.1
+
+# JSON web token
+PyJWT==2.0.1
+
+# Django Defender
+django-defender==0.8.0
+
+# Let Javascript refer to Django URLs by name
+django-js-reverse==0.9.1
