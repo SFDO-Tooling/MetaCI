@@ -41,26 +41,6 @@ EMAIL_BACKEND = env(
 )
 
 
-# CACHING
-# ------------------------------------------------------------------------------
-REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=2)
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CONNECTION_POOL_CLASS": "redis.BlockingConnectionPool",
-            "CONNECTION_POOL_KWARGS": {
-                "max_connections": REDIS_MAX_CONNECTIONS,
-                "timeout": 20,
-            },
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
-            # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-        },
-    }
-}
-
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
 MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
