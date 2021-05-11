@@ -199,7 +199,10 @@ def parse_test(test, suite, root):
         "suite": suite,
         "name": test.attrib.get("name") or "<no name>",
         "elem": test,
-        "status": "Pass" if status.attrib["status"] == "PASS" else "Fail",
+        # Note: robot status should always be PASS, FAIL, or SKIP, so
+        # it's a simple transformation to become one of the values from
+        # OUTCOME_CHOICES in testresults/choices.py
+        "status": status.attrib["status"].capitalize(),
         "screenshots": [],
         "message": status.text,
         "failing_keyword": keyword,
