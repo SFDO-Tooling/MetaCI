@@ -241,7 +241,7 @@ def find_screenshots(root):
     if root is None:
         return []
     screenshots = []
-    for msg in root.findall(".//msg[@html='yes']"):
+    for msg in root.findall(".//msg[@html='true']"):
         txt = "".join([text for text in msg.itertext()])
         for screenshot in re.findall(r'href="([\w.-]+)">', txt):
             screenshots.append(screenshot)
