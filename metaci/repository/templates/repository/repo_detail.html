@@ -12,6 +12,11 @@
 {% block layout_header_buttons %}
   <ul class="slds-button-group-list">
     <li>
+      {% if user.is_superuser %}
+      <a href="{% url 'admin:release_release_add' %}?repo_id={{ repo.pk }}">
+        <button class="slds-button slds-button_outline-brand">Create Release Item</button>
+      </a>
+      {% endif %}
       <a href="{{ repo.url }}" target="_blank">
         <button class="slds-button slds-button_outline-brand">View Repo in GitHub</button>
       </a>

@@ -61,7 +61,7 @@ class Release(StatusModel):
         _("version name"), max_length=255, null=True, blank=True
     )
     version_number = models.CharField(
-        _("version number"), max_length=255, null=True, blank=True
+        _("version number"), max_length=255, null=True, blank=False
     )
     package_version_id = models.CharField(
         _("package version id"), max_length=18, null=True, blank=True
