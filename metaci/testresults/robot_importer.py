@@ -146,8 +146,8 @@ def get_robot_tests(root, elem, parents=()):
 
     if not has_children_suites:
         suite_file = elem.attrib["source"].replace(os.getcwd(), "")
-        setup = elem.find("kw[@type='setup']")
-        teardown = elem.find("kw[@type='teardown']")
+        setup = elem.find("kw[@type='SETUP']")
+        teardown = elem.find("kw[@type='TEARDOWN']")
         suite = {
             "file": suite_file,
             "elem": elem,
@@ -175,8 +175,8 @@ def _robot_duration(status_element):
 
 def parse_test(test, suite, root):
     status = test.find("status")
-    setup = test.find("kw[@type='setup']")
-    teardown = test.find("kw[@type='teardown']")
+    setup = test.find("kw[@type='SETUP']")
+    teardown = test.find("kw[@type='TEARDOWN']")
     zero = timedelta(seconds=0)
     setup_time = _robot_duration(setup.find("status")) if setup else zero
     teardown_time = _robot_duration(teardown.find("status")) if teardown else zero
