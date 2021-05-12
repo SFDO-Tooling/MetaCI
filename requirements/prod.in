@@ -1,7 +1,7 @@
 ansi2html
 boto3
 cumulusci==3.35.0.dev0
-django<3.2
+django<3.3
 django-allauth
 django-anymail
 django-crispy-forms
