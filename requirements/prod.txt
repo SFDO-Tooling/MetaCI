@@ -114,7 +114,7 @@ djangorestframework==3.12.4
     #   sfdo-template-helpers
 docutils==0.16
     # via cumulusci
-faker==8.1.1
+faker==8.1.3
     # via
     #   cumulusci
     #   snowfakery
@@ -122,7 +122,7 @@ fs==2.4.13
     # via cumulusci
 github3.py==2.0.0
     # via cumulusci
-greenlet==1.0.0
+greenlet==1.1.0
     # via
     #   cumulusci
     #   sqlalchemy
@@ -288,9 +288,9 @@ six==1.15.0
     #   fs
     #   python-dateutil
     #   salesforce-bulk
-snowfakery==1.10
+snowfakery==1.11
     # via cumulusci
-sqlalchemy==1.4.11
+sqlalchemy==1.4.15
     # via
     #   cumulusci
     #   snowfakery
