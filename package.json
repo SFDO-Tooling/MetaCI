@@ -13,7 +13,7 @@
     "@sentry/browser": "^6.3.4",
     "del": "^6.0.0",
     "i18next": "^20.2.2",
-    "i18next-browser-languagedetector": "^6.1.0",
+    "i18next-browser-languagedetector": "^6.1.1",
     "i18next-http-backend": "^1.2.2",
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.16",
