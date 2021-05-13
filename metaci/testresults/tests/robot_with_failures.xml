@@ -1,119 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 3.2.1 (Python 3.7.6 on darwin)" generated="20200623 18:49:20.911" rpa="false">
-  <suite id="s1" name="Robot Fail" source="/private/tmp/robot_fail.robot">
-    <test id="s1-t1" name="Passing test">
-      <kw name="Pass Execution" library="BuiltIn">
-        <doc>Skips rest of the current test, setup, or teardown with PASS status.</doc>
-        <arguments>
-          <arg>Life is good, yo.</arg>
-        </arguments>
-        <msg timestamp="20200623 18:49:20.956" level="INFO">Execution passed with message:
+<robot generator="Rebot 4.0.1 (Python 3.8.9 on darwin)" generated="20210511 15:16:12.894" rpa="false" schemaversion="2">
+<suite id="s1" name="Robot Fail" source="/private/tmp/robot_fail.robot">
+<test id="s1-t1" name="Passing test">
+<kw name="Pass Execution" library="BuiltIn">
+<arg>Life is good, yo.</arg>
+<doc>Skips rest of the current test, setup, or teardown with PASS status.</doc>
+<msg timestamp="20200623 18:49:20.956" level="INFO">Execution passed with message:
         Life is good, yo.</msg>
-        <status status="PASS" starttime="20200623 18:49:20.956" endtime="20200623 18:49:20.956"></status>
-      </kw>
-      <status status="PASS" starttime="20200623 18:49:20.955" endtime="20200623 18:49:20.956" critical="yes">Life is good, yo.</status>
-    </test>
-    <test id="s1-t2" name="Failing test 1">
-      <kw name="Keyword with failure">
-        <kw name="Fail" library="BuiltIn">
-          <doc>Fails the test with the given message and optionally alters its tags.</doc>
-          <arguments>
-            <arg>${message}</arg>
-          </arguments>
-          <msg timestamp="20200623 18:49:20.959" level="FAIL">Danger, Will Robinson!</msg>
-          <status status="FAIL" starttime="20200623 18:49:20.958" endtime="20200623 18:49:20.959"></status>
-        </kw>
-        <status status="FAIL" starttime="20200623 18:49:20.957" endtime="20200623 18:49:20.959"></status>
-      </kw>
-      <doc>A test that fails with a keyword directly in the test</doc>
-      <status status="FAIL" starttime="20200623 18:49:20.957" endtime="20200623 18:49:20.960" critical="yes">Danger, Will Robinson!</status>
-    </test>
-    <test id="s1-t3" name="Failing test 2">
-      <kw name="Keyword which calls a failing keyword">
-        <kw name="Keyword with failure">
-          <arguments>
-            <arg>I'm sorry, Dave. I'm afraid I can't do that.</arg>
-          </arguments>
-          <kw name="Fail" library="BuiltIn">
-            <doc>Fails the test with the given message and optionally alters its tags.</doc>
-            <arguments>
-              <arg>${message}</arg>
-            </arguments>
-            <msg timestamp="20200623 18:49:20.962" level="FAIL">I'm sorry, Dave. I'm afraid I can't do that.</msg>
-            <status status="FAIL" starttime="20200623 18:49:20.961" endtime="20200623 18:49:20.962"></status>
-          </kw>
-          <status status="FAIL" starttime="20200623 18:49:20.961" endtime="20200623 18:49:20.962"></status>
-        </kw>
-        <status status="FAIL" starttime="20200623 18:49:20.961" endtime="20200623 18:49:20.962"></status>
-      </kw>
-      <doc>A test that fails due to a failure in a lower level keyword.</doc>
-      <status status="FAIL" starttime="20200623 18:49:20.960" endtime="20200623 18:49:20.963" critical="yes">I'm sorry, Dave. I'm afraid I can't do that.</status>
-    </test>
-    <test id="s1-t4" name="Failing test 3">
-      <kw name="Run Keyword And Continue On Failure" library="BuiltIn">
-        <doc>Runs the keyword and continues execution even if a failure occurs.</doc>
-        <arguments>
-          <arg>Keyword with failure</arg>
-          <arg>First failure</arg>
-        </arguments>
-        <kw name="Keyword with failure">
-          <arguments>
-            <arg>First failure</arg>
-          </arguments>
-          <kw name="Fail" library="BuiltIn">
-            <doc>Fails the test with the given message and optionally alters its tags.</doc>
-            <arguments>
-              <arg>${message}</arg>
-            </arguments>
-            <msg timestamp="20200623 18:49:21.021" level="FAIL">First failure</msg>
-            <status status="FAIL" starttime="20200623 18:49:21.020" endtime="20200623 18:49:21.021"></status>
-          </kw>
-          <status status="FAIL" starttime="20200623 18:49:21.019" endtime="20200623 18:49:21.021"></status>
-        </kw>
-        <status status="FAIL" starttime="20200623 18:49:21.019" endtime="20200623 18:49:21.021"></status>
-      </kw>
-      <kw name="Run Keyword And Continue On Failure" library="BuiltIn">
-        <doc>Runs the keyword and continues execution even if a failure occurs.</doc>
-        <arguments>
-          <arg>Keyword with failure</arg>
-          <arg>Second failure</arg>
-        </arguments>
-        <kw name="Keyword with failure">
-          <arguments>
-            <arg>Second failure</arg>
-          </arguments>
-          <kw name="Fail" library="BuiltIn">
-            <doc>Fails the test with the given message and optionally alters its tags.</doc>
-            <arguments>
-              <arg>${message}</arg>
-            </arguments>
-            <msg timestamp="20200623 18:49:21.023" level="FAIL">Second failure</msg>
-            <status status="FAIL" starttime="20200623 18:49:21.023" endtime="20200623 18:49:21.023"></status>
-          </kw>
-          <status status="FAIL" starttime="20200623 18:49:21.022" endtime="20200623 18:49:21.024"></status>
-        </kw>
-        <status status="FAIL" starttime="20200623 18:49:21.022" endtime="20200623 18:49:21.024"></status>
-      </kw>
-      <doc>A test that has multiple keyword failures</doc>
-      <status status="FAIL" starttime="20200623 18:49:21.017" endtime="20200623 18:49:21.024" critical="yes">Several failures occurred:
+<status status="PASS" starttime="20200623 18:49:20.956" endtime="20200623 18:49:20.956"/>
+</kw>
+<status status="PASS" starttime="20200623 18:49:20.955" endtime="20200623 18:49:20.956">Life is good, yo.</status>
+</test>
+<test id="s1-t2" name="Failing test 1">
+<kw name="Keyword with failure">
+<kw name="Fail" library="BuiltIn">
+<arg>${message}</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<msg timestamp="20200623 18:49:20.959" level="FAIL">Danger, Will Robinson!</msg>
+<status status="FAIL" starttime="20200623 18:49:20.958" endtime="20200623 18:49:20.959"/>
+</kw>
+<status status="FAIL" starttime="20200623 18:49:20.957" endtime="20200623 18:49:20.959"/>
+</kw>
+<doc>A test that fails with a keyword directly in the test</doc>
+<status status="FAIL" starttime="20200623 18:49:20.957" endtime="20200623 18:49:20.960">Danger, Will Robinson!</status>
+</test>
+<test id="s1-t3" name="Failing test 2">
+<kw name="Keyword which calls a failing keyword">
+<kw name="Keyword with failure">
+<arg>I'm sorry, Dave. I'm afraid I can't do that.</arg>
+<kw name="Fail" library="BuiltIn">
+<arg>${message}</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<msg timestamp="20200623 18:49:20.962" level="FAIL">I'm sorry, Dave. I'm afraid I can't do that.</msg>
+<status status="FAIL" starttime="20200623 18:49:20.961" endtime="20200623 18:49:20.962"/>
+</kw>
+<status status="FAIL" starttime="20200623 18:49:20.961" endtime="20200623 18:49:20.962"/>
+</kw>
+<status status="FAIL" starttime="20200623 18:49:20.961" endtime="20200623 18:49:20.962"/>
+</kw>
+<doc>A test that fails due to a failure in a lower level keyword.</doc>
+<status status="FAIL" starttime="20200623 18:49:20.960" endtime="20200623 18:49:20.963">I'm sorry, Dave. I'm afraid I can't do that.</status>
+</test>
+<test id="s1-t4" name="Failing test 3">
+<kw name="Run Keyword And Continue On Failure" library="BuiltIn">
+<arg>Keyword with failure</arg>
+<arg>First failure</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<kw name="Keyword with failure">
+<arg>First failure</arg>
+<kw name="Fail" library="BuiltIn">
+<arg>${message}</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<msg timestamp="20200623 18:49:21.021" level="FAIL">First failure</msg>
+<status status="FAIL" starttime="20200623 18:49:21.020" endtime="20200623 18:49:21.021"/>
+</kw>
+<status status="FAIL" starttime="20200623 18:49:21.019" endtime="20200623 18:49:21.021"/>
+</kw>
+<status status="FAIL" starttime="20200623 18:49:21.019" endtime="20200623 18:49:21.021"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" library="BuiltIn">
+<arg>Keyword with failure</arg>
+<arg>Second failure</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<kw name="Keyword with failure">
+<arg>Second failure</arg>
+<kw name="Fail" library="BuiltIn">
+<arg>${message}</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<msg timestamp="20200623 18:49:21.023" level="FAIL">Second failure</msg>
+<status status="FAIL" starttime="20200623 18:49:21.023" endtime="20200623 18:49:21.023"/>
+</kw>
+<status status="FAIL" starttime="20200623 18:49:21.022" endtime="20200623 18:49:21.024"/>
+</kw>
+<status status="FAIL" starttime="20200623 18:49:21.022" endtime="20200623 18:49:21.024"/>
+</kw>
+<doc>A test that has multiple keyword failures</doc>
+<status status="FAIL" starttime="20200623 18:49:21.017" endtime="20200623 18:49:21.024">Several failures occurred:
 
       1) First failure
 
       2) Second failure</status>
-    </test>
-    <status status="FAIL" starttime="20200623 18:49:20.915" endtime="20200623 18:49:21.026"></status>
-  </suite>
-  <statistics>
-    <total>
-      <stat pass="1" fail="3">Critical Tests</stat>
-      <stat pass="1" fail="3">All Tests</stat>
-    </total>
-    <tag>
-    </tag>
-    <suite>
-      <stat pass="1" fail="3" id="s1" name="Robot Fail">Robot Fail</stat>
-    </suite>
-  </statistics>
-  <errors>
-  </errors>
+</test>
+<status status="FAIL" starttime="20200623 18:49:20.915" endtime="20200623 18:49:21.026"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="3" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="1" fail="3" skip="0" id="s1" name="Robot Fail">Robot Fail</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
 </robot>

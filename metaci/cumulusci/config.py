@@ -18,7 +18,7 @@ class MetaCIProjectConfig(BaseProjectConfig):
 
     @property
     def config_project_local_path(self):
-        """ MetaCI never uses the local path """
+        """MetaCI never uses the local path"""
         return
 
     @property
@@ -51,7 +51,7 @@ class MetaCIUniversalConfig(UniversalConfig):
 
     @property
     def config_global_path(self):
-        """ MetaCI never uses the global path """
+        """MetaCI never uses the global path"""
         return
 
     def get_project_config(self, build):

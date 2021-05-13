@@ -130,7 +130,7 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
 
 
 def parse_robot_output(path):
-    """ Parses a robotframework output.xml file into individual test xml files """
+    """Parses a robotframework output.xml file into individual test xml files"""
     tree = elementtree_parse_file(path)
     root = tree.getroot()
     return get_robot_tests(root, root)
@@ -146,8 +146,8 @@ def get_robot_tests(root, elem, parents=()):
 
     if not has_children_suites:
         suite_file = elem.attrib["source"].replace(os.getcwd(), "")
-        setup = elem.find("kw[@type='setup']")
-        teardown = elem.find("kw[@type='teardown']")
+        setup = elem.find("kw[@type='SETUP']")
+        teardown = elem.find("kw[@type='TEARDOWN']")
         suite = {
             "file": suite_file,
             "elem": elem,
@@ -175,12 +175,11 @@ def _robot_duration(status_element):
 
 def parse_test(test, suite, root):
     status = test.find("status")
-    setup = test.find("kw[@type='setup']")
-    teardown = test.find("kw[@type='teardown']")
+    setup = test.find("kw[@type='SETUP']")
+    teardown = test.find("kw[@type='TEARDOWN']")
     zero = timedelta(seconds=0)
     setup_time = _robot_duration(setup.find("status")) if setup else zero
     teardown_time = _robot_duration(teardown.find("status")) if teardown else zero
-    tags = test.find("tags")
 
     # I'm not 100% convinced this is what we want. It's great in the
     # normal case, but it's possible for a test to have multiple failing
@@ -195,14 +194,15 @@ def parse_test(test, suite, root):
             if library:
                 keyword = f"{library}.{keyword}"
 
-    robot_tags = ",".join(
-        sorted([tag.text for tag in tags.iterfind("tag")]) if tags else []
-    )
+    robot_tags = ",".join(sorted([tag.text for tag in test.iterfind("tag")]))
     test_info = {
         "suite": suite,
         "name": test.attrib.get("name") or "<no name>",
         "elem": test,
-        "status": "Pass" if status.attrib["status"] == "PASS" else "Fail",
+        # Note: robot status should always be PASS, FAIL, or SKIP, so
+        # it's a simple transformation to become one of the values from
+        # OUTCOME_CHOICES in testresults/choices.py
+        "status": status.attrib["status"].capitalize(),
         "screenshots": [],
         "message": status.text,
         "failing_keyword": keyword,
@@ -244,7 +244,7 @@ def find_screenshots(root):
     if root is None:
         return []
     screenshots = []
-    for msg in root.findall(".//msg[@html='yes']"):
+    for msg in root.findall(".//msg[@html='true']"):
         txt = "".join([text for text in msg.itertext()])
         for screenshot in re.findall(r'href="([\w.-]+)">', txt):
             screenshots.append(screenshot)
