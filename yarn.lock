@@ -9189,10 +9189,10 @@ sarcastic@^1.5.0:
   resolved "https://registry.yarnpkg.com/sarcastic/-/sarcastic-1.5.0.tgz#1e87e75bb64e856d3f34d1f5a391c3abecf8c7c1"
   integrity sha512-j7zmeNbABvOGXzt11WIm7nITPJ0exX/IL0sV9GZHNSsrFEjadfK5Z3GfBEelc6/VoEp17i/JEw3UuzyJNvgZNw==
 
-sass-loader@^11.1.0:
-  version "11.1.0"
-  resolved "https://registry.yarnpkg.com/sass-loader/-/sass-loader-11.1.0.tgz#302a83e41834a7ac0cc9d7591e52688ef4ed92af"
-  integrity sha512-TS8KtLtMAqK68lBs0PRzoGf7ndz9m7pKo4BXvUzjGDDgWEY0qcoMMRVpaHfYM0i3/E6UsererqIpjs7dVA/p7A==
+sass-loader@^11.1.1:
+  version "11.1.1"
+  resolved "https://registry.yarnpkg.com/sass-loader/-/sass-loader-11.1.1.tgz#0db441bbbe197b2af96125bebb7f4be6476b13a7"
+  integrity sha512-fOCp/zLmj1V1WHDZbUbPgrZhA7HKXHEqkslzB+05U5K9SbSbcmH91C7QLW31AsXikxUMaxXRhhcqWZAxUMLDyA==
   dependencies:
     klona "^2.0.4"
     neo-async "^2.6.2"
