@@ -1,3 +1,4 @@
+import fnmatch
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
@@ -242,10 +243,13 @@ def test_execution_errors():
     error_messages = [element.text for element in msg_elements]
 
     expected_error_messages = [
-        "Error in file 'example.robot' on line 2: Library setting requires value.",
-        "Error in file 'example.robot' on line 3: Resource setting requires value.",
+        # note: these are glob patterns, not regexes
+        "Error in file '*' on line 2: Library setting requires value.",
+        "Error in file '*' on line 3: Resource setting requires value.",
     ]
     assert len(error_messages) == len(expected_error_messages)
+    for pattern in expected_error_messages:
+        assert len(fnmatch.filter(error_messages, pattern)) == 1
 
 
 @pytest.mark.django_db
