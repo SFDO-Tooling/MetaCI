@@ -1,117 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 3.2.2 (Python 3.9.1 on darwin)" generated="20210301 14:20:18.962" rpa="false">
+<robot generator="Rebot 4.0.1 (Python 3.8.9 on darwin)" generated="20210511 15:19:11.175" rpa="false" schemaversion="2">
 <suite id="s1" name="Performance" source="/Users/pprescod/code/CumulusCI/cumulusci/robotframework/tests/salesforce/performance.robot">
 <test id="s1-t1" name="Test Elapsed Time For Last Record">
 <kw name="Salesforce Insert" library="cumulusci.robotframework.Salesforce">
-<doc>Creates a new Salesforce object and returns the Id.</doc>
-<arguments>
+<var>${contact_id}</var>
 <arg>Contact</arg>
 <arg>FirstName=Dummy1</arg>
 <arg>LastName=Dummy2</arg>
 <arg>EmailBouncedDate=2030-01-01T00:00:00</arg>
-</arguments>
-<assign>
-<var>${contact_id}</var>
-</assign>
+<doc>Creates a new Salesforce object and returns the Id.</doc>
 <msg timestamp="20210301 14:20:19.553" level="INFO">Inserting Contact with values {'FirstName': 'Dummy1', 'LastName': 'Dummy2', 'EmailBouncedDate': '2030-01-01T00:00:00'}</msg>
 <msg timestamp="20210301 14:20:21.136" level="INFO">Storing Contact 003R000001aWPbLIAW to session records</msg>
 <msg timestamp="20210301 14:20:21.138" level="INFO">${contact_id} = 003R000001aWPbLIAW</msg>
-<msg timestamp="20210301 14:20:21.138" level="INFO" />
-<status status="PASS" starttime="20210301 14:20:19.553" endtime="20210301 14:20:21.138"></status>
+<msg timestamp="20210301 14:20:21.138" level="INFO"/>
+<status status="PASS" starttime="20210301 14:20:19.553" endtime="20210301 14:20:21.138"/>
 </kw>
 <kw name="Elapsed Time For Last Record" library="cumulusci.robotframework.Salesforce">
-<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
-<arguments>
+<var>${Elapsed}</var>
 <arg>obj_name=Contact</arg>
 <arg>where=Id='${contact_id}'</arg>
 <arg>start_field=CreatedDate</arg>
 <arg>end_field=EmailBouncedDate</arg>
 <arg>order_by=EmailBouncedDate</arg>
-</arguments>
-<assign>
-<var>${Elapsed}</var>
-</assign>
+<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
 <msg timestamp="20210301 14:20:21.154" level="INFO">Running SOQL Query: SELECT CreatedDate, EmailBouncedDate FROM Contact WHERE Id='003R000001aWPbLIAW' ORDER BY EmailBouncedDate DESC NULLS LAST LIMIT 1</msg>
 <msg timestamp="20210301 14:20:21.583" level="INFO">${Elapsed} = 278818780.0</msg>
-<status status="PASS" starttime="20210301 14:20:21.153" endtime="20210301 14:20:21.583"></status>
+<status status="PASS" starttime="20210301 14:20:21.153" endtime="20210301 14:20:21.583"/>
 </kw>
 <kw name="Should Be True" library="BuiltIn">
-<doc>Fails if the given condition is not true.</doc>
-<arguments>
 <arg>${Elapsed} &gt;= 100_000</arg>
-</arguments>
-<status status="PASS" starttime="20210301 14:20:21.583" endtime="20210301 14:20:21.584"></status>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" starttime="20210301 14:20:21.583" endtime="20210301 14:20:21.584"/>
 </kw>
 <kw name="Salesforce Insert" library="cumulusci.robotframework.Salesforce">
-<doc>Creates a new Salesforce object and returns the Id.</doc>
-<arguments>
+<var>${contact2_id}</var>
 <arg>Contact</arg>
 <arg>FirstName=Dummy1</arg>
 <arg>LastName=Dummy2</arg>
 <arg>EmailBouncedDate=2029-01-01T00:00:00</arg>
-</arguments>
-<assign>
-<var>${contact2_id}</var>
-</assign>
+<doc>Creates a new Salesforce object and returns the Id.</doc>
 <msg timestamp="20210301 14:20:21.585" level="INFO">Inserting Contact with values {'FirstName': 'Dummy1', 'LastName': 'Dummy2', 'EmailBouncedDate': '2029-01-01T00:00:00'}</msg>
 <msg timestamp="20210301 14:20:22.128" level="INFO">Storing Contact 003R000001aWPbQIAW to session records</msg>
 <msg timestamp="20210301 14:20:22.131" level="INFO">${contact2_id} = 003R000001aWPbQIAW</msg>
-<status status="PASS" starttime="20210301 14:20:21.584" endtime="20210301 14:20:22.131"></status>
+<status status="PASS" starttime="20210301 14:20:21.584" endtime="20210301 14:20:22.131"/>
 </kw>
 <kw name="Elapsed Time For Last Record" library="cumulusci.robotframework.Salesforce">
-<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
-<arguments>
+<var>${Elapsed_latest}</var>
 <arg>obj_name=Contact</arg>
 <arg>start_field=CreatedDate</arg>
 <arg>end_field=EmailBouncedDate</arg>
 <arg>order_by=EmailBouncedDate</arg>
-</arguments>
-<assign>
-<var>${Elapsed_latest}</var>
-</assign>
+<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
 <msg timestamp="20210301 14:20:22.132" level="INFO">Running SOQL Query: SELECT CreatedDate, EmailBouncedDate FROM Contact ORDER BY EmailBouncedDate DESC NULLS LAST LIMIT 1</msg>
 <msg timestamp="20210301 14:20:22.920" level="INFO">${Elapsed_latest} = 278818780.0</msg>
-<status status="PASS" starttime="20210301 14:20:22.132" endtime="20210301 14:20:22.920"></status>
+<status status="PASS" starttime="20210301 14:20:22.132" endtime="20210301 14:20:22.920"/>
 </kw>
 <kw name="Should Be Equal" library="BuiltIn">
-<doc>Fails if the given objects are unequal.</doc>
-<arguments>
 <arg>${Elapsed}</arg>
 <arg>${Elapsed_latest}</arg>
-</arguments>
-<status status="PASS" starttime="20210301 14:20:22.921" endtime="20210301 14:20:22.921"></status>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20210301 14:20:22.921" endtime="20210301 14:20:22.921"/>
 </kw>
 <kw name="Set Test Elapsed Time" library="cumulusci.robotframework.Salesforce">
-<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
-<arguments>
 <arg>${Elapsed}</arg>
-</arguments>
+<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
 <msg timestamp="20210301 14:20:22.922" level="INFO">Set test message to:
 Elapsed time set by test : 278818780.0</msg>
 <msg timestamp="20210301 14:20:22.922" level="INFO">Set tag 'cci_metric_elapsed_time'.</msg>
 <msg timestamp="20210301 14:20:22.923" level="INFO">${cci_metric_elapsed_time} = 278818780.0</msg>
-<status status="PASS" starttime="20210301 14:20:22.921" endtime="20210301 14:20:22.923"></status>
+<status status="PASS" starttime="20210301 14:20:22.921" endtime="20210301 14:20:22.923"/>
 </kw>
-<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="teardown">
+<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="TEARDOWN">
 <doc>Deletes records that were created while running this test case.</doc>
 <msg timestamp="20210301 14:20:22.923" level="INFO">Deleting 2 records</msg>
 <msg timestamp="20210301 14:20:22.923" level="INFO">  Deleting Contact 003R000001aWPbQIAW</msg>
 <msg timestamp="20210301 14:20:22.924" level="INFO">Deleting Contact with Id 003R000001aWPbQIAW</msg>
 <msg timestamp="20210301 14:20:24.171" level="INFO">  Deleting Contact 003R000001aWPbLIAW</msg>
 <msg timestamp="20210301 14:20:24.171" level="INFO">Deleting Contact with Id 003R000001aWPbLIAW</msg>
-<status status="PASS" starttime="20210301 14:20:22.923" endtime="20210301 14:20:24.721"></status>
+<status status="PASS" starttime="20210301 14:20:22.923" endtime="20210301 14:20:24.721"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>cci_metric_elapsed_time</tag>
 <tag>no-browser</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:19.551" endtime="20210301 14:20:24.722" critical="yes">Elapsed time set by test : 278818780.0</status>
+<status status="PASS" starttime="20210301 14:20:19.551" endtime="20210301 14:20:24.722">Elapsed time set by test : 278818780.0</status>
 </test>
 <test id="s1-t2" name="Test Elapsed Time For Last Record - Failure No Record">
 <kw name="Run Keyword And Expect Error" library="BuiltIn">
-<doc>Runs the keyword and checks that the expected error occurred.</doc>
-<arguments>
 <arg>*Matching record not found*</arg>
 <arg>Elapsed Time For Last Record</arg>
 <arg>obj_name=AsyncApexJob</arg>
@@ -119,241 +93,199 @@ Elapsed time set by test : 278818780.0</msg>
 <arg>start_field=CreatedDate</arg>
 <arg>end_field=CompletedDate</arg>
 <arg>order_by=CompletedDate</arg>
-</arguments>
+<doc>Runs the keyword and checks that the expected error occurred.</doc>
 <kw name="Elapsed Time For Last Record" library="cumulusci.robotframework.Salesforce">
-<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
-<arguments>
 <arg>obj_name=AsyncApexJob</arg>
 <arg>where=ApexClass.Name='BlahBlah'</arg>
 <arg>start_field=CreatedDate</arg>
 <arg>end_field=CompletedDate</arg>
 <arg>order_by=CompletedDate</arg>
-</arguments>
+<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
 <msg timestamp="20210301 14:20:24.724" level="INFO">Running SOQL Query: SELECT CreatedDate, CompletedDate FROM AsyncApexJob WHERE ApexClass.Name='BlahBlah' ORDER BY CompletedDate DESC NULLS LAST LIMIT 1</msg>
 <msg timestamp="20210301 14:20:25.167" level="FAIL">Matching record not found: SELECT CreatedDate, CompletedDate FROM AsyncApexJob WHERE ApexClass.Name='BlahBlah' ORDER BY CompletedDate DESC NULLS LAST LIMIT 1</msg>
-<status status="FAIL" starttime="20210301 14:20:24.724" endtime="20210301 14:20:25.168"></status>
+<status status="FAIL" starttime="20210301 14:20:24.724" endtime="20210301 14:20:25.168"/>
 </kw>
-<status status="PASS" starttime="20210301 14:20:24.723" endtime="20210301 14:20:25.168"></status>
+<status status="PASS" starttime="20210301 14:20:24.723" endtime="20210301 14:20:25.168"/>
 </kw>
-<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="teardown">
+<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="TEARDOWN">
 <doc>Deletes records that were created while running this test case.</doc>
 <msg timestamp="20210301 14:20:25.169" level="INFO">Deleting 0 records</msg>
-<status status="PASS" starttime="20210301 14:20:25.169" endtime="20210301 14:20:25.169"></status>
+<status status="PASS" starttime="20210301 14:20:25.169" endtime="20210301 14:20:25.169"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>no-browser</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:24.723" endtime="20210301 14:20:25.169" critical="yes"></status>
+<status status="PASS" starttime="20210301 14:20:24.723" endtime="20210301 14:20:25.169"/>
 </test>
 <test id="s1-t3" name="Test Elapsed Time For Last Record - Failure Bad Fields">
 <kw name="Salesforce Insert" library="cumulusci.robotframework.Salesforce">
-<doc>Creates a new Salesforce object and returns the Id.</doc>
-<arguments>
+<var>${contact_id}</var>
 <arg>Contact</arg>
 <arg>LastName=Dummy2</arg>
 <arg>EmailBouncedDate=2030-01-01T00:00:00</arg>
-</arguments>
-<assign>
-<var>${contact_id}</var>
-</assign>
+<doc>Creates a new Salesforce object and returns the Id.</doc>
 <msg timestamp="20210301 14:20:25.172" level="INFO">Inserting Contact with values {'LastName': 'Dummy2', 'EmailBouncedDate': '2030-01-01T00:00:00'}</msg>
 <msg timestamp="20210301 14:20:25.754" level="INFO">Storing Contact 003R000001aWPbVIAW to session records</msg>
 <msg timestamp="20210301 14:20:25.756" level="INFO">${contact_id} = 003R000001aWPbVIAW</msg>
-<status status="PASS" starttime="20210301 14:20:25.172" endtime="20210301 14:20:25.756"></status>
+<status status="PASS" starttime="20210301 14:20:25.172" endtime="20210301 14:20:25.756"/>
 </kw>
 <kw name="Run Keyword And Expect Error" library="BuiltIn">
-<doc>Runs the keyword and checks that the expected error occurred.</doc>
-<arguments>
 <arg>*Date parse error*</arg>
 <arg>Elapsed Time For Last Record</arg>
 <arg>obj_name=Contact</arg>
 <arg>start_field=EmailBouncedDate</arg>
 <arg>end_field=LastName</arg>
 <arg>order_by=LastName</arg>
-</arguments>
+<doc>Runs the keyword and checks that the expected error occurred.</doc>
 <kw name="Elapsed Time For Last Record" library="cumulusci.robotframework.Salesforce">
-<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
-<arguments>
 <arg>obj_name=Contact</arg>
 <arg>start_field=EmailBouncedDate</arg>
 <arg>end_field=LastName</arg>
 <arg>order_by=LastName</arg>
-</arguments>
+<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
 <msg timestamp="20210301 14:20:25.758" level="INFO">Running SOQL Query: SELECT EmailBouncedDate, LastName FROM Contact ORDER BY LastName DESC NULLS LAST LIMIT 1</msg>
 <msg timestamp="20210301 14:20:26.192" level="FAIL">Date parse error: Parser must be a string or character stream, not NoneType in record {'attributes': {'type': 'Contact', 'url': '/services/data/v50.0/sobjects/Contact/003R000001aW2UUIA0'}, 'EmailBouncedDate': None, 'LastName': 'Zuniga'}</msg>
-<status status="FAIL" starttime="20210301 14:20:25.757" endtime="20210301 14:20:26.192"></status>
+<status status="FAIL" starttime="20210301 14:20:25.757" endtime="20210301 14:20:26.192"/>
 </kw>
-<status status="PASS" starttime="20210301 14:20:25.757" endtime="20210301 14:20:26.192"></status>
+<status status="PASS" starttime="20210301 14:20:25.757" endtime="20210301 14:20:26.192"/>
 </kw>
 <kw name="Run Keyword And Expect Error" library="BuiltIn">
-<doc>Runs the keyword and checks that the expected error occurred.</doc>
-<arguments>
 <arg>*Date parse error*</arg>
 <arg>Elapsed Time For Last Record</arg>
 <arg>obj_name=Contact</arg>
 <arg>start_field=EmailBouncedDate</arg>
 <arg>end_field=FirstName</arg>
 <arg>order_by=FirstName</arg>
-</arguments>
+<doc>Runs the keyword and checks that the expected error occurred.</doc>
 <kw name="Elapsed Time For Last Record" library="cumulusci.robotframework.Salesforce">
-<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
-<arguments>
 <arg>obj_name=Contact</arg>
 <arg>start_field=EmailBouncedDate</arg>
 <arg>end_field=FirstName</arg>
 <arg>order_by=FirstName</arg>
-</arguments>
+<doc>For records representing jobs or processes, compare the record's start-time to its end-time to see how long a process took.</doc>
 <msg timestamp="20210301 14:20:26.193" level="INFO">Running SOQL Query: SELECT EmailBouncedDate, FirstName FROM Contact ORDER BY FirstName DESC NULLS LAST LIMIT 1</msg>
 <msg timestamp="20210301 14:20:26.690" level="FAIL">Date parse error: Parser must be a string or character stream, not NoneType in record {'attributes': {'type': 'Contact', 'url': '/services/data/v50.0/sobjects/Contact/003R000001aW2TIIA0'}, 'EmailBouncedDate': None, 'FirstName': 'Zoe'}</msg>
-<status status="FAIL" starttime="20210301 14:20:26.193" endtime="20210301 14:20:26.690"></status>
+<status status="FAIL" starttime="20210301 14:20:26.193" endtime="20210301 14:20:26.690"/>
 </kw>
-<status status="PASS" starttime="20210301 14:20:26.193" endtime="20210301 14:20:26.691"></status>
+<status status="PASS" starttime="20210301 14:20:26.193" endtime="20210301 14:20:26.691"/>
 </kw>
-<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="teardown">
+<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="TEARDOWN">
 <doc>Deletes records that were created while running this test case.</doc>
 <msg timestamp="20210301 14:20:26.692" level="INFO">Deleting 1 records</msg>
 <msg timestamp="20210301 14:20:26.692" level="INFO">  Deleting Contact 003R000001aWPbVIAW</msg>
 <msg timestamp="20210301 14:20:26.692" level="INFO">Deleting Contact with Id 003R000001aWPbVIAW</msg>
-<status status="PASS" starttime="20210301 14:20:26.692" endtime="20210301 14:20:27.367"></status>
+<status status="PASS" starttime="20210301 14:20:26.692" endtime="20210301 14:20:27.367"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>no-browser</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:25.171" endtime="20210301 14:20:27.367" critical="yes"></status>
+<status status="PASS" starttime="20210301 14:20:25.171" endtime="20210301 14:20:27.367"/>
 </test>
 <test id="s1-t4" name="Test Perf Set Elapsed Time">
 <kw name="Set Test Elapsed Time" library="cumulusci.robotframework.Salesforce">
-<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
-<arguments>
 <arg>11655.9</arg>
-</arguments>
+<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
 <msg timestamp="20210301 14:20:27.370" level="INFO">Set test message to:
 Elapsed time set by test : 11655.9</msg>
 <msg timestamp="20210301 14:20:27.370" level="INFO">Set tag 'cci_metric_elapsed_time'.</msg>
 <msg timestamp="20210301 14:20:27.371" level="INFO">${cci_metric_elapsed_time} = 11655.9</msg>
-<status status="PASS" starttime="20210301 14:20:27.369" endtime="20210301 14:20:27.371"></status>
+<status status="PASS" starttime="20210301 14:20:27.369" endtime="20210301 14:20:27.371"/>
 </kw>
-<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="teardown">
+<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="TEARDOWN">
 <doc>Deletes records that were created while running this test case.</doc>
 <msg timestamp="20210301 14:20:27.372" level="INFO">Deleting 0 records</msg>
-<status status="PASS" starttime="20210301 14:20:27.371" endtime="20210301 14:20:27.372"></status>
+<status status="PASS" starttime="20210301 14:20:27.371" endtime="20210301 14:20:27.372"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>cci_metric_elapsed_time</tag>
 <tag>no-browser</tag>
 <tag>perf</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:27.369" endtime="20210301 14:20:27.372" critical="yes">Elapsed time set by test : 11655.9</status>
+<status status="PASS" starttime="20210301 14:20:27.369" endtime="20210301 14:20:27.372">Elapsed time set by test : 11655.9</status>
 </test>
 <test id="s1-t5" name="Test Perf Set Elapsed Time Twice">
 <kw name="Set Test Elapsed Time" library="cumulusci.robotframework.Salesforce">
-<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
-<arguments>
 <arg>11655.9</arg>
-</arguments>
+<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
 <msg timestamp="20210301 14:20:27.375" level="INFO">Set test message to:
 Elapsed time set by test : 11655.9</msg>
 <msg timestamp="20210301 14:20:27.375" level="INFO">Set tag 'cci_metric_elapsed_time'.</msg>
 <msg timestamp="20210301 14:20:27.376" level="INFO">${cci_metric_elapsed_time} = 11655.9</msg>
-<status status="PASS" starttime="20210301 14:20:27.374" endtime="20210301 14:20:27.376"></status>
+<status status="PASS" starttime="20210301 14:20:27.374" endtime="20210301 14:20:27.376"/>
 </kw>
 <kw name="Set Test Elapsed Time" library="cumulusci.robotframework.Salesforce">
-<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
-<arguments>
 <arg>53</arg>
-</arguments>
+<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
 <msg timestamp="20210301 14:20:27.376" level="INFO">Set test message to:
 Elapsed time set by test : 53.0</msg>
 <msg timestamp="20210301 14:20:27.376" level="INFO">Set tag 'cci_metric_elapsed_time'.</msg>
 <msg timestamp="20210301 14:20:27.377" level="INFO">${cci_metric_elapsed_time} = 53.0</msg>
-<status status="PASS" starttime="20210301 14:20:27.376" endtime="20210301 14:20:27.377"></status>
+<status status="PASS" starttime="20210301 14:20:27.376" endtime="20210301 14:20:27.377"/>
 </kw>
-<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="teardown">
+<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="TEARDOWN">
 <doc>Deletes records that were created while running this test case.</doc>
 <msg timestamp="20210301 14:20:27.377" level="INFO">Deleting 0 records</msg>
-<status status="PASS" starttime="20210301 14:20:27.377" endtime="20210301 14:20:27.378"></status>
+<status status="PASS" starttime="20210301 14:20:27.377" endtime="20210301 14:20:27.378"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>cci_metric_elapsed_time</tag>
 <tag>no-browser</tag>
 <tag>perf</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:27.374" endtime="20210301 14:20:27.378" critical="yes">Elapsed time set by test : 53.0</status>
+<status status="PASS" starttime="20210301 14:20:27.374" endtime="20210301 14:20:27.378">Elapsed time set by test : 53.0</status>
 </test>
 <test id="s1-t6" name="Test Perf Set Elapsed Time String">
 <kw name="Log" library="BuiltIn">
-<doc>Logs the given message with the given level.</doc>
-<arguments>
 <arg>A</arg>
-</arguments>
+<doc>Logs the given message with the given level.</doc>
 <msg timestamp="20210301 14:20:27.380" level="INFO">A</msg>
-<status status="PASS" starttime="20210301 14:20:27.380" endtime="20210301 14:20:27.380"></status>
+<status status="PASS" starttime="20210301 14:20:27.380" endtime="20210301 14:20:27.380"/>
 </kw>
 <kw name="Set Test Elapsed Time" library="cumulusci.robotframework.Salesforce">
-<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
-<arguments>
 <arg>5 hours</arg>
-</arguments>
+<doc>This keyword captures a computed rather than measured elapsed time for performance tests.</doc>
 <msg timestamp="20210301 14:20:27.381" level="INFO">Set test message to:
 Elapsed time set by test : 18000.0</msg>
 <msg timestamp="20210301 14:20:27.381" level="INFO">Set tag 'cci_metric_elapsed_time'.</msg>
 <msg timestamp="20210301 14:20:27.382" level="INFO">${cci_metric_elapsed_time} = 18000.0</msg>
-<status status="PASS" starttime="20210301 14:20:27.380" endtime="20210301 14:20:27.382"></status>
+<status status="PASS" starttime="20210301 14:20:27.380" endtime="20210301 14:20:27.382"/>
 </kw>
-<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="teardown">
+<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="TEARDOWN">
 <doc>Deletes records that were created while running this test case.</doc>
 <msg timestamp="20210301 14:20:27.382" level="INFO">Deleting 0 records</msg>
-<status status="PASS" starttime="20210301 14:20:27.382" endtime="20210301 14:20:27.382"></status>
+<status status="PASS" starttime="20210301 14:20:27.382" endtime="20210301 14:20:27.382"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>cci_metric_elapsed_time</tag>
 <tag>no-browser</tag>
 <tag>perf</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:27.379" endtime="20210301 14:20:27.383" critical="yes">Elapsed time set by test : 18000.0</status>
+<status status="PASS" starttime="20210301 14:20:27.379" endtime="20210301 14:20:27.383">Elapsed time set by test : 18000.0</status>
 </test>
 <test id="s1-t7" name="Test Perf Measure Elapsed">
-<kw name="Log" library="BuiltIn" type="setup">
-<doc>Logs the given message with the given level.</doc>
-<arguments>
+<kw name="Log" library="BuiltIn" type="SETUP">
 <arg>Before</arg>
-</arguments>
+<doc>Logs the given message with the given level.</doc>
 <msg timestamp="20210301 14:20:27.397" level="INFO">Before</msg>
-<status status="PASS" starttime="20210301 14:20:27.397" endtime="20210301 14:20:27.397"></status>
+<status status="PASS" starttime="20210301 14:20:27.397" endtime="20210301 14:20:27.397"/>
 </kw>
 <kw name="Log" library="BuiltIn">
-<doc>Logs the given message with the given level.</doc>
-<arguments>
 <arg>B</arg>
-</arguments>
+<doc>Logs the given message with the given level.</doc>
 <msg timestamp="20210301 14:20:27.398" level="INFO">B</msg>
-<status status="PASS" starttime="20210301 14:20:27.398" endtime="20210301 14:20:27.398"></status>
+<status status="PASS" starttime="20210301 14:20:27.398" endtime="20210301 14:20:27.398"/>
 </kw>
 <kw name="Start Performance Timer" library="cumulusci.robotframework.Salesforce">
 <doc>Start an elapsed time stopwatch for performance tests.</doc>
 <msg timestamp="20210301 14:20:27.400" level="INFO">${__start_time} = 2021-03-01 14:20:27.398580</msg>
-<status status="PASS" starttime="20210301 14:20:27.398" endtime="20210301 14:20:27.400"></status>
+<status status="PASS" starttime="20210301 14:20:27.398" endtime="20210301 14:20:27.400"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
-<doc>Pauses the test executed for the given time.</doc>
-<arguments>
 <arg>1</arg>
-</arguments>
+<doc>Pauses the test executed for the given time.</doc>
 <msg timestamp="20210301 14:20:28.401" level="INFO">Slept 1 second</msg>
-<status status="PASS" starttime="20210301 14:20:27.400" endtime="20210301 14:20:28.402"></status>
+<status status="PASS" starttime="20210301 14:20:27.400" endtime="20210301 14:20:28.402"/>
 </kw>
 <kw name="Log" library="BuiltIn">
-<doc>Logs the given message with the given level.</doc>
-<arguments>
 <arg>Noop</arg>
-</arguments>
+<doc>Logs the given message with the given level.</doc>
 <msg timestamp="20210301 14:20:28.403" level="INFO">Noop</msg>
-<status status="PASS" starttime="20210301 14:20:28.403" endtime="20210301 14:20:28.403"></status>
+<status status="PASS" starttime="20210301 14:20:28.403" endtime="20210301 14:20:28.403"/>
 </kw>
 <kw name="Stop Performance Timer" library="cumulusci.robotframework.Salesforce">
 <doc>Record the results of a stopwatch. For perf testing.</doc>
@@ -361,36 +293,30 @@ Elapsed time set by test : 18000.0</msg>
 Elapsed time set by test : 1.0</msg>
 <msg timestamp="20210301 14:20:28.405" level="INFO">Set tag 'cci_metric_elapsed_time'.</msg>
 <msg timestamp="20210301 14:20:28.406" level="INFO">${cci_metric_elapsed_time} = 1.0</msg>
-<status status="PASS" starttime="20210301 14:20:28.404" endtime="20210301 14:20:28.406"></status>
+<status status="PASS" starttime="20210301 14:20:28.404" endtime="20210301 14:20:28.406"/>
 </kw>
-<kw name="Log" library="BuiltIn" type="teardown">
-<doc>Logs the given message with the given level.</doc>
-<arguments>
+<kw name="Log" library="BuiltIn" type="TEARDOWN">
 <arg>After</arg>
-</arguments>
+<doc>Logs the given message with the given level.</doc>
 <msg timestamp="20210301 14:20:28.407" level="INFO">After</msg>
-<status status="PASS" starttime="20210301 14:20:28.407" endtime="20210301 14:20:28.407"></status>
+<status status="PASS" starttime="20210301 14:20:28.407" endtime="20210301 14:20:28.407"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>cci_metric_elapsed_time</tag>
 <tag>no-browser</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:27.396" endtime="20210301 14:20:28.407" critical="yes">Elapsed time set by test : 1.0</status>
+<status status="PASS" starttime="20210301 14:20:27.396" endtime="20210301 14:20:28.407">Elapsed time set by test : 1.0</status>
 </test>
 <test id="s1-t8" name="Set Time and Also Metric">
 <kw name="Start Performance Timer" library="cumulusci.robotframework.Salesforce">
 <doc>Start an elapsed time stopwatch for performance tests.</doc>
 <msg timestamp="20210301 14:20:28.411" level="INFO">${__start_time} = 2021-03-01 14:20:28.410189</msg>
-<status status="PASS" starttime="20210301 14:20:28.410" endtime="20210301 14:20:28.411"></status>
+<status status="PASS" starttime="20210301 14:20:28.410" endtime="20210301 14:20:28.411"/>
 </kw>
 <kw name="Log" library="BuiltIn">
-<doc>Logs the given message with the given level.</doc>
-<arguments>
 <arg>Noop</arg>
-</arguments>
+<doc>Logs the given message with the given level.</doc>
 <msg timestamp="20210301 14:20:28.412" level="INFO">Noop</msg>
-<status status="PASS" starttime="20210301 14:20:28.412" endtime="20210301 14:20:28.412"></status>
+<status status="PASS" starttime="20210301 14:20:28.412" endtime="20210301 14:20:28.412"/>
 </kw>
 <kw name="Stop Performance Timer" library="cumulusci.robotframework.Salesforce">
 <doc>Record the results of a stopwatch. For perf testing.</doc>
@@ -398,94 +324,82 @@ Elapsed time set by test : 1.0</msg>
 Elapsed time set by test : 0.0</msg>
 <msg timestamp="20210301 14:20:28.413" level="INFO">Set tag 'cci_metric_elapsed_time'.</msg>
 <msg timestamp="20210301 14:20:28.413" level="INFO">${cci_metric_elapsed_time} = 0.0</msg>
-<status status="PASS" starttime="20210301 14:20:28.412" endtime="20210301 14:20:28.413"></status>
+<status status="PASS" starttime="20210301 14:20:28.412" endtime="20210301 14:20:28.413"/>
 </kw>
 <kw name="Set Test Metric" library="cumulusci.robotframework.Salesforce">
-<doc>This keyword captures any metric for performance monitoring.</doc>
-<arguments>
 <arg>number of records</arg>
 <arg>100</arg>
-</arguments>
+<doc>This keyword captures any metric for performance monitoring.</doc>
 <msg timestamp="20210301 14:20:28.414" level="INFO">Set tag 'cci_metric'.</msg>
 <msg timestamp="20210301 14:20:28.415" level="INFO">${cci_metric_number of records} = 100.0</msg>
-<status status="PASS" starttime="20210301 14:20:28.414" endtime="20210301 14:20:28.415"></status>
+<status status="PASS" starttime="20210301 14:20:28.414" endtime="20210301 14:20:28.415"/>
 </kw>
-<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="teardown">
+<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="TEARDOWN">
 <doc>Deletes records that were created while running this test case.</doc>
 <msg timestamp="20210301 14:20:28.416" level="INFO">Deleting 0 records</msg>
-<status status="PASS" starttime="20210301 14:20:28.416" endtime="20210301 14:20:28.416"></status>
+<status status="PASS" starttime="20210301 14:20:28.416" endtime="20210301 14:20:28.416"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>cci_metric</tag>
 <tag>cci_metric_elapsed_time</tag>
 <tag>no-browser</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:28.409" endtime="20210301 14:20:28.417" critical="yes">Elapsed time set by test : 0.0</status>
+<status status="PASS" starttime="20210301 14:20:28.409" endtime="20210301 14:20:28.417">Elapsed time set by test : 0.0</status>
 </test>
 <test id="s1-t9" name="Test Perf Measure Other Metric">
 <kw name="Set Test Metric" library="cumulusci.robotframework.Salesforce">
-<doc>This keyword captures any metric for performance monitoring.</doc>
-<arguments>
 <arg>Max_CPU_Percent</arg>
 <arg>30</arg>
-</arguments>
+<doc>This keyword captures any metric for performance monitoring.</doc>
 <msg timestamp="20210301 14:20:28.419" level="INFO">Set tag 'cci_metric'.</msg>
 <msg timestamp="20210301 14:20:28.420" level="INFO">${cci_metric_Max_CPU_Percent} = 30.0</msg>
-<status status="PASS" starttime="20210301 14:20:28.419" endtime="20210301 14:20:28.420"></status>
+<status status="PASS" starttime="20210301 14:20:28.419" endtime="20210301 14:20:28.420"/>
 </kw>
-<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="teardown">
+<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="TEARDOWN">
 <doc>Deletes records that were created while running this test case.</doc>
 <msg timestamp="20210301 14:20:28.421" level="INFO">Deleting 0 records</msg>
-<status status="PASS" starttime="20210301 14:20:28.421" endtime="20210301 14:20:28.421"></status>
+<status status="PASS" starttime="20210301 14:20:28.421" endtime="20210301 14:20:28.421"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>cci_metric</tag>
 <tag>no-browser</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:28.418" endtime="20210301 14:20:28.422" critical="yes"></status>
+<status status="PASS" starttime="20210301 14:20:28.418" endtime="20210301 14:20:28.422"/>
 </test>
 <test id="s1-t10" name="Mismatched Stop Performance Timer">
 <kw name="Run Keyword And Expect Error" library="BuiltIn">
-<doc>Runs the keyword and checks that the expected error occurred.</doc>
-<arguments>
 <arg>*Elapsed time clock was not*</arg>
 <arg>Stop Performance Timer</arg>
-</arguments>
+<doc>Runs the keyword and checks that the expected error occurred.</doc>
 <kw name="Stop Performance Timer" library="cumulusci.robotframework.Salesforce">
 <doc>Record the results of a stopwatch. For perf testing.</doc>
 <msg timestamp="20210301 14:20:28.425" level="FAIL">Elapsed time clock was not started. Use the Start Elapsed Time keyword to do so.</msg>
-<status status="FAIL" starttime="20210301 14:20:28.424" endtime="20210301 14:20:28.426"></status>
+<status status="FAIL" starttime="20210301 14:20:28.424" endtime="20210301 14:20:28.426"/>
 </kw>
-<status status="PASS" starttime="20210301 14:20:28.424" endtime="20210301 14:20:28.426"></status>
+<status status="PASS" starttime="20210301 14:20:28.424" endtime="20210301 14:20:28.426"/>
 </kw>
-<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="teardown">
+<kw name="Delete Session Records" library="cumulusci.robotframework.Salesforce" type="TEARDOWN">
 <doc>Deletes records that were created while running this test case.</doc>
 <msg timestamp="20210301 14:20:28.427" level="INFO">Deleting 0 records</msg>
-<status status="PASS" starttime="20210301 14:20:28.426" endtime="20210301 14:20:28.427"></status>
+<status status="PASS" starttime="20210301 14:20:28.426" endtime="20210301 14:20:28.427"/>
 </kw>
-<tags>
 <tag>api</tag>
 <tag>no-browser</tag>
-</tags>
-<status status="PASS" starttime="20210301 14:20:28.423" endtime="20210301 14:20:28.427" critical="yes"></status>
+<status status="PASS" starttime="20210301 14:20:28.423" endtime="20210301 14:20:28.427"/>
 </test>
-<status status="PASS" starttime="20210301 14:20:18.963" endtime="20210301 14:20:28.429"></status>
+<status status="PASS" starttime="20210301 14:20:18.963" endtime="20210301 14:20:28.429"/>
 </suite>
 <statistics>
 <total>
-<stat pass="10" fail="0">Critical Tests</stat>
-<stat pass="10" fail="0">All Tests</stat>
+<stat pass="10" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
-<stat pass="0" fail="0" info="non-critical">noncritical</stat>
-<stat pass="10" fail="0">api</stat>
-<stat pass="10" fail="0">no-browser</stat>
-<stat pass="3" fail="0">perf</stat>
+<stat pass="10" fail="0" skip="0">api</stat>
+<stat pass="2" fail="0" skip="0">cci_metric</stat>
+<stat pass="6" fail="0" skip="0">cci_metric_elapsed_time</stat>
+<stat pass="10" fail="0" skip="0">no-browser</stat>
+<stat pass="3" fail="0" skip="0">perf</stat>
 </tag>
 <suite>
-<stat pass="10" fail="0" id="s1" name="Performance">Performance</stat>
+<stat pass="10" fail="0" skip="0" id="s1" name="Performance">Performance</stat>
 </suite>
 </statistics>
 <errors>
