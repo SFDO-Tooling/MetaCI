@@ -15,4 +15,4 @@ pytest-mock
 pytest-tap
 responses
 Sphinx
-Werkzeug<2
+Werkzeug<3
