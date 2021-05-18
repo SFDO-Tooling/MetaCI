@@ -25,7 +25,7 @@ module.exports = merge(common, {
   },
   devtool: 'inline-cheap-module-source-map',
   devServer: {
-    dev: {
+    devMiddleware: {
       index: '',
       publicPath: '/static/',
       writeToDisk: true,
