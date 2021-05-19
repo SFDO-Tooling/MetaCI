@@ -1219,10 +1219,10 @@
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.12.tgz#431ec342a7195622f86688bbda82e3166ce8cb28"
   integrity sha512-6RglhutqrGFMO1MNUXp95RBuYIuc8wTnMAV5MUhLmjTOy78ncwOw7RgeQ/HeymkKXRhZd0s2DNrM1rL7unk3MQ==
 
-"@salesforce-ux/design-system@^2.15.6":
-  version "2.15.6"
-  resolved "https://registry.yarnpkg.com/@salesforce-ux/design-system/-/design-system-2.15.6.tgz#eff52ec7548d009bb88b29b21eb61d698dd901af"
-  integrity sha512-uy2NSu+fhI0v4hJtWk0EQqCRbkR2SZQjCorSm2EAbpLwiQ/3XgQIglZVgcCQF2Ra0ZYGlvHRoKK3kgEkRxkrcQ==
+"@salesforce-ux/design-system@^2.15.7":
+  version "2.15.7"
+  resolved "https://registry.yarnpkg.com/@salesforce-ux/design-system/-/design-system-2.15.7.tgz#a7caf25968bc540e955fa1d14b9aca38fa5aea83"
+  integrity sha512-ofH6Kyqc4soWEtD4zIa1vVd6cbMCLYwh2DKOSf+WGN6BVRyHH+ezIDsy1BYL6nFrkqZ7sZU57Nu0O9lK8XT1JQ==
 
 "@salesforce/babel-preset-design-system-react@^3.0.0":
   version "3.0.0"
