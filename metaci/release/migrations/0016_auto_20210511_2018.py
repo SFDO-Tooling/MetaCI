@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(populate_version_number, unpopulate_version_number),
+        migrations.RunPython(populate_version_number, migrations.RunPython.noop),
         migrations.AlterField(
             model_name="release",
             name="version_number",
