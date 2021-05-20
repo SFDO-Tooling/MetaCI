@@ -17,17 +17,15 @@ class ReleaseAdmin(admin.ModelAdmin):
         if repo_id is not None:
             repo = Repository.objects.get(pk=int(repo_id))
             form.base_fields["repo"].initial = repo
+            next_version = None
             if repo.latest_release:
                 if len(repo.latest_release.version_number.split(".")) > 1:
                     next_version = f"{repo.latest_release.version_number.split('.')[0]}.{int(repo.latest_release.version_number.split('.')[1]) + 1}"
-                    form.base_fields["version_name"].initial = next_version
-                    form.base_fields["version_number"].initial = next_version
-                    form.base_fields[
-                        "git_tag"
-                    ].initial = f"{repo.release_tag_regex}{next_version}"
             else:
-                form.base_fields["version_name"].initial = "1.0"
-                form.base_fields["version_number"].intial = "1.0"
+                next_version = "1.0"
+            if next_version is not None:
+                form.base_fields["version_name"].initial = next_version
+                form.base_fields["version_number"].initial = next_version
                 form.base_fields[
                     "git_tag"
                 ].initial = f"{repo.release_tag_regex}{next_version}"
