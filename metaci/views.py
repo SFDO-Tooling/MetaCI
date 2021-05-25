@@ -6,10 +6,10 @@ import sys
 import cumulusci
 import django
 from django.conf import settings
-from django.shortcuts import render
-from django.views.generic.base import TemplateView
 from django.http import HttpResponseForbidden
+from django.shortcuts import render
 from django.template import TemplateDoesNotExist
+from django.views.generic.base import TemplateView
 
 
 class AboutView(TemplateView):

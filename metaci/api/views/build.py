@@ -1,15 +1,14 @@
 from django.shortcuts import render
-from metaci.api.pagination import RestrictedPagination
-from metaci.api.serializers.build import BuildSerializer
-from metaci.api.serializers.build import BuildFlowSerializer
-from metaci.api.serializers.build import RebuildSerializer
-from metaci.build.filters import BuildFilter
-from metaci.build.filters import BuildFlowFilter
-from metaci.build.filters import RebuildFilter
-from metaci.build.models import Build
-from metaci.build.models import BuildFlow
-from metaci.build.models import Rebuild
 from rest_framework import viewsets
+
+from metaci.api.pagination import RestrictedPagination
+from metaci.api.serializers.build import (
+    BuildFlowSerializer,
+    BuildSerializer,
+    RebuildSerializer,
+)
+from metaci.build.filters import BuildFilter, BuildFlowFilter, RebuildFilter
+from metaci.build.models import Build, BuildFlow, Rebuild
 
 
 class BuildViewSet(viewsets.ModelViewSet):

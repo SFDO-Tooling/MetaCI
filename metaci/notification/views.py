@@ -1,14 +1,16 @@
-from django.shortcuts import render
-from django.forms import modelform_factory
-from django.views.generic import CreateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import modelform_factory
+from django.shortcuts import render
+from django.views.generic import CreateView, DeleteView
 
 from metaci.notification.forms import AddNotificationForm
-from metaci.notification.models import BranchNotification
-from metaci.notification.models import PlanNotification
-from metaci.notification.models import PlanRepositoryNotification
-from metaci.notification.models import RepositoryNotification
+from metaci.notification.models import (
+    BranchNotification,
+    PlanNotification,
+    PlanRepositoryNotification,
+    RepositoryNotification,
+)
 
 
 @login_required

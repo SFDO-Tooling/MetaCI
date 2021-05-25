@@ -2,17 +2,11 @@ import json
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
-from django.http import HttpResponseBadRequest
-
-from rq import Worker
-from rq.registry import DeferredJobRegistry
-from rq.registry import FinishedJobRegistry
-from rq.registry import StartedJobRegistry
-
-from django_rq.queues import get_connection
-from django_rq.queues import get_queue_by_index
+from django.http import HttpResponse, HttpResponseBadRequest
+from django_rq.queues import get_connection, get_queue_by_index
 from django_rq.settings import QUEUES_LIST
+from rq import Worker
+from rq.registry import DeferredJobRegistry, FinishedJobRegistry, StartedJobRegistry
 
 
 def test(request):

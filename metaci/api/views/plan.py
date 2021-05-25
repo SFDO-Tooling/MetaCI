@@ -1,11 +1,9 @@
 from django.shortcuts import render
-from metaci.api.serializers.plan import PlanSerializer
-from metaci.api.serializers.plan import PlanRepositorySerializer
-from metaci.plan.filters import PlanFilter
-from metaci.plan.filters import PlanRepositoryFilter
-from metaci.plan.models import Plan
-from metaci.plan.models import PlanRepository
 from rest_framework import viewsets
+
+from metaci.api.serializers.plan import PlanRepositorySerializer, PlanSerializer
+from metaci.plan.filters import PlanFilter, PlanRepositoryFilter
+from metaci.plan.models import Plan, PlanRepository
 
 
 class PlanViewSet(viewsets.ModelViewSet):

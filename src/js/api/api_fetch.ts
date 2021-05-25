@@ -32,43 +32,45 @@ const getResponse = (resp: Response, errorStatus): Promise<any> =>
       },
     );
 
-const getApiFetch = () => (
-  url: string,
-  opts: {
-    [key: string]: any;
-  } = {},
-): Promise<any> => {
-  const options = Object.assign({}, { headers: {} }, opts);
-  const method = options.method || 'GET';
-  if (!csrfSafeMethod(method)) {
-    options.headers['X-CSRFToken'] = cookies.get('csrftoken') || '';
-  }
+const getApiFetch =
+  () =>
+  (
+    url: string,
+    opts: {
+      [key: string]: any;
+    } = {},
+  ): Promise<any> => {
+    const options = Object.assign({}, { headers: {} }, opts);
+    const method = options.method || 'GET';
+    if (!csrfSafeMethod(method)) {
+      options.headers['X-CSRFToken'] = cookies.get('csrftoken') || '';
+    }
 
-  return fetch(url, options)
-    .then(
-      (response) => {
-        if (response.ok) {
-          return getResponse(response, null);
-        }
-        if (response.status >= 400 && response.status) {
-          logError(response);
-          return getResponse(response, response.status);
-        }
-        const error = new Error(response.statusText) as {
-          [key: string]: any;
-        };
-        error.response = response;
-        throw error;
-      },
-      (err) => {
+    return fetch(url, options)
+      .then(
+        (response) => {
+          if (response.ok) {
+            return getResponse(response, null);
+          }
+          if (response.status >= 400 && response.status) {
+            logError(response);
+            return getResponse(response, response.status);
+          }
+          const error = new Error(response.statusText) as {
+            [key: string]: any;
+          };
+          error.response = response;
+          throw error;
+        },
+        (err) => {
+          logError(err);
+          throw err;
+        },
+      )
+      .catch((err) => {
         logError(err);
         throw err;
-      },
-    )
-    .catch((err) => {
-      logError(err);
-      throw err;
-    });
-};
+      });
+  };
 
 export default getApiFetch;

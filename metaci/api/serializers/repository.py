@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from metaci.repository.models import Repository
-from metaci.repository.models import Branch
+
+from metaci.repository.models import Branch, Repository
 
 
 class RepositorySerializer(serializers.HyperlinkedModelSerializer):
