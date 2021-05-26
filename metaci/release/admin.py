@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 
 from metaci.release.models import ChangeCaseTemplate, ImplementationStep, Release
 from metaci.release.utils import send_release_webhook, send_submit_webhook
+from metaci.repository.models import Repository
 
 
 class ImplementationStepInline(admin.TabularInline):
@@ -12,7 +13,27 @@ class ImplementationStepInline(admin.TabularInline):
 
 @admin.register(Release)
 class ReleaseAdmin(admin.ModelAdmin):
-    # change_form_template = "templates/admin/release/release/change_form.html"
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(ReleaseAdmin, self).get_form(request, obj, **kwargs)
+        repo_id = request.GET.get("repo_id")
+        if repo_id is not None:
+            repo = Repository.objects.get(pk=int(repo_id))
+            form.base_fields["repo"].initial = repo
+            next_version = None
+            if repo.latest_release:
+                if len(repo.latest_release.version_number.split(".")) > 1:
+                    next_version = f"{repo.latest_release.version_number.split('.')[0]}.{int(repo.latest_release.version_number.split('.')[1]) + 1}"
+            else:
+                next_version = "1.0"
+            if next_version is not None:
+                form.base_fields["version_name"].initial = next_version
+                form.base_fields["version_number"].initial = next_version
+                form.base_fields[
+                    "git_tag"
+                ].initial = f"{repo.release_tag_regex}{next_version}"
+
+        return form
+
     fieldsets = (
         (None, {"fields": ("repo", ("version_name", "version_number"), "status")}),
         (
