@@ -13,12 +13,17 @@ from django.utils.dateparse import parse_date
 logger = logging.getLogger(__name__)
 
 
-def implementation_payload(role, config_item):
-    if role and config_item:
+def implementation_payload(role, config_item, release):
+    if role and config_item and release:
         return {
             "description": role,
-            "start_time": role,
-            "end_time": role,
+            "owner": "00XXXXXXXXXX",  # need to tie GUS user id to MetaCI user.
+            "start_time": release.implementation_steps.get(
+                plan__role=f"{role}"
+            ).start_time.isoformat(),
+            "end_time": release.implementation_steps.get(
+                plan__role=f"{role}"
+            ).stop_time.isoformat(),
             "configuration_item": config_item,
             "implementation_steps": role,
         }
@@ -34,19 +39,6 @@ def jwt_for_webhook():
         settings.METACI_RELEASE_WEBHOOK_AUTH_KEY,
         algorithm="HS256",
     )
-
-
-def parse_change_case_link(change_case_link):
-    if (
-        change_case_link
-        and len(
-            change_case_link.split(f"{settings.METACI_CHANGE_CASE_URL_TEMPLATE[:-9]}")
-        )
-        > 1
-    ):  # 500 to parse beginning sequence of change case; indexing [:-9] to remove "{case_id}" from url link
-        return f"500{change_case_link.split(settings.METACI_CHANGE_CASE_URL_TEMPLATE[:-9])[1]}"
-    else:
-        raise Exception("Please provide a valid change case link.")
 
 
 def update_release_from_github(release, repo_api=None):
@@ -103,7 +95,7 @@ def send_release_webhook(release, config_item=None):
     if config_item and settings.METACI_START_STOP_WEBHOOK:
         implementation_steps = release.implementation_steps.all()
         steps = [
-            implementation_payload(implementation_step.plan.role, config_item)
+            implementation_payload(implementation_step.plan.role, config_item, release)
             for implementation_step in implementation_steps
         ]
 
@@ -123,7 +115,7 @@ def send_release_webhook(release, config_item=None):
     result = response.json()
     if result["success"]:
         with transaction.atomic():
-            if "implementation_steps" in result:
+            if "implementationSteps" in result:
                 for step_model, step_result in zip(
                     implementation_steps, result["implementationSteps"]
                 ):
@@ -149,10 +141,10 @@ def send_submit_webhook(release, config_item=None):
         f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
 
-    payload = {"case_id": parse_change_case_link(release.change_case_link)}
+    payload = {"case_id": release.change_case_link}
     token = jwt_for_webhook()
     response = requests.post(
-        f"{settings.METACI_RELEASE_WEBHOOK_URL}/case/{parse_change_case_link(release.change_case_link)}/submit",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/case/{release.change_case_link}/submit",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
