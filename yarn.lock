@@ -1229,10 +1229,10 @@
   resolved "https://registry.yarnpkg.com/@salesforce/babel-preset-design-system-react/-/babel-preset-design-system-react-3.0.0.tgz#b8334d14fc3801064ac5b6e5349145dc057bc17f"
   integrity sha512-NM3aObtfYl9RpfVu5eDU96fmTW7Mj2V1Y1O5b8dpLGESgXxqHiGIV7d4bKHzmD8O00g1qjPAPusd0f2IB7Yi0Q==
 
-"@salesforce/design-system-react@^0.10.32":
-  version "0.10.32"
-  resolved "https://registry.yarnpkg.com/@salesforce/design-system-react/-/design-system-react-0.10.32.tgz#f2834de2960f13adadeb0bbbc0a5bae580b517a6"
-  integrity sha512-gnF3yUFxn2C6kTU5QM6oOUPw4gTISvDVXJW0Z8RtAfNgcc2il9X5KcHrg07KQfqGKLK5DXS9uRZ4vDttzBC//g==
+"@salesforce/design-system-react@^0.10.34":
+  version "0.10.34"
+  resolved "https://registry.yarnpkg.com/@salesforce/design-system-react/-/design-system-react-0.10.34.tgz#b5bfc0de7408437b46ef12f4d6d0778b43e3ec18"
+  integrity sha512-EPHlAEH7j3yDCAq5w+/NgIW9pr+N3fCS44JYM3oQDIXsM8HkK+WvOfQj2WmIz6HVDp5E3BbQkFxZlBexJtt6SQ==
   dependencies:
     "@salesforce/babel-preset-design-system-react" "^3.0.0"
     classnames "^2.2.6"
@@ -1250,7 +1250,7 @@
     prop-types ">=15.7.2"
     react-contenteditable "^3.3.5"
     react-highlighter "^0.4.3"
-    react-modal "3.12.1"
+    react-modal "3.13.1"
     react-onclickoutside "^6.10.0"
     react-required-if "^1.0.3"
     react-text-truncate "^0.16.0"
@@ -8593,10 +8593,10 @@ react-lifecycles-compat@^3.0.0:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-modal@3.12.1:
-  version "3.12.1"
-  resolved "https://registry.yarnpkg.com/react-modal/-/react-modal-3.12.1.tgz#38c33f70d81c33d02ff1ed115530443a3dc2afd3"
-  integrity sha512-WGuXn7Fq31PbFJwtWmOk+jFtGC7E9tJVbFX0lts8ZoS5EPi9+WWylUJWLKKVm3H4GlQ7ZxY7R6tLlbSIBQ5oZA==
+react-modal@3.13.1:
+  version "3.13.1"
+  resolved "https://registry.yarnpkg.com/react-modal/-/react-modal-3.13.1.tgz#a02dce63bbfee7582936f1e9835d518ef8f56453"
+  integrity sha512-m6yXK7I4YKssQnsjHK7xITSXy2O81BSOHOsg0/uWAsdKtuT9HF2tdoYhRuxNNQg2V+LgepsoHUPJKS8m6no+eg==
   dependencies:
     exenv "^1.2.0"
     prop-types "^15.5.10"
