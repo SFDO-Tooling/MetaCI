@@ -44,7 +44,7 @@
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",
     "@types/js-cookie": "^2.2.6",
-    "@types/lodash": "^4.14.169",
+    "@types/lodash": "^4.14.170",
     "@types/react": "^16.14.2",
     "@types/react-document-title": "^2.0.4",
     "@types/react-dom": "^16.9.10",
