@@ -102,7 +102,7 @@ def send_release_webhook(release, config_item=None):
     payload = {
         "case_template_id": release.change_case_template.case_template_id,
         "package_name": release.repo.name,  # Need to figure out.
-        "version": release.version_number,  # Need to see if this is valid.
+        "version": release.version_number,
         "release_url": f"{release.repo.url}/releases/tag/{urllib.parse.quote(tag)}",
         "steps": steps,
     }
