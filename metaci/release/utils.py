@@ -136,7 +136,7 @@ def send_submit_webhook(release, config_item=None):
         or not settings.METACI_START_STOP_WEBHOOK
         or not config_item
     ):
-        return  # should we better error handle this?
+        return
     logger.info(
         f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
