@@ -1,10 +1,10 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from metaci.cumulusci.models import ScratchOrgInstance
 
 from .models import User
-from metaci.cumulusci.models import ScratchOrgInstance
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):

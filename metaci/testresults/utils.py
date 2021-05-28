@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
-from metaci.build.models import Build
-from metaci.build.models import BuildFlow
+
+from metaci.build.models import Build, BuildFlow
 
 
 def find_buildflow(request, build_id, flow):

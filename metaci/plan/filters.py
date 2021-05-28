@@ -1,7 +1,7 @@
 import rest_framework_filters as filters
+
+from metaci.plan.models import Plan, PlanRepository
 from metaci.repository.filters import RepositoryRelatedFilter
-from metaci.plan.models import Plan
-from metaci.plan.models import PlanRepository
 from metaci.repository.models import Repository
 
 
