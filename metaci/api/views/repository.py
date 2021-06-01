@@ -1,11 +1,9 @@
-from metaci.api.serializers.repository import BranchSerializer
-from metaci.api.serializers.repository import RepositorySerializer
-from metaci.repository.filters import BranchFilter
-from metaci.repository.filters import RepositoryFilter
-from metaci.repository.models import Branch
-from metaci.repository.models import Repository
-from metaci.api.utils import PkOrSlugMixin
 from rest_framework import viewsets
+
+from metaci.api.serializers.repository import BranchSerializer, RepositorySerializer
+from metaci.api.utils import PkOrSlugMixin
+from metaci.repository.filters import BranchFilter, RepositoryFilter
+from metaci.repository.models import Branch, Repository
 
 
 class BranchViewSet(viewsets.ModelViewSet):

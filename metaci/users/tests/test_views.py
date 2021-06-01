@@ -1,7 +1,7 @@
 import unittest
 
-from django.test import RequestFactory
 import pytest
+from django.test import RequestFactory
 
 from ..models import User
 from ..views import UserRedirectView, UserUpdateView

@@ -82,40 +82,41 @@ export const perfREST_API = ({
 
 /* eslint-disable no-use-before-define */
 
-export const perfRESTFetch = (
-  url: string,
-  params?: Record<string, unknown>,
-) => (
-  dispatch: Dispatch,
-  _getState: AppState,
-  { apiFetch }: { apiFetch: UntypedFunc },
-) => {
-  if (params) {
-    url = `${url}&${stringify(params)}`;
-  }
-  return perfREST_API({
-    dispatch,
-    apiFetch,
-    prefix: 'PERF',
-    url,
-    checkValid: assertPerfData,
-  });
-};
+export const perfRESTFetch =
+  (url: string, params?: Record<string, unknown>) =>
+  (
+    dispatch: Dispatch,
+    _getState: AppState,
+    { apiFetch }: { apiFetch: UntypedFunc },
+  ) => {
+    if (params) {
+      url = `${url}&${stringify(params)}`;
+    }
+    return perfREST_API({
+      dispatch,
+      apiFetch,
+      prefix: 'PERF',
+      url,
+      checkValid: assertPerfData,
+    });
+  };
 
-export const perfREST_UI_Fetch = (params?: Record<string, unknown>) => (
-  dispatch: Dispatch,
-  _getState: AppState,
-  { apiFetch }: { apiFetch: any },
-) => {
-  let url = testmethod_perf_UI_url;
-  if (params) {
-    url = `${url}?${stringify(params)}`;
-  }
-  return perfREST_API({
-    dispatch,
-    apiFetch,
-    prefix: 'UI',
-    url,
-    checkValid: assertUIData,
-  });
-};
+export const perfREST_UI_Fetch =
+  (params?: Record<string, unknown>) =>
+  (
+    dispatch: Dispatch,
+    _getState: AppState,
+    { apiFetch }: { apiFetch: any },
+  ) => {
+    let url = testmethod_perf_UI_url;
+    if (params) {
+      url = `${url}?${stringify(params)}`;
+    }
+    return perfREST_API({
+      dispatch,
+      apiFetch,
+      prefix: 'UI',
+      url,
+      checkValid: assertUIData,
+    });
+  };

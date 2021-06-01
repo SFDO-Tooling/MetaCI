@@ -1,15 +1,13 @@
 import pytest
+from django.urls import reverse
+from rest_framework.test import APITestCase
 
 from metaci.conftest import (
-    RepositoryFactory,
     BranchFactory,
-    PlanFactory,
     BuildFlowFactory,
+    PlanFactory,
+    RepositoryFactory,
 )
-
-from django.urls import reverse
-
-from rest_framework.test import APITestCase
 
 from .test_testmethod_perf import _TestingHelpers
 

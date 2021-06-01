@@ -1,13 +1,13 @@
 from django.shortcuts import render
-from metaci.api.serializers.cumulusci import OrgSerializer
-from metaci.api.serializers.cumulusci import ScratchOrgInstanceSerializer
-from metaci.api.serializers.cumulusci import ServiceSerializer
-from metaci.cumulusci.filters import OrgFilter
-from metaci.cumulusci.filters import ScratchOrgInstanceFilter
-from metaci.cumulusci.models import Org
-from metaci.cumulusci.models import ScratchOrgInstance
-from metaci.cumulusci.models import Service
 from rest_framework import viewsets
+
+from metaci.api.serializers.cumulusci import (
+    OrgSerializer,
+    ScratchOrgInstanceSerializer,
+    ServiceSerializer,
+)
+from metaci.cumulusci.filters import OrgFilter, ScratchOrgInstanceFilter
+from metaci.cumulusci.models import Org, ScratchOrgInstance, Service
 
 
 class OrgViewSet(viewsets.ModelViewSet):

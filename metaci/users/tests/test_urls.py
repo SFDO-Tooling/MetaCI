@@ -1,6 +1,6 @@
 import unittest
 
-from django.urls import reverse, resolve
+from django.urls import resolve, reverse
 
 from metaci.users.models import User
 
