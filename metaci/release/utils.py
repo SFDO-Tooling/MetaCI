@@ -138,7 +138,7 @@ def send_submit_webhook(release, config_item=None):
     ):
         return
     logger.info(
-        f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+        f"Sending submit webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
 
     payload = {"case_id": release.change_case_link}
