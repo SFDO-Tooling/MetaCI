@@ -10,7 +10,7 @@
   "dependencies": {
     "@salesforce-ux/design-system": "^2.15.7",
     "@salesforce/design-system-react": "^0.10.34",
-    "@sentry/browser": "^6.4.1",
+    "@sentry/browser": "^6.5.0",
     "del": "^6.0.0",
     "i18next": "^20.3.0",
     "i18next-browser-languagedetector": "^6.1.1",
