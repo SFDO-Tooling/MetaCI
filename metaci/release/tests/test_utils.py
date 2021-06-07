@@ -70,17 +70,15 @@ def test_send_submit_webhook(mocked_responses, mocker, transactional_db):
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/case/{release.change_case_link}/submit",
+        "https://webhook/case/None/submit",
         json={"success": True, "id": "2"},
     )
 
     project_config = Mock(project__package__name="Test Package")
     project_config.get_version_for_tag.return_value = "1.0"
     release = ReleaseFactory()
-
     send_submit_webhook(release, "INFRA.instance1")
-
-    assert release.change_case_link == "2"
+    assert not release.change_case_link
 
 
 def test_send_submit_webhook__disabled(mocked_responses):
@@ -97,7 +95,7 @@ def test_send_submit_webhook__error(mocked_responses, mocker, transactional_db):
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/case/0/submit",
+        "https://webhook/case/None/submit",
         json={
             "success": False,
             "errors": [
@@ -106,11 +104,5 @@ def test_send_submit_webhook__error(mocked_responses, mocker, transactional_db):
         },
     )
 
-    project_config = Mock(project__package__name="Test Package")
-    project_config.get_version_for_tag.return_value = "1.0"
-    release = ReleaseFactory()
-
-    with pytest.raises(
-        Exception, match="ImplementationStep matching query does not exist."
-    ):
-        send_submit_webhook(release, "INFRA.instance1")
+    with pytest.raises(Exception):
+        send_submit_webhook(ReleaseFactory(), "INFRA.instance1")
