@@ -73,7 +73,7 @@ class ReleaseAdmin(admin.ModelAdmin):
     def response_change(self, request, obj):
         if (
             "_create-change-case" in request.POST
-        ):  # should we do a try catch for better error handling?
+        ):
             send_release_webhook(
                 obj, obj.repo.orgs.get(name="packaging").configuration_item
             )
