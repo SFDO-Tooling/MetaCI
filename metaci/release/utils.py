@@ -19,7 +19,7 @@ def implementation_payload(role, config_item, release):
             "description": role,
             "owner": "00XXXXXXXXXX",  # need to tie GUS user id to MetaCI user.
             "start_time": release.implementation_steps.get(
-                plan__role=f"{role}"
+                plan__role=role
             ).start_time.isoformat(),
             "end_time": release.implementation_steps.get(
                 plan__role=f"{role}"
