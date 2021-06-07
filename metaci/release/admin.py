@@ -80,7 +80,7 @@ class ReleaseAdmin(admin.ModelAdmin):
             self.message_user(request, "The change case has been successfully created.")
         if (
             "_submit-change-case" in request.POST
-        ):  # should we do a try catch for better error handling?
+        ):
             send_submit_webhook(
                 obj, obj.repo.orgs.get(name="packaging").configuration_item
             )
