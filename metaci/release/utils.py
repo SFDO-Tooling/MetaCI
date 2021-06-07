@@ -22,7 +22,7 @@ def implementation_payload(role, config_item, release):
                 plan__role=role
             ).start_time.isoformat(),
             "end_time": release.implementation_steps.get(
-                plan__role=f"{role}"
+                plan__role=role
             ).stop_time.isoformat(),
             "configuration_item": config_item,
             "implementation_steps": role,
