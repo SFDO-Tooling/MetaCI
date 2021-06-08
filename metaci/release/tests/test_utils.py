@@ -98,9 +98,7 @@ def test_send_submit_webhook__error(mocked_responses, mocker, transactional_db):
         "https://webhook/case/None/submit",
         json={
             "success": False,
-            "errors": [
-                {"message": "ImplementationStep matching query does not exist."}
-            ],
+            "errors": ["Error submitting change case."],
         },
     )
 
