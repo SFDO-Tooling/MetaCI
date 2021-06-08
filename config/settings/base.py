@@ -459,6 +459,9 @@ METACI_LONG_RUNNING_BUILD_CONFIG = json.loads(
 # GUS BUS Enablement
 METACI_START_STOP_WEBHOOK = env("METACI_START_STOP_WEBHOOK", default=False)
 
+# GUS BUS OWNER ID
+GUS_BUS_OWNER_ID = env("GUS_BUS_OWNER_ID", default="")
+
 # Number of scratch orgs to leave available in the org.
 SCRATCH_ORG_RESERVE = env.int("METACI_SCRATCH_ORG_RESERVE", 10)
 

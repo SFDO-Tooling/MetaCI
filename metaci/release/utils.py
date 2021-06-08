@@ -17,7 +17,7 @@ def implementation_payload(role, config_item, release):
     if role and config_item and release:
         return {
             "description": role,
-            "owner": "005B0000005csnpIAA",  # need to tie GUS user id to MetaCI user.
+            "owner": settings.GUS_BUS_OWNER_ID,
             "start_time": release.implementation_steps.get(
                 plan__role=role
             ).start_time.isoformat(),
@@ -84,7 +84,11 @@ def update_release_from_github(release, repo_api=None):
 
 
 def send_release_webhook(release, config_item=None):
-    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
+    if (
+        release is None
+        or not settings.METACI_RELEASE_WEBHOOK_URL
+        or not settings.GUS_BUS_OWNER_ID
+    ):
         return  # should we better error handle this?
     logger.info(
         f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
@@ -92,7 +96,7 @@ def send_release_webhook(release, config_item=None):
     tag = release.git_tag
 
     steps = []
-    if config_item and settings.METACI_START_STOP_WEBHOOK:
+    if config_item and settings.METACI_START_STOP_WEBHOOK and settings.GUS_BUS_OWNER_ID:
         implementation_steps = release.implementation_steps.all()
         steps = [
             implementation_payload(implementation_step.plan.role, config_item, release)
@@ -134,6 +138,7 @@ def send_submit_webhook(release, config_item=None):
         release is None
         or not settings.METACI_RELEASE_WEBHOOK_URL
         or not settings.METACI_START_STOP_WEBHOOK
+        or not settings.GUS_BUS_OWNER_ID
         or not config_item
     ):
         return
@@ -160,6 +165,7 @@ def send_start_webhook(project_config, release, role, config_item):
         release is None
         or not settings.METACI_RELEASE_WEBHOOK_URL
         or not settings.METACI_START_STOP_WEBHOOK
+        or not settings.GUS_BUS_OWNER_ID
     ):
         return
     if not config_item:
@@ -195,6 +201,7 @@ def send_stop_webhook(project_config, release, role, config_item):
         release is None
         or not settings.METACI_RELEASE_WEBHOOK_URL
         or not settings.METACI_START_STOP_WEBHOOK
+        or not settings.GUS_BUS_OWNER_ID
     ):
         return
     if not config_item:
