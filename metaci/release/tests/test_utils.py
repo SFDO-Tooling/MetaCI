@@ -70,16 +70,15 @@ def test_send_submit_webhook(mocked_responses, mocker, transactional_db):
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/case/1/submit",
+        "https://webhook/case/2/submit",
         json={"success": True, "id": "2"},
     )
 
     project_config = Mock(project__package__name="Test Package")
     project_config.get_version_for_tag.return_value = "1.0"
     release = ReleaseFactory()
-    release.change_case_link = release.change_case_template.case_template_id
+    release.change_case_link = "2"
     send_submit_webhook(release, "INFRA.instance1")
-    assert release.change_case_link == "1"
 
 
 def test_send_submit_webhook__disabled(mocked_responses):
