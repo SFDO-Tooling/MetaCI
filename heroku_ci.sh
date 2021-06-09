@@ -35,6 +35,7 @@ coveralls
 
 # Run JS tests
 yarn test:coverage
+echo "JS Test exit status: $?"
 if [ $exit_status -eq 0 ]
 then
     exit_status=$?
