@@ -22,6 +22,7 @@ clean-test:
 test: 
 	pytest
 
+
 # Use CLASS_PATH to run coverage for a subset of tests. 
 # $ make coverage CLASS_PATH="cumulusci/core/tests"
 coverage: clean-test
