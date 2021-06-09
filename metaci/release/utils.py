@@ -17,7 +17,7 @@ def implementation_payload(role, config_item, release):
     if role and config_item and release:
         return {
             "description": role,
-            "owner": settings.GUS_BUS_OWNER_ID,
+            "owner": f"{settings.GUS_BUS_OWNER_ID}",
             "start_time": release.implementation_steps.get(
                 plan__role=role
             ).start_time.isoformat(),
@@ -94,7 +94,6 @@ def send_release_webhook(release, config_item=None):
         f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
     tag = release.git_tag
-
     steps = []
     if config_item and settings.METACI_START_STOP_WEBHOOK and settings.GUS_BUS_OWNER_ID:
         implementation_steps = release.implementation_steps.all()
@@ -102,7 +101,6 @@ def send_release_webhook(release, config_item=None):
             implementation_payload(implementation_step.plan.role, config_item, release)
             for implementation_step in implementation_steps
         ]
-
     payload = {
         "case_template_id": release.change_case_template.case_template_id,
         "package_name": release.repo.name,  # Need to figure out.
@@ -154,13 +152,22 @@ def send_submit_webhook(release, config_item=None):
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
-    if result["success"]:
+    if (
+        "results" in result
+        and len(result["results"]) > 0
+        and result["results"][0]["success"]
+        or result["success"]
+    ):
         return
     else:
-        raise Exception("\n".join(err["message"] for err in result["errors"]))
+        if "results" in result:
+            for error in result["results"]:
+                raise Exception("\n".join(err["message"] for err in error["errors"]))
+        else:
+            raise Exception("\n".join(err["message"] for err in result["errors"]))
 
 
-def send_start_webhook(project_config, release, role, config_item):
+def send_start_webhook(release, role, config_item):
     if (
         release is None
         or not settings.METACI_RELEASE_WEBHOOK_URL
@@ -196,7 +203,7 @@ def send_start_webhook(project_config, release, role, config_item):
         raise Exception("\n".join(err["message"] for err in result["errors"]))
 
 
-def send_stop_webhook(project_config, release, role, config_item):
+def send_stop_webhook(release, role, config_item):
     if (
         release is None
         or not settings.METACI_RELEASE_WEBHOOK_URL
