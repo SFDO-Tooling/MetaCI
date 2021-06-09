@@ -35,9 +35,11 @@ coveralls
 
 # Run JS tests
 yarn test:coverage
+js_tests_exit_code=$?
+
 if [ $exit_status -eq 0 ]
 then
-    exit_status=$?
+    exit_status=$js_tests_exit_code
 fi
 
 cat ./coverage/lcov.info | /app/node_modules/.bin/coveralls
