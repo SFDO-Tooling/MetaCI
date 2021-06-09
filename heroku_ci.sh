@@ -46,4 +46,6 @@ cat ./coverage/lcov.info | /app/node_modules/.bin/coveralls
 
 curl -k "https://coveralls.io/webhook?repo_token=${COVERALLS_REPO_TOKEN}" -d "payload[build_num]=${HEROKU_TEST_RUN_ID}&payload[status]=done"
 
-exit $exit_status
+if [ "$exit_status" != "0" ]; then
+    exit $exit_status
+fi
