@@ -35,9 +35,14 @@ coveralls
 
 # Run JS tests
 yarn test:coverage
-exit_status=$exit_status || $?
-cat ./coverage/lcov.info | /app/node_modules/.bin/coveralls
+js_tests_exit_code=$?
 
+if [ $exit_status -eq 0 ]
+then
+    exit_status=$js_tests_exit_code
+fi
+
+cat ./coverage/lcov.info | /app/node_modules/.bin/coveralls
 curl -k "https://coveralls.io/webhook?repo_token=${COVERALLS_REPO_TOKEN}" -d "payload[build_num]=${HEROKU_TEST_RUN_ID}&payload[status]=done"
 if [ "$exit_status" != "0" ]; then
     exit $exit_status
