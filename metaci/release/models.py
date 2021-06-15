@@ -104,8 +104,8 @@ class Release(StatusModel):
         null=False,
         blank=False,
     )
-    change_case_link = models.URLField(
-        _("change case link"), max_length=1024, null=True, blank=True
+    change_case_link = models.CharField(
+        _("change case ID"), max_length=1024, null=True, blank=True
     )
 
     class Meta:

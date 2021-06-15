@@ -1,6 +1,8 @@
 from django.contrib import admin
+from django.http import HttpResponseRedirect
 
 from metaci.release.models import ChangeCaseTemplate, ImplementationStep, Release
+from metaci.release.utils import send_release_webhook, send_submit_webhook
 from metaci.repository.models import Repository
 
 
@@ -67,6 +69,22 @@ class ReleaseAdmin(admin.ModelAdmin):
     search_fields = ["^package_version_id", "^git_tag"]
     empty_value_display = "-empty-"
     inlines = [ImplementationStepInline]
+
+    def response_change(self, request, obj):
+        if "_create-change-case" in request.POST:
+            send_release_webhook(
+                obj, obj.repo.orgs.get(name="packaging").configuration_item
+            )
+            self.message_user(request, "The change case has been successfully created.")
+        if "_submit-change-case" in request.POST:
+            send_submit_webhook(
+                obj, obj.repo.orgs.get(name="packaging").configuration_item
+            )
+            self.message_user(
+                request, "The change case has been successfully submitted."
+            )
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
 
 
 admin.site.register(ChangeCaseTemplate)
