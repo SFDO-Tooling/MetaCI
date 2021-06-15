@@ -17,10 +17,15 @@ def test_send_release_webhook(mocked_responses, mocker, transactional_db):
         METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
         GUS_BUS_OWNER_ID="00G",
     )
+
     mocked_responses.add(
         "POST",
         "https://webhook/release/",
-        json={"success": True, "implementationSteps": ["2", "1", "3"], "id": "2"},
+        json={
+            "success": True,
+            "implementationSteps": ["2", "1", "3"],
+            "id": "2",
+        },  # testing that if one of the two lists has extra items they are ignored.
     )
 
     project_config = Mock(project__package__name="Test Package")
