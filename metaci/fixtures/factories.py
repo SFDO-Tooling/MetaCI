@@ -60,6 +60,7 @@ class PlanFactory(factory.django.DjangoModelFactory):
 
     name_prefix = "Plan"
     name = fake_name()
+    role = "test"
 
 
 class RepositoryFactory(factory.django.DjangoModelFactory):

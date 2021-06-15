@@ -84,11 +84,7 @@ def update_release_from_github(release, repo_api=None):
 
 
 def send_release_webhook(release, config_item=None):
-    if (
-        release is None
-        or not settings.METACI_RELEASE_WEBHOOK_URL
-        or not settings.GUS_BUS_OWNER_ID
-    ):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
         return  # should we better error handle this?
     logger.info(
         f"Sending release webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
@@ -172,7 +168,6 @@ def send_start_webhook(release, role, config_item):
         release is None
         or not settings.METACI_RELEASE_WEBHOOK_URL
         or not settings.METACI_START_STOP_WEBHOOK
-        or not settings.GUS_BUS_OWNER_ID
     ):
         return
     if not config_item:
@@ -208,7 +203,6 @@ def send_stop_webhook(release, role, config_item):
         release is None
         or not settings.METACI_RELEASE_WEBHOOK_URL
         or not settings.METACI_START_STOP_WEBHOOK
-        or not settings.GUS_BUS_OWNER_ID
     ):
         return
     if not config_item:
