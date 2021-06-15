@@ -17,7 +17,7 @@ def implementation_payload(role, config_item, release):
     if role and config_item and release:
         return {
             "description": role,
-            "owner": f"{settings.GUS_BUS_OWNER_ID}",
+            "owner": settings.GUS_BUS_OWNER_ID,
             "start_time": release.implementation_steps.get(
                 plan__role=role
             ).start_time.isoformat(),
