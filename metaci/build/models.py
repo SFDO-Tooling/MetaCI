@@ -426,16 +426,6 @@ class Build(models.Model):
         self.delete_build_dir()
         self.flush_log()
 
-        if self.plan.role == "release":
-            try:
-                send_release_webhook(self.release, self.org.configuration_item)
-            except Exception as err:
-                message = f"Error while sending release webhook: {err}"
-                self.logger.error(message)
-                set_build_info(
-                    build, status="error", exception=message, time_end=timezone.now()
-                )
-                return
         if (
             self.org and self.org.name and self.org.name.lower() == "packaging"
         ):  # Calling for any actions taken against packaging org
