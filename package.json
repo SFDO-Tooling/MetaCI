@@ -59,7 +59,7 @@
     "babel-eslint": "^10.0.3",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
-    "chokidar": "^3.5.1",
+    "chokidar": "^3.5.2",
     "core-js": "^3.14.0",
     "coveralls": "^3.1.0",
     "css-loader": "^5.2.6",
