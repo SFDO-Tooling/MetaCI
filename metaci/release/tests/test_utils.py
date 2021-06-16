@@ -153,7 +153,7 @@ def test_send_start_webhook(mocked_responses, mocker, transactional_db):
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/implementation_step_id/1000/start/",
+        "https://webhook/implementation/1000/start/",
         json={"success": True, "id": "1", "implementation_step_id": "1000"},
     )
     project_config = Mock(project__package__name="Test Package")
@@ -192,7 +192,7 @@ def test_send_start_webhook_failed_result(mocked_responses, mocker, transactiona
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/implementation_step_id/1000/start/",
+        "https://webhook/implementation/1000/start/",
         json={
             "success": False,
             "errors": ["Error starting implementation step."],
@@ -232,7 +232,7 @@ def test_send_stop_webhook(mocked_responses, mocker, transactional_db):
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/implementation_step_id/1000/stop/",
+        "https://webhook/implementation/1000/stop/",
         json={"success": True, "id": "1", "implementation_step_id": "1000"},
     )
     project_config = Mock(project__package__name="Test Package")
@@ -271,7 +271,7 @@ def test_send_stop_webhook_failed_result(mocked_responses, mocker, transactional
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/implementation_step_id/1000/stop/",
+        "https://webhook/implementation/1000/stop/",
         json={
             "success": False,
             "errors": ["Error starting implementation step."],

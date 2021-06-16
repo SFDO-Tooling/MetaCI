@@ -36,7 +36,6 @@ from metaci.cumulusci.config import MetaCIUniversalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
 from metaci.release.utils import (
-    send_release_webhook,
     send_start_webhook,
     send_stop_webhook,
 )
@@ -334,10 +333,9 @@ class Build(models.Model):
             # Look up or spin up the org
             org_config = self.get_org(project_config)
             if (
-                self.org and self.org.name and self.org.name.lower() == "packaging"
+                self.plan and self.plan.role and self.plan.role in ["release","release_deploy","push_sandbox","push_production"]
             ):  # Calling for any actions taken against packaging org
                 send_start_webhook(
-                    project_config,
                     self.release,
                     self.plan.role,
                     self.org.configuration_item,
@@ -431,7 +429,6 @@ class Build(models.Model):
         ):  # Calling for any actions taken against packaging org
             try:
                 send_stop_webhook(
-                    project_config,
                     self.release,
                     self.plan.role,
                     self.org.configuration_item,

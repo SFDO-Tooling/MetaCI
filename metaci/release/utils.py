@@ -185,17 +185,27 @@ def send_start_webhook(release, role, config_item):
     }
     token = jwt_for_webhook()
     response = requests.post(
-        f"{settings.METACI_RELEASE_WEBHOOK_URL}/implementation_step_id/{implementation_step_id}/start/",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/implementation/{implementation_step_id}/start/",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
-    if result["success"]:
+    if (
+        "results" in result
+        and len(result["results"]) > 0
+        and result["results"][0]["success"]
+        or result["success"]
+    ):
         logger.info(
             f"Successfully started implementation_step: {implementation_step_id}"
         )
+        return
     else:
-        raise Exception("\n".join(err["message"] for err in result["errors"]))
+        if "results" in result:
+            for error in result["results"]:
+                raise Exception("\n".join(err["message"] for err in error["errors"]))
+        else:
+            raise Exception("\n".join(err["message"] for err in result["errors"]))
 
 
 def send_stop_webhook(release, role, config_item):
@@ -220,14 +230,24 @@ def send_stop_webhook(release, role, config_item):
     }
     token = jwt_for_webhook()
     response = requests.post(
-        f"{settings.METACI_RELEASE_WEBHOOK_URL}/implementation_step_id/{implementation_step_id}/stop/",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/implementation/{implementation_step_id}/stop/",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
-    if result["success"]:
+    if (
+        "results" in result
+        and len(result["results"]) > 0
+        and result["results"][0]["success"]
+        or result["success"]
+    ):
         logger.info(
             f"Successfully stopped implementation_step: {implementation_step_id}"
         )
+        return
     else:
-        raise Exception("\n".join(err["message"] for err in result["errors"]))
+        if "results" in result:
+            for error in result["results"]:
+                raise Exception("\n".join(err["message"] for err in error["errors"]))
+        else:
+            raise Exception("\n".join(err["message"] for err in result["errors"]))
