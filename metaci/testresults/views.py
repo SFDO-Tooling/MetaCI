@@ -386,7 +386,6 @@ def testresult_download_asset(request, result_id, testresult_asset_id):
 
 def _serve_file_response(file, content_type):
     try:
-        raise FileNotFoundError
         response = HttpResponse(file, content_type=content_type)
         response["Content-Disposition"] = (
             "attachment; filename=%s" % file.name.split("/")[-1]
