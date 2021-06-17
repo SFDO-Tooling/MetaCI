@@ -122,7 +122,9 @@ class TestTestResultsViews:
     @pytest.mark.django_db
     def test_build_flow_download_asset(self, data, superuser):
         asset = BuildFlowAsset(
-            build_flow=data["buildflow"], asset=ContentFile("", "test"), category="test"
+            build_flow=data["buildflow"],
+            asset=ContentFile("", "test"),
+            category="robot-output",
         )
         asset.save()
 
@@ -136,4 +138,5 @@ class TestTestResultsViews:
             },
         )
         response = self.client.get(url)
-        assert response.status_code == 302
+        assert response.status_code == 200
+        assert response["content-type"] == "text/xml"
