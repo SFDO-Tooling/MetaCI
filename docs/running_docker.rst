@@ -41,20 +41,20 @@ Running MetaCI In Docker
 
 Below are the following steps necessary to run MetaCI on Docker:
 
-1. `.env File Creation and Variable Declaration`_
-    __ `.env File Creation and Variable Declaration`
+1. Configure MetaCI
+
+   Copy ``.env.example`` to create a file named ``.env`` in the top level of the MetaCI repository.
+   Then, follow `<./docs/configuring.rst>`_ to update the variables in this file.
 
 2. `Building Your Docker Containers`_ 
-    __ `Building Your Docker Containers`
+    __ `Build Your Docker Containers`
+
+3. `Run Your Docker Containers`_
+    __ `Run Your Docker Containers`
 
 
-3. `Running Your Docker Containers`_
-    __ `Running Your Docker Containers`
-
-Please see `<./docs/configuring.rst>`_ to configure your container.
-
-Building Your Docker Containers
--------------------------------
+Build Your Docker Containers
+----------------------------
 
 This next section assumes you have downloaded ``docker`` and ``docker-compose``.
 Additionally it assumes you have a ``.env`` file in the root directory of this 

@@ -30,17 +30,17 @@ RUN mkdir $CHROMEDRIVER_DIR
 COPY ./docker/utility/install_chromedriver.sh /app/docker/utility/install_chromedriver.sh
 RUN /app/docker/utility/install_chromedriver.sh $CHROMEDRIVER_DIR $CHROMEDRIVER_VERSION
 
-# Put Chromedriver into the PATH
-ENV PATH $CHROMEDRIVER_DIR:$PATH
+# Update PATH
+ENV PATH $CHROMEDRIVER_DIR:/app/sfdx/bin:$PATH
 
 # declaring necessary node and yarn versions
-ENV NODE_VERSION 10.16.3
+ENV NODE_VERSION 12.21.0
 # installing node
 COPY ./docker/utility/install_node.sh /app/docker/utility/install_node.sh
 RUN /bin/sh /app/docker/utility/install_node.sh
 
 # declaring necessary node and yarn versions
-ENV YARN_VERSION 1.22.4
+ENV YARN_VERSION 1.22.10
 # installing yarn
 COPY ./docker/utility/install_yarn.sh /app/docker/utility/install_yarn.sh
 RUN /bin/sh /app/docker/utility/install_yarn.sh
@@ -51,8 +51,9 @@ RUN /bin/sh /app/docker/utility/install_sfdx.sh
 
 # installing python related dependencies with pip
 COPY ./requirements /app/requirements
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r /app/requirements/$BUILD_ENV.txt
+RUN pip install --no-cache-dir --upgrade pip pip-tools
+RUN pip install --no-cache-dir -r /app/requirements/prod.txt
+RUN if [ "${BUILD_ENV}" = "local" ]; then pip install --no-cache-dir -r /app/requirements/dev.txt; fi
 
 # installing yarn dependencies
 COPY ./package.json /app/package.json
@@ -70,4 +71,4 @@ ENV DJANGO_HASHID_SALT='sample hashid=salt' \
 
 # Avoid building prod assets in development
 RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
-RUN python /app/manage.py collectstatic --noinput
+RUN if [ "${BUILD_ENV}" = "production" ]; then python /app/manage.py collectstatic --noinput; fi
