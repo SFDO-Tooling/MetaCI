@@ -5,16 +5,17 @@ from tempfile import mkstemp
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
 from robot import rebot
 
-from metaci.build.models import Build, BuildFlow, BuildFlowAsset
+from metaci.build.models import Build, BuildFlow
 from metaci.build.utils import paginate
 from metaci.testresults.filters import BuildFlowFilter
 from metaci.testresults.importer import STATS_MAP
-from metaci.testresults.models import TestMethod, TestResult
+from metaci.testresults.models import TestMethod, TestResult, TestResultAsset
 from metaci.testresults.utils import find_buildflow
 
 ASSET_URL_RE = re.compile(r'"(buildflow)?asset://(\d+)"')
@@ -151,6 +152,7 @@ def test_result_detail(request, result_id):
 
 def make_asset_resolver(result):
     def resolve_asset_url(m):
+        url = ""
         asset_type = m.group(1)
         if asset_type == "buildflow":
             queryset = result.build_flow.assets
@@ -159,9 +161,26 @@ def make_asset_resolver(result):
         asset_id = int(m.group(2))
         try:
             asset = queryset.get(id=asset_id)
-            url = asset.asset.url
         except ObjectDoesNotExist:
-            url = ""
+            pass
+        else:
+            if asset_type == "buildflow":
+                url = reverse(
+                    "build_flow_download_asset",
+                    kwargs={
+                        "build_id": result.build_flow.build.pk,
+                        "flow": result.build_flow.flow,
+                        "build_flow_asset_id": asset.pk,
+                    },
+                )
+            else:
+                url = reverse(
+                    "testresult_download_asset",
+                    kwargs={
+                        "result_id": asset.result.pk,
+                        "testresult_asset_id": asset.pk,
+                    },
+                )
         return '"{}"'.format(html.escape(url))
 
     return resolve_asset_url
@@ -350,4 +369,27 @@ def build_flow_compare_to(request, build_id, flow):
 def build_flow_download_asset(request, build_id, flow, build_flow_asset_id):
     build_flow = find_buildflow(request, build_id, flow)
     asset = build_flow.assets.get(id=build_flow_asset_id)
-    return redirect(asset.asset.url)
+    content_type = "text/xml" if asset.category == "robot-output" else "image/png"
+    return _serve_file_response(asset.asset, content_type)
+
+
+def testresult_download_asset(request, result_id, testresult_asset_id):
+    # confirm user has permission for this build
+    build_qs = Build.objects.for_user(request.user)
+    get_object_or_404(TestResult, id=result_id, build_flow__build__in=build_qs)
+
+    asset = get_object_or_404(
+        TestResultAsset, id=testresult_asset_id, result__id=result_id
+    )
+    return _serve_file_response(asset.asset, "image/png")
+
+
+def _serve_file_response(file, content_type):
+    try:
+        response = HttpResponse(file, content_type=content_type)
+        response["Content-Disposition"] = (
+            "attachment; filename=%s" % file.name.split("/")[-1]
+        )
+        return response
+    except FileNotFoundError:
+        raise Http404("File not found.")

@@ -36,5 +36,10 @@ urlpatterns = [
         views.test_result_robot,
         name="test_result_robot",
     ),
+    re_path(
+        r"^result/(?P<result_id>\d+)/download-asset/(?P<testresult_asset_id>.*)$",
+        views.testresult_download_asset,
+        name="testresult_download_asset",
+    ),
     re_path(r"^compare/$", views.build_flow_compare, name="build_flow_compare"),
 ]
