@@ -6,11 +6,71 @@ from metaci.release.models import ImplementationStep
 
 from ...fixtures.factories import PlanFactory, ReleaseFactory
 from ..utils import (
+    implementation_payload,
     send_release_webhook,
     send_start_webhook,
     send_stop_webhook,
     send_submit_webhook,
 )
+
+
+def test_implementation_payload(mocker, transactional_db):
+    mocker.patch(
+        "metaci.release.utils.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_CHANGE_CASE_URL_TEMPLATE="{case_id}",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+        GUS_BUS_OWNER_ID="00G",
+    )
+    release = ReleaseFactory()
+    release.implementation_steps.set(
+        [
+            ImplementationStep(
+                release=release,
+                plan=PlanFactory(role="foo"),
+                external_id="1000",
+                start_time="2021-06-08T08:00:00+00:00",
+                stop_time="2021-06-09T18:00:00+00:00",
+            ),
+        ],
+        bulk=False,
+    )
+    result = implementation_payload(None, "123", release)
+    assert result == {
+        "description": "foo",
+        "owner": "00G",
+        "start_time": "2021-06-08T08:00:00+00:00",
+        "end_time": "2021-06-09T18:00:00+00:00",
+        "configuration_item": "123",
+        "implementation_steps": "foo",
+    }
+
+
+def test_implementation_payload_error(mocker, transactional_db):
+    mocker.patch(
+        "metaci.release.utils.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_CHANGE_CASE_URL_TEMPLATE="{case_id}",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+        GUS_BUS_OWNER_ID="00G",
+    )
+    release = ReleaseFactory()
+    release.implementation_steps.set(
+        [
+            ImplementationStep(
+                release=release,
+                plan=PlanFactory(role="foo"),
+                external_id="1000",
+                start_time="2021-06-08T08:00:00+00:00",
+                stop_time="2021-06-09T18:00:00+00:00",
+            ),
+        ],
+        bulk=False,
+    )
+    with pytest.raises(Exception):
+        implementation_payload(None, "123", release)
 
 
 def test_send_release_webhook(mocked_responses, mocker, transactional_db):
@@ -182,7 +242,9 @@ def test_send_start_webhook__disabled(mocked_responses):
     assert len(mocked_responses.calls) == 0
 
 
-def test_send_start_webhook_failed_result(mocked_responses, mocker, transactional_db):
+def test_send_start_webhook_failed_result_with_config(
+    mocked_responses, mocker, transactional_db
+):
     mocker.patch(
         "metaci.release.utils.settings",
         METACI_RELEASE_WEBHOOK_URL="https://webhook",
@@ -193,12 +255,7 @@ def test_send_start_webhook_failed_result(mocked_responses, mocker, transactiona
     mocked_responses.add(
         "POST",
         "https://webhook/implementation/1000/start/",
-        json={
-            "success": False,
-            "errors": ["Error starting implementation step."],
-            "id": "1",
-            "implementation_step_id": "1000",
-        },
+        json={"success": False, "errors": ["Error starting implementation step."]},
     )
     release = ReleaseFactory()
     release.implementation_steps.set(
@@ -215,6 +272,31 @@ def test_send_start_webhook_failed_result(mocked_responses, mocker, transactiona
     )
     with pytest.raises(Exception):
         send_start_webhook(release, "foo", "INFRA.instance1")
+
+
+def test_send_start_webhook_failed_result_no_config(mocker, transactional_db):
+    mocker.patch(
+        "metaci.release.utils.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_CHANGE_CASE_URL_TEMPLATE="{case_id}",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+    )
+    release = ReleaseFactory()
+    release.implementation_steps.set(
+        [
+            ImplementationStep(
+                release=release,
+                plan=PlanFactory(role="foo"),
+                external_id="1000",
+                start_time="2021-06-08T08:00:00+00:00",
+                stop_time="2021-06-09T18:00:00+00:00",
+            ),
+        ],
+        bulk=False,
+    )
+    with pytest.raises(Exception):
+        send_start_webhook(release, "foo", None)
 
 
 def test_send_stop_webhook(mocked_responses, mocker, transactional_db):
@@ -256,7 +338,9 @@ def test_send_stop_webhook__disabled(mocked_responses):
     assert len(mocked_responses.calls) == 0
 
 
-def test_send_stop_webhook_failed_result(mocked_responses, mocker, transactional_db):
+def test_send_stop_webhook_failed_result_with_config(
+    mocked_responses, mocker, transactional_db
+):
     mocker.patch(
         "metaci.release.utils.settings",
         METACI_RELEASE_WEBHOOK_URL="https://webhook",
@@ -267,12 +351,7 @@ def test_send_stop_webhook_failed_result(mocked_responses, mocker, transactional
     mocked_responses.add(
         "POST",
         "https://webhook/implementation/1000/stop/",
-        json={
-            "success": False,
-            "errors": ["Error starting implementation step."],
-            "id": "1",
-            "implementation_step_id": "1000",
-        },
+        json={"success": False, "errors": ["Error stopping implementation step."]},
     )
     release = ReleaseFactory()
     release.implementation_steps.set(
@@ -289,3 +368,28 @@ def test_send_stop_webhook_failed_result(mocked_responses, mocker, transactional
     )
     with pytest.raises(Exception):
         send_stop_webhook(release, "foo", "INFRA.instance1")
+
+
+def test_send_stop_webhook_failed_result_no_config(mocker, transactional_db):
+    mocker.patch(
+        "metaci.release.utils.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_CHANGE_CASE_URL_TEMPLATE="{case_id}",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+    )
+    release = ReleaseFactory()
+    release.implementation_steps.set(
+        [
+            ImplementationStep(
+                release=release,
+                plan=PlanFactory(role="foo"),
+                external_id="1000",
+                start_time="2021-06-08T08:00:00+00:00",
+                stop_time="2021-06-09T18:00:00+00:00",
+            ),
+        ],
+        bulk=False,
+    )
+    with pytest.raises(Exception):
+        send_stop_webhook(release, "foo", None)

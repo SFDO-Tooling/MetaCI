@@ -156,11 +156,7 @@ def send_submit_webhook(release, config_item=None):
     ):
         return
     else:
-        if "results" in result:
-            for error in result["results"]:
-                raise Exception("\n".join(err["message"] for err in error["errors"]))
-        else:
-            raise Exception("\n".join(err["message"] for err in result["errors"]))
+        raise Exception("\n".join(err for err in result["errors"]))
 
 
 def send_start_webhook(release, role, config_item):
@@ -201,11 +197,7 @@ def send_start_webhook(release, role, config_item):
         )
         return
     else:
-        if "results" in result:
-            for error in result["results"]:
-                raise Exception("\n".join(err["message"] for err in error["errors"]))
-        else:
-            raise Exception("\n".join(err["message"] for err in result["errors"]))
+        raise Exception("\n".join(err for err in result["errors"]))
 
 
 def send_stop_webhook(release, role, config_item):
@@ -246,8 +238,4 @@ def send_stop_webhook(release, role, config_item):
         )
         return
     else:
-        if "results" in result:
-            for error in result["results"]:
-                raise Exception("\n".join(err["message"] for err in error["errors"]))
-        else:
-            raise Exception("\n".join(err["message"] for err in result["errors"]))
+        raise Exception("\n".join(err for err in result["errors"]))
