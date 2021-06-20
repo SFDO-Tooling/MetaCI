@@ -36,7 +36,7 @@ def test_implementation_payload(mocker, transactional_db):
         ],
         bulk=False,
     )
-    result = implementation_payload(None, "123", release)
+    result = implementation_payload("foo", "123", release)
     assert result == {
         "description": "foo",
         "owner": "00G",
