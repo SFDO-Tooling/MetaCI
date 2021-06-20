@@ -217,11 +217,6 @@ def test_send_start_webhook_failed_result(mocked_responses, mocker, transactiona
         send_start_webhook(release, "foo", "INFRA.instance1")
 
 
-def test_send_start_webhook_no_config_item(mocked_responses, transactional_db):
-    with pytest.raises(Exception):
-        send_start_webhook(ReleaseFactory(), "foo", None)
-
-
 def test_send_stop_webhook(mocked_responses, mocker, transactional_db):
     mocker.patch(
         "metaci.release.utils.settings",
@@ -294,8 +289,3 @@ def test_send_stop_webhook_failed_result(mocked_responses, mocker, transactional
     )
     with pytest.raises(Exception):
         send_stop_webhook(release, "foo", "INFRA.instance1")
-
-
-def test_send_stop_webhook_no_config_item(mocked_responses, transactional_db):
-    with pytest.raises(Exception):
-        send_stop_webhook(ReleaseFactory(), "foo", None)
