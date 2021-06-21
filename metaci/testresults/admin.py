@@ -1,17 +1,15 @@
 from django.contrib import admin
-from metaci.testresults.models import TestResult
-from metaci.testresults.models import TestMethod
-from metaci.testresults.models import TestResultAsset
+
+from metaci.testresults.models import TestMethod, TestResult, TestResultAsset
 
 
+@admin.register(TestResult)
 class TestResultAdmin(admin.ModelAdmin):
     list_display = ("build_flow", "method", "duration", "outcome")
     list_filter = ("build_flow__build__repo", "method", "method__testclass")
 
 
-admin.site.register(TestResult, TestResultAdmin)
-
-
+@admin.register(TestResultAsset)
 class TestResultAssetAdmin(admin.ModelAdmin):
     list_display = ("result", "asset")
     list_filter = (
@@ -22,13 +20,8 @@ class TestResultAssetAdmin(admin.ModelAdmin):
     raw_id_fields = ("result",)
 
 
-admin.site.register(TestResultAsset, TestResultAssetAdmin)
-
-
+@admin.register(TestMethod)
 class TestMethodAdmin(admin.ModelAdmin):
     list_display = ("name", "testclass")
     list_filter = ("testclass__repo", "testclass", "test_dashboard")
     raw_id_fields = ("testclass",)
-
-
-admin.site.register(TestMethod, TestMethodAdmin)

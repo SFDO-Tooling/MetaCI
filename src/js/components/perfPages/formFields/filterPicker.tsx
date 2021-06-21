@@ -14,7 +14,7 @@ const FilterPicker = ({
   field_name,
   currentValue,
   onSelect,
-}: Props): JSX.Element => {
+}: Props) => {
   const selected = currentValue
     ? choices.filter((choice) => choice.id === currentValue)
     : [];

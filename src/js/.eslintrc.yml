@@ -1,5 +1,4 @@
 # http://eslint.org/docs/rules/
-# copied from https://raw.githubusercontent.com/SFDO-Tooling/MetaShare/master/src/js/.eslintrc.yml
 
 parser: '@typescript-eslint/parser'
 parserOptions:
@@ -17,15 +16,17 @@ plugins:
   - '@typescript-eslint'
 extends:
   - plugin:@typescript-eslint/recommended
-  - prettier/@typescript-eslint
 rules:
   # TypeScript
   '@typescript-eslint/camelcase': 0  # may want to tighten this sometime.
-  '@typescript-eslint/explicit-function-return-type': 0
+  '@typescript-eslint/explicit-module-boundary-types': 0
   '@typescript-eslint/no-empty-function': 0
   '@typescript-eslint/no-explicit-any': 0
+  '@typescript-eslint/no-use-before-define': 2
 
   # Import
-  simple-import-sort/sort: 1
+  simple-import-sort/imports: 1
   import/default: 0
   import/order: 0
+
+  no-use-before-define: 0

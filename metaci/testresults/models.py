@@ -34,6 +34,9 @@ class TestClass(models.Model):
     def __str__(self):
         return self.name
 
+    # pytest: this is not a test
+    __test__ = False
+
 
 class TestMethod(models.Model):
     name = models.CharField(max_length=255, db_index=True)
@@ -48,6 +51,9 @@ class TestMethod(models.Model):
 
     def __str__(self):
         return self.name
+
+    # pytest: This is not a test
+    __test__ = False
 
 
 class TestResultManager(models.Manager):
@@ -75,7 +81,7 @@ class TestResultManager(models.Manager):
                     results[cls][method] = {}
 
                 for limit in result.get_limit_types():
-                    test_limit = "test_{}_used".format(limit)
+                    test_limit = f"test_{limit}_used"
 
                     if test_limit not in results[cls][method]:
                         results[cls][method][test_limit] = OrderedDict()
@@ -137,23 +143,11 @@ class TestResult(models.Model):
     robot_keyword = models.CharField(
         max_length=255, null=True, blank=True, db_index=True
     )
-    # Maybe robot_tags should be a one-to-many relationship with a tags
-    # table, but that seems like overkill for my immediate needs.
-    # For now, making it a CharField that contains a comma-separated
-    # list of tags is sufficient.
-    robot_tags = models.CharField(
-        max_length=80,
-        null=True,
-        blank=True,
-    )
+    robot_tags = models.TextField(null=True, blank=True)
     robot_xml = models.TextField(null=True, blank=True)
-    email_invocations_used = models.IntegerField(null=True, blank=True, db_index=True)
-    email_invocations_allowed = models.IntegerField(
-        null=True, blank=True, db_index=True
-    )
-    email_invocations_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
-    )
+    email_invocations_used = models.IntegerField(null=True, blank=True)
+    email_invocations_allowed = models.IntegerField(null=True, blank=True)
+    email_invocations_percent = models.IntegerField(null=True, blank=True)
     soql_queries_used = models.IntegerField(null=True, blank=True)
     soql_queries_allowed = models.IntegerField(null=True, blank=True)
     soql_queries_percent = models.IntegerField(null=True, blank=True)
@@ -223,18 +217,12 @@ class TestResult(models.Model):
     test_callouts_used = models.IntegerField(null=True, blank=True)
     test_callouts_allowed = models.IntegerField(null=True, blank=True)
     test_callouts_percent = models.IntegerField(null=True, blank=True)
-    worst_limit = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    worst_limit = models.CharField(max_length=255, null=True, blank=True)
     worst_limit_percent = models.IntegerField(null=True, blank=True, db_index=True)
-    worst_limit_nontest = models.CharField(
-        max_length=255, null=True, blank=True, db_index=True
-    )
-    worst_limit_nontest_percent = models.IntegerField(
-        null=True, blank=True, db_index=True
-    )
-    worst_limit_test = models.CharField(
-        max_length=255, null=True, blank=True, db_index=True
-    )
-    worst_limit_test_percent = models.IntegerField(null=True, blank=True, db_index=True)
+    worst_limit_nontest = models.CharField(max_length=255, null=True, blank=True)
+    worst_limit_nontest_percent = models.IntegerField(null=True, blank=True)
+    worst_limit_test = models.CharField(max_length=255, null=True, blank=True)
+    worst_limit_test_percent = models.IntegerField(null=True, blank=True)
 
     objects = TestResultManager()
 
@@ -280,6 +268,9 @@ class TestResultAsset(models.Model):
         TestResult, related_name="assets", on_delete=models.CASCADE
     )
     asset = models.FileField(upload_to=asset_upload_to)
+
+    # pytest: This is not a test
+    __test__ = False
 
 
 FieldType = namedtuple("FieldType", ["label", "aggregation"])

@@ -28,7 +28,7 @@ class TestAPIRobot(APITestCase):
 
         repo1 = RepositoryFactory(name="repo1")
         repo2 = RepositoryFactory(name="repo2")
-        master = BranchFactory(name="master")
+        main = BranchFactory(name="main")
         feature = BranchFactory(name="feature/robot")
 
         # The default for queries is today's date, so we need to use that
@@ -59,8 +59,8 @@ class TestAPIRobot(APITestCase):
             robot_keyword,
             message,
         ) in (
-            (repo1, "file1.robot", "Pass", master, "Passing 1", None, None, None),
-            (repo1, "file1.robot", "Pass", master, "Passing 2", None, None, None),
+            (repo1, "file1.robot", "Pass", main, "Passing 1", None, None, None),
+            (repo1, "file1.robot", "Pass", main, "Passing 2", None, None, None),
             (
                 repo2,
                 "file2.robot",
@@ -154,8 +154,8 @@ class TestAPIRobot(APITestCase):
         response = self.client.get("/api/robot.csv")
         expected = [
             "id,outcome,date,duration,repo_name,branch_name,source_file,test_name,robot_tags,robot_keyword,message",
-            f"2,Pass,{self.today},0.1,repo1,master,file1.robot,Passing 1,,,",
-            f"3,Pass,{self.today},0.1,repo1,master,file1.robot,Passing 2,,,",
+            f"2,Pass,{self.today},0.1,repo1,main,file1.robot,Passing 1,,,",
+            f"3,Pass,{self.today},0.1,repo1,main,file1.robot,Passing 2,,,",
             f"4,Fail,{self.today},0.1,repo2,feature/robot,file2.robot,Failing 1,,KW1,epic fail",
             f"5,Fail,{self.today},0.1,repo2,feature/robot,file2.robot,Failing 2,,KW1,epic fail",
             f"6,Fail,{self.today},0.1,repo2,feature/robot,file3.robot,Failing 3,,KW2,epic fail",
@@ -179,11 +179,11 @@ class TestAPIRobot(APITestCase):
 
     def test_branch_filter(self):
         self.client.force_authenticate(self.superuser)
-        response = self.client.get("/api/robot.csv?branch_name=master")
+        response = self.client.get("/api/robot.csv?branch_name=main")
         expected = [
             "id,outcome,date,duration,repo_name,branch_name,source_file,test_name,robot_tags,robot_keyword,message",
-            f"2,Pass,{self.today},0.1,repo1,master,file1.robot,Passing 1,,,",
-            f"3,Pass,{self.today},0.1,repo1,master,file1.robot,Passing 2,,,",
+            f"2,Pass,{self.today},0.1,repo1,main,file1.robot,Passing 1,,,",
+            f"3,Pass,{self.today},0.1,repo1,main,file1.robot,Passing 2,,,",
         ]
         actual = response.content.decode().splitlines()
         self.assertCountEqual(expected, actual)
@@ -232,7 +232,7 @@ class TestAPIRobotDateHandling(APITestCase):
         cls.client = APIClient()
 
         repo = RepositoryFactory(name="repo1")
-        master = BranchFactory(name="master")
+        main = BranchFactory(name="main")
 
         today = timezone.make_aware(
             dateutil.parser.parse("01:00:00"), timezone.get_current_timezone()
@@ -256,7 +256,7 @@ class TestAPIRobotDateHandling(APITestCase):
             TestResultFactory(
                 method__testclass__test_type="Robot",
                 build_flow__build__repo=repo,
-                build_flow__build__branch=master,
+                build_flow__build__branch=main,
                 build_flow__time_end=time_end,
                 method__name="Test 1",
                 outcome="Pass",
@@ -274,7 +274,7 @@ class TestAPIRobotDateHandling(APITestCase):
         actual = response.content.decode().splitlines()
         expected = [
             "id,outcome,date,duration,repo_name,branch_name,source_file,test_name,robot_tags,robot_keyword,message",
-            f"8,Pass,{self.today},0.1,repo1,master,/tmp/example.robot,Test 1,,Some keyword,",
+            f"8,Pass,{self.today},0.1,repo1,main,/tmp/example.robot,Test 1,,Some keyword,",
         ]
         self.assertCountEqual(expected, actual)
 
@@ -285,8 +285,8 @@ class TestAPIRobotDateHandling(APITestCase):
         actual = response.content.decode().splitlines()
         expected = [
             "id,outcome,date,duration,repo_name,branch_name,source_file,test_name,robot_tags,robot_keyword,message",
-            "10,Pass,2020-01-02 01:00:00,0.1,repo1,master,/tmp/example.robot,Test 1,,Some keyword,",
-            "11,Pass,2020-01-02 01:00:00,0.1,repo1,master,/tmp/example.robot,Test 1,,Some keyword,",
+            "10,Pass,2020-01-02 01:00:00,0.1,repo1,main,/tmp/example.robot,Test 1,,Some keyword,",
+            "11,Pass,2020-01-02 01:00:00,0.1,repo1,main,/tmp/example.robot,Test 1,,Some keyword,",
         ]
         self.assertCountEqual(expected, actual)
 
@@ -297,11 +297,11 @@ class TestAPIRobotDateHandling(APITestCase):
         actual = response.content.decode().splitlines()
         expected = [
             "id,outcome,date,duration,repo_name,branch_name,source_file,test_name,robot_tags,robot_keyword,message",
-            "10,Pass,2020-01-02 01:00:00,0.1,repo1,master,/tmp/example.robot,Test 1,,Some keyword,",
-            "11,Pass,2020-01-02 01:00:00,0.1,repo1,master,/tmp/example.robot,Test 1,,Some keyword,",
-            "12,Pass,2020-01-03 01:00:00,0.1,repo1,master,/tmp/example.robot,Test 1,,Some keyword,",
-            "13,Pass,2020-01-03 01:00:00,0.1,repo1,master,/tmp/example.robot,Test 1,,Some keyword,",
-            "14,Pass,2020-01-03 01:00:00,0.1,repo1,master,/tmp/example.robot,Test 1,,Some keyword,",
+            "10,Pass,2020-01-02 01:00:00,0.1,repo1,main,/tmp/example.robot,Test 1,,Some keyword,",
+            "11,Pass,2020-01-02 01:00:00,0.1,repo1,main,/tmp/example.robot,Test 1,,Some keyword,",
+            "12,Pass,2020-01-03 01:00:00,0.1,repo1,main,/tmp/example.robot,Test 1,,Some keyword,",
+            "13,Pass,2020-01-03 01:00:00,0.1,repo1,main,/tmp/example.robot,Test 1,,Some keyword,",
+            "14,Pass,2020-01-03 01:00:00,0.1,repo1,main,/tmp/example.robot,Test 1,,Some keyword,",
         ]
         self.assertCountEqual(expected, actual)
 

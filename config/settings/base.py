@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Django settings for metaci project.
 
@@ -8,10 +7,9 @@ https://docs.djangoproject.com/en/dev/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
-from __future__ import absolute_import, unicode_literals
-
-import os
+import json
 from ipaddress import IPv4Network
+from pathlib import Path
 from typing import List
 
 import environ
@@ -35,8 +33,13 @@ def url_prefix_list(val: str) -> List[str]:
     return [url_prefix(url) for url in val.split(",")]
 
 
+def nl_separated_bytes_list(val: str) -> List[bytes]:
+    return [item.encode("latin1") for item in val.split("\n")]
+
+
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
+WHITENOISE_APPS = ("whitenoise.runserver_nostatic",)
 DJANGO_APPS = (
     # Default Django apps:
     "django.contrib.auth",
@@ -54,7 +57,6 @@ THIRD_PARTY_APPS = (
     "allauth",  # registration
     "allauth.account",  # registration
     "allauth.socialaccount",  # registration
-    "allauth.socialaccount.providers.github",  # github
     "crispy_forms",  # Form layouts
     "django_filters",  # view helpers for filtering models
     "django_js_reverse",  # allow JS to reverse URLs
@@ -63,12 +65,12 @@ THIRD_PARTY_APPS = (
     "guardian",  # Per Object Permissions via django-guardian
     "rest_framework",  # API
     "rest_framework.authtoken",
-    "scheduler",  # django-rq-scheduler
     "watson",  # Full text search
 )
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
+    "metaci.oauth2.github",
     "metaci.users.apps.UsersConfig",
     "metaci.api.apps.ApiConfig",
     "metaci.build.apps.BuildConfig",
@@ -83,7 +85,7 @@ LOCAL_APPS = (
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = WHITENOISE_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -99,6 +101,7 @@ ALLOWED_HOSTS = [
 MIDDLEWARE = (
     "log_request_id.middleware.RequestIDMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -142,6 +145,9 @@ MANAGERS = ADMINS
 DATABASES = {"default": env.db("DATABASE_URL", default="postgres:///metaci")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
+DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", default=[], cast=nl_separated_bytes_list)
+
+
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
 # Local time zone for this installation. Choices can be found here:
@@ -168,7 +174,8 @@ USE_TZ = True
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#templates
-if os.path.exists(str(ROOT_DIR.path("dist", "prod"))):
+production_app_path = Path(ROOT_DIR.path("dist", "prod"))
+if production_app_path.exists():
     TEMPLATE_DIRS = [
         str(ROOT_DIR.path("dist", "prod")),
         str(APPS_DIR.path("templates")),
@@ -201,6 +208,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
+                "metaci.release.context_processors.get_release_values",
             ],
         },
     }
@@ -231,6 +239,8 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
+WHITENOISE_ALLOW_ALL_ORIGINS = False
+
 # MEDIA CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
@@ -245,7 +255,7 @@ ROOT_URLCONF = "config.urls"
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin")
-ADMIN_URL_ROUTE = r"^{}/".format(ADMIN_URL)
+ADMIN_URL_ROUTE = rf"^{ADMIN_URL}/"
 
 # Forward-compatible alias for use with IP-checking middleware
 ADMIN_AREA_PREFIX = ADMIN_URL
@@ -277,6 +287,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# GitHub OAuth2 (for GitHub app or GitHub Oauth App)
+GITHUB_CLIENT_ID = env("GITHUB_CLIENT_ID")
+GITHUB_CLIENT_SECRET = env("GITHUB_CLIENT_SECRET")
+
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = (
@@ -293,6 +307,10 @@ ACCOUNT_EMAIL_VERIFICATION = env("ACCOUNT_EMAIL_VERIFICATION", default="mandator
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 ACCOUNT_ADAPTER = "metaci.users.adapters.AccountAdapter"
 SOCIALACCOUNT_ADAPTER = "metaci.users.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_PROVIDERS = {
+    "github": {"APP": {"client_id": GITHUB_CLIENT_ID, "secret": GITHUB_CLIENT_SECRET}}
+}
+SOCIALACCOUNT_STORE_TOKENS = False
 
 # Custom user app defaults
 # Select the correct user model
@@ -300,12 +318,25 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 LOGIN_URL = "account_login"
 
-# SLUGLIFIER
-AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
-
-# django-rq
+# Redis configuration
 REDIS_URL = env("REDIS_URL", default="redis://localhost:6379")
-REDIS_URL += "/0"
+REDIS_LOCATION = f"{REDIS_URL}/0"
+REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=2)
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_LOCATION,
+        "OPTIONS": {
+            "CONNECTION_POOL_CLASS": "redis.BlockingConnectionPool",
+            "CONNECTION_POOL_KWARGS": {
+                "max_connections": REDIS_MAX_CONNECTIONS,
+                "timeout": 20,
+            },
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        },
+    }
+}
 RQ_QUEUES = {
     "default": {
         "USE_REDIS_CACHE": "default",
@@ -334,21 +365,71 @@ RQ_QUEUES = {
     },
 }
 RQ_EXCEPTION_HANDLERS = ["metaci.build.exceptions.maybe_requeue_job"]
+CRON_JOBS = {
+    "autoscale": {
+        "func": "metaci.build.autoscaling.autoscale",
+        "cron_string": "* * * * *",
+    },
+    "check_waiting_builds": {
+        "func": "metaci.build.tasks.check_waiting_builds",
+        "cron_string": "* * * * *",
+    },
+    "monthly_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_monthly",
+        "cron_string": "0 0 1 * *",
+    },
+    "weekly_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_weekly",
+        "cron_string": "0 0 * * 0",
+    },
+    "daily_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_daily",
+        "cron_string": "0 0 * * *",
+    },
+    "hourly_builds_job": {
+        "func": "metaci.plan.tasks.run_scheduled_hourly",
+        "cron_string": "0 * * * *",
+    },
+    "generate_summaries_job": {
+        "func": "metaci.testresults.tasks.generate_summaries",
+        "cron_string": "0,30 * * * *",
+    },
+    "prune_branches": {
+        "func": "metaci.repository.tasks.prune_branches",
+        "cron_string": "0 * * * *",
+    },
+}
+# There is a default dict of cron jobs,
+# and the cron_string can be optionally overridden
+# using JSON in the CRON_SCHEDULE environment variable.
+# CRON_SCHEDULE is a mapping from a name identifying the job
+# to a cron string specifying the schedule for the job,
+# or null to disable the job.
+cron_overrides = json.loads(env("CRON_SCHEDULE", default="{}"))
+if not isinstance(cron_overrides, dict):
+    raise TypeError("CRON_SCHEDULE must be a JSON object")
+for key, cron_string in cron_overrides.items():
+    if key in CRON_JOBS:
+        if cron_string is None:
+            del CRON_JOBS[key]
+        else:
+            CRON_JOBS[key]["cron_string"] = cron_string
+    else:
+        raise KeyError(key)
+
 
 # Site URL
 SITE_URL = None
 FROM_EMAIL = "test@mailinator.com"
 
-# Github credentials
+# Github credentials (for CumulusCI flows that use the github service to call GitHub)
+# Instead of username/password, you can supply GITHUB_APP_ID and GITHUB_APP_KEY,
+# and CumulusCI will use those in preference to the username/password.
 GITHUB_USERNAME = env("GITHUB_USERNAME", default=None)
 GITHUB_PASSWORD = env("GITHUB_PASSWORD", default=None)
 GITHUB_WEBHOOK_SECRET = env("GITHUB_WEBHOOK_SECRET", default="")
 
 # Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = None
-CONNECTED_APP_CLIENT_SECRET = None
-CONNECTED_APP_CALLBACK_URL = None
-
 SFDX_CLIENT_ID = None
 SFDX_HUB_KEY = None
 SFDX_HUB_USERNAME = None
@@ -365,6 +446,21 @@ METACI_ALLOW_PERSISTENT_ORG_LOGIN = env.bool("METACI_ALLOW_PERSISTENT_ORG_LOGIN"
 METACI_ENFORCE_RELEASE_CHANGE_CASE = env.bool(
     "METACI_ENFORCE_RELEASE_CHANGE_CASE", False
 )
+METACI_RELEASE_WEBHOOK_URL = env("METACI_RELEASE_WEBHOOK_URL", default=None)
+METACI_RELEASE_WEBHOOK_ISSUER = env("HEROKU_APP_NAME", default="MetaCI")
+METACI_RELEASE_WEBHOOK_AUTH_KEY = env("METACI_RELEASE_WEBHOOK_AUTH_KEY", default=None)
+METACI_CHANGE_CASE_URL_TEMPLATE = env(
+    "METACI_CHANGE_CASE_URL_TEMPLATE", default="{case_id}"
+)
+METACI_LONG_RUNNING_BUILD_CONFIG = json.loads(
+    env("METACI_LONG_RUNNING_BUILD_CONFIG", default="{}")
+)
+
+# GUS BUS Enablement
+METACI_START_STOP_WEBHOOK = env("METACI_START_STOP_WEBHOOK", default=False)
+
+# GUS BUS OWNER ID
+GUS_BUS_OWNER_ID = env("GUS_BUS_OWNER_ID", default="")
 
 # Number of scratch orgs to leave available in the org.
 SCRATCH_ORG_RESERVE = env.int("METACI_SCRATCH_ORG_RESERVE", 10)

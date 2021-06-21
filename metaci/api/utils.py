@@ -1,4 +1,5 @@
 import re
+
 from rest_framework.generics import get_object_or_404
 
 
@@ -20,7 +21,7 @@ class PkOrSlugMixin(object):
     lookup_value_regexp = r"[^/.]+"
 
     def get_object(self):
-        """ return the object based on pk or slug """
+        """return the object based on pk or slug"""
         queryset = self.filter_queryset(self.get_queryset())
 
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field

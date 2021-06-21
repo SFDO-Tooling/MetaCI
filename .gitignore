@@ -74,9 +74,10 @@ metaci/media/
 # MailHog binary
 mailhog
 
-
+# Production dirs
 staticfiles/
 dist/
+docs/_build
 
 # Virtualenv
 venv
@@ -103,4 +104,3 @@ postgres/
 # safeguarding secrets
 sfdx_hub.key
 
-docs/_build

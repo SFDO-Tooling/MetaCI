@@ -19,7 +19,7 @@ const DateRangePicker = ({
   startValue?: string | null;
   endValue?: string | null;
   onChange: (name: string, format: string | typeof undefined) => void;
-}): React.ReactNode => {
+}) => {
   const localOnChange = (name: string, data: SLDSDateOption) => {
     if (data.formattedDate === '') {
       onChange(name, undefined);

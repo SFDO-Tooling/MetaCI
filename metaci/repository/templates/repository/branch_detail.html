@@ -1,73 +1,55 @@
 {% extends 'layout_full.html' %}
 
-{% block layout_parent_link %}<a href="/repos/{{ branch.repo.owner }}/{{ branch.repo.name }}">{{ branch.repo }}</a>{% endblock %}
+{% block layout_header_text %}
+  <div class="slds-page-header__row">
+    <div class="slds-text-body_regular">
+      {% if branch.is_tag %}
+        Tag
+      {% else %}
+        Branch
+      {% endif %}
+    </div>
+  </div>
+  {% if branch.is_tag %}
+    {{ branch.name|cut:"tag: " }}
+  {% else %}
+    {{ branch.name }}
+  {% endif %}
+{% endblock %}
 
-{% block layout_header_text %}{{ branch.name }}{% endblock %}
+{% block layout_header_buttons %}
+    <ul class="slds-button-group-list">
+      <li>
+        {% if branch.is_tag %}
+          <a href="{{ repo.url }}/releases/tag/{{ branch.name|cut:"tag: " }}" target="_blank">
+            <button class="slds-button slds-button_outline-brand">
+              View Tag in GitHub
+            </button>
+          </a
+        {% else %}
+          <a href="{{ repo.url }}/tree/{{ branch.name }}" target="_blank">
+            <button class="slds-button slds-button_outline-brand">
+              View Branch in GitHub
+            </button>
+          </a
+        {% endif %}
+      </li>
+    </ul>
+{% endblock %}
 
 {% block layout_header_details %}
   <ul class="slds-grid slds-page-header__detail-row">
     <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">URL</p>
-      <p class="slds-text-body--regular slds-truncate" title="{{ branch.repo.url }}/tree/{{ branch.name }}">
-        <a href="{{ branch.repo.url }}/tree/{{ branch.name }}" target="_blank">{{ branch.repo.url }}/tree/{{ branch.name }}</a>
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">Repo</p>
+      <p class="slds-text-body--regular slds-truncate" title="{{ repo }}">
+        <a href="/repos/{{ repo.owner }}/{{ repo.name }}" target="_blank">{{ repo }}</a>
       </p>
     </li>
   </ul>
 {% endblock %}
 
 {% block layout_body %}
-<table class="slds-table slds-table--bordered slds-table--cell-buffer">
-  <thead>
-    <tr class="slds-text-title--caps">
-      <th scope="col">
-        <div class="slds-truncate" title="">#</div>
-      </th>
-      <th scope="col">
-        <div class="slds-truncate" title="">Status</div>
-      </th>
-      <th scope="col">
-        <div class="slds-truncate" title="">Plan</div>
-      </th>
-      <th scope="col">
-        <div class="slds-truncate" title="">Commit</div>
-      </th>
-      <th scope="col">
-        <div class="slds-truncate" title="">Start Date</div>
-      </th>
-      <th scope="col">
-        <div class="slds-truncate" title="">End Date</div>
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for build in builds %}
-    <tr>
-      <th data-label="Build Number">
-        <div class="slds-truncate" title="{{ build.id }}"><a href="/builds/{{ build.id }}">{{ build.id }}</a></div>
-      </th>
-      <td data-label="Status">
-        <div
-          class="slds-truncate slds-badge {% if build.get_status == 'fail'%}  slds-theme--error {% elif build.get_status == 'error' %}slds-theme--offline{% elif build.get_status == 'success' %}slds-theme--success{% endif %}"
-          title="{{ build.get_status }}">
-          {{ build.get_status }}
-        </div>
-      </td>
-      <td data-label="Plan">
-        <div class="slds-truncate" title="{{ build.plan }}">{{ build.plan }}</div>
-      </td>
-      <td data-label="Commit">
-        <div class="slds-truncate" title="{{ build.commit }}">{{ build.commit }}</div>
-      </td>
-      <td data-label="Start Date">
-        <div class="slds-truncate" title="{{ build.get_time_start }}">{{ build.get_time_start }}</div>
-      </td>
-      <td data-label="End Date">
-        <div class="slds-truncate" title="{{ build.get_time_end }}">{{ build.get_time_end }}</div>
-      </td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
-{% include 'build/build_pagination.html' %}
+
+{% include 'build/build_table.html' %}
 
 {% endblock %}

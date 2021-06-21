@@ -12,7 +12,7 @@ from metaci.cumulusci.exceptions import LoggerException
 
 
 class LogStream(object):
-    """ File-like interface to Django model. """
+    """File-like interface to Django model."""
 
     def __init__(self, model):
         if not hasattr(model, "log"):
@@ -36,16 +36,16 @@ class LogStream(object):
 
 
 class LogHandler(logging.StreamHandler):
-    """ Handle log messages. """
+    """Handle log messages."""
 
     def __init__(self, model):
-        """ Initialize the handler. """
+        """Initialize the handler."""
         super(LogHandler, self).__init__()
         self.stream = LogStream(model)
 
 
 def init_logger(model):
-    """ Initialize the logger. """
+    """Initialize the logger."""
 
     logger = logging.getLogger("cumulusci")
 

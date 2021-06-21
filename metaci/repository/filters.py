@@ -1,6 +1,6 @@
 import rest_framework_filters as filters
-from metaci.repository.models import Branch
-from metaci.repository.models import Repository
+
+from metaci.repository.models import Branch, Repository
 
 
 class RepositoryRelatedFilter(filters.FilterSet):

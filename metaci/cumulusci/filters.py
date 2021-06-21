@@ -1,7 +1,6 @@
 import rest_framework_filters as filters
-from metaci.cumulusci.models import Org
-from metaci.cumulusci.models import ScratchOrgInstance
-from metaci.cumulusci.models import Service
+
+from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.repository.filters import RepositoryRelatedFilter
 from metaci.repository.models import Repository
 
@@ -13,7 +12,7 @@ class OrgRelatedFilter(filters.FilterSet):
 
     class Meta:
         model = Org
-        fields = {"json": ["icontains"], "name": ["exact"], "scratch": ["exact"]}
+        fields = {"name": ["exact"], "scratch": ["exact"]}
 
 
 class OrgFilter(OrgRelatedFilter):
@@ -44,7 +43,7 @@ class ScratchOrgInstanceFilter(ScratchOrgInstanceRelatedFilter):
 class ServiceRelatedFilter(filters.FilterSet):
     class Meta:
         model = Org
-        fields = {"json": ["icontains"], "name": ["exact"]}
+        fields = {"name": ["exact"]}
 
 
 class ServiceFilter(OrgRelatedFilter):

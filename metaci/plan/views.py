@@ -1,12 +1,22 @@
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 
 from metaci.build.utils import view_queryset
-from metaci.plan.models import Plan, PlanRepository
 from metaci.plan.forms import RunPlanForm
+from metaci.plan.models import Plan, PlanRepository
 from metaci.repository.models import Repository
+
+
+def can_run_plan(user, plan_id):
+    """Checks that the user is logged in and has needed permission"""
+    can_run = False
+    if (
+        Plan.objects.for_user(user, "plan.run_plan").filter(id=plan_id).count()
+        and user.is_authenticated
+    ):
+        can_run = True
+    return can_run
 
 
 def plan_list(request):
@@ -20,8 +30,9 @@ def plan_detail(request, plan_id):
 
     query = {"plan": plan}
     builds = view_queryset(request, query)
+    can_run = can_run_plan(request.user, plan_id)
 
-    context = {"builds": builds, "plan": plan}
+    context = {"builds": builds, "plan": plan, "can_run_plan": can_run}
     return render(request, "plan/detail.html", context=context)
 
 
@@ -32,24 +43,24 @@ def plan_detail_repo(request, plan_id, repo_owner, repo_name):
     )
     query = {"planrepo": planrepo}
     builds = view_queryset(request, query)
+    can_run = can_run_plan(request.user, plan_id)
 
     context = {
         "builds": builds,
         "plan": planrepo.plan,
         "planrepo": planrepo,
         "repo": planrepo.repo,
+        "can_run_plan": can_run,
     }
     return render(request, "plan/plan_repo_detail.html", context=context)
 
 
 def plan_run(request, plan_id):
     plan = get_object_or_404(Plan, id=plan_id)
-    if (
-        not Plan.objects.for_user(request.user, "plan.run_plan")
-        .filter(id=plan_id)
-        .count()
-    ):
+
+    if not can_run_plan(request.user, plan_id):
         raise PermissionDenied("You are not authorized to run this plan")
+
     context = {"plan": plan, "planrepos": plan.planrepository_set.should_run().all()}
     return render(request, "plan/run_select_repo.html", context=context)
 
@@ -61,7 +72,8 @@ def plan_run_repo(request, plan_id, repo_owner, repo_name):
     planrepo = get_object_or_404(
         PlanRepository, plan_id=plan.id, repo_id=repo.id, active=True, plan__active=True
     )
-    if not request.user.has_perm("plan.run_plan", planrepo):
+
+    if not can_run_plan(request.user, plan_id):
         raise PermissionDenied("You are not authorized to run this plan")
 
     if request.method == "POST":

@@ -1,4 +1,5 @@
 from django import dispatch
 
 # Sent whenever a build completes
-build_complete = dispatch.Signal(providing_args=['build', 'status'])
+# provided signal args: 'build', 'status'
+build_complete = dispatch.Signal()

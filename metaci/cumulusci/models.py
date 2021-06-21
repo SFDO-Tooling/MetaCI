@@ -1,16 +1,9 @@
-from __future__ import unicode_literals
-
-import json
-from calendar import timegm
-from datetime import datetime
-from urllib.parse import urljoin
-
-import jwt
-import requests
 from cumulusci.core.config import OrgConfig, ScratchOrgConfig
+from cumulusci.oauth.salesforce import jwt_session
 from django.apps import apps
 from django.conf import settings
 from django.core.cache import cache
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
@@ -19,29 +12,7 @@ from django.utils.dateparse import parse_datetime
 from simple_salesforce import Salesforce as SimpleSalesforce
 from simple_salesforce.exceptions import SalesforceError
 
-
-def jwt_session(url=None, username=None):
-    if url is None:
-        url = settings.SF_PROD_LOGIN_URL
-
-    payload = {
-        "alg": "RS256",
-        "iss": settings.SFDX_CLIENT_ID,
-        "sub": username,
-        "aud": url,  # jwt aud is NOT mydomain
-        "exp": timegm(datetime.utcnow().utctimetuple()),
-    }
-    encoded_jwt = jwt.encode(payload, settings.SFDX_HUB_KEY, algorithm="RS256")
-    data = {
-        "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-        "assertion": encoded_jwt,
-    }
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    auth_url = urljoin(url, "services/oauth2/token")
-    response = requests.post(url=auth_url, data=data, headers=headers)
-    response.raise_for_status()
-
-    return response.json()
+from ..fields import EncryptedJSONField
 
 
 def sf_session(jwt):
@@ -79,7 +50,13 @@ class OrgQuerySet(models.QuerySet):
 
 class Org(models.Model):
     name = models.CharField(max_length=255)
-    json = models.TextField()
+    configuration_item = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Set when integrating with an external system for change traffic control.",
+    )
+    json = EncryptedJSONField(encoder=DjangoJSONEncoder)
     scratch = models.BooleanField(default=False)
     repo = models.ForeignKey(
         "repository.Repository", related_name="orgs", on_delete=models.CASCADE
@@ -91,20 +68,18 @@ class Org(models.Model):
         ordering = ["name", "repo__owner", "repo__name"]
 
     def __str__(self):
-        return "{}: {}".format(self.repo.name, self.name)
+        return f"{self.repo.name}: {self.name}"
 
     def get_absolute_url(self):
         return reverse("org_detail", kwargs={"org_id": self.id})
 
     def get_org_config(self):
-        org_config = json.loads(self.json)
-
-        return OrgConfig(org_config, self.name)
+        return OrgConfig(self.json, self.name)
 
     @property
     def lock_id(self):
         if not self.scratch:
-            return "metaci-org-lock-{}".format(self.id)
+            return f"metaci-org-lock-{self.id}"
 
     @property
     def is_locked(self):
@@ -139,6 +114,8 @@ class ExpiredOrgManager(models.Manager):
 
 
 class ScratchOrgInstance(models.Model):
+    id: int
+
     org = models.ForeignKey(
         "cumulusci.Org", related_name="instances", on_delete=models.PROTECT
     )
@@ -154,7 +131,7 @@ class ScratchOrgInstance(models.Model):
     sf_org_id = models.CharField(max_length=32)
     deleted = models.BooleanField(default=False)
     delete_error = models.TextField(null=True, blank=True)
-    json = models.TextField()
+    json = EncryptedJSONField(encoder=DjangoJSONEncoder)
     time_created = models.DateTimeField(auto_now_add=True)
     time_deleted = models.DateTimeField(null=True, blank=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
@@ -168,7 +145,7 @@ class ScratchOrgInstance(models.Model):
             return self.username
         if self.sf_org_id:
             return self.sf_org_id
-        return "{}: {}".format(self.org, self.id)
+        return f"{self.org}: {self.id}"
 
     def get_absolute_url(self):
         return reverse(
@@ -188,12 +165,19 @@ class ScratchOrgInstance(models.Model):
         return self._get_org_config()
 
     def _get_org_config(self):
-        org_config = json.loads(self.json)
+        org_config = self.json.copy()
         org_config["date_created"] = parse_datetime(org_config["date_created"])
         return ScratchOrgConfig(org_config, self.org.name)
 
     def get_jwt_based_session(self):
-        return jwt_session(settings.SF_SANDBOX_LOGIN_URL, self.username)
+        config = self.json
+        return jwt_session(
+            settings.SFDX_CLIENT_ID,
+            settings.SFDX_HUB_KEY,
+            self.username,
+            url=config.get("instance_url") or settings.SF_SANDBOX_LOGIN_URL,
+            auth_url=settings.SF_SANDBOX_LOGIN_URL,
+        )
 
     def delete_org(self, org_config=None):
         if org_config is None:
@@ -201,13 +185,15 @@ class ScratchOrgInstance(models.Model):
 
         try:
             # connect to SFDX Hub
-            sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
+            sfjwt = jwt_session(
+                settings.SFDX_CLIENT_ID,
+                settings.SFDX_HUB_KEY,
+                settings.SFDX_HUB_USERNAME,
+            )
             sf = sf_session(sfjwt)
             # query ActiveScratchOrg via OrgId
             asos = sf.query(
-                "SELECT ID FROM ActiveScratchOrg WHERE ScratchOrg='{}'".format(
-                    self.sf_org_id
-                )
+                f"SELECT ID FROM ActiveScratchOrg WHERE ScratchOrg='{self.sf_org_id}'"
             )
             if asos["totalSize"] > 0:
                 aso = asos["records"][0]["Id"]
@@ -228,7 +214,7 @@ class ScratchOrgInstance(models.Model):
 
 class Service(models.Model):
     name = models.CharField(max_length=255)
-    json = models.TextField()
+    json = EncryptedJSONField(encoder=DjangoJSONEncoder)
 
     def __str__(self):
         return self.name

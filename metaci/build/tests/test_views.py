@@ -1,5 +1,3 @@
-from unittest import mock
-
 import pytest
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
@@ -113,8 +111,7 @@ class TestBuildViews:
 
         assert response.status_code == 200
 
-    @mock.patch("metaci.build.views.QATestingForm")
-    def test_build_detail_qa__post(self, QATestingForm, client, superuser, data):
+    def test_build_detail_qa__post(self, client, superuser, data):
         client.force_login(superuser)
         url = reverse("build_detail_qa", kwargs={"build_id": data["build"].id})
         response = client.post(url)

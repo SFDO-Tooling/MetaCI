@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # flake8: noqa: F405
 """
 Local settings
@@ -29,6 +28,8 @@ SECRET_KEY = env(
     "DJANGO_SECRET_KEY", default="!)_b4xaov6!0b^_=96*wh@p-9si4p0ho-@4&g7eija9gaxhmo!"
 )
 
+DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", cast=nl_separated_bytes_list)
+
 # Mail settings
 # ------------------------------------------------------------------------------
 
@@ -39,26 +40,6 @@ EMAIL_BACKEND = env(
     "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
 )
 
-
-# CACHING
-# ------------------------------------------------------------------------------
-REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=1)
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CONNECTION_POOL_CLASS": "redis.BlockingConnectionPool",
-            "CONNECTION_POOL_KWARGS": {
-                "max_connections": REDIS_MAX_CONNECTIONS,
-                "timeout": 20,
-            },
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
-            # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-        },
-    }
-}
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
@@ -97,7 +78,7 @@ INSTALLED_APPS += ("django_extensions",)
 
 # URL that handles the media served from MEDIA_ROOT, used for managing
 # stored files.
-# MEDIA_URL = 'https://s3.amazonaws.com/{}/'.format(AWS_STORAGE_BUCKET_NAME)
+# MEDIA_URL = f'https://s3.amazonaws.com/{AWS_STORAGE_BUCKET_NAME}/'
 # DEFAULT_FILE_STORAGE = 'config.settings.storage_backends.MediaStorage'
 
 # TESTING
@@ -120,17 +101,12 @@ ALLOWED_HOSTS = [
     "localhost:8080",
     "0.0.0.0",
 ]
-
+METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.LocalOneOffBuilder"
 # Site URL
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 # Github credentials
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", False)
-
-# Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID", default=None)
-CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET", default=None)
-CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL", default=None)
 
 AUTOSCALERS = {
     "local-app": {

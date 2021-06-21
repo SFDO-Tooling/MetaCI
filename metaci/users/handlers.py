@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from guardian.conf import settings as guardian_settings
+
 from metaci.users.models import User
 
 

@@ -1,9 +1,8 @@
-from django.conf.urls import url
+from django.conf.urls import re_path
 
 from metaci.hirefire import views
 
-
 urlpatterns = [
-    url(r"^test$", views.test, name="test"),
-    url(r"^(?P<token>.*)/info$", views.info, name="info"),
+    re_path(r"^test$", views.test, name="test"),
+    re_path(r"^(?P<token>.*)/info$", views.info, name="info"),
 ]

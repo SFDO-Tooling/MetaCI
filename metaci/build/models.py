@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 import os
 import shutil
@@ -30,14 +28,19 @@ from django.db import models
 from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
+from jinja2.sandbox import ImmutableSandboxedEnvironment
 
 from metaci.build.tasks import set_github_status
 from metaci.build.utils import format_log, set_build_info
 from metaci.cumulusci.config import MetaCIUniversalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
+from metaci.release.utils import (
+    send_release_webhook,
+    send_start_webhook,
+    send_stop_webhook,
+)
 from metaci.testresults.importer import import_test_results
-from metaci.testresults.robot_importer import import_robot_test_results
 from metaci.utils import generate_hash
 
 BUILD_STATUSES = (
@@ -81,6 +84,8 @@ FAIL_EXCEPTIONS = (
     RobotTestFailure,
 )
 
+jinja2_env = ImmutableSandboxedEnvironment()
+
 
 class GnarlyEncoder(DjangoJSONEncoder):
     """ A Very Gnarly Encoder that serializes a repr() if it can't get anything else.... """
@@ -121,6 +126,12 @@ class Build(models.Model):
     )
     commit = models.CharField(max_length=64)
     commit_message = models.TextField(null=True, blank=True)
+    commit_status = models.CharField(
+        max_length=140,
+        null=True,
+        blank=True,
+        help_text="Optional success message to be reported as a github commit status",
+    )
     tag = models.CharField(max_length=255, null=True, blank=True)
     pr = models.IntegerField(null=True, blank=True)
     plan = models.ForeignKey(
@@ -222,7 +233,7 @@ class Build(models.Model):
                 self.planrepo = matching_repo[0]
 
     def __str__(self):
-        return "{}: {} - {}".format(self.id, self.repo, self.commit)
+        return f"{self.id}: {self.repo} - {self.commit}"
 
     def get_log_html(self):
         if self.log:
@@ -232,7 +243,7 @@ class Build(models.Model):
         return reverse("build_detail", kwargs={"build_id": str(self.id)})
 
     def get_external_url(self):
-        url = "{}{}".format(settings.SITE_URL, self.get_absolute_url())
+        url = f"{settings.SITE_URL}{self.get_absolute_url()}"
         return url
 
     def get_build(self):
@@ -273,6 +284,9 @@ class Build(models.Model):
     def get_time_qa_end(self):
         return self.get_build_attr("time_qa_end")
 
+    def get_commit(self):
+        return f"{self.commit[:8]}"
+
     def set_status(self, status):
         build = self.get_build()
         build.status = status
@@ -280,7 +294,7 @@ class Build(models.Model):
 
     def flush_log(self):
         for handler in self.logger.handlers:
-            handler.stream.flush(force=True)
+            handler.stream.flush()
 
     @property
     def worker_id(self):
@@ -298,12 +312,11 @@ class Build(models.Model):
 
         if self.schedule:
             self.logger.info(
-                "Build triggered by {} schedule #{}".format(
-                    self.schedule.schedule, self.schedule.id
-                )
+                f"Build triggered by {self.schedule.schedule} schedule #{self.schedule.id}"
             )
 
         try:
+
             # Extract the repo to a temp build dir
             self.build_dir = self.checkout()
             self.root_dir = os.getcwd()
@@ -320,6 +333,15 @@ class Build(models.Model):
 
             # Look up or spin up the org
             org_config = self.get_org(project_config)
+            if (
+                self.org and self.org.name and self.org.name.lower() == "packaging"
+            ):  # Calling for any actions taken against packaging org
+                send_start_webhook(
+                    project_config,
+                    self.release,
+                    self.plan.role,
+                    self.org.configuration_item,
+                )
 
         except Exception as e:
             self.logger.error(str(e))
@@ -338,14 +360,14 @@ class Build(models.Model):
         try:
             self.org_api_version = org_config.latest_api_version
         except Exception as e:
-            self.logger.warn(f"Could not retrieve salesforce API version: {e}")
+            self.logger.warning(f"Could not retrieve salesforce API version: {e}")
 
         # Run flows
         try:
             flows = [flow.strip() for flow in self.plan.flows.split(",")]
             for flow in flows:
                 self.logger = init_logger(self)
-                self.logger.info("Running flow: {}".format(flow))
+                self.logger.info(f"Running flow: {flow}")
                 self.save()
 
                 build_flow = BuildFlow(
@@ -357,14 +379,10 @@ class Build(models.Model):
                 if build_flow.status != "success":
                     self.logger = init_logger(self)
                     self.logger.error(
-                        "Build flow {} completed with status {}".format(
-                            flow, build_flow.status
-                        )
+                        f"Build flow {flow} completed with status {build_flow.status}"
                     )
                     self.logger.error(
-                        "    {}: {}".format(
-                            build_flow.exception, build_flow.error_message
-                        )
+                        f"    {build_flow.exception}: {build_flow.error_message}"
                     )
                     set_build_info(
                         build,
@@ -380,9 +398,7 @@ class Build(models.Model):
                     return
                 else:
                     self.logger = init_logger(self)
-                    self.logger.info(
-                        "Build flow {} completed successfully".format(flow)
-                    )
+                    self.logger.info(f"Build flow {flow} completed successfully")
                     self.flush_log()
                     self.save()
 
@@ -410,6 +426,24 @@ class Build(models.Model):
         self.delete_build_dir()
         self.flush_log()
 
+        if (
+            self.org and self.org.name and self.org.name.lower() == "packaging"
+        ):  # Calling for any actions taken against packaging org
+            try:
+                send_stop_webhook(
+                    project_config,
+                    self.release,
+                    self.plan.role,
+                    self.org.configuration_item,
+                )
+            except Exception as err:
+                message = f"Error while sending implementation stop step webhook: {err}"
+                self.logger.error(message)
+                set_build_info(
+                    build, status="error", exception=message, time_end=timezone.now()
+                )
+                return
+
         if self.plan.role == "qa":
             set_build_info(
                 build,
@@ -423,15 +457,16 @@ class Build(models.Model):
     def checkout(self):
         # get the ref
         zip_content = BytesIO()
-        self.repo.github_api.archive("zipball", zip_content, ref=self.commit)
+        gh = self.repo.get_github_api()
+        gh.archive("zipball", zip_content, ref=self.commit)
         build_dir = tempfile.mkdtemp()
-        self.logger.info("-- Extracting zip to temp dir {}".format(build_dir))
+        self.logger.info(f"-- Extracting zip to temp dir {build_dir}")
         self.save()
         zip_file = zipfile.ZipFile(zip_content)
         zip_file.extractall(build_dir)
         # assume the zipfile has a single child dir with the repo
         build_dir = os.path.join(build_dir, os.listdir(build_dir)[0])
-        self.logger.info("-- Commit extracted to build dir: {}".format(build_dir))
+        self.logger.info(f"-- Commit extracted to build dir: {build_dir}")
         self.save()
 
         if self.plan.sfdx_config:
@@ -469,7 +504,7 @@ class Build(models.Model):
                     self.logger.warning(str(e))
                     self.logger.info(
                         "Retrying create scratch org "
-                        + "(retry {} of {})".format(attempt, retries)
+                        + f"(retry {attempt} of {retries})"
                     )
                     attempt += 1
                     continue
@@ -542,7 +577,7 @@ class Build(models.Model):
 
     def delete_build_dir(self):
         if hasattr(self, "build_dir"):
-            self.logger.info("Deleting build dir {}".format(self.build_dir))
+            self.logger.info(f"Deleting build dir {self.build_dir}")
             shutil.rmtree(self.build_dir)
             self.save()
 
@@ -575,14 +610,13 @@ class BuildFlow(models.Model):
     asset_hash = models.CharField(max_length=64, unique=True, default=generate_hash)
 
     def __str__(self):
-        return "{}: {} - {} - {}".format(
-            self.build.id, self.build.repo, self.build.commit, self.flow
-        )
+        return f"{self.build.id}: {self.build.repo} - {self.build.commit} - {self.flow}"
 
     def get_absolute_url(self):
-        return reverse(
-            "build_detail", kwargs={"build_id": str(self.build.id)}
-        ) + "#flow-{}".format(self.flow)
+        return (
+            reverse("build_detail", kwargs={"build_id": str(self.build.id)})
+            + f"#flow-{self.flow}"
+        )
 
     def get_log_html(self):
         if self.log:
@@ -603,6 +637,9 @@ class BuildFlow(models.Model):
         try:
             # Run the flow
             self.run_flow(project_config, org_config)
+
+            # Determine build commit status
+            self.set_commit_status()
 
             # Load test results
             self.load_test_results()
@@ -636,6 +673,9 @@ class BuildFlow(models.Model):
 
         flow_config = project_config.get_flow(self.flow)
 
+        # If it's a release build, pass the dates in
+        options = self._get_flow_options()
+
         callbacks = None
         if settings.METACI_FLOW_CALLBACK_ENABLED:
             from metaci.build.flows import MetaCIFlowCallback
@@ -644,11 +684,44 @@ class BuildFlow(models.Model):
 
         # Create the flow and handle initialization exceptions
         self.flow_instance = FlowCoordinator(
-            project_config, flow_config, name=self.flow, callbacks=callbacks
+            project_config,
+            flow_config,
+            name=self.flow,
+            options=options,
+            callbacks=callbacks,
         )
 
         # Run the flow
         return self.flow_instance.run(org_config)
+
+    def _get_flow_options(self) -> dict:
+        options = {}
+        if self.build.plan.role == "release" and self.build.release:
+            options["github_release_notes"] = {
+                "sandbox_date": self.build.release.sandbox_push_date,
+                "production_date": self.build.release.production_push_date,
+            }
+        if (
+            self.build.plan.role == "push_sandbox" and self.build.release
+        ):  # override lives in MetaCI
+            options["push_sandbox"] = {
+                "version": f"{self.build.release.version_number}",
+            }
+        if (
+            self.build.plan.role == "push_production" and self.build.release
+        ):  # override lives in MetaCI
+            options["push_all"] = {
+                "version": f"{self.build.release.version_number}",
+            }
+
+        return options
+
+    def set_commit_status(self):
+        if self.build.plan.commit_status_template:
+            template = jinja2_env.from_string(self.build.plan.commit_status_template)
+            message = template.render(results=self.flow_instance.results)
+            self.build.commit_status = message
+            self.build.save()
 
     def record_result(self):
         self.status = "success"
@@ -656,24 +729,10 @@ class BuildFlow(models.Model):
         self.save()
 
     def load_test_results(self):
-        has_results = False
+        """Import results from JUnit or test_results.json.
 
-        root_dir_robot_path = "{}/output.xml".format(self.root_dir)
-        # Load robotframework's output.xml if found
-        if os.path.isfile("output.xml"):
-            has_results = True
-            import_robot_test_results(self, "output.xml")
-
-        elif os.path.isfile(root_dir_robot_path):
-            # FIXME: Not sure why robot stopped writing into the cwd
-            # (build temp dir) but this should handle it so long as
-            # only one build runs at a time
-            has_results = True
-            try:
-                import_robot_test_results(self, root_dir_robot_path)
-            finally:
-                os.remove(root_dir_robot_path)
-
+        Robot Framework results are imported in MetaCIFlowCallback.post_task
+        """
         # Load JUnit
         results = []
         if self.build.plan.junit_path:
@@ -681,12 +740,9 @@ class BuildFlow(models.Model):
                 results.extend(self.load_junit(filename))
             if not results:
                 self.logger.warning(
-                    "No results found at JUnit path {}".format(
-                        self.build.plan.junit_path
-                    )
+                    f"No results found at JUnit path {self.build.plan.junit_path}"
                 )
         if results:
-            has_results = True
             import_test_results(self, results, "JUnit")
 
         # Load from test_results.json
@@ -705,16 +761,14 @@ class BuildFlow(models.Model):
                 pass
 
         if results:
-            has_results = True
             import_test_results(self, results, "Apex")
 
-        if has_results:
-            self.tests_total = self.test_results.count()
-            self.tests_pass = self.test_results.filter(outcome="Pass").count()
-            self.tests_fail = self.test_results.filter(
-                outcome__in=["Fail", "CompileFail"]
-            ).count()
-            self.save()
+        self.tests_total = self.test_results.count()
+        self.tests_pass = self.test_results.filter(outcome="Pass").count()
+        self.tests_fail = self.test_results.filter(
+            outcome__in=["Fail", "CompileFail"]
+        ).count()
+        self.save()
 
     def load_junit(self, filename):
         results = []
@@ -836,7 +890,7 @@ class FlowTask(models.Model):
     objects = FlowTaskManager()
 
     def __str__(self):
-        return "{}: {} - {}".format(self.build_flow_id, self.stepnum, self.path)
+        return f"{self.build_flow_id}: {self.stepnum} - {self.path}"
 
     class Meta:
         ordering = ["-build_flow", "stepnum"]

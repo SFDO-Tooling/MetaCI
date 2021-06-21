@@ -1,13 +1,11 @@
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Field
-from crispy_forms.layout import Fieldset
-from crispy_forms.layout import Layout
-from crispy_forms.layout import Submit
+from crispy_forms.layout import Field, Fieldset, Layout, Submit
 from django import forms
 from django.conf import settings
-from metaci.repository.models import Branch
+
 from metaci.build.models import Build
+from metaci.repository.models import Branch
 
 
 class RunPlanForm(forms.Form):
@@ -84,7 +82,7 @@ class RunPlanForm(forms.Form):
         )
 
     def _get_branch_choices(self):
-        gh_repo = self.repo.github_api
+        gh_repo = self.repo.get_github_api()
         choices = [(gh_repo.default_branch, gh_repo.default_branch)]
         for branch in gh_repo.branches():
             if branch.name != gh_repo.default_branch:
@@ -107,7 +105,7 @@ class RunPlanForm(forms.Form):
     def create_build(self):
         commit = self.cleaned_data.get("commit")
         if not commit:
-            gh_repo = self.repo.github_api
+            gh_repo = self.repo.get_github_api()
             gh_branch = gh_repo.branch(self.cleaned_data["branch"])
             commit = gh_branch.commit.sha
 
@@ -144,4 +142,10 @@ class RunPlanForm(forms.Form):
 
 
 def is_release_plan(plan):
-    return plan.role in ("release_deploy", "release", "release_test")
+    return plan.role in (
+        "release_deploy",
+        "release",
+        "release_test",
+        "push_sandbox",
+        "push_production",
+    )

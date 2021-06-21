@@ -6,6 +6,7 @@ process.env.BROWSERSLIST_CONFIG = './.browserslistrc';
 
 const path = require('path');
 
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
@@ -17,15 +18,19 @@ module.exports = {
   resolve: {
     modules: ['src/js', 'src/sass', 'static', 'node_modules'],
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    alias: {
+      '~img': path.join(__dirname, 'static', 'images'),
+    },
   },
   output: {
     publicPath: '/static/',
   },
   optimization: {
+    minimizer: ['...', new CssMinimizerPlugin()],
     runtimeChunk: 'single',
     splitChunks: {
       cacheGroups: {
-        vendor: {
+        defaultVendors: {
           name: 'vendors',
           test: /[\\/]node_modules[\\/](?!raven-js)/,
           chunks: 'all',
@@ -101,4 +106,7 @@ module.exports = {
       filename: 'testperf.html',
     }),
   ],
+  performance: {
+    hints: false,
+  },
 };

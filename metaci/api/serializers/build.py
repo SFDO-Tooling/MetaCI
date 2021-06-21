@@ -1,16 +1,12 @@
 from rest_framework import serializers
-from metaci.api.serializers.cumulusci import OrgSerializer
-from metaci.api.serializers.cumulusci import ScratchOrgInstanceSerializer
-from metaci.api.serializers.repository import BranchSerializer
-from metaci.api.serializers.repository import RepositorySerializer
+
+from metaci.api.serializers.cumulusci import OrgSerializer, ScratchOrgInstanceSerializer
 from metaci.api.serializers.plan import PlanSerializer
-from metaci.build.models import Build
-from metaci.build.models import BuildFlow
-from metaci.build.models import Rebuild
+from metaci.api.serializers.repository import BranchSerializer, RepositorySerializer
+from metaci.build.models import Build, BuildFlow, Rebuild
 from metaci.cumulusci.models import Org
 from metaci.plan.models import Plan
-from metaci.repository.models import Branch
-from metaci.repository.models import Repository
+from metaci.repository.models import Branch, Repository
 
 
 class BuildFlowSerializer(serializers.HyperlinkedModelSerializer):

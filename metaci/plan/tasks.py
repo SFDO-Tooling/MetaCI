@@ -1,5 +1,5 @@
-from django import db
 import django_rq
+from django import db
 
 from metaci.plan.models import PlanSchedule
 
@@ -14,21 +14,29 @@ def run_scheduled(schedule):
     schedules = PlanSchedule.objects.filter(schedule=schedule)
 
     log = []
-    log.append("Found {} {} schedules to run".format(schedules.count(), schedule))
+    log.append(f"Found {schedules.count()} {schedule} schedules to run")
 
     for sched in schedules:
         try:
             build = sched.run()
             log.append(
-                "Created build #{} from Plan {} on branch {}".format(
-                    build.id, sched.plan, sched.branch
-                )
+                f"Created build #{build.id} from Plan {sched.plan} on branch {sched.branch}"
             )
 
         except Exception as e:
-            log.append("Schedule {} failed with error:\n{}".format(sched, str(e)))
+            log.append(f"Schedule {sched} failed with error:\n{str(e)}")
 
     return "\n".join(log)
+
+
+@django_rq.job("short")
+def run_scheduled_monthly():
+    return run_scheduled("monthly")
+
+
+@django_rq.job("short")
+def run_scheduled_weekly():
+    return run_scheduled("weekly")
 
 
 @django_rq.job("short")

@@ -1,3 +1,3 @@
 worker_short_a: python manage.py metaci_rqworker short
 worker_short_b: python manage.py metaci_rqworker short
-worker_scheduler: python manage.py rqscheduler --queue short
+worker_scheduler: python manage.py metaci_rqscheduler --queue short

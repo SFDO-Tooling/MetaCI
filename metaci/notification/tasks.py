@@ -1,17 +1,21 @@
-import django_rq
 import time
+
+import django_rq
 from django import db
 from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.template.loader import get_template
-from metaci.users.models import User
+
 from metaci.build.models import Build
-from metaci.notification.models import RepositoryNotification
-from metaci.notification.models import BranchNotification
-from metaci.notification.models import PlanNotification
-from metaci.notification.models import PlanRepositoryNotification
+from metaci.notification.models import (
+    BranchNotification,
+    PlanNotification,
+    PlanRepositoryNotification,
+    RepositoryNotification,
+)
 from metaci.plan.models import PlanRepository
+from metaci.users.models import User
 
 
 def reset_database_connection():
@@ -76,7 +80,7 @@ def queue_build_notifications(build_id):
     for user_id in users:
         send_notification_message.delay(build_id, user_id)
 
-    return "Enqueued send of {} notification messages".format(len(users))
+    return f"Enqueued send of {len(users)} notification messages"
 
 
 @django_rq.job("short", timeout=60)
@@ -97,13 +101,7 @@ def send_notification_message(build_id, user_id):
 
     context = {"build": build, "log_lines": log_lines}
 
-    subject = "[{}] Build #{} of {} {} - {}".format(
-        build.repo.name,
-        build.id,
-        build.branch.name,
-        build.plan.name,
-        build.get_status().upper(),
-    )
+    subject = f"[{build.repo.name}] Build #{build.id} of {build.branch.name} {build.plan.name} - {build.get_status().upper()}"
     message = template_txt.render(context)
     html_message = template_html.render(context)
 

@@ -1,8 +1,10 @@
-import datetime
 import numbers
+import random
 
 import factory
 import factory.fuzzy
+from django.utils import timezone
+from faker import Faker
 
 from metaci.build.models import (
     BUILD_FLOW_STATUSES,
@@ -14,7 +16,7 @@ from metaci.build.models import (
 )
 from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.plan.models import Plan, PlanRepository, PlanSchedule
-from metaci.release.models import Release
+from metaci.release.models import ChangeCaseTemplate, Release
 from metaci.repository.models import Branch, Repository
 from metaci.testresults.models import (
     TestClass,
@@ -28,6 +30,8 @@ BUILD_STATUS_NAMES = (
     tuple(name for (name, label) in BUILD_STATUSES) + ("success",) * 7
 )  # weighted towards success!
 BUILD_FLOW_STATUS_NAMES = (name for (name, label) in BUILD_FLOW_STATUSES)
+
+fake = Faker()
 
 
 def do_logs():
@@ -45,8 +49,7 @@ def fake_name(prefix=None):
     from outside of the factory if you have a preference when you instantiate
     the class."""
     return factory.LazyAttribute(
-        lambda a: (getattr(a, "name_prefix", None) or prefix or "")
-        + factory.Faker("word").generate({})
+        lambda a: (getattr(a, "name_prefix", None) or prefix or "") + fake.word()
     )
 
 
@@ -57,6 +60,7 @@ class PlanFactory(factory.django.DjangoModelFactory):
 
     name_prefix = "Plan"
     name = fake_name()
+    role = "test"
 
 
 class RepositoryFactory(factory.django.DjangoModelFactory):
@@ -76,7 +80,7 @@ class OrgFactory(factory.django.DjangoModelFactory):
         model = Org
 
     repo = factory.SubFactory(RepositoryFactory)
-    json = "{}"
+    json = {}
 
 
 class ScratchOrgInstanceFactory(factory.django.DjangoModelFactory):
@@ -84,6 +88,7 @@ class ScratchOrgInstanceFactory(factory.django.DjangoModelFactory):
         model = ScratchOrgInstance
 
     org = factory.SubFactory(OrgFactory)
+    json = {}
 
 
 class PlanRepositoryFactory(factory.django.DjangoModelFactory):
@@ -98,7 +103,7 @@ class BranchFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Branch
 
-    name = factory.fuzzy.FuzzyChoice(["master", "branch1", "branch2"])
+    name = factory.fuzzy.FuzzyChoice(["main", "branch1", "branch2"])
     repo = factory.SubFactory(RepositoryFactory)
 
 
@@ -113,6 +118,7 @@ class BuildFactory(factory.django.DjangoModelFactory):
         lambda build: BranchFactory(repo=build.planrepo.repo)
     )
     status = factory.fuzzy.FuzzyChoice(BUILD_STATUS_NAMES)
+    commit = str(random.getrandbits(128))
 
 
 class BuildFlowFactory(factory.django.DjangoModelFactory):
@@ -124,12 +130,7 @@ class BuildFlowFactory(factory.django.DjangoModelFactory):
 
     flow = factory.fuzzy.FuzzyChoice(["rida", "andebb", "ttank", "tleft"])
     status = factory.fuzzy.FuzzyChoice(BUILD_FLOW_STATUS_NAMES)
-    time_end = (
-        datetime.datetime.utcnow()
-        .replace(tzinfo=datetime.timezone.utc)
-        .isoformat()
-        .split("T")[0]  # Area before the split
-    )
+    time_end = timezone.now()
 
 
 class TestClassFactory(factory.django.DjangoModelFactory):
@@ -231,6 +232,17 @@ class RebuildFactory(factory.django.DjangoModelFactory):
     status = factory.fuzzy.FuzzyChoice(BUILD_STATUS_NAMES)
 
 
+class ChangeCaseTemplateFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ChangeCaseTemplate
+
+    case_template_id = "1"
+
+
 class ReleaseFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Release
+
+    change_case_template = factory.SubFactory(ChangeCaseTemplateFactory)
+    repo = factory.SubFactory(RepositoryFactory)
+    git_tag = "release/1.0"

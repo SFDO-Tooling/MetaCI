@@ -1,10 +1,12 @@
 from unittest import mock
 
 import pytest
+from django.contrib.auth.models import Group
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 
-from metaci.fixtures.factories import BranchFactory
-from metaci.fixtures.factories import ReleaseFactory
+from metaci.fixtures.factories import BranchFactory, ReleaseFactory
+from metaci.plan.views import can_run_plan
 
 
 @pytest.mark.django_db
@@ -126,3 +128,18 @@ class TestPlanViews:
         )
         response = client.get(url)
         assert response.status_code == 403
+
+    def test_can_run_plan(self, client, data, user):
+        can_run = can_run_plan(user, data["plan"].id)
+        # not logged in and no perm
+        assert not can_run
+
+        client.force_login(user)
+        can_run = can_run_plan(user, data["plan"].id)
+        # logged in but no perm
+        assert not can_run
+
+        assign_perm("plan.run_plan", Group.objects.get(name="Public"), data["planrepo"])
+        can_run = can_run_plan(user, data["plan"].id)
+        # logged in with perm
+        assert can_run

@@ -1,11 +1,14 @@
-# -*- coding: utf-8 -*-
 """
 Test settings
 
 - Used to run tests fast on the continuous integration server and locally
 """
 
+from cryptography.fernet import Fernet
+
 from .base import *  # noqa
+
+INSTALLED_APPS += ("metaci.tests",)
 
 # DEBUG
 # ------------------------------------------------------------------------------
@@ -22,6 +25,8 @@ ALLOWED_HOSTS = ["testserver"]
 # Note: This key only used for development and testing.
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="CHANGEME!!!")
 
+DB_ENCRYPTION_KEYS = [Fernet.generate_key()]
+
 # Mail settings
 # ------------------------------------------------------------------------------
 EMAIL_HOST = "localhost"
@@ -30,25 +35,6 @@ EMAIL_PORT = 1025
 # In-memory email backend stores messages in django.core.mail.outbox
 # for unit testing purposes
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
-
-# CACHING
-# ------------------------------------------------------------------------------
-# Speed advantages of in-memory caching without having to run Memcached
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "",
-    }
-}
-
-# Use Redis for RQ queues instead of cache which uses LocMemCache
-RQ_QUEUES = {
-    "default": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
-    "high": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
-    "medium": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
-    "short": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 500, "AUTOCOMMIT": False},
-    "robot": {"URL": REDIS_URL, "DEFAULT_TIMEOUT": 7200, "AUTOCOMMIT": False},
-}
 
 
 # PASSWORD HASHING
@@ -71,11 +57,6 @@ TEMPLATES[0]["OPTIONS"]["loaders"] = [
 
 GITHUB_USERNAME = "TestUser"
 
-# Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = "1234567890"
-CONNECTED_APP_CLIENT_SECRET = "abcdefg1234567890"
-CONNECTED_APP_CALLBACK_URL = "http://localhost/callback"
-
 HEROKU_TOKEN = "BOGUS"
 HEROKU_APP_NAME = "testapp"
 
@@ -90,3 +71,6 @@ AUTOSCALERS = {
         "queues": ["default", "medium", "high"],
     }
 }
+
+METACI_LONG_RUNNING_BUILD_CONFIG = {"app_name": "test-app"}
+METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.LocalOneOffBuilder"

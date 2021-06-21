@@ -37,8 +37,9 @@ Copy the ``.env`` file to config/settings/.env::
     cp env.example config/settings/.env
 
 Edit this file to fill in values for the missing settings, especially
-for connecting to GitHub.
-
+for connecting to GitHub. Please see `<./docs/configuring.rst>`_
+for more details.
+ 
 Now run ``workon metaci`` to set those environment variables.
 
 Your ``PATH`` (and environment variables) will be updated when you
@@ -97,10 +98,6 @@ Run this command if you would like to populate the database with fake testing
 data:
 
     ./manage.py populate_db
-
-Run this command to create a necessary repeatable django-rq job in the database::
-
-    ./manage.py metaci_scheduled_jobs
 
 
 Creating A Superuser

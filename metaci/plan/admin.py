@@ -1,6 +1,7 @@
 from django.contrib import admin
-from metaci.plan.models import Plan, PlanRepository, PlanRepositoryTrigger, PlanSchedule
 from guardian.admin import GuardedModelAdmin
+
+from metaci.plan.models import Plan, PlanRepository, PlanRepositoryTrigger, PlanSchedule
 
 
 class PlanRepositoryInline(admin.TabularInline):
@@ -8,34 +9,26 @@ class PlanRepositoryInline(admin.TabularInline):
     extra = 1
 
 
+@admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
     list_display = ("name", "trigger", "role", "flows", "org", "regex", "active")
     list_filter = ("active", "trigger", "role", "org", "repos")
     inlines = [PlanRepositoryInline]
 
 
-admin.site.register(Plan, PlanAdmin)
-
-
+@admin.register(PlanRepository)
 class PlanRepositoryAdmin(GuardedModelAdmin):
     list_display = ("repo", "plan", "active")
     list_filter = ("repo", "plan", "active")
 
 
-admin.site.register(PlanRepository, PlanRepositoryAdmin)
-
-
+@admin.register(PlanRepositoryTrigger)
 class PlanRepositoryTriggerAdmin(GuardedModelAdmin):
     list_display = ("target_plan_repo", "source_plan_repo")
     list_filter = ("target_plan_repo", "source_plan_repo")
 
 
-admin.site.register(PlanRepositoryTrigger, PlanRepositoryTriggerAdmin)
-
-
+@admin.register(PlanSchedule)
 class PlanScheduleAdmin(GuardedModelAdmin):
     list_display = ("plan", "branch", "schedule")
     list_filter = ("plan", "branch", "schedule")
-
-
-admin.site.register(PlanSchedule, PlanScheduleAdmin)

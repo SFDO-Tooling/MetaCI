@@ -1,16 +1,22 @@
 import time
+import traceback
+import typing as T
 from collections import namedtuple
 
 import django_rq
+from cumulusci.core.utils import import_global
+from cumulusci.oauth.salesforce import jwt_session
 from django import db
 from django.conf import settings
 from django.core.cache import cache
+from django.utils import timezone
 from rq.exceptions import ShutDownImminentException
 
 from metaci.build.autoscaling import autoscale
 from metaci.build.exceptions import RequeueJob
 from metaci.build.signals import build_complete
-from metaci.cumulusci.models import Org, jwt_session, sf_session
+from metaci.build.utils import set_build_info
+from metaci.cumulusci.models import Org, sf_session
 from metaci.repository.utils import create_status
 
 ACTIVESCRATCHORGLIMITS_KEY = "metaci:activescratchorgs:limits"
@@ -27,7 +33,9 @@ def scratch_org_limits():
     if cached:
         return cached
 
-    sfjwt = jwt_session(username=settings.SFDX_HUB_USERNAME)
+    sfjwt = jwt_session(
+        settings.SFDX_CLIENT_ID, settings.SFDX_HUB_KEY, settings.SFDX_HUB_USERNAME
+    )
     limits = sf_session(sfjwt).limits()["ActiveScratchOrgs"]
     value = ActiveScratchOrgLimits(remaining=limits["Remaining"], max=limits["Max"])
     # store it for 65 seconds, enough til the next tick. we may want to tune this
@@ -89,7 +97,39 @@ def run_build(build_id, lock_id=None):
     return build.get_status()
 
 
-def start_build(build, lock_id=None):
+def dispatch_build(build, lock_id: str = None):
+    queue_name = build.plan.queue
+    if queue_name == "long-running":
+        return dispatch_one_off_build(build, lock_id)
+    else:
+        return dispatch_queued_build(build, lock_id)
+
+
+def dispatch_one_off_build(build, lock_id: str = None):
+    # parent functions are expecting something in this
+    # shape
+    class Result(T.NamedTuple):
+        id: T.Any
+
+    try:
+        job_id = launch_one_off_build_worker(build, lock_id)
+        build.log = build.log or ""
+        build.log += f"\nRunning build in context (dyno) {job_id}\n"
+        build.save()
+    except Exception as e:
+        set_build_info(
+            build,
+            status="error",
+            time_end=timezone.now(),
+            error_message=str(e),
+            exception=e.__class__.__name__,
+            traceback="".join(traceback.format_tb(e.__traceback__)),
+        )
+        raise e
+    return Result(job_id)
+
+
+def dispatch_queued_build(build, lock_id: str = None):
     queue = django_rq.get_queue(build.plan.queue)
     result = queue.enqueue(
         run_build, build.id, lock_id, job_timeout=build.plan.build_timeout
@@ -121,7 +161,7 @@ def check_queued_build(build_id):
     try:
         org = build.org or Org.objects.get(name=build.plan.org, repo=build.repo)
     except Org.DoesNotExist:
-        message = "Could not find org configuration for org {}".format(build.plan.org)
+        message = f"Could not find org configuration for org {build.plan.org}"
         build.log = message
         build.set_status("error")
         build.save()
@@ -138,10 +178,10 @@ def check_queued_build(build_id):
             build.log = msg
             build.save()
             return msg
-        res_run = start_build(build)
+        res_run = dispatch_build(build)
         return (
             "DevHub has scratch org capacity, running the build "
-            + "as task {}".format(res_run.id)
+            + f"as task {res_run.id}"
         )
     else:
         # For persistent orgs, use the cache to lock the org
@@ -149,21 +189,17 @@ def check_queued_build(build_id):
 
         if status is True:
             # Lock successful, run the build
-            res_run = start_build(build, org.lock_id)
-            return "Got a lock on the org, running as task {}".format(res_run.id)
+            res_run = dispatch_build(build, org.lock_id)
+            return f"Got a lock on the org, running as task {res_run.id}"
         else:
             # Failed to get lock, queue next check
             build.task_id_check = None
             build.set_status("waiting")
-            build.log = "Waiting on build #{} to complete".format(
-                cache.get(org.lock_id)
-            )
+            build.log = f"Waiting on build #{cache.get(org.lock_id)} to complete"
             build.save()
             return (
                 "Failed to get lock on org. "
-                + "{} has the org locked. Queueing next check.".format(
-                    cache.get(org.lock_id)
-                )
+                + f"{cache.get(org.lock_id)} has the org locked. Queueing next check."
             )
 
 
@@ -181,7 +217,7 @@ def check_waiting_builds():
         build.save()
 
     if builds:
-        return "Checked waiting builds: {}".format(builds)
+        return f"Checked waiting builds: {builds}"
     else:
         return "No queued builds to check"
 
@@ -212,7 +248,7 @@ def delete_scratch_orgs():
     if not count:
         return "No orgs found to delete"
 
-    return "Scheduled deletion attempts for {} orgs".format(count)
+    return f"Scheduled deletion attempts for {count} orgs"
 
 
 @django_rq.job("short")
@@ -223,12 +259,24 @@ def delete_scratch_org(org_instance_id):
     try:
         org = ScratchOrgInstance.objects.get(id=org_instance_id)
     except ScratchOrgInstance.DoesNotExist:
-        return "Failed: could not find ScratchOrgInstance with id {}".format(
-            org_instance_id
-        )
+        return f"Failed: could not find ScratchOrgInstance with id {org_instance_id}"
 
     org.delete_org()
     if org.deleted:
-        return "Deleted org instance #{}".format(org.id)
+        return f"Deleted org instance #{org.id}"
     else:
-        return "Failed to delete org instance #{}".format(org.id)
+        return f"Failed to delete org instance #{ord.id}"
+
+
+def launch_one_off_build_worker(build, lock_id: str):
+    """Immediately launch a one-off-build with env-appropriate autoscaler"""
+    config = settings.METACI_LONG_RUNNING_BUILD_CONFIG
+    assert isinstance(
+        config, dict
+    ), "METACI_LONG_RUNNING_BUILD_CONFIG should be a JSON-format dict"
+    autoscaler_class = import_global(settings.METACI_LONG_RUNNING_BUILD_CLASS)
+    autoscaler = autoscaler_class(config)
+    try:
+        return autoscaler.one_off_build(build.id, lock_id)
+    except Exception as e:
+        raise AssertionError(f"Cannot create one-off-build {e}") from e

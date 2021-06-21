@@ -1,8 +1,7 @@
 from rest_framework import serializers
+
 from metaci.api.serializers.repository import RepositorySerializer
-from metaci.cumulusci.models import Org
-from metaci.cumulusci.models import ScratchOrgInstance
-from metaci.cumulusci.models import Service
+from metaci.cumulusci.models import Org, ScratchOrgInstance, Service
 from metaci.repository.models import Repository
 
 

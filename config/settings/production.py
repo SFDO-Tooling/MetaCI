@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# flake8: noqa: F405
 """
 Production Configurations
 
@@ -10,14 +10,10 @@ Production Configurations
 
 
 """
-from __future__ import absolute_import, unicode_literals
-
 import json
+import ssl
 
 from .base import *  # noqa
-
-# from django.utils import six
-
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -25,6 +21,7 @@ from .base import *  # noqa
 # Raises ImproperlyConfigured exception if DJANGO_SECRET_KEY not in os.environ
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
+DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", cast=nl_separated_bytes_list)
 
 # This ensures that Django will be able to detect a secure connection
 # properly on Heroku.
@@ -36,8 +33,6 @@ INSTALLED_APPS += ("defender",)
 
 # Use Whitenoise to serve static files
 # See: https://whitenoise.readthedocs.io/
-WHITENOISE_MIDDLEWARE = ("whitenoise.middleware.WhiteNoiseMiddleware",)
-MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
 RAVEN_MIDDLEWARE = (
     "raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware",
 )
@@ -66,6 +61,7 @@ SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 X_FRAME_OPTIONS = "DENY"
+LANGUAGE_COOKIE_HTTPONLY = True
 
 # SITE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -90,23 +86,15 @@ AWS_STORAGE_BUCKET_NAME = env("DJANGO_AWS_STORAGE_BUCKET_NAME")
 AWS_AUTO_CREATE_BUCKET = True
 AWS_BUCKET_ACL = "private"
 AWS_DEFAULT_ACL = None
+AWS_S3_OBJECT_PARAMETERS = {}
+s3_sse = env("DJANGO_AWS_S3_ENCRYPTION", default=None)
+if s3_sse is not None:
+    AWS_S3_OBJECT_PARAMETERS["ServerSideEncryption"] = s3_sse
 
-# AWS_S3_CALLING_FORMAT = OrdinaryCallingFormat()
-
-# AWS cache settings, don't change unless you know what you're doing:
-# AWS_EXPIRY = 60 * 60 * 24 * 7
-
-# TODO See: https://github.com/jschneier/django-storages/issues/47
-# Revert the following and use str after the above-mentioned bug is fixed in
-# either django-storage-redux or boto
-# AWS_HEADERS = {
-#    'Cache-Control': six.b('max-age=%d, s-maxage=%d, must-revalidate' % (
-#        AWS_EXPIRY, AWS_EXPIRY))
-# }
 
 # URL that handles the media served from MEDIA_ROOT, used for managing
 # stored files.
-MEDIA_URL = "https://s3.amazonaws.com/{}/".format(AWS_STORAGE_BUCKET_NAME)
+MEDIA_URL = f"https://s3.amazonaws.com/{AWS_STORAGE_BUCKET_NAME}/"
 DEFAULT_FILE_STORAGE = "config.settings.storage_backends.MediaStorage"
 
 # Static Assets
@@ -166,26 +154,6 @@ DATABASES["default"] = env.db("DATABASE_URL")
 
 # CACHING
 # ------------------------------------------------------------------------------
-
-REDIS_MAX_CONNECTIONS = env.int("REDIS_MAX_CONNECTIONS", default=1)
-REDIS_LOCATION = "{0}/{1}".format(env("REDIS_URL", default="redis://127.0.0.1:6379"), 0)
-# Heroku URL does not pass the DB number, so we parse it in
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_LOCATION,
-        "OPTIONS": {
-            "CONNECTION_POOL_CLASS": "redis.BlockingConnectionPool",
-            "CONNECTION_POOL_KWARGS": {
-                "max_connections": REDIS_MAX_CONNECTIONS,
-                "timeout": 20,
-            },
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
-            # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-        },
-    }
-}
 
 
 # Logging configuration, heroku logfmt
@@ -261,6 +229,7 @@ HEROKU_APP_NAME = env("HEROKU_APP_NAME", default=None)
 
 if HEROKU_TOKEN and HEROKU_APP_NAME:
     METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.HerokuAutoscaler"
+    METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.HerokuOneOffBuilder"
 
 # Autoscalers are defined per METACI_APP
 AUTOSCALERS = json.loads(env("AUTOSCALERS", default="{}"))
@@ -277,7 +246,6 @@ if not AUTOSCALERS and HEROKU_APP_NAME:
         }
     }
 
-
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL")
 
@@ -286,13 +254,15 @@ SITE_URL = env("SITE_URL")
 FROM_EMAIL = env("FROM_EMAIL")
 
 # Salesforce OAuth Connected App credentials
-CONNECTED_APP_CLIENT_ID = env("CONNECTED_APP_CLIENT_ID")
-CONNECTED_APP_CLIENT_SECRET = env("CONNECTED_APP_CLIENT_SECRET")
-CONNECTED_APP_CALLBACK_URL = env("CONNECTED_APP_CALLBACK_URL")
-
 SFDX_CLIENT_ID = env("SFDX_CLIENT_ID")
 SFDX_HUB_KEY = env("SFDX_HUB_KEY")
 SFDX_HUB_USERNAME = env("SFDX_HUB_USERNAME")
 
 # django-defender configuration
 DEFENDER_REDIS_NAME = "default"
+
+if REDIS_LOCATION.startswith("rediss://"):
+    # Fix Redis errors with Heroku self-signed certificates
+    # See:
+    #   - https://github.com/jazzband/django-redis/issues/353
+    CACHES["default"]["OPTIONS"]["CONNECTION_POOL_KWARGS"] = {"ssl_cert_reqs": False}

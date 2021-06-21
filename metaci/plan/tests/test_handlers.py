@@ -1,10 +1,11 @@
 from unittest import mock
+
 from django.test import TestCase
 
-from metaci.build.signals import build_complete
-from metaci.repository.models import Branch, Repository
-from metaci.plan.models import Plan, PlanRepository, PlanRepositoryTrigger
 from metaci.build.models import Build
+from metaci.build.signals import build_complete
+from metaci.plan.models import Plan, PlanRepository, PlanRepositoryTrigger
+from metaci.repository.models import Branch, Repository
 
 
 class PlanHandlerTestCase(TestCase):
@@ -46,12 +47,12 @@ class PlanHandlerTestCase(TestCase):
             plan=self.target_plan, repo=self.target_repo
         )
 
-        self.branch = Branch.objects.create(repo=self.target_repo, name="master")
+        self.branch = Branch.objects.create(repo=self.target_repo, name="main")
 
         self.plan_repo_trigger = PlanRepositoryTrigger.objects.create(
             source_plan_repo=self.source_plan_repo,
             target_plan_repo=self.target_plan_repo,
-            branch="master",
+            branch="main",
         )
         self.build = Build.objects.create(
             repo=self.source_repo, planrepo=self.source_plan_repo, plan=self.source_plan

@@ -11,16 +11,8 @@
     "github"
   ],
   "env": {
-    "CONNECTED_APP_CALLBACK_URL": {
-      "description": "The callback url configured for the Connected App.  You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
-      "value": ""
-    },
-    "CONNECTED_APP_CLIENT_ID": {
-      "description": "The Client ID of the Salesforce Connected App.  You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
-      "value": ""
-    },
-    "CONNECTED_APP_CLIENT_SECRET": {
-      "description": "The Client Secret of the Salesforce Connected App. You should be able to get these values from the command `cumulusci2 org connected_app` in your locally configured instance of CumulusCI",
+    "DB_ENCRYPTION_KEYS": {
+      "description": "Encryption key for secrets stored in the database. Generate a key using cryptography.fernet.Fernet.generate_key()",
       "value": ""
     },
     "DJANGO_ALLOWED_HOSTS": {
@@ -61,6 +53,14 @@
     "GITHUB_WEBHOOK_SECRET": {
       "description": "The url for handling Github webhooks.  Ex: https://<app-name>.herokuapp.com/webhook/github",
       "generator": "secret"
+    },
+    "GITHUB_CLIENT_ID": {
+      "description": "Client ID of your GitHub app",
+      "value": ""
+    },
+    "GITHUB_CLIENT_SECRET": {
+      "description": "Client Secret of your GitHub app",
+      "value": ""
     },
     "HIREFIRE_TOKEN": {
       "description": "The token for integrating with Hirefire.io for auto-scaling worker dynos based on queued/running builds",
@@ -142,7 +142,7 @@
         "heroku-redis:in-dyno"
       ],
       "scripts": {
-        "test-setup": "pip install --upgrade -r requirements/test.txt",
+        "test-setup": "pip install --upgrade -r requirements/dev.txt",
         "test": "./heroku_ci.sh"
       },
       "env": {

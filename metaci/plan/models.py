@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import re
 
 import yaml
@@ -13,7 +11,12 @@ from guardian.shortcuts import get_objects_for_user
 from metaci.build.models import Build
 from metaci.repository.models import Branch, Repository
 
-TRIGGER_TYPES = (("manual", "Manual"), ("commit", "Commit"), ("tag", "Tag"))
+TRIGGER_TYPES = (
+    ("manual", "Manual"),
+    ("commit", "Commit"),
+    ("status", "Commit Status"),
+    ("tag", "Tag"),
+)
 
 BUILD_ROLES = (
     ("beta_release", "Beta Release"),
@@ -22,6 +25,8 @@ BUILD_ROLES = (
     ("feature", "Feature Test"),
     ("feature_robot", "Feature Test Robot"),
     ("other", "Other"),
+    ("push_sandbox", "Push Sandbox"),
+    ("push_production", "Push Production"),
     ("qa", "QA Org"),
     ("release_deploy", "Release Deploy"),
     ("release", "Release"),
@@ -40,6 +45,7 @@ QUEUES = (
     ("medium", "medium priority"),
     ("high", "high priority"),
     ("robot", "robot tests"),
+    ("long-running", "long-running"),
 )
 
 
@@ -47,7 +53,7 @@ def validate_yaml_field(value):
     try:
         yaml.safe_load(value)
     except yaml.YAMLError as err:
-        raise ValidationError("Error parsing additional YAML: {}".format(err))
+        raise ValidationError(f"Error parsing additional YAML: {err}")
 
 
 class PlanQuerySet(models.QuerySet):
@@ -82,7 +88,18 @@ class Plan(models.Model):
     regex = models.CharField(max_length=255, null=True, blank=True)
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
-    context = models.CharField(max_length=255, null=True, blank=True)
+    context = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="If set, builds of this plan will update the commit status in GitHub using this context.",
+    )
+    commit_status_template = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Template for the commit message set after a successful build.",
+    )
     active = models.BooleanField(default=True)
     keep_org_on_error = models.BooleanField(default=False)
     keep_org_on_fail = models.BooleanField(default=False)
@@ -101,6 +118,12 @@ class Plan(models.Model):
     class Meta:
         ordering = ["name", "active", "context"]
 
+    def clean(self):
+        if self.trigger != "manual" and not self.regex:
+            raise ValidationError(
+                "Plans with a non-manual trigger type must also specify a regex."
+            )
+
     def get_absolute_url(self):
         return reverse("plan_detail", kwargs={"plan_id": self.id})
 
@@ -111,59 +134,74 @@ class Plan(models.Model):
         for repo in self.repos.all():
             yield repo
 
-    def check_push(self, push):
+    def check_github_event(self, event, payload):
         run_build = False
         commit = None
         commit_message = None
 
-        # Handle commit events
-        if self.trigger == "commit":
-            # Check if the event was triggered by a commit
-            if not push["ref"].startswith("refs/heads/"):
-                return run_build, commit, commit_message
-            branch = push["ref"][11:]
+        if event == "push":
+            # Handle commit events
+            if self.trigger == "commit":
+                # Check if the event was triggered by a commit
+                if not payload["ref"].startswith("refs/heads/"):
+                    return run_build, commit, commit_message
+                branch = payload["ref"][11:]
 
-            # Check the branch against regex
-            if not re.match(self.regex, branch):
+                # Check the branch against regex
+                if not re.match(self.regex, branch):
+                    return run_build, commit, commit_message
+
+                run_build = True
+                commit = payload["after"]
+                if commit == "0000000000000000000000000000000000000000":
+                    run_build = False
+                    commit = None
+                    return run_build, commit, commit_message
+
+                for commit_info in payload.get("commits", []):
+                    if commit_info["id"] == commit:
+                        commit_message = commit_info["message"]
+                        break
+
+                # Skip build if commit message contains [ci skip]
+                if commit_message and "[ci skip]" in commit_message:
+                    run_build = False
+                    commit = None
+
+            # Handle tag events
+            elif self.trigger == "tag":
+                # Check if the event was triggered by a tag
+                if not payload["ref"].startswith("refs/tags/"):
+                    return run_build, commit, commit_message
+                tag = payload["ref"][10:]
+
+                # Check the tag against regex
+                if not re.match(self.regex, tag):
+                    return run_build, commit, commit_message
+
+                run_build = True
+                commit = payload["head_commit"]["id"]
+
+        elif (
+            event == "status"
+            and self.trigger == "status"
+            and payload["state"] == "success"
+        ):
+            if not re.match(self.regex, payload["context"]):
                 return run_build, commit, commit_message
 
             run_build = True
-            commit = push["after"]
-            if commit == "0000000000000000000000000000000000000000":
-                run_build = False
-                commit = None
-                return run_build, commit, commit_message
-
-            for commit_info in push.get("commits", []):
-                if commit_info["id"] == commit:
-                    commit_message = commit_info["message"]
-                    break
-
-            # Skip build if commit message contains [ci skip]
-            if commit_message and "[ci skip]" in commit_message:
-                run_build = False
-                commit = None
-            return run_build, commit, commit_message
-
-        # Handle tag events
-        elif self.trigger == "tag":
-            # Check if the event was triggered by a tag
-            if not push["ref"].startswith("refs/tags/"):
-                return run_build, commit, commit_message
-            tag = push["ref"][10:]
-
-            # Check the tag against regex
-            if not re.match(self.regex, tag):
-                return run_build, commit, commit_message
-
-            run_build = True
-            commit = push["head_commit"]["id"]
-            return run_build, commit, commit_message
+            commit = payload["sha"]
 
         return run_build, commit, commit_message
 
 
-SCHEDULE_CHOICES = (("daily", "Daily"), ("hourly", "Hourly"))
+SCHEDULE_CHOICES = (
+    ("daily", "Daily"),
+    ("hourly", "Hourly"),
+    ("weekly", "Weekly"),
+    ("monthly", "Monthly"),
+)
 
 
 class PlanRepositoryQuerySet(models.QuerySet):
@@ -205,7 +243,7 @@ class PlanRepository(models.Model):
         )
 
     def __str__(self):
-        return "[{}] {}".format(self.repo, self.plan)
+        return f"[{self.repo}] {self.plan}"
 
     def get_absolute_url(self):
         return reverse(
@@ -245,7 +283,7 @@ class PlanRepositoryTrigger(models.Model):
         verbose_name_plural = "Plan Repository Triggers"
 
     def _get_commit(self):
-        repo = self.target_plan_repo.repo.github_api
+        repo = self.target_plan_repo.repo.get_github_api()
         branch = repo.branch(self.branch)
         commit = branch.commit.sha
         return commit
@@ -282,7 +320,7 @@ class PlanSchedule(models.Model):
             repo=self.branch.repo,
             plan=self.plan,
             branch=self.branch,
-            commit=self.branch.github_api.commit.sha,
+            commit=self.branch.get_github_api().commit.sha,
             schedule=self,
             build_type="scheduled",
         )

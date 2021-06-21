@@ -129,7 +129,7 @@
     {% if assets %}
       {% for asset in assets %}
       <li>
-        <a href="/tests/{{ build_flow.build.id }}/{{ build_flow.flow }}/download-asset/{{ asset.category }}">{{ asset.category }}</a>
+        <a href="/tests/{{ build_flow.build.id }}/{{ build_flow.flow }}/download-asset/{{ asset.id }}">{{ asset.category }}</a>
       </li>
       {% endfor %}
     {% else %}

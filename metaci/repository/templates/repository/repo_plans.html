@@ -1,38 +1,47 @@
 {% extends 'layout_full.html' %}
 
-{% block layout_parent_link %}<a href="/repo">Repos</a>{% endblock %}
+{% block layout_header_text %}
+  <div class="slds-page-header__row">
+    <div class="slds-text-body_regular">
+      Repository
+    </div>
+  </div>
+  {{ repo }}
+{% endblock %}
 
-{% block layout_header_text %}{{ repo }}: Plans{% endblock %}
-
-{% block layout_header_details %}
-<ul class="slds-grid slds-page-header__detail-row">
-  <li class="slds-page-header__detail-block">
-    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">URL</p>
-    <p class="slds-text-body--regular slds-truncate" title="{{ repo.url }}">
-      <a href="{{ repo.url }}" target="_blank">{{ repo.url }}</a>
-    </p>
-  </li>
-</ul>
+{% block layout_header_buttons %}
+  <ul class="slds-button-group-list">
+    <li>
+      <a href="{{ repo.url }}" target="_blank">
+        <button class="slds-button slds-button_outline-brand">View Repo in GitHub</button>
+      </a>
+    </li>
+  </ul>
 {% endblock %}
 
 {% block layout_body %}
 
 <div class="slds-tabs--default">
   <ul class="slds-tabs--default__nav" role="tablist">
-    <li class="slds-tabs--default__item" title="Builds" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}"
-        role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Latest
+    <li class="slds-tabs--default__item" title="Builds" role="presentation"><a class="slds-tabs--default__link"
+        href="{{ repo.get_absolute_url }}" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1"
+        id="tab-default-1__item">Latest
         Builds</a></li>
-    <li class="slds-tabs--default__item" title="Branches" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/branches"
-        role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Branches</a></li>
-    <li class="slds-tabs--default__item slds-active" title="Plans" role="presentation"><a class="slds-tabs--default__link"
-        href="{{ repo.get_absolute_url }}/plans" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-3"
-        id="tab-default-3__item">Plans</a></li>
-    <li class="slds-tabs--default__item" title="Orgs" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/orgs"
-        role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-4" id="tab-default-4__item">Orgs</a></li>
-    <li class="slds-tabs--default__item" title="Perf" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/perf" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-5" id="tab-default-5__item">Perf (Beta)</a></li>
-    <li class="slds-tabs--default__item" title="Robot Results" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/results" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-6" id="tab-default-6__item">Robot Results</a></li>
+    <li class="slds-tabs--default__item" title="Branches" role="presentation"><a class="slds-tabs--default__link"
+        href="{{ repo.get_absolute_url }}/branches" role="tab" tabindex="-1" aria-selected="false"
+        aria-controls="tab-default-2" id="tab-default-2__item">Branches</a></li>
+    <li class="slds-tabs--default__item slds-active" title="Plans" role="presentation"><a
+        class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/plans" role="tab" tabindex="-1"
+        aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item">Plans</a></li>
+    <li class="slds-tabs--default__item" title="Orgs" role="presentation"><a class="slds-tabs--default__link"
+        href="{{ repo.get_absolute_url }}/orgs" role="tab" tabindex="-1" aria-selected="false"
+        aria-controls="tab-default-4" id="tab-default-4__item">Orgs</a></li>
+    <li class="slds-tabs--default__item" title="Perf" role="presentation"><a class="slds-tabs--default__link"
+        href="{{ repo.get_absolute_url }}/perf" role="tab" tabindex="-1" aria-selected="false"
+        aria-controls="tab-default-5" id="tab-default-5__item">Perf (Beta)</a></li>
+    <!-- <li class="slds-tabs--default__item" title="Robot Results" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/results" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-6" id="tab-default-6__item">Robot Results</a></li> -->
     <!-- <li class="slds-tabs--default__item" title="Tests" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/tests" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-5" id="tab-default-5__item">Tests</a></li> -->
-      </ul>
+  </ul>
   <div id="tab-default-3" class="slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-3__item">
 
     <table class="slds-table slds-table--bordered slds-table--cell-buffer">

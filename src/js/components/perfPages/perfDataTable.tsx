@@ -12,6 +12,26 @@ import { LoadingStatus, PerfDataState } from 'store/perfdata/reducer';
 import { ServerDataFetcher } from './perfPage';
 import { QueryParamHelpers } from './perfTableUtils';
 
+interface SpinnerProps {
+  status: LoadingStatus;
+}
+
+const PerfDataTableSpinner = ({ status }: SpinnerProps) => {
+  if (status === 'LOADING') {
+    return (
+      <Spinner
+        size="small"
+        variant="base"
+        assistiveText={{ label: 'Small spinner' }}
+      />
+    );
+  }
+  return null;
+};
+PerfDataTableSpinner.propTypes = {
+  status: PropTypes.string.isRequired,
+};
+
 interface Props {
   fetchServerData: ServerDataFetcher;
   queryparams: QueryParamHelpers;
@@ -24,7 +44,7 @@ const PerfDataTable = ({
   items,
   perfState,
   queryparams,
-}: Props): React.ReactNode => {
+}: Props) => {
   if (perfState && perfState.status === 'ERROR') {
     const message =
       get(perfState, 'reason.reason.detail') ||
@@ -115,7 +135,7 @@ const PerfDataTable = ({
   const perfDataColumns = () =>
     columns().map(([name, label]: [string, string]) => {
       let isSorted = false;
-      let sortDirection: string | null = null;
+      let sortDirection: 'desc' | 'asc' | null = null;
 
       if (queryparams.get('o') === name) {
         isSorted = true;
@@ -163,26 +183,6 @@ const PerfDataTable = ({
       </div>
     </div>
   );
-};
-
-interface SpinnerProps {
-  status: LoadingStatus;
-}
-
-const PerfDataTableSpinner = ({ status }: SpinnerProps) => {
-  if (status === 'LOADING') {
-    return (
-      <Spinner
-        size="small"
-        variant="base"
-        assistiveText={{ label: 'Small spinner' }}
-      />
-    );
-  }
-  return null;
-};
-PerfDataTableSpinner.propTypes = {
-  status: PropTypes.string.isRequired,
 };
 
 export default PerfDataTable;

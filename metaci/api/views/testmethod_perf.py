@@ -18,7 +18,7 @@ thirty_days_ago = datetime.now() - timedelta(days=30)
 class DEFAULTS:
     page_size = 50
     max_page_size = 100
-    branch = "master"
+    branch = "main"
     daterange_after = thirty_days_ago.isoformat("T").split("T")[0]
 
 

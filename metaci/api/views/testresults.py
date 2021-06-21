@@ -1,10 +1,9 @@
 import django_filters.rest_framework
-
-from .testmethod_perf import BuildFlowFilterSet, TestMethodPerfFilterSet
+from django.db.models import F
 
 from metaci.testresults.models import FieldType
 
-from django.db.models import F
+from .testmethod_perf import BuildFlowFilterSet, TestMethodPerfFilterSet
 
 
 class TestMethodResultFilterSet(

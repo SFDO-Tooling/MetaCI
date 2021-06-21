@@ -1,5 +1,6 @@
-from rest_framework.reverse import reverse
 import unittest
+
+from rest_framework.reverse import reverse
 
 
 class TestURLReversals(unittest.TestCase):

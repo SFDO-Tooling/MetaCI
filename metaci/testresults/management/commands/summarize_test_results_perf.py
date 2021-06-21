@@ -4,7 +4,6 @@ from metaci.testresults.models import TestResultPerfWeeklySummary
 
 
 class Command(BaseCommand):
-    # NOTE: This should only be run at heroku postdeploy stage
     help = "Build rows in testresult_perfsummaries table for a single date"
 
     def add_arguments(self, parser):

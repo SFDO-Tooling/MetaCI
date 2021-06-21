@@ -1,7 +1,7 @@
 from rest_framework import serializers
+
 from metaci.api.serializers.repository import RepositorySerializer
-from metaci.plan.models import Plan
-from metaci.plan.models import PlanRepository
+from metaci.plan.models import Plan, PlanRepository
 from metaci.repository.models import Repository
 
 

@@ -4,8 +4,8 @@ import { assertUIData } from '@/api/testmethod_perf_UI_JSON_schema';
 import { assertPerfData } from '@/api/testmethod_perfdata_JSON_schema';
 import * as actions from '@/store/perfdata/actions';
 
-import testmethod_perf_UI_data from '../../api/testmethod_perf_UI.json';
 import testmethod_perf_data from '../../api/testmethod_perf.json';
+import testmethod_perf_UI_data from '../../api/testmethod_perf_UI.json';
 import { storeWithApi } from './../../utils';
 
 describe('perfRESTFetch', () => {

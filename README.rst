@@ -53,35 +53,12 @@ You can also fork the CumulusCI-Test repository and use that as a demo since it 
 
 Getting Started
 ---------------
+MetaCI can be run locally or configured for use on Heroku.
+For local setup see `running <https://github.com/SFDO-Tooling/MetaCI/blob/main/docs/running.rst>`_.
 
-The recommended way to deploy and configure `MetaCI` is via the `MetaCI-CLI` project which can access your local CumulusCI project configurations including repo info and org configs to quickly get you up and running with `MetaCI`.
-
-Full documentation on launching and configuring `MetaCI` on Heroku using the `MetaCI-CLI`:
-http://metaci-cli.readthedocs.io/
-
-You can also reference the following session recordings showing live demos of how to configure `CumulusCI` and `MetaCI` for projects:
-https://www.youtube.com/watch?v=CgvYKDqb6Ng
-https://www.youtube.com/watch?v=TN-e785MqBA
-
-Or, if you feel like deploying manually and configuring through the Admin interface:
-
-.. image:: https://www.herokucdn.com/deploy/button.svg
-   :target: https://heroku.com/deploy
-
-Basic Commands
---------------
-
-Create Your Initial Admin Account
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
-
-* To create an **superuser account**, use this command::
-
-    $ python manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
-
+We're currently working on improving our documentation for deploying MetaCI on Heroku.
+If you have questions about production setup, please reach out to the SFDO Release Engineering Team,
+or post a question on the `CumulusCI Trailblazer Community Group <https://trailblazers.salesforce.com/_ui/core/chatter/groups/GroupProfilePage?g=0F9300000009M9Z>`_.
 RQ Worker
 ^^^^^^^^^
 
@@ -147,14 +124,42 @@ To configure autoscaling:
 1. Set the METACI_MAX_WORKERS setting to the maximum number of dynos you'd like to scale up to.
 2. Set the METACI_WORKER_RESERVE setting to the number of dynos you'd like to reserve for high-priority builds. (Optional; defaults to 1.)
 3. Set up a Heroku user with access to this app, and create an authorization token using ``heroku authorizations:create``. Set the HEROKU_TOKEN setting to this authorization token.
-4. Set the AUTOSCALERS setting as a dict in the following format: {'app_name : {'app_name': name, 'worker_type': type, 'max_workers': METACI_MAX_WORKERS, 'worker_reserve': METACI_WORKER_RESERVE, 'queues': [list of queues]}}. You may list more than one Heroku app in the in AUTOSCALERS setting.
+4. Set the AUTOSCALERS setting as a dict in the following format: {'app_name : {'app_name': name, 'worker_type': type, 'max_workers': METACI_MAX_WORKERS, 'worker_reserve': METACI_WORKER_RESERVE, 'queues': [list of queues]}}. You may list more than one Heroku app in the in AUTOSCALERS setting and MetaCI will scale them all up and down at the same time.
     1. app_name - The name of the Heroku App.
     2. queues - a list of redis queues to monitor
     3. worker_type - The name of the worker dynos allocated for the given queues.
     4. max_workers - See METACI_MAX_WORKERS
     5. worker_reserve - See METACI_WORKER_RESERVE
-6. Add a RepeatableJob with Callable = ``metaci.build.autoscaling.autoscale``, Queue = ``short``, and Interval = ``1 minute``.
 
+
+One-Off Builds
+~~~~~~~~~~~~~~
+
+In some environments, such as Heroku, it is helpful to run builds in
+environments which are spun up for just a single build. In Heroku, builds
+created in this way will not share their finite lifespan (24 hours) with
+previous builds. They also are not restarted when the app is updated.
+
+You can specify the Python class to use for one-off builds with the
+METACI_LONG_RUNNING_BUILD_CLASS environment variable, but the defaults
+work well in Heroku.
+
+You can specify the configuration for the class in JSON with an 
+environment variable called METACI_LONG_RUNNING_BUILD_CONFIG.
+
+For Heroku, this is a dictionary with a single key, like this:
+
+    METACI_LONG_RUNNING_BUILD_CONFIG = {"app_name": "my-app"}
+
+my-app would be replaced with the name of the Heroku App that should
+be used.
+
+Note: We anticipate that you might run into autoscaling logic
+errors if you try to use one of your AUTOSCALERS apps for one-off
+dynos as well because they both eat into the same quota but the
+autoscaler class only knows about the persistent dynos. Perhaps
+if your usage never approaches its quota then this will not
+cause problems for you. This is not a tested or supported configuration.
 
 Email Server
 ^^^^^^^^^^^^

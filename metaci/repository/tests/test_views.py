@@ -9,22 +9,19 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 
-from metaci.repository.models import Branch
 from metaci.build.models import Build
 from metaci.conftest import (
     BranchFactory,
     BuildFactory,
-    BuildFlowFactory,
     PlanFactory,
     PlanRepositoryFactory,
+    ReleaseFactory,
     RepositoryFactory,
     StaffSuperuserFactory,
-    TestResultFactory,
     UserFactory,
 )
-from metaci.plan.models import Plan, PlanRepository
 from metaci.repository import views
-from metaci.repository.models import Repository
+from metaci.repository.models import Branch
 
 
 class TestRepositoryViews(TestCase):
@@ -254,7 +251,7 @@ class TestRepositoryViews(TestCase):
         exception_raised = False
         try:
             views.validate_github_webhook(request)
-        except:
+        except Exception:
             exception_raised = True
         assert not exception_raised
 
@@ -264,9 +261,9 @@ class TestRepositoryViews(TestCase):
 
     @pytest.mark.django_db
     @mock.patch("metaci.repository.views.validate_github_webhook")
-    def test_github_push_webhook__repo_not_tracked(self, validate):
+    def test_github_webhook__repo_not_tracked(self, validate):
         self.client.force_login(self.user)
-        url = reverse("github_push_webhook")
+        url = reverse("github_webhook")
         push_data = {
             "repository": {"id": 1234567890},
             "ref": "refs/heads/feature-branch-1",
@@ -274,32 +271,38 @@ class TestRepositoryViews(TestCase):
         }
 
         response = self.client.post(
-            url, data=json.dumps(push_data), content_type="application/json"
+            url,
+            data=json.dumps(push_data),
+            content_type="application/json",
+            headers={"X-GitHub-Event": "push"},
         )
 
         assert response.content == b"Not listening for this repository"
 
     @pytest.mark.django_db
     @mock.patch("metaci.repository.views.validate_github_webhook")
-    def test_github_push_webhook__no_branch_found(self, validate):
+    def test_github_webhook__no_branch_found(self, validate):
         self.client.force_login(self.user)
-        url = reverse("github_push_webhook")
+        url = reverse("github_webhook")
         push_data = {
             "repository": {"id": self.repo.github_id},
             "head_commit": "aR4Zd84F1i3No8",
         }
 
         response = self.client.post(
-            url, data=json.dumps(push_data), content_type="application/json"
+            url,
+            data=json.dumps(push_data),
+            content_type="application/json",
+            headers={"X-GitHub-Event": "push"},
         )
         assert response.status_code == 200
         assert response.content == b"No branch found"
 
     @pytest.mark.django_db
     @mock.patch("metaci.repository.views.validate_github_webhook")
-    def test_github_push_webhook__with_tag(self, validate):
+    def test_github_webhook__with_tag(self, validate):
         self.client.force_login(self.user)
-        url = reverse("github_push_webhook")
+        url = reverse("github_webhook")
         push_data = {
             "repository": {"id": self.repo.github_id},
             "ref": "refs/tags/beta",
@@ -307,16 +310,19 @@ class TestRepositoryViews(TestCase):
         }
 
         response = self.client.post(
-            url, data=json.dumps(push_data), content_type="application/json"
+            url,
+            data=json.dumps(push_data),
+            content_type="application/json",
+            headers={"X-GitHub-Event": "push"},
         )
         assert response.status_code == 200
         assert response.content == b"OK"
 
     @pytest.mark.django_db
     @mock.patch("metaci.repository.views.validate_github_webhook")
-    def test_github_push_webhook__with_branch(self, validate):
+    def test_github_webhook__with_branch(self, validate):
         self.client.force_login(self.user)
-        url = reverse("github_push_webhook")
+        url = reverse("github_webhook")
         branch_name = "feature-branch-1"
         push_data = {
             "repository": {"id": self.repo.github_id},
@@ -325,7 +331,10 @@ class TestRepositoryViews(TestCase):
         }
 
         response = self.client.post(
-            url, data=json.dumps(push_data), content_type="application/json"
+            url,
+            data=json.dumps(push_data),
+            content_type="application/json",
+            headers={"X-GitHub-Event": "push"},
         )
         assert response.status_code == 200
         assert response.content == b"OK"
@@ -341,7 +350,7 @@ class TestRepositoryViews(TestCase):
     def test_get_branch_name_from_payload__no_ref(self):
         payload = {"not_ref": "12345"}
         branch_name = views.get_branch_name_from_payload(payload)
-        assert branch_name == None
+        assert branch_name is None
 
     def test_get_branch_name_from_payload(self):
         branch_name = "test-branch"
@@ -354,42 +363,39 @@ class TestRepositoryViews(TestCase):
         actual = views.get_branch_name_from_payload(tag_payload)
         assert actual == f"tag: {tag_name}"
 
+    def test_get_branch_name_from_payload__branches(self):
+        payload = {"branches": [{"name": "test-branch"}]}
+        result = views.get_branch_name_from_payload(payload)
+        assert result == "test-branch"
+
     @pytest.mark.django_db
     def test_get_or_create_branch(self):
         branch_name = "test-branch"
-        branch = BranchFactory(name=branch_name, is_removed=True)
+        BranchFactory(name=branch_name, is_removed=True)
         repo = RepositoryFactory(name="Test Repo")
 
         actual = views.get_or_create_branch(branch_name, repo)
         assert actual is not None
 
     @pytest.mark.django_db
-    def test_get_or_create_release(self):
-        tag = "release-tag"
+    def test_get_release_if_applicable(self):
+        payload = {"ref": "refs/tags/release-1", "head_commit": "abc123"}
         repo = RepositoryFactory(name="Test Repo")
-        push_payload = {"head_commit": {"id": "asdf1234"}}
+        repo.release_tag_regex = "release-1"
+        release = ReleaseFactory(repo=repo, git_tag="release-1")
+        result = views.get_release_if_applicable(payload, repo)
+        assert result == release
 
-        actual = views.get_or_create_release(push_payload, tag, repo)
-        assert actual is not None
-
-    @mock.patch("metaci.repository.views.tag_is_release")
-    @mock.patch("metaci.repository.views.get_or_create_release")
-    def test_get_release_applicable(self, get_release, tag_is_release):
-        push = {"ref": "refs/tags/release-1", "head_commit": "abc123"}
+    def test_get_release_if_applicable__no_ref(self):
+        payload = {}
         repo = mock.Mock()
-        repo.release_tag_regex = r"refs/tags/release-1"
+        result = views.get_release_if_applicable(payload, repo)
+        assert result is None
 
-        get_release.return_value = True
-        tag_is_release.return_value = True
-
-        release = views.get_release_if_applicable(push, repo)
-
-        assert release == True
-
-    def test_get_release_not_applicable(self):
-        push = {"ref": "refs/tags/test-tag"}
+    def test_get_release_if_applicable__not_release_tag(self):
+        payload = {"ref": "refs/tags/test-tag"}
         repo = mock.Mock(release_tag_regex=False)
-        actual = views.get_release_if_applicable(push, repo)
+        actual = views.get_release_if_applicable(payload, repo)
         assert actual is None
 
     @mock.patch("metaci.repository.views.re.match")
@@ -412,3 +418,13 @@ class TestRepositoryViews(TestCase):
 
         tag_name = views.get_tag_name_from_ref(test_ref)
         assert tag_name == tagged_release
+
+    @pytest.mark.django_db
+    def test_create_builds(self):
+        """A plan without a regex, that has a trigger of 'commit',
+        'tag', or 'status', should fail to create a build"""
+        self.plan.regex = None
+        self.plan.save()
+        builds_before = len(Build.objects.all())
+        views.create_builds("push", None, self.repo, self.branch, None)
+        assert builds_before == len(Build.objects.all())

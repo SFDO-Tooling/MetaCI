@@ -62,7 +62,7 @@ def format_log(log):
     conv = Ansi2HTMLConverter(dark_bg=False, scheme="solarized", markup_lines=True)
     headers = conv.produce_headers()
     content = conv.convert(log, full=False)
-    content = '<pre class="ansi2html-content">{}</pre>'.format(content)
+    content = f'<pre class="ansi2html-content">{content}</pre>'
     return headers + content
 
 
@@ -85,5 +85,5 @@ def run_command(command, env=None, cwd=None):
     p.stdout.close()
     p.wait()
     if p.returncode:
-        message = "Return code: {}\nstderr: {}".format(p.returncode, p.stderr)
+        message = f"Return code: {p.returncode}\nstderr: {p.stderr}"
         raise CommandException(message)

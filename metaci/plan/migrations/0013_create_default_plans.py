@@ -31,7 +31,7 @@ def create_default_plans(apps, schema_editor):
             "version, and create a GitHub release with release notes"
         ),
         type="commit",
-        regex="master",
+        regex="main",
         flows="ci_master,release_beta",
         org="packaging",
         context="Upload Beta",
@@ -83,6 +83,15 @@ def create_default_plans(apps, schema_editor):
         ),
         type="org",
         flows="dev_org",
+        org="dev",
+        public=False,
+    )
+
+    Plan.objects.create(
+        name="Performance Test",
+        description=("Runs the test_performance_scratch flow aginst a scratch org"),
+        type="manual",
+        flows="test_performance_scratch",
         org="dev",
         public=False,
     )

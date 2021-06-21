@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include, re_path
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views import defaults as default_views
@@ -10,62 +7,65 @@ from django.views.generic import TemplateView
 
 from metaci import views as mbci_views
 from metaci.build import views as build_views
-from metaci.repository.views import github_push_webhook
+from metaci.repository.views import github_webhook
 
 urlpatterns = [
-    url(
+    re_path(
         r"^robots\.txt$",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-    url(r"^$", build_views.build_list, name="home"),
-    url(
+    re_path(r"^$", build_views.build_list, name="home"),
+    re_path(
         r"^about/$",
         mbci_views.AboutView.as_view(template_name="pages/about.html"),
         name="about",
     ),
-    # Django Admin, use {% url 'admin:index' %}
-    url(settings.ADMIN_URL_ROUTE, admin.site.urls),
+    # Django Admin, use {%  url 'admin:index' %}
+    re_path(settings.ADMIN_URL_ROUTE, admin.site.urls),
     # User management
-    url(r"^users/", include("metaci.users.urls", namespace="users")),
-    url(r"^accounts/", include("allauth.urls")),
+    re_path(r"^users/", include("metaci.users.urls", namespace="users")),
+    re_path(r"^accounts/", include("allauth.urls")),
     # django-rq
-    url(r"^django-rq/", include("django_rq.urls")),
+    re_path(r"^django-rq/", include("django_rq.urls")),
     # search
-    url(r"^search$", build_views.build_search, name="search"),
-    url(r"^api/", include("metaci.api.urls")),
-    url(r"^builds/", include("metaci.build.urls")),
-    url(r"^create-org/", include("metaci.create_org.urls")),
-    url(r"^notifications/", include("metaci.notification.urls")),
-    url(r"^tests/", include("metaci.testresults.urls")),
-    url(r"^plans/", include("metaci.plan.urls")),
-    url(r"^orgs/", include("metaci.cumulusci.urls")),
-    url(r"^hirefire/", include("metaci.hirefire.urls")),
-    url(r"^repos/", include("metaci.repository.urls")),
-    url(r"^webhook/github/push$", github_push_webhook, name="github_push_webhook"),
+    re_path(r"^search$", build_views.build_search, name="search"),
+    re_path(r"^api/", include("metaci.api.urls")),
+    re_path(r"^builds/", include("metaci.build.urls")),
+    re_path(r"^create-org/", include("metaci.create_org.urls")),
+    re_path(r"^notifications/", include("metaci.notification.urls")),
+    re_path(r"^tests/", include("metaci.testresults.urls")),
+    re_path(r"^plans/", include("metaci.plan.urls")),
+    re_path(r"^orgs/", include("metaci.cumulusci.urls")),
+    re_path(r"^hirefire/", include("metaci.hirefire.urls")),
+    re_path(r"^repos/", include("metaci.repository.urls")),
+    re_path(r"^webhook/github/push$", github_webhook, name="github_webhook"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# override default error view
+handler403 = "metaci.views.custom_403"
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
-    # these url in browser to see how these error pages look like.
+    # these paths in the browser to see how these error pages look.
     urlpatterns += [
-        url(
+        re_path(
             r"^400/$",
             default_views.bad_request,
             kwargs={"exception": Exception("Bad Request!")},
         ),
-        url(
+        re_path(
             r"^403/$",
-            default_views.permission_denied,
+            mbci_views.custom_403,
             kwargs={"exception": Exception("Permission Denied")},
         ),
-        url(
+        re_path(
             r"^404/$",
             default_views.page_not_found,
             kwargs={"exception": Exception("Page not Found")},
         ),
-        url(r"^500/$", default_views.server_error),
+        re_path(r"^500/$", default_views.server_error),
     ]
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
 
-        urlpatterns += [url(r"^__debug__/", include(debug_toolbar.urls))]
+        urlpatterns += [re_path(r"^__debug__/", include(debug_toolbar.urls))]

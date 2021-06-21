@@ -1,4 +1,5 @@
 from django.dispatch import receiver
+
 from metaci.build.signals import build_complete
 from metaci.notification.tasks import queue_build_notifications
 

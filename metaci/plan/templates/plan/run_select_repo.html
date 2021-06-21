@@ -14,7 +14,7 @@ Select repository to run plan {{ plan.id }} "{{ plan.name }}"
     {% for pr in planrepos %}
     {% with repo=pr.repo %}
     <li>
-      <a href="/plans/{{ plan.id }}/{{ repo.owner }}/{{ repo.name }}/run/?branch=master">
+      <a href="/plans/{{ plan.id }}/{{ repo.owner }}/{{ repo.name }}/run/">
         {{ repo.owner }}/{{ repo.name }}
       </a>
     </li>

@@ -7,7 +7,6 @@ process.env.NODE_ENV = 'development';
 const fs = require('fs');
 const path = require('path');
 
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const I18nextWebpackPlugin = require('i18next-scanner-webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { merge } = require('webpack-merge');
@@ -24,22 +23,25 @@ module.exports = merge(common, {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
-  devtool: 'cheap-module-inline-source-map',
+  devtool: 'inline-cheap-module-source-map',
   devServer: {
-    index: '',
+    devMiddleware: {
+      index: '',
+      publicPath: '/static/',
+      writeToDisk: true,
+    },
     proxy: {
       '**': 'http://localhost:8000',
-      '/ws': {
+      '/ws/notifications': {
         target: 'http://localhost:8000',
         ws: true,
       },
     },
-    hot: false,
-    writeToDisk: true,
+    static: false,
     port: 4088,
+    hot: false,
   },
   plugins: [
-    new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].css',
     }),

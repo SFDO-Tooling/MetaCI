@@ -9,7 +9,7 @@ def prune_branches():
     db.connection.close()
     pruned = []
     for branch in Branch.objects.all():
-        if not branch.github_api:
+        if not branch.get_github_api():
             branch.delete()
             pruned.append(str(branch))
     if pruned:
