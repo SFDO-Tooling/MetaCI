@@ -34,13 +34,13 @@ RUN /app/docker/utility/install_chromedriver.sh $CHROMEDRIVER_DIR $CHROMEDRIVER_
 ENV PATH $CHROMEDRIVER_DIR:$PATH
 
 # declaring necessary node and yarn versions
-ENV NODE_VERSION 10.16.3
+ENV NODE_VERSION 12.21.0
 # installing node
 COPY ./docker/utility/install_node.sh /app/docker/utility/install_node.sh
 RUN /bin/sh /app/docker/utility/install_node.sh
 
 # declaring necessary node and yarn versions
-ENV YARN_VERSION 1.22.4
+ENV YARN_VERSION 1.22.10
 # installing yarn
 COPY ./docker/utility/install_yarn.sh /app/docker/utility/install_yarn.sh
 RUN /bin/sh /app/docker/utility/install_yarn.sh
