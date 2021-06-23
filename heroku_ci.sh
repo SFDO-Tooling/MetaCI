@@ -4,7 +4,7 @@
 set -x
 
 # Pretend this is a git repo so that coveralls can find git info
-git clone -b "$HEROKU_TEST_RUN_BRANCH" --single-branch https://github.com/SFDO-Tooling/MetaCI MetaCI_checkout 
+git clone -b "$HEROKU_TEST_RUN_BRANCH" --single-branch https://github.com/RupertBarrow/MetaCI MetaCI_checkout 
 cd MetaCI_checkout
 git reset --hard $HEROKU_TEST_RUN_COMMIT_VERSION
 cd ..
