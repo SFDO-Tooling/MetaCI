@@ -1,6 +1,6 @@
 FROM python:3.8
 
-ARG BUILD_ENV=local
+ARG BUILD_ENV=dev
 ARG CHROMEDRIVER_VERSION
 
 RUN mkdir -p /app/.apt/usr/bin
@@ -51,8 +51,9 @@ RUN /bin/sh /app/docker/utility/install_sfdx.sh
 
 # installing python related dependencies with pip
 COPY ./requirements /app/requirements
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r /app/requirements/$BUILD_ENV.txt
+RUN pip install --no-cache-dir --upgrade pip pip-tools
+RUN pip install --no-cache-dir -r /app/requirements/prod.txt
+RUN if [[ "$BUILD_ENV" == "dev" ]]; then pip install --no-cache-dir -r /app/requirements/dev.txt; fi
 
 # installing yarn dependencies
 COPY ./package.json /app/package.json
@@ -69,5 +70,5 @@ ENV DJANGO_HASHID_SALT='sample hashid=salt' \
   REDIS_URL="redis://redis:6379"
 
 # Avoid building prod assets in development
-RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
+RUN if [ "${BUILD_ENV}" = "prod" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
 RUN python /app/manage.py collectstatic --noinput

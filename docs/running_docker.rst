@@ -75,7 +75,7 @@ data and the creation of a default admin user.
 
 If you would like to disable this functionality please add a `DJANGO_SETTINGS_MODULE` environment variable
 in the web service section of the docker-compose file to set it from its default value (set in Dockerfile) from
-`config.settings.local` to `config.settings.production`.
+`config.settings.dev` to `config.settings.prod`.
 For examples of how to do this please see `setting docker-compose environment variables`_.
 
 .. _setting docker-compose environment variables: https://docs.docker.com/compose/environment-variables/
@@ -88,7 +88,7 @@ Then run the following command:
     docker-compose up (for debug mode)
 
 After running this command which will take a couple minutes on startup visit ``localhost:8000/admin/login``
-and login with the following credentials if DJANGO_SETTINGS_MODULE is config.settings.local:
+and login with the following credentials if DJANGO_SETTINGS_MODULE is config.settings.dev:
 
 username:
     ``admin``
@@ -96,7 +96,7 @@ password:
     ``password``
 
 From here you should be able to run builds. However note that this default account will not be created 
-when BUILD_ENV is set to production
+when BUILD_ENV is set to prod
 
 Docker Commands
 ---------------
@@ -243,7 +243,7 @@ Build Arguments
 BUILD_ENV:
     Argument used to determine what dependencies and scripts to run when installing
     dependencies, populating databases, and setting ``DJANGO_SETTINGS_MODULE``. Values:
-    ``local``, ``production``, and ``test``.
+    ``dev``, ``prod``, and ``test``.
 
 CHROMEDRIVER_VERSION:
     Argument used to override the version of Chromedriver to install, which defaults to
