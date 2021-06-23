@@ -36,7 +36,6 @@ from metaci.cumulusci.config import MetaCIUniversalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
 from metaci.release.utils import (
-    send_release_webhook,
     send_start_webhook,
     send_stop_webhook,
 )
@@ -88,7 +87,7 @@ jinja2_env = ImmutableSandboxedEnvironment()
 
 
 class GnarlyEncoder(DjangoJSONEncoder):
-    """ A Very Gnarly Encoder that serializes a repr() if it can't get anything else.... """
+    """A Very Gnarly Encoder that serializes a repr() if it can't get anything else...."""
 
     def default(self, obj):  # pylint: disable=W0221, E0202
         try:
@@ -337,7 +336,6 @@ class Build(models.Model):
                 self.org and self.org.name and self.org.name.lower() == "packaging"
             ):  # Calling for any actions taken against packaging org
                 send_start_webhook(
-                    project_config,
                     self.release,
                     self.plan.role,
                     self.org.configuration_item,
@@ -431,7 +429,6 @@ class Build(models.Model):
         ):  # Calling for any actions taken against packaging org
             try:
                 send_stop_webhook(
-                    project_config,
                     self.release,
                     self.plan.role,
                     self.org.configuration_item,
@@ -859,7 +856,7 @@ class FlowTaskManager(models.Manager):
 
 
 class FlowTask(models.Model):
-    """ A FlowTask holds the result of a task execution during a BuildFlow. """
+    """A FlowTask holds the result of a task execution during a BuildFlow."""
 
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
