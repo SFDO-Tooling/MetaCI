@@ -18,7 +18,8 @@ ROOT_DIR = environ.Path(__file__) - 3  # (metaci/config/settings/base.py - 3 = m
 APPS_DIR = ROOT_DIR.path("metaci")
 
 env = environ.Env()
-env.read_env()
+env_file_path = Path(ROOT_DIR, '.env')
+env.read_env(str(env_file_path))
 
 
 def ipv4_networks(val: str) -> List[IPv4Network]:
