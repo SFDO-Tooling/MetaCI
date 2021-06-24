@@ -295,6 +295,14 @@ class Build(models.Model):
         for handler in self.logger.handlers:
             handler.stream.flush()
 
+    def gus_bus_call_check(self):
+        if (
+            self.org and self.org.name and self.org.name.lower() == "packaging"
+        ):  # Calling for any actions taken against packaging org
+            return True
+        else:
+            return False
+
     @property
     def worker_id(self):
         return os.environ.get("DYNO")
@@ -333,13 +341,21 @@ class Build(models.Model):
             # Look up or spin up the org
             org_config = self.get_org(project_config)
             if (
-                self.plan and self.plan.role and self.plan.role in ["release","release_deploy","push_sandbox","push_production"]
+                self.gus_bus_call_check()
             ):  # Calling for any actions taken against packaging org
-                send_start_webhook(
-                    self.release,
-                    self.plan.role,
-                    self.org.configuration_item,
-                )
+                try:
+                    send_start_webhook(
+                        self.release,
+                        self.plan.role,
+                        self.org.configuration_item,
+                    )
+                except Exception as err:
+                    message = f"Error while sending implementation stop step webhook: {err}"
+                    self.logger.error(message)
+                    set_build_info(
+                        build, status="error", exception=message, time_end=timezone.now()
+                    )
+                    return
 
         except Exception as e:
             self.logger.error(str(e))
@@ -425,7 +441,7 @@ class Build(models.Model):
         self.flush_log()
 
         if (
-            self.org and self.org.name and self.org.name.lower() == "packaging"
+            self.gus_bus_call_check()
         ):  # Calling for any actions taken against packaging org
             try:
                 send_stop_webhook(
