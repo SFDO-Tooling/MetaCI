@@ -1,10 +1,13 @@
 #!/bin/bash
 
 # This file installs the given Node version to the docker image
-# dynamically changing download link based on environmental 
-# Architecture
 
-# NEED TO SET NODE_VERSION ENVIRONMENT VARIABLE if not set already
+# Check whether jq is availible, if so, read the engines.node value from package.json
+if command -v jq &> /dev/null
+then
+    NODE_VERSION=${NODE_VERSION:-$(jq --raw-output '.engines.node' package.json)}
+fi
+
 ARCH=
 dpkgArch="$(dpkg --print-architecture)"
 case "${dpkgArch##*-}" in \
