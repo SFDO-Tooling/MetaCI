@@ -54,7 +54,7 @@ RUN /bin/sh /app/docker/utility/install_sfdx.sh
 COPY ./requirements ./requirements
 RUN pip install --no-cache-dir --upgrade pip pip-tools
 RUN pip install --no-cache-dir -r /app/requirements/prod.txt
-RUN if [[ "$BUILD_ENV" == "dev" ]]; then pip install --no-cache-dir -r /app/requirements/dev.txt; fi
+RUN if [ "${BUILD_ENV}" = "dev" ]; then pip install --no-cache-dir -r /app/requirements/dev.txt; fi
 
 # installing yarn dependencies
 COPY yarn.lock ./
