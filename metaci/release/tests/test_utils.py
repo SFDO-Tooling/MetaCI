@@ -30,8 +30,8 @@ def test_implementation_payload(mocker, transactional_db):
                 release=release,
                 plan=PlanFactory(role="foo"),
                 external_id="1000",
-                start_time="2021-06-08T08:00:00+00:00",
-                stop_time="2021-06-09T18:00:00+00:00",
+                start_time="2021-06-08T08:00:00-00:00",
+                stop_time="2021-06-08T18:00:00-00:00",
             ),
         ],
         bulk=False,
@@ -40,8 +40,8 @@ def test_implementation_payload(mocker, transactional_db):
     assert result == {
         "description": "foo",
         "owner": "00G",
-        "start_time": "2021-06-08T08:00:00+00:00",
-        "end_time": "2021-06-09T18:00:00+00:00",
+        "start_time": "2021-06-08T08:00:00-07:00",
+        "end_time": "2021-06-08T18:00:00-07:00",
         "configuration_item": "123",
         "implementation_steps": "foo",
     }
@@ -167,7 +167,10 @@ def test_send_submit_webhook(mocked_responses, mocker, transactional_db):
     mocked_responses.add(
         "POST",
         "https://webhook/case/2/submit",
-        json={"success": True, "id": "2"},
+        json={
+            "results": [{"success": True, "id": "a2d0u000000tDYeAAM"}],
+            "hasErrors": False,
+        },
     )
 
     project_config = Mock(project__package__name="Test Package")
@@ -194,8 +197,18 @@ def test_send_submit_webhook__error(mocked_responses, mocker, transactional_db):
         "POST",
         "https://webhook/case/None/submit",
         json={
-            "success": False,
-            "errors": ["Error submitting change case."],
+            "results": [
+                {
+                    "success": False,
+                    "errors": [
+                        {
+                            "message": "Update failed. First exception on row 0 with id 5000u000001DwaTAAS; first error: FIELD_CUSTOM_VALIDATION_EXCEPTION, Only Case Owners are allowed to submit for approval",
+                            "errorCode": "System.DmlException",
+                        }
+                    ],
+                }
+            ],
+            "hasErrors": True,
         },
     )
 
@@ -214,7 +227,10 @@ def test_send_start_webhook(mocked_responses, mocker, transactional_db):
     mocked_responses.add(
         "POST",
         "https://webhook/implementation/1000/start/",
-        json={"success": True, "id": "1", "implementation_step_id": "1000"},
+        json={
+            "results": [{"success": True, "id": "a2d0u000000tDYeAAM"}],
+            "hasErrors": False,
+        },
     )
     project_config = Mock(project__package__name="Test Package")
     project_config.get_version_for_tag.return_value = "1.0"
@@ -255,7 +271,53 @@ def test_send_start_webhook_failed_result_with_config(
     mocked_responses.add(
         "POST",
         "https://webhook/implementation/1000/start/",
-        json={"success": False, "errors": ["Error starting implementation step."]},
+        json={
+            "results": [
+                {
+                    "success": False,
+                    "id": "a2d0u000000tEzHAAU",
+                    "errors": [
+                        {
+                            "message": {
+                                "blockedLock": {
+                                    "configurationItem": {
+                                        "id": "a7JB0000000LajBMAS",
+                                        "name": "NA91",
+                                        "path": "Salesforce.SFDC_Core.IA2.IA2-SP1.NA91",
+                                    },
+                                    "title": "Free Text",
+                                },
+                                "blockingLocks": [
+                                    {
+                                        "blockingLock": {
+                                            "configurationItem": {
+                                                "id": "a7JB00000004GHBMA2",
+                                                "path": "Salesforce.SFDC_Core.IA2",
+                                            },
+                                            "id": "a8L0u0000004MFrEAM",
+                                            "lockCase": {},
+                                            "lockOwner": {
+                                                "email": "phiggins@salesforce.com",
+                                                "id": "005B0000000h4eWIAQ",
+                                                "name": "Paul Higgins",
+                                            },
+                                            "lockType": {
+                                                "id": "a8KB0000000CcbxMAC",
+                                                "name": "Moratorium",
+                                            },
+                                        }
+                                    }
+                                ],
+                                "message": "Conflicts Detected! Found 1 lock(s) for CI: NA91",
+                            },
+                            "fields": [],
+                            "errorCode": "FIELD_CUSTOM_VALIDATION_EXCEPTION",
+                        }
+                    ],
+                }
+            ],
+            "hasErrors": True,
+        },
     )
     release = ReleaseFactory()
     release.implementation_steps.set(
@@ -310,7 +372,10 @@ def test_send_stop_webhook(mocked_responses, mocker, transactional_db):
     mocked_responses.add(
         "POST",
         "https://webhook/implementation/1000/stop/",
-        json={"success": True, "id": "1", "implementation_step_id": "1000"},
+        json={
+            "results": [{"success": True, "id": "a2d0u000000tDYeAAM"}],
+            "hasErrors": False,
+        },
     )
     project_config = Mock(project__package__name="Test Package")
     project_config.get_version_for_tag.return_value = "1.0"
@@ -351,7 +416,53 @@ def test_send_stop_webhook_failed_result_with_config(
     mocked_responses.add(
         "POST",
         "https://webhook/implementation/1000/stop/",
-        json={"success": False, "errors": ["Error stopping implementation step."]},
+        json={
+            "results": [
+                {
+                    "success": False,
+                    "id": "a2d0u000000tEzHAAU",
+                    "errors": [
+                        {
+                            "message": {
+                                "blockedLock": {
+                                    "configurationItem": {
+                                        "id": "a7JB0000000LajBMAS",
+                                        "name": "NA91",
+                                        "path": "Salesforce.SFDC_Core.IA2.IA2-SP1.NA91",
+                                    },
+                                    "title": "Free Text",
+                                },
+                                "blockingLocks": [
+                                    {
+                                        "blockingLock": {
+                                            "configurationItem": {
+                                                "id": "a7JB00000004GHBMA2",
+                                                "path": "Salesforce.SFDC_Core.IA2",
+                                            },
+                                            "id": "a8L0u0000004MFrEAM",
+                                            "lockCase": {},
+                                            "lockOwner": {
+                                                "email": "phiggins@salesforce.com",
+                                                "id": "005B0000000h4eWIAQ",
+                                                "name": "Paul Higgins",
+                                            },
+                                            "lockType": {
+                                                "id": "a8KB0000000CcbxMAC",
+                                                "name": "Moratorium",
+                                            },
+                                        }
+                                    }
+                                ],
+                                "message": "Conflicts Detected! Found 1 lock(s) for CI: NA91",
+                            },
+                            "fields": [],
+                            "errorCode": "FIELD_CUSTOM_VALIDATION_EXCEPTION",
+                        }
+                    ],
+                }
+            ],
+            "hasErrors": True,
+        },
     )
     release = ReleaseFactory()
     release.implementation_steps.set(

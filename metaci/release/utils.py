@@ -161,11 +161,12 @@ def send_submit_webhook(release, config_item=None):
         "results" in result
         and len(result["results"]) > 0
         and result["results"][0]["success"]
-        or result["success"]
     ):
         return
     else:
-        raise Exception("\n".join(err for err in result["errors"]))
+        raise Exception(
+            "\n".join(err["message"] for err in result["results"]["errors"])
+        )
 
 
 def send_start_webhook(release, role, config_item):
@@ -199,14 +200,15 @@ def send_start_webhook(release, role, config_item):
         "results" in result
         and len(result["results"]) > 0
         and result["results"][0]["success"]
-        or result["success"]
     ):
         logger.info(
             f"Successfully started implementation_step: {implementation_step_id}"
         )
         return
     else:
-        raise Exception("\n".join(err for err in result["errors"]))
+        raise Exception(
+            "\n".join(err["message"] for err in result["results"]["errors"])
+        )
 
 
 def send_stop_webhook(release, role, config_item):
@@ -240,11 +242,12 @@ def send_stop_webhook(release, role, config_item):
         "results" in result
         and len(result["results"]) > 0
         and result["results"][0]["success"]
-        or result["success"]
     ):
         logger.info(
             f"Successfully stopped implementation_step: {implementation_step_id}"
         )
         return
     else:
-        raise Exception("\n".join(err for err in result["errors"]))
+        raise Exception(
+            "\n".join(err["message"] for err in result["results"]["errors"])
+        )
