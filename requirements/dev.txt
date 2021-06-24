@@ -65,7 +65,7 @@ factory-boy==3.2.0
     # via
     #   -r requirements/dev.in
     #   pytest-factoryboy
-faker==8.6.0
+faker==8.8.2
     # via
     #   -c requirements/prod.txt
     #   factory-boy
@@ -87,7 +87,7 @@ ipython-genutils==0.2.0
     # via traitlets
 ipython==7.24.1
     # via ipdb
-isort==5.8.0
+isort==5.9.1
     # via -r requirements/dev.in
 jedi==0.18.0
     # via ipython
@@ -120,7 +120,7 @@ pickleshare==0.7.5
     # via ipython
 pluggy==0.13.1
     # via pytest
-prompt-toolkit==3.0.18
+prompt-toolkit==3.0.19
     # via ipython
 ptyprocess==0.7.0
     # via pexpect
