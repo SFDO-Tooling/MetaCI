@@ -65,7 +65,7 @@ factory-boy==3.2.0
     # via
     #   -r requirements/dev.in
     #   pytest-factoryboy
-faker==8.6.0
+faker==8.8.2
     # via
     #   -c requirements/prod.txt
     #   factory-boy
