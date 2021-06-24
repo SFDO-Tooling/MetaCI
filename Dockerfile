@@ -34,30 +34,30 @@ RUN /app/docker/utility/install_chromedriver.sh $CHROMEDRIVER_DIR $CHROMEDRIVER_
 # Put Chromedriver into the PATH
 ENV PATH $CHROMEDRIVER_DIR:$PATH
 
-# declaring necessary node and yarn versions
 # installing node
-COPY ./docker/utility/install_node.sh /app/docker/utility/install_node.sh
+WORKDIR /app
+ENV PATH ./node_modules/.bin:$PATH
+COPY package.json ./
+COPY ./docker/utility/install_node.sh ./docker/utility/install_node.sh
 RUN /bin/sh /app/docker/utility/install_node.sh
 
 # declaring necessary node and yarn versions
 # installing yarn
-COPY ./docker/utility/install_yarn.sh /app/docker/utility/install_yarn.sh
+COPY ./docker/utility/install_yarn.sh ./docker/utility/install_yarn.sh
 RUN /bin/sh /app/docker/utility/install_yarn.sh
 
 # installing sfdx
-COPY ./docker/utility/install_sfdx.sh /app/docker/utility/install_sfdx.sh
+COPY ./docker/utility/install_sfdx.sh ./docker/utility/install_sfdx.sh
 RUN /bin/sh /app/docker/utility/install_sfdx.sh
 
 # installing python related dependencies with pip
-COPY ./requirements /app/requirements
+COPY ./requirements ./requirements
 RUN pip install --no-cache-dir --upgrade pip pip-tools
 RUN pip install --no-cache-dir -r /app/requirements/prod.txt
 RUN if [[ "$BUILD_ENV" == "dev" ]]; then pip install --no-cache-dir -r /app/requirements/dev.txt; fi
 
 # installing yarn dependencies
-COPY ./package.json /app/package.json
-COPY ./yarn.lock /app/yarn.lock
-WORKDIR /app
+COPY yarn.lock ./
 RUN yarn install
 # copying rest of working directory to /app folder
 COPY . /app
