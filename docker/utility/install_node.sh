@@ -18,10 +18,11 @@ case "${dpkgArch##*-}" in \
     armhf) ARCH='armv7l';; \
     i386) ARCH='x86';; \
     *) echo "unsupported architecture"; exit 1 ;;
-  esac
-  # gpg keys listed at https://github.com/nodejs/node#release-keys
-  set -ex
-  for key in \
+esac
+
+# gpg keys listed at https://github.com/nodejs/node#release-keys
+set -ex
+for key in \
       94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
       FD3A5288F042B6850C66B31F09FE44734EB7990E \
       71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
@@ -46,3 +47,4 @@ case "${dpkgArch##*-}" in \
   && tar -xJf "node-v$NODE_VERSION-linux-$ARCH.tar.xz" -C /usr/local --strip-components=1 --no-same-owner \
   && rm "node-v$NODE_VERSION-linux-$ARCH.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
   && ln -s /usr/local/bin/node /usr/local/bin/nodejs
+
