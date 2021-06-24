@@ -77,7 +77,7 @@ Enter the repo name, owner name, and the url.  Currently only repositories on gi
 Configuring Orgs
 ----------------
 
-Any org you connect to your local CumulusCI keychain can be added to MetaCI as a build org.  Go to CUMULUSCI -> Orgs -> Add and give the org a name, select the repo, and paste in the results of ``cumulusci2 org info <org_name> --json`` on your local system.  Remember that org names are already namespaced by their repository so rather than ``package_name_feature``, just call the org ``feature``.
+Any org you connect to your local CumulusCI keychain can be added to MetaCI as a build org.  Go to CUMULUSCI -> Orgs -> Add and give the org a name, select the repo, and paste in the results of ``cci org info <org_name> --json`` on your local system.  Remember that org names are already namespaced by their repository so rather than ``package_name_feature``, just call the org ``feature``.
 
 
 Configuring Plans
