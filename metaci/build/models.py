@@ -87,7 +87,7 @@ jinja2_env = ImmutableSandboxedEnvironment()
 
 
 class GnarlyEncoder(DjangoJSONEncoder):
-    """ A Very Gnarly Encoder that serializes a repr() if it can't get anything else.... """
+    """A Very Gnarly Encoder that serializes a repr() if it can't get anything else...."""
 
     def default(self, obj):  # pylint: disable=W0221, E0202
         try:
@@ -856,7 +856,7 @@ class FlowTaskManager(models.Manager):
 
 
 class FlowTask(models.Model):
-    """ A FlowTask holds the result of a task execution during a BuildFlow. """
+    """A FlowTask holds the result of a task execution during a BuildFlow."""
 
     time_start = models.DateTimeField(null=True, blank=True)
     time_end = models.DateTimeField(null=True, blank=True)
