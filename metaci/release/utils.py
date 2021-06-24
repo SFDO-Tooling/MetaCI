@@ -5,6 +5,7 @@ from calendar import timegm
 from datetime import datetime
 
 import jwt
+import pytz
 import requests
 from django.conf import settings
 from django.db import transaction
@@ -18,12 +19,20 @@ def implementation_payload(role, config_item, release):
         return {
             "description": role,
             "owner": settings.GUS_BUS_OWNER_ID,
-            "start_time": release.implementation_steps.get(
-                plan__role=role
-            ).start_time.isoformat(),
-            "end_time": release.implementation_steps.get(
-                plan__role=role
-            ).stop_time.isoformat(),
+            "start_time": pytz.timezone("US/Pacific")
+            .localize(
+                release.implementation_steps.get(plan__role=role).start_time.replace(
+                    tzinfo=None
+                )
+            )
+            .isoformat(),
+            "end_time": pytz.timezone("US/Pacific")
+            .localize(
+                release.implementation_steps.get(plan__role=role).stop_time.replace(
+                    tzinfo=None
+                )
+            )
+            .isoformat(),
             "configuration_item": config_item,
             "implementation_steps": role,
         }
