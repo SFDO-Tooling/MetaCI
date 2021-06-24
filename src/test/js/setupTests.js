@@ -24,4 +24,4 @@ beforeAll(() => {
   window.console.info = jest.fn();
 });
 
-afterEach(fetchMock.reset);
+afterEach(() => fetchMock.reset());
