@@ -123,34 +123,23 @@ class Release(StatusModel):
 
     def save(self, *args, **kw):
         super().save(*args, **kw)
-        # self.create_default_implementation_step(
-        #     "release_deploy",
-        #     get_default_sandbox_date(),
-        #     get_default_sandbox_date(),
-        #     datetime.time(8),
-        #     datetime.time(18),
-        # )
-        # self.create_default_implementation_step(
-        #     "release",
-        #     get_default_sandbox_date(),
-        #     get_default_sandbox_date(),
-        #     datetime.time(8),
-        #     datetime.time(18),
-        # )
-        # self.create_default_implementation_step(
-        #     "push_sandbox",
-        #     get_default_sandbox_date(),
-        #     get_default_sandbox_date(),
-        #     datetime.time(18),
-        #     datetime.time(23, 59),
-        # )  # time will vary depending on product
-        # self.create_default_implementation_step(
-        #     "push_production",
-        #     get_default_production_date(),
-        #     get_default_production_date(),
-        #     datetime.time(18),
-        #     datetime.time(23, 59),
-        # )  # time will vary depending on product
+        if "implementation_steps" in self.repo.default_implementation_steps:
+            for value in self.repo.default_implementation_steps["implementation_steps"]:
+                self.create_default_implementation_step(
+                    value["plan"],
+                    (
+                        get_default_sandbox_date()
+                        + datetime.timedelta(days=value["start_date_offset"])
+                    ),
+                    (
+                        get_default_sandbox_date()
+                        + datetime.timedelta(
+                            days=value["start_date_offset"], hours=value["duration"]
+                        )
+                    ),
+                    datetime.time(value["start_time"]),
+                    datetime.time((value["start_time"] + value["duration"]) % 24),
+                )  # modular arthimatic to account for time going to the next day
 
     def create_default_implementation_step(
         self, role, start_date=None, end_date=None, start_time=None, stop_time=None
