@@ -127,22 +127,21 @@ class Release(StatusModel):
             for value in self.repo.default_implementation_steps["implementation_steps"]:
                 self.create_default_implementation_step(
                     value["plan"],
-                    (
-                        get_default_sandbox_date()
-                        + datetime.timedelta(days=value["start_date_offset"])
-                    ),
-                    (
-                        get_default_sandbox_date()
-                        + datetime.timedelta(
-                            days=value["start_date_offset"], hours=value["duration"]
-                        )
-                    ),
-                    datetime.time(value["start_time"]),
-                    datetime.time((value["start_time"] + value["duration"]) % 24),
+                    (get_default_sandbox_date()),
+                    (get_default_sandbox_date()),
+                    value["start_time"],
+                    value["start_date_offset"],
+                    value["duration"],
                 )  # modular arthimatic to account for time going to the next day
 
     def create_default_implementation_step(
-        self, role, start_date=None, end_date=None, start_time=None, stop_time=None
+        self,
+        role,
+        start_date=None,
+        end_date=None,
+        start_time=None,
+        start_date_offset=None,
+        duration=None,
     ):
         """Create default implementation steps"""
         if len(self.implementation_steps.filter(plan__role=f"{role}")) < 1:
@@ -160,9 +159,18 @@ class Release(StatusModel):
                     release=self,
                     plan=planrepo.plan,
                     start_time=make_aware(
-                        datetime.datetime.combine(start_date, start_time)
+                        datetime.datetime.combine(
+                            start_date + datetime.timedelta(days=start_date_offset),
+                            datetime.time(start_time),
+                        )
                     ),
                     stop_time=make_aware(
-                        datetime.datetime.combine(end_date, stop_time)
+                        datetime.datetime.combine(
+                            end_date
+                            + datetime.timedelta(
+                                days=start_date_offset, hours=duration + start_time
+                            ),
+                            datetime.time((start_time + duration) % 24),
+                        )
                     ),
                 ).save()
