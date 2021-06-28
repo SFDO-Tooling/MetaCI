@@ -1,11 +1,24 @@
 import datetime
+from metaci.fixtures.factories import PlanFactory, PlanRepositoryFactory
 
 import pytest
 from model_utils import Choices
 
 from metaci.conftest import RepositoryFactory
-from metaci.release.models import ChangeCaseTemplate, Release
+from metaci.release.models import ChangeCaseTemplate, ImplementationStep, Release
 from metaci.repository.models import Repository
+
+
+@pytest.mark.django_db
+class TestChangeCaseTemplate:
+    def test_change_case_template_str(self):
+        assert str(ChangeCaseTemplate(name="test")) == "test"
+
+
+@pytest.mark.django_db
+class TestImplementationSteps:
+    def test_change_case_template_str(self):
+        assert str(ImplementationStep(plan=PlanFactory(name="test"))) == "test"
 
 
 @pytest.mark.django_db
@@ -35,48 +48,33 @@ class TestRelease:
     ####### Keep getting the following error: ###############
     # ValueError: save() prohibited to prevent data loss due to unsaved related object 'release'.
     #########################################################
-    # def test_release_implementation_steps_plan_role(self):
-    #     release = Release(
-    #         repo=RepositoryFactory(
-    #             default_implementation_steps={
-    #                 "implementation_steps": [
-    #                     {
-    #                         "plan": "release",
-    #                         "duration": 10,
-    #                         "start_time": 8,
-    #                         "start_date_offset": 0,
-    #                     },
-    #                 ]
-    #             },
-    #         ),
-    #         change_case_template=ChangeCaseTemplate(),
-    #     )
-    #     release.implementation_steps.set(
-    #         [
-    #             ImplementationStep(
-    #                 release=ReleaseFactory(
-    #                     repo=RepositoryFactory(
-    #                         default_implementation_steps={
-    #                             "implementation_steps": [
-    #                                 {
-    #                                     "plan": "release",
-    #                                     "duration": 10,
-    #                                     "start_time": 8,
-    #                                     "start_date_offset": 0,
-    #                                 },
-    #                             ]
-    #                         },
-    #                     )
-    #                 ),
-    #                 plan=PlanFactory(),
-    #                 external_id="1000",
-    #                 start_time="2021-06-08T08:00:00+00:00",
-    #                 stop_time="2021-06-09T18:00:00+00:00",
-    #             ),
-    #         ],
-    #         bulk=False,
-    #     )
-    #     assert release.create_default_implementation_step("test") == None
+    def test_release_implementation_steps_plan_role(self):
+        plan = PlanFactory(role="release", change_traffic_control=True)
+        plan.save()
+
+        repo = RepositoryFactory(
+            default_implementation_steps={
+                "implementation_steps": [
+                    {
+                        "plan": "release",
+                        "duration": 10,
+                        "start_time": 8,
+                        "start_date_offset": 0,
+                    },
+                ]
+            },
+        )
+        repo.save()
+        planrepo = PlanRepositoryFactory(plan=plan, repo=repo)
+        planrepo.save()
+        change_case_template = ChangeCaseTemplate()
+        change_case_template.save()
+        release = Release(
+            repo=repo,
+            change_case_template=change_case_template,
+        )
+        release.save()
+        assert release.implementation_steps.count() == 1
 
     def test_release_implementation_steps_no_plan_role(self):
         release = Release(

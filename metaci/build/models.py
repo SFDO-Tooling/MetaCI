@@ -295,14 +295,6 @@ class Build(models.Model):
         for handler in self.logger.handlers:
             handler.stream.flush()
 
-    def gus_bus_call_check(self):
-        if (
-            self.org and self.org.name and self.org.name.lower() == "packaging"
-        ):  # Calling for any actions taken against packaging org
-            return True
-        else:
-            return False
-
     @property
     def worker_id(self):
         return os.environ.get("DYNO")
@@ -341,7 +333,7 @@ class Build(models.Model):
             # Look up or spin up the org
             org_config = self.get_org(project_config)
             if (
-                self.gus_bus_call_check()
+                self.plan.change_traffic_control
             ):  # Calling for any actions taken against packaging org
                 try:
                     send_start_webhook(
@@ -350,7 +342,7 @@ class Build(models.Model):
                         self.org.configuration_item,
                     )
                 except Exception as err:
-                    message = f"Error while sending implementation stop step webhook: {err}"
+                    message = f"Error while sending implementation start step webhook: {err}"
                     self.logger.error(message)
                     set_build_info(
                         build, status="error", exception=message, time_end=timezone.now()
@@ -441,7 +433,7 @@ class Build(models.Model):
         self.flush_log()
 
         if (
-            self.gus_bus_call_check()
+            self.plan.change_traffic_control
         ):  # Calling for any actions taken against packaging org
             try:
                 send_stop_webhook(
