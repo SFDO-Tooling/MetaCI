@@ -1,6 +1,6 @@
 FROM python:3.8
 
-ARG BUILD_ENV=production
+ARG BUILD_ENV=dev
 ARG CHROMEDRIVER_VERSION
 
 RUN mkdir -p /app/.apt/usr/bin
