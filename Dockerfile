@@ -1,6 +1,6 @@
 FROM python:3.8
 
-ARG BUILD_ENV=dev
+ARG BUILD_ENV=production
 ARG CHROMEDRIVER_VERSION
 
 RUN mkdir -p /app/.apt/usr/bin
@@ -32,11 +32,10 @@ COPY ./docker/utility/install_chromedriver.sh /app/docker/utility/install_chrome
 RUN /app/docker/utility/install_chromedriver.sh $CHROMEDRIVER_DIR $CHROMEDRIVER_VERSION
 
 # Update PATH
-ENV PATH $CHROMEDRIVER_DIR:/app/sfdx/bin:$PATH
+ENV PATH $CHROMEDRIVER_DIR:./node_modules/.bin:$PATH:/app/sfdx/bin
 
 # installing node
 WORKDIR /app
-ENV PATH ./node_modules/.bin:$PATH
 COPY package.json ./
 COPY ./docker/utility/install_node.sh ./docker/utility/install_node.sh
 RUN /bin/sh /app/docker/utility/install_node.sh
@@ -69,5 +68,5 @@ ENV DJANGO_HASHID_SALT='sample hashid=salt' \
   REDIS_URL="redis://redis:6379"
 
 # Avoid building prod assets in development
-RUN if [ "${BUILD_ENV}" = "prod" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
-RUN if [ "${BUILD_ENV}" = "prod" ]; then python /app/manage.py collectstatic --noinput; fi
+RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
+RUN if [ "${BUILD_ENV}" = "production" ]; then python /app/manage.py collectstatic --noinput; fi

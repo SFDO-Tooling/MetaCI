@@ -46,11 +46,9 @@ Below are the following steps necessary to run MetaCI on Docker:
    Copy ``.env.example`` to create a file named ``.env`` in the top level of the MetaCI repository.
    Then, follow `<./docs/configuring.rst>`_ to update the variables in this file.
 
-2. `Building Your Docker Containers`_ 
-    __ `Build Your Docker Containers`
+2. `Build Your Docker Containers`_
 
 3. `Run Your Docker Containers`_
-    __ `Run Your Docker Containers`
 
 
 Build Your Docker Containers
@@ -68,14 +66,14 @@ up the web application it will take roughly 60 seconds to fully compile.
     
     docker-compose build
 
-Running Your Docker Containers
-------------------------------
+Run Your Docker Containers
+--------------------------
 MetaCI's docker container comes out of the box with development test
 data and the creation of a default admin user.
 
 If you would like to disable this functionality please add a `DJANGO_SETTINGS_MODULE` environment variable
 in the web service section of the docker-compose file to set it from its default value (set in Dockerfile) from
-`config.settings.dev` to `config.settings.prod`.
+`config.settings.dev` to `config.settings.production`.
 For examples of how to do this please see `setting docker-compose environment variables`_.
 
 .. _setting docker-compose environment variables: https://docs.docker.com/compose/environment-variables/
@@ -96,7 +94,7 @@ password:
     ``password``
 
 From here you should be able to run builds. However note that this default account will not be created 
-when BUILD_ENV is set to prod
+when BUILD_ENV is set to production
 
 Docker Commands
 ---------------
@@ -243,7 +241,7 @@ Build Arguments
 BUILD_ENV:
     Argument used to determine what dependencies and scripts to run when installing
     dependencies, populating databases, and setting ``DJANGO_SETTINGS_MODULE``. Values:
-    ``dev``, ``prod``, and ``test``.
+    ``dev``, ``production``, and ``test``.
 
 CHROMEDRIVER_VERSION:
     Argument used to override the version of Chromedriver to install, which defaults to

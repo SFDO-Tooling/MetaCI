@@ -2,11 +2,9 @@
 
 # This file installs the given Yarn version to the docker image
 
-# Check whether jq is availible, if so, read the engines.node value from package.json
-if command -v jq &> /dev/null
-then
-    YARN_VERSION=${YARN_VERSION:-$(jq --raw-output '.engines.yarn' package.json)}
-fi
+# Read the engines.yarn value from package.json
+YARN_VERSION=${YARN_VERSION:-$(jq --raw-output '.engines.yarn' package.json)}
+echo "Installing yarn $YARN_VERSION"
 
 set -ex
 key=6A010C5166006599AA17F08146C2130DFD2497F5
