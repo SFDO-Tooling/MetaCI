@@ -206,9 +206,8 @@ def send_start_webhook(release, role, config_item):
         )
         return
     else:
-        raise Exception(
-            "\n".join(err["message"] for err in result["results"]["errors"])
-        )
+        msg = "\n".join(err["message"] for err in result["results"]["errors"])
+        raise Exception(f"Error while sending implementation start step webhook: {msg}")
 
 
 def send_stop_webhook(release, role, config_item):
@@ -248,6 +247,5 @@ def send_stop_webhook(release, role, config_item):
         )
         return
     else:
-        raise Exception(
-            "\n".join(err["message"] for err in result["results"]["errors"])
-        )
+        msg = "\n".join(err["message"] for err in result["results"]["errors"])
+        raise Exception(f"Error while sending implementation stop step webhook: {msg}")
