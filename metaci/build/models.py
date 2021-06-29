@@ -334,7 +334,7 @@ class Build(models.Model):
             org_config = self.get_org(project_config)
             if (
                 self.plan.change_traffic_control
-            ):  # Calling for any actions taken against packaging org
+            ):
                 try:
                     send_start_webhook(
                         self.release,
@@ -419,9 +419,12 @@ class Build(models.Model):
             if org_config.created:
                 self.delete_org(org_config)
 
+            self.logger = init_logger(self)
+            self.logger.error(str(e))
+            self.delete_build_dir()
             if (
                 self.plan.change_traffic_control
-            ):  # Calling for any actions taken against packaging org
+            ):
                 try:
                     send_stop_webhook(
                         self.release,
@@ -431,17 +434,6 @@ class Build(models.Model):
                 except Exception as err:
                     message = f"Error while sending implementation stop step webhook: {err}"
                     self.logger.error(message)
-                    set_build_info(
-                        build, status="error", exception=message, time_end=timezone.now()
-                    )
-                    self.logger = init_logger(self)
-                    self.logger.error(str(e))
-                    self.delete_build_dir()
-                    self.flush_log()
-                    return
-            self.logger = init_logger(self)
-            self.logger.error(str(e))
-            self.delete_build_dir()
             self.flush_log()
             return
 
@@ -455,7 +447,7 @@ class Build(models.Model):
 
         if (
             self.plan.change_traffic_control
-        ):  # Calling for any actions taken against packaging org
+        ):
             try:
                 send_stop_webhook(
                     self.release,
@@ -465,9 +457,6 @@ class Build(models.Model):
             except Exception as err:
                 message = f"Error while sending implementation stop step webhook: {err}"
                 self.logger.error(message)
-                set_build_info(
-                    build, status="error", exception=message, time_end=timezone.now()
-                )
                 return
 
         if self.plan.role == "qa":
