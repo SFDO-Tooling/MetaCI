@@ -1,10 +1,10 @@
 import datetime
-from metaci.fixtures.factories import PlanFactory, PlanRepositoryFactory
 
 import pytest
 from model_utils import Choices
 
 from metaci.conftest import RepositoryFactory
+from metaci.fixtures.factories import PlanFactory, PlanRepositoryFactory
 from metaci.release.models import ChangeCaseTemplate, ImplementationStep, Release
 from metaci.repository.models import Repository
 
@@ -51,18 +51,15 @@ class TestRelease:
     def test_release_implementation_steps_plan_role(self):
         plan = PlanFactory(role="release", change_traffic_control=True)
         plan.save()
-
         repo = RepositoryFactory(
-            default_implementation_steps={
-                "implementation_steps": [
-                    {
-                        "plan": "release",
-                        "duration": 10,
-                        "start_time": 8,
-                        "start_date_offset": 0,
-                    },
-                ]
-            },
+            default_implementation_steps=[
+                {
+                    "plan": "release",
+                    "duration": 10,
+                    "start_time": 8,
+                    "start_date_offset": 0,
+                },
+            ],
         )
         repo.save()
         planrepo = PlanRepositoryFactory(plan=plan, repo=repo)
@@ -79,16 +76,14 @@ class TestRelease:
     def test_release_implementation_steps_no_plan_role(self):
         release = Release(
             repo=RepositoryFactory(
-                default_implementation_steps={
-                    "implementation_steps": [
-                        {
-                            "plan": "release",
-                            "duration": 10,
-                            "start_time": 8,
-                            "start_date_offset": 0,
-                        },
-                    ]
-                },
+                default_implementation_steps=[
+                    {
+                        "plan": "release",
+                        "duration": 10,
+                        "start_time": 8,
+                        "start_date_offset": 0,
+                    },
+                ]
             ),
             change_case_template=ChangeCaseTemplate(),
         )

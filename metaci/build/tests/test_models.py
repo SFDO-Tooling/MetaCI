@@ -70,7 +70,7 @@ class TestBuild:
 
         build = BuildFactory()
         build.plan.flows = "test"
-
+        build.plan.role = "qa"
         try:
             build.run()
         finally:

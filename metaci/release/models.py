@@ -1,7 +1,6 @@
 import datetime
 
 from django.db import models
-from django.utils.timezone import make_aware
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
@@ -123,25 +122,26 @@ class Release(StatusModel):
 
     def save(self, *args, **kw):
         super().save(*args, **kw)
-        if "implementation_steps" in self.repo.default_implementation_steps:
-            for value in self.repo.default_implementation_steps["implementation_steps"]:
-                self.create_default_implementation_step(
-                    value["plan"],
-                    (get_default_sandbox_date()),
-                    (get_default_sandbox_date()),
-                    value["start_time"],
-                    value["start_date_offset"],
-                    value["duration"],
-                )  # modular arthimatic to account for time going to the next day
+        for implementation_step in self.repo.default_implementation_steps:
+            start = datetime.datetime.combine(
+                self.release_creation_date
+                + datetime.timedelta(
+                    days=implementation_step.get("start_date_offset", 0)
+                ),
+                datetime.time(implementation_step["start_time"]),
+            )
+            end = start + datetime.timedelta(hours=implementation_step["duration"])
+            self.create_default_implementation_step(
+                implementation_step["plan"],
+                start,
+                end,
+            )
 
     def create_default_implementation_step(
         self,
         role,
-        start_date=None,
-        end_date=None,
-        start_time=None,
-        start_date_offset=None,
-        duration=None,
+        start=None,
+        end=None,
     ):
         """Create default implementation steps"""
         if len(self.implementation_steps.filter(plan__role=f"{role}")) < 1:
@@ -158,19 +158,6 @@ class Release(StatusModel):
                 ImplementationStep(
                     release=self,
                     plan=planrepo.plan,
-                    start_time=make_aware(
-                        datetime.datetime.combine(
-                            start_date + datetime.timedelta(days=start_date_offset),
-                            datetime.time(start_time),
-                        )
-                    ),
-                    stop_time=make_aware(
-                        datetime.datetime.combine(
-                            end_date
-                            + datetime.timedelta(
-                                days=start_date_offset, hours=duration + start_time
-                            ),
-                            datetime.time((start_time + duration) % 24),
-                        )
-                    ),
+                    start_time=start,
+                    stop_time=end,
                 ).save()
