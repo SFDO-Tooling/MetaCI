@@ -6,7 +6,7 @@ services:
       - .env
     volumes:
       - ./docker/postgres:/var/lib/postgresql/data:delegated
-    image: postgres:9.6
+    image: postgres:12
     ports: 
     - "5432:5432/tcp"
     restart: always
@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: Dockerfile
     command: |
-        /bin/bash -c 'while !</dev/tcp/postgres/5432; do echo "Waiting for postgres databaseto start..."; /bin/sleep 1; done; \
+        /bin/bash -c 'while !</dev/tcp/postgres/5432; do echo "Waiting for postgres database to start..."; /bin/sleep 1; done; \
         /bin/sleep 1; /bin/sh /app/docker/utility/start_server.sh;'
     ports:
       - "8000:8000"
@@ -30,3 +30,5 @@ services:
       - .env
     volumes:
       - .:/app
+      - /app/node_modules
+      - /app/sfdx

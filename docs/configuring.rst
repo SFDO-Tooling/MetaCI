@@ -3,14 +3,6 @@ Configuring MetaCI
 ==================
 
 
-.env File Creation And Variable Declaration
--------------------------------------------
-
-*Please begin by making a copy of env.example and renaming it .env in your root project directory*
-
-Local Variables
----------------
-
 DJANGO_SECRET_KEY: 
     This represents the secret key used to sign session cookies for the Django web application.
     Set it to an arbitrary string that is not shared with another Django site.

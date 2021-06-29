@@ -1,6 +1,6 @@
 FROM python:3.8
 
-ARG BUILD_ENV=local
+ARG BUILD_ENV=dev
 ARG CHROMEDRIVER_VERSION
 
 RUN mkdir -p /app/.apt/usr/bin
@@ -16,6 +16,7 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
   && apt-get update -y \
   && apt-get install --no-install-recommends -y \
      google-chrome-stable \
+     jq \
   && rm -rf /var/lib/apt/lists/*
 
 COPY ./docker/utility/wrap_chrome_binary.sh /app/docker/utility/wrap_chrome_binary.sh
@@ -30,34 +31,32 @@ RUN mkdir $CHROMEDRIVER_DIR
 COPY ./docker/utility/install_chromedriver.sh /app/docker/utility/install_chromedriver.sh
 RUN /app/docker/utility/install_chromedriver.sh $CHROMEDRIVER_DIR $CHROMEDRIVER_VERSION
 
-# Put Chromedriver into the PATH
-ENV PATH $CHROMEDRIVER_DIR:$PATH
+# Update PATH
+ENV PATH $CHROMEDRIVER_DIR:./node_modules/.bin:$PATH:/app/sfdx/bin
 
-# declaring necessary node and yarn versions
-ENV NODE_VERSION 10.16.3
 # installing node
-COPY ./docker/utility/install_node.sh /app/docker/utility/install_node.sh
+WORKDIR /app
+COPY package.json ./
+COPY ./docker/utility/install_node.sh ./docker/utility/install_node.sh
 RUN /bin/sh /app/docker/utility/install_node.sh
 
 # declaring necessary node and yarn versions
-ENV YARN_VERSION 1.22.4
 # installing yarn
-COPY ./docker/utility/install_yarn.sh /app/docker/utility/install_yarn.sh
+COPY ./docker/utility/install_yarn.sh ./docker/utility/install_yarn.sh
 RUN /bin/sh /app/docker/utility/install_yarn.sh
 
 # installing sfdx
-COPY ./docker/utility/install_sfdx.sh /app/docker/utility/install_sfdx.sh
+COPY ./docker/utility/install_sfdx.sh ./docker/utility/install_sfdx.sh
 RUN /bin/sh /app/docker/utility/install_sfdx.sh
 
 # installing python related dependencies with pip
-COPY ./requirements /app/requirements
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r /app/requirements/$BUILD_ENV.txt
+COPY ./requirements ./requirements
+RUN pip install --no-cache-dir --upgrade pip pip-tools
+RUN pip install --no-cache-dir -r /app/requirements/prod.txt
+RUN if [ "${BUILD_ENV}" = "dev" ]; then pip install --no-cache-dir -r /app/requirements/dev.txt; fi
 
 # installing yarn dependencies
-COPY ./package.json /app/package.json
-COPY ./yarn.lock /app/yarn.lock
-WORKDIR /app
+COPY yarn.lock ./
 RUN yarn install
 # copying rest of working directory to /app folder
 COPY . /app
@@ -70,4 +69,4 @@ ENV DJANGO_HASHID_SALT='sample hashid=salt' \
 
 # Avoid building prod assets in development
 RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
-RUN python /app/manage.py collectstatic --noinput
+RUN if [ "${BUILD_ENV}" = "production" ]; then python /app/manage.py collectstatic --noinput; fi

@@ -41,20 +41,18 @@ Running MetaCI In Docker
 
 Below are the following steps necessary to run MetaCI on Docker:
 
-1. `.env File Creation and Variable Declaration`_
-    __ `.env File Creation and Variable Declaration`
+1. Configure MetaCI
 
-2. `Building Your Docker Containers`_ 
-    __ `Building Your Docker Containers`
+   Copy ``.env.example`` to create a file named ``.env`` in the top level of the MetaCI repository.
+   Then, follow `<./docs/configuring.rst>`_ to update the variables in this file.
+
+2. `Build Your Docker Containers`_
+
+3. `Run Your Docker Containers`_
 
 
-3. `Running Your Docker Containers`_
-    __ `Running Your Docker Containers`
-
-Please see `<./docs/configuring.rst>`_ to configure your container.
-
-Building Your Docker Containers
--------------------------------
+Build Your Docker Containers
+----------------------------
 
 This next section assumes you have downloaded ``docker`` and ``docker-compose``.
 Additionally it assumes you have a ``.env`` file in the root directory of this 
@@ -68,14 +66,14 @@ up the web application it will take roughly 60 seconds to fully compile.
     
     docker-compose build
 
-Running Your Docker Containers
-------------------------------
+Run Your Docker Containers
+--------------------------
 MetaCI's docker container comes out of the box with development test
 data and the creation of a default admin user.
 
 If you would like to disable this functionality please add a `DJANGO_SETTINGS_MODULE` environment variable
 in the web service section of the docker-compose file to set it from its default value (set in Dockerfile) from
-`config.settings.local` to `config.settings.production`.
+`config.settings.dev` to `config.settings.production`.
 For examples of how to do this please see `setting docker-compose environment variables`_.
 
 .. _setting docker-compose environment variables: https://docs.docker.com/compose/environment-variables/
@@ -88,7 +86,7 @@ Then run the following command:
     docker-compose up (for debug mode)
 
 After running this command which will take a couple minutes on startup visit ``localhost:8000/admin/login``
-and login with the following credentials if DJANGO_SETTINGS_MODULE is config.settings.local:
+and login with the following credentials if DJANGO_SETTINGS_MODULE is config.settings.dev:
 
 username:
     ``admin``
@@ -218,10 +216,10 @@ CHROMEDRIVER_DIR:
     in the filesystem. CHROMEDRIVER_DIR is set for you in the Dockerfile.
 
 NODE_VERSION: 
-    Environment variable used to set node version for download, this variable is set in the Dockerfile
+    Environment variable used to set node version for download, defaults to the version set in the engines.node field of package.json.
 
 YARN_VERSION: 
-    Environment variable used to set yarn version for download, this variable is set in the Dockerfile
+    Environment variable used to set yarn version for download, defaults to the version set in the engines.yarn field of package.json.
 
 PYTHONUNBUFFERED: 
     Environment variable set in Dockerfile used to not write .pyc files to Docker container
@@ -243,7 +241,7 @@ Build Arguments
 BUILD_ENV:
     Argument used to determine what dependencies and scripts to run when installing
     dependencies, populating databases, and setting ``DJANGO_SETTINGS_MODULE``. Values:
-    ``local``, ``production``, and ``test``.
+    ``dev``, ``production``, and ``test``.
 
 CHROMEDRIVER_VERSION:
     Argument used to override the version of Chromedriver to install, which defaults to

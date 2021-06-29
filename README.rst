@@ -13,16 +13,14 @@ A specialized lightweight CI server for building Salesforce projects from Github
 What is This?
 -------------
 
-`MetaCI` started as an extension of the CumulusCI 2 (https://github.com/SFDO-Tooling/CumulusCI/tree/feature/2.0) project.  After spending almost a year trying to find a cloud hosted CI service that could handle our needs for Salesforce managed package builds, the crazy idea was born: why not just write our own CI server specific to our needs?
+`MetaCI` started as an extension of the `CumulusCI <https://github.com/SFDO-Tooling/CumulusCI>`_ project.  After spending almost a year trying to find a cloud hosted CI service that could handle our needs for Salesforce managed package builds, the crazy idea was born: why not just write our own CI server specific to our needs?
 
 A few key things to point out that made this compelling:
 
 * Running our builds in any of the cloud CI platforms available felt like putting a square peg into a round hole.  Specifically, our builds aren't contained inside the build VM.  They build against an external resource, a Salesforce org.  That creates a lot of incorrect assumptions by the build system such as simple concurrency where anything can run concurrently since it's isolated in the build agent's VM.  That's not true for Salesforce projects and that false assumption creates many challenges with nasty workarounds at best. 
-* CumulusCI 2 already contains all the logic to run all our build operations.  Unlike most CI scenarios, we have a very specific set of dependencies across all our builds.  Using a system that essentially gives us full flexibility by starting each build from a clean VM is way overkill for what we need.
+* CumulusCI already contains all the logic to run all our build operations.  Unlike most CI scenarios, we have a very specific set of dependencies across all our builds.  Using a system that essentially gives us full flexibility by starting each build from a clean VM is way overkill for what we need.
 * The available cloud CI options don't support burst pricing.  You pay to have X build containers reserved 24x7 for the month.  Our build patterns are far more burst oriented than that.  Maybe 80% of the time we're not building anything, 15% of the time we're building a few concurrent branches, and 5% of the time we're building lots at once and could need up to 25 concurrent builds.
 * Heroku is a great platform for burst capacity architectures but no available CI systems run well on Heroku.
-
-So, MetaCI was started as a prototype of a crazy idea mid-November 2016, got prototype buy in mid-December 2016, and is going into production to replace Bamboo Cloud before January 31, 2017.
 
 Features
 --------
@@ -46,10 +44,8 @@ Prerequisites
 -------------
 
 * A Github repository containing metadata for a managed package development project
-* The cumulusci python package installed and configured on your local system so you can run deploy commands against your repo locally.  See http://cumulusci.readthedocs.io/en/latest/tutorial.html for more details on setting up CumulusCI locally.
-* Optional, but highly recommended: Access to Salesforce DX.  If you configure the SFDX_CONFIG and SFDX_HUB_ORG config variables with the appropriate json you can use scratch orgs in your builds.  You'll need to configure your local environment to not use encryption when storing credentials in files so you can export the configs to MetaCI.
-
-You can also fork the CumulusCI-Test repository and use that as a demo since it is already configured for CumulusCI.  
+* The `cumulusci` python package installed and configured on your local system so you can run deploy commands against your repo locally.  See the `CumulusCI documentation <https://cumulusci.readthedocs.io/>`_ for more details on setting up CumulusCI locally.
+* Optional, but highly recommended: Access to Salesforce DX. MetaCI can be configured to run builds in scratch orgs or persistent orgs.
 
 Getting Started
 ---------------
@@ -59,6 +55,7 @@ For local setup see `running <https://github.com/SFDO-Tooling/MetaCI/blob/main/d
 We're currently working on improving our documentation for deploying MetaCI on Heroku.
 If you have questions about production setup, please reach out to the SFDO Release Engineering Team,
 or post a question on the `CumulusCI Trailblazer Community Group <https://trailblazers.salesforce.com/_ui/core/chatter/groups/GroupProfilePage?g=0F9300000009M9Z>`_.
+
 RQ Worker
 ^^^^^^^^^
 
@@ -80,13 +77,7 @@ Enter the repo name, owner name, and the url.  Currently only repositories on gi
 Configuring Orgs
 ----------------
 
-Any org you connect to your local CumulusCI keychain can be added to MetaCI as a build org.  Go to CUMULUSCI -> Orgs -> Add and give the org a name, select the repo, and paste in the results of `cumulusci2 org info <org_name>` on your local system.  Remember that org names are already namespaced by their repository so rather than package_name_feature, just call the org feature.
-
-
-Configuring Services
---------------------
-
-For a few flows, you need to have the github service configured in CumulusCI.  On your local system, run `cumulusci12 project show_github` to get the json to load add the `github` service under Service -> Add.  If you get an error, run `cumulusci2 project connect_github` to configure the github service in your local system then run show_github again.
+Any org you connect to your local CumulusCI keychain can be added to MetaCI as a build org.  Go to CUMULUSCI -> Orgs -> Add and give the org a name, select the repo, and paste in the results of ``cci org info <org_name> --json`` on your local system.  Remember that org names are already namespaced by their repository so rather than ``package_name_feature``, just call the org ``feature``.
 
 
 Configuring Plans
@@ -105,7 +96,7 @@ Additionally, you can define a Plan Repository Trigger that will trigger a plan 
 Private Plans & Repositories
 ----------------------------
 
-You can set Plans and Repositories and Private.  When a Plan or Repository is private, the Plan or Repository and its builds will not show up in the public view.  They will show up for any user with the `is_staff` permission.
+You can set Plans and Repositories as Private.  When a Plan or Repository is private, the Plan or Repository and its builds will not show up in the public view.  They will show up for any user with the `is_staff` permission.
 
 To set up user logins using Github, go to /admin and create a new Social App.  Create a new OAuth Application in your Github Settings on github.com to get the client id and secret info.  Once created, have your users go to https://<your_app_name>.herokuapp.com/accounts/github/login to login via Github.  Once they log in you can go to Users under admin and check the is_staff field for your staff users.
 
@@ -164,27 +155,4 @@ cause problems for you. This is not a tested or supported configuration.
 Email Server
 ^^^^^^^^^^^^
 
-In development, it is often nice to be able to see emails that are being sent from your application. If you choose to use `MailHog`_ when generating the project a local SMTP server with a web interface will be available.
-
-.. _mailhog: https://github.com/mailhog/MailHog
-
-To start the service, make sure you have nodejs installed, and then type the following::
-
-    $ npm install
-    $ grunt serve
-
-(After the first run you only need to type ``grunt serve``) This will start an email server that listens on ``127.0.0.1:1025`` in addition to starting your Django project and a watch task for live reload.
-
-To view messages that are sent by your application, open your browser and go to ``http://127.0.0.1:8025``
-
-The email server will exit when you exit the Grunt task on the CLI with Ctrl+C.
-
 In Production, set up Mailgun as a Heroku addon.
-
-Sentry
-^^^^^^
-
-Sentry is an error logging aggregator service. You can sign up for a free account at  https://getsentry.com/signup/?code=cookiecutter  or download and host it yourself.
-The system is setup with reasonable defaults, including 404 logging and integration with the WSGI application.
-
-Setting the Sentry DSN in production is optional but highly recommended.  Having good error management for your CI app is really nice!

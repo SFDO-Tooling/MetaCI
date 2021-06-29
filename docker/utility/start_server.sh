@@ -3,7 +3,7 @@
 # running django database migrations 
 python /app/manage.py migrate
 # creating test data if local settings are configured
-if [ "${DJANGO_SETTINGS_MODULE}" = "config.settings.local" ] ; then
+if [ "${DJANGO_SETTINGS_MODULE}" = "config.settings.dev" ] ; then
     echo "CREATING ADMIN USER FOR TESTING PURPOSES..."
     # Using key error as an indicator for whether or not to run database population and job scheduling scripts
     echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'password')" | python manage.py shell
