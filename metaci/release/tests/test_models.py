@@ -54,7 +54,7 @@ class TestRelease:
         repo = RepositoryFactory(
             default_implementation_steps=[
                 {
-                    "plan": "release",
+                    "role": "release",
                     "duration": 10,
                     "start_time": 8,
                     "start_date_offset": 0,

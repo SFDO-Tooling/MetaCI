@@ -394,12 +394,12 @@ def test_send_stop_webhook(mocked_responses, mocker, transactional_db):
         bulk=False,
     )
     release.change_case_link = "2"
-    send_stop_webhook(release, "foo", "INFRA.instance1")
+    send_stop_webhook(release, "foo", "INFRA.instance1", "Implemented - per plan")
     assert len(mocked_responses.calls) == 1
 
 
 def test_send_stop_webhook__disabled(mocked_responses):
-    send_stop_webhook(None, None, None)
+    send_stop_webhook(None, None, None, None)
     assert len(mocked_responses.calls) == 0
 
 
@@ -478,7 +478,7 @@ def test_send_stop_webhook_failed_result_with_config(
         bulk=False,
     )
     with pytest.raises(Exception):
-        send_stop_webhook(release, "foo", "INFRA.instance1")
+        send_stop_webhook(release, "foo", "INFRA.instance1", "Implemented - per plan")
 
 
 def test_send_stop_webhook_failed_result_no_config(mocker, transactional_db):

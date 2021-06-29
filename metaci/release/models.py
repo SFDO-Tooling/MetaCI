@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from model_utils.models import StatusModel
+from pydantic import BaseModel
 
 from metaci.plan.models import PlanRepository
 from metaci.release.utils import update_release_from_github
@@ -45,6 +46,26 @@ def get_default_sandbox_date():
 
 def get_default_production_date():
     return datetime.date.today() + datetime.timedelta(days=6)
+
+
+class DefaultImplementationStep(BaseModel):
+    start_date_offset: int = 0
+    start_time: int
+    duration: int
+    role: str
+
+    def start(self, release, implementation_step):
+        if self and implementation_step:
+            return datetime.datetime.combine(
+                release.release_creation_date
+                + datetime.timedelta(
+                    days=implementation_step.get("start_date_offset", 0)
+                ),
+                datetime.time(implementation_step["start_time"]),
+            )
+
+    def end(self, start, implementation_step):
+        return start + datetime.timedelta(hours=implementation_step["duration"])
 
 
 class Release(StatusModel):
@@ -122,17 +143,12 @@ class Release(StatusModel):
 
     def save(self, *args, **kw):
         super().save(*args, **kw)
-        for implementation_step in self.repo.default_implementation_steps:
-            start = datetime.datetime.combine(
-                self.release_creation_date
-                + datetime.timedelta(
-                    days=implementation_step.get("start_date_offset", 0)
-                ),
-                datetime.time(implementation_step["start_time"]),
-            )
-            end = start + datetime.timedelta(hours=implementation_step["duration"])
+        for step_dict in self.repo.default_implementation_steps:
+            step_info = DefaultImplementationStep(**step_dict)
+            start = step_info.start(self, step_dict)
+            end = step_info.end(start, step_dict)
             self.create_default_implementation_step(
-                implementation_step["plan"],
+                step_dict["role"],
                 start,
                 end,
             )
