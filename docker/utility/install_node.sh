@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # This file installs the given Node version to the docker image
-# dynamically changing download link based on environmental 
-# Architecture
 
-# NEED TO SET NODE_VERSION ENVIRONMENT VARIABLE if not set already
+# Read the engines.node value from package.json
+NODE_VERSION=${NODE_VERSION:-$(jq --raw-output '.engines.node' package.json)}
+echo "Installing node $NODE_VERSION"
+
 ARCH=
 dpkgArch="$(dpkg --print-architecture)"
 case "${dpkgArch##*-}" in \
@@ -15,10 +16,11 @@ case "${dpkgArch##*-}" in \
     armhf) ARCH='armv7l';; \
     i386) ARCH='x86';; \
     *) echo "unsupported architecture"; exit 1 ;;
-  esac
-  # gpg keys listed at https://github.com/nodejs/node#release-keys
-  set -ex
-  for key in \
+esac
+
+# gpg keys listed at https://github.com/nodejs/node#release-keys
+set -ex
+for key in \
       94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
       FD3A5288F042B6850C66B31F09FE44734EB7990E \
       71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
@@ -30,10 +32,11 @@ case "${dpkgArch##*-}" in \
       4ED778F539E3634C779C87C6D7062848A1AB005C \
       A48C2BEE680E841632CD4E44F07496B3EB3C1762 \
       B9E2F5981AA6E0CD28160D9FF13993A75599653C \
+      C82FA3AE1CBEDC6BE46B9360C43CEC45C17AB93C \
   ; do \
-      gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
+      gpg -v --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "$key" || \
+      gpg -v --batch --keyserver keys.gnupg.net --recv-keys "$key" || \
+      gpg -v --batch --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
   done \
   && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-$ARCH.tar.xz" \
   && curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -42,3 +45,4 @@ case "${dpkgArch##*-}" in \
   && tar -xJf "node-v$NODE_VERSION-linux-$ARCH.tar.xz" -C /usr/local --strip-components=1 --no-same-owner \
   && rm "node-v$NODE_VERSION-linux-$ARCH.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
   && ln -s /usr/local/bin/node /usr/local/bin/nodejs
+
