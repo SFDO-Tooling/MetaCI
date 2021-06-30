@@ -456,8 +456,7 @@ class Build(models.Model):
                     "Implemented - per plan"
                 )
             except Exception as err:
-                message = f"Error while sending implementation stop step webhook: {err}"
-                self.logger.error(message)
+                self.logger.error(str(err))
                 return
 
         if self.plan.role == "qa":
