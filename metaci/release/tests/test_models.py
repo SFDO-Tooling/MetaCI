@@ -84,4 +84,11 @@ class TestRelease:
             ),
             change_case_template=ChangeCaseTemplate(),
         )
-        assert release.create_default_implementation_step("push_production") is None
+        assert (
+            release.create_default_implementation_step(
+                "push_production",
+                datetime.datetime.now(),
+                datetime.datetime.now() + datetime.timedelta(days=3),
+            )
+            is None
+        )

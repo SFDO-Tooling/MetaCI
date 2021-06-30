@@ -153,12 +153,7 @@ class Release(StatusModel):
                 end,
             )
 
-    def create_default_implementation_step(
-        self,
-        role,
-        start=None,
-        end=None,
-    ):
+    def create_default_implementation_step(self, role, start, end):
         """Create default implementation steps"""
         if len(self.implementation_steps.filter(plan__role=f"{role}")) < 1:
             try:
