@@ -64,8 +64,8 @@ class DefaultImplementationStep(BaseModel):
                 datetime.time(implementation_step["start_time"]),
             )
 
-    def end(self, start, implementation_step):
-        return start + datetime.timedelta(hours=implementation_step["duration"])
+    def end(self, start):
+        return start + datetime.timedelta(hours=self.duration)
 
 
 class Release(StatusModel):
