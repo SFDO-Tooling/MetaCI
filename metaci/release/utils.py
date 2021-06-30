@@ -13,7 +13,7 @@ from django.utils.dateparse import parse_date
 logger = logging.getLogger(__name__)
 
 
-def implementation_payload(role, config_item, infra_type,release):
+def implementation_payload(role, config_item, infra_type, release):
     if role and config_item and release and infra_type:
         return {
             "description": role,
@@ -95,7 +95,9 @@ def send_release_webhook(release, config_item=None):
     if config_item and settings.METACI_START_STOP_WEBHOOK and settings.GUS_BUS_OWNER_ID:
         implementation_steps = release.implementation_steps.all()
         steps = [
-            implementation_payload(implementation_step.plan.role, config_item, "Release Deploy",release)
+            implementation_payload(
+                implementation_step.plan.role, config_item, "Release Deploy", release
+            )
             for implementation_step in implementation_steps
         ]
     payload = {
@@ -156,9 +158,7 @@ def send_submit_webhook(release, config_item=None):
     ):
         return
     else:
-        raise Exception(
-            "\n".join(err["message"] for err in result["results"]["errors"])
-        )
+        raise Exception("\n".join(err for err in result["errors"]))
 
 
 def send_start_webhook(release, role, config_item):
@@ -198,7 +198,7 @@ def send_start_webhook(release, role, config_item):
         )
         return
     else:
-        msg = "\n".join(err["message"] for err in result["results"]["errors"])
+        msg = "\n".join(err for err in result["errors"])
         raise Exception(f"Error while sending implementation start step webhook: {msg}")
 
 
@@ -240,5 +240,5 @@ def send_stop_webhook(release, role, config_item, status):
         )
         return
     else:
-        msg = "\n".join(err["message"] for err in result["results"]["errors"])
+        msg = "\n".join(err for err in result["errors"])
         raise Exception(f"Error while sending implementation stop step webhook: {msg}")
