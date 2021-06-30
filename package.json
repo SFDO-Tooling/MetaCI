@@ -61,7 +61,7 @@
     "babel-loader": "^8.2.2",
     "chokidar": "^3.5.2",
     "core-js": "^3.15.1",
-    "coveralls": "^3.1.0",
+    "coveralls": "^3.1.1",
     "css-loader": "^5.2.6",
     "css-minimizer-webpack-plugin": "^2.0.0",
     "eslint": "~7.29.0",
