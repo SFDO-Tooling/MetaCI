@@ -45,9 +45,6 @@ class TestRelease:
         assert release.change_case_template  # checking default see not None
         assert not release.change_case_link  # checking default set to None
 
-    ####### Keep getting the following error: ###############
-    # ValueError: save() prohibited to prevent data loss due to unsaved related object 'release'.
-    #########################################################
     def test_release_implementation_steps_plan_role(self):
         plan = PlanFactory(role="release", change_traffic_control=True)
         plan.save()
