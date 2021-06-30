@@ -15,15 +15,12 @@ logger = logging.getLogger(__name__)
 
 def implementation_payload(role, config_item, infra_type, release):
     if role and config_item and release and infra_type:
+        implementation_step = release.implementation_steps.get(plan__role=role)
         return {
             "description": role,
             "owner": settings.GUS_BUS_OWNER_ID,
-            "start_time": release.implementation_steps.get(plan__role=role)
-            .start_time.astimezone(None)
-            .isoformat(),
-            "end_time": release.implementation_steps.get(plan__role=role)
-            .stop_time.astimezone(None)
-            .isoformat(),
+            "start_time": implementation_step.start_time.astimezone(None).isoformat(),
+            "end_time": implementation_step.stop_time.astimezone(None).isoformat(),
             "configuration_item": config_item,
             "infrastructure_type": infra_type,
             "implementation_steps": role,
