@@ -89,7 +89,7 @@ def send_release_webhook(release, config_item=None):
     )
     tag = release.git_tag
     steps = []
-    if config_item and settings.METACI_START_STOP_WEBHOOK and settings.GUS_BUS_OWNER_ID:
+    if config_item and settings.GUS_BUS_OWNER_ID:
         implementation_steps = release.implementation_steps.all()
         steps = [
             implementation_payload(
@@ -131,7 +131,6 @@ def send_submit_webhook(release, config_item=None):
     if (
         release is None
         or not settings.METACI_RELEASE_WEBHOOK_URL
-        or not settings.METACI_START_STOP_WEBHOOK
         or not settings.GUS_BUS_OWNER_ID
         or not config_item
     ):
@@ -159,11 +158,7 @@ def send_submit_webhook(release, config_item=None):
 
 
 def send_start_webhook(release, role, config_item):
-    if (
-        release is None
-        or not settings.METACI_RELEASE_WEBHOOK_URL
-        or not settings.METACI_START_STOP_WEBHOOK
-    ):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
         return
     if not config_item:
         raise Exception(
@@ -200,11 +195,7 @@ def send_start_webhook(release, role, config_item):
 
 
 def send_stop_webhook(release, role, config_item, status):
-    if (
-        release is None
-        or not settings.METACI_RELEASE_WEBHOOK_URL
-        or not settings.METACI_START_STOP_WEBHOOK
-    ):
+    if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
         return
     if not config_item:
         raise Exception(

@@ -41,8 +41,8 @@ def test_implementation_payload(mocker, transactional_db):
     assert result == {
         "description": "foo",
         "owner": "00G",
-        "start_time": "2021-06-08T08:00:00+00:00",
-        "end_time": "2021-06-08T18:00:00+00:00",
+        "start_time": "2021-06-08T01:00:00-07:00",
+        "end_time": "2021-06-08T11:00:00-07:00",
         "configuration_item": "123",
         "infrastructure_type": "Release Deploy",
         "implementation_steps": "foo",
@@ -82,6 +82,7 @@ def test_send_release_webhook(mocked_responses, mocker, transactional_db):
         METACI_CHANGE_CASE_URL_TEMPLATE="{case_id}",
         METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
         METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+        DJANGO_TIME_ZONE="utc",
         GUS_BUS_OWNER_ID="00G",
     )
 
