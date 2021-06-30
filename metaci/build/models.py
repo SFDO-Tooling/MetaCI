@@ -422,9 +422,7 @@ class Build(models.Model):
             self.logger = init_logger(self)
             self.logger.error(str(e))
             self.delete_build_dir()
-            if (
-                self.plan.change_traffic_control
-            ):
+            if self.plan.change_traffic_control:
                 try:
                     send_stop_webhook(
                         self.release,
