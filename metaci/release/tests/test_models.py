@@ -5,7 +5,12 @@ from model_utils import Choices
 
 from metaci.conftest import RepositoryFactory
 from metaci.fixtures.factories import PlanFactory, PlanRepositoryFactory
-from metaci.release.models import ChangeCaseTemplate, ImplementationStep, Release
+from metaci.release.models import (
+    ChangeCaseTemplate,
+    ImplementationStep,
+    Release,
+    DefaultImplementationStep,
+)
 from metaci.repository.models import Repository
 
 
@@ -71,24 +76,26 @@ class TestRelease:
         assert release.implementation_steps.count() == 1
 
     def test_release_implementation_steps_no_plan_role(self):
+        release_step = {
+            "role": "release",
+            "duration": 10,
+            "start_time": 8,
+            "start_date_offset": 0,
+        }
+        wrong_step = {
+            "role": "ale",
+            "duration": 10,
+            "start_time": 8,
+            "start_date_offset": 0,
+        }
         release = Release(
-            repo=RepositoryFactory(
-                default_implementation_steps=[
-                    {
-                        "plan": "release",
-                        "duration": 10,
-                        "start_time": 8,
-                        "start_date_offset": 0,
-                    },
-                ]
-            ),
+            repo=RepositoryFactory(default_implementation_steps=[release_step]),
             change_case_template=ChangeCaseTemplate(),
         )
+        default_step = DefaultImplementationStep(**wrong_step)
         assert (
             release.create_default_implementation_step(
-                "push_production",
-                datetime.datetime.now(),
-                datetime.datetime.now() + datetime.timedelta(days=3),
+                default_step
             )
             is None
         )

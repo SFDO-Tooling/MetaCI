@@ -30,19 +30,20 @@ def test_implementation_payload(mocker, transactional_db):
                 release=release,
                 plan=PlanFactory(role="foo"),
                 external_id="1000",
-                start_time="2021-06-08T08:00:00-00:00",
-                stop_time="2021-06-08T18:00:00-00:00",
+                start_time="2021-06-08T08:00:00+00:00",
+                stop_time="2021-06-08T18:00:00+00:00",
             ),
         ],
         bulk=False,
     )
-    result = implementation_payload("foo", "123", release)
+    result = implementation_payload("foo", "123", "Release Deploy",release)
     assert result == {
         "description": "foo",
         "owner": "00G",
-        "start_time": "2021-06-08T08:00:00-07:00",
-        "end_time": "2021-06-08T18:00:00-07:00",
+        "start_time": "2021-06-08T01:00:00-07:00",
+        "end_time": "2021-06-08T11:00:00-07:00",
         "configuration_item": "123",
+        "infrastructure_type": "Release Deploy",
         "implementation_steps": "foo",
     }
 

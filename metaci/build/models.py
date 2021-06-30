@@ -332,22 +332,12 @@ class Build(models.Model):
 
             # Look up or spin up the org
             org_config = self.get_org(project_config)
-            if (
-                self.plan.change_traffic_control
-            ):
-                try:
-                    send_start_webhook(
-                        self.release,
-                        self.plan.role,
-                        self.org.configuration_item,
-                    )
-                except Exception as err:
-                    message = f"Error while sending implementation start step webhook: {err}"
-                    self.logger.error(message)
-                    set_build_info(
-                        build, status="error", exception=message, time_end=timezone.now()
-                    )
-                    return
+            if self.plan.change_traffic_control:
+                send_start_webhook(
+                    self.release,
+                    self.plan.role,
+                    self.org.configuration_item,
+                )
 
         except Exception as e:
             self.logger.error(str(e))
@@ -441,11 +431,7 @@ class Build(models.Model):
             self.delete_org(org_config)
 
         self.delete_build_dir()
-        self.flush_log()
-
-        if (
-            self.plan.change_traffic_control
-        ):
+        if self.plan.change_traffic_control:
             try:
                 send_stop_webhook(
                     self.release,
@@ -456,6 +442,7 @@ class Build(models.Model):
             except Exception as err:
                 self.logger.error(str(err))
                 return
+        self.flush_log()
 
         if self.plan.role == "qa":
             set_build_info(

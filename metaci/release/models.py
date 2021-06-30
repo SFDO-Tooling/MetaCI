@@ -144,8 +144,9 @@ class Release(StatusModel):
     def save(self, *args, **kw):
         super().save(*args, **kw)
         for step_dict in self.repo.default_implementation_steps:
+            step = DefaultImplementationStep(**step_dict)
             self.create_default_implementation_step(
-                DefaultImplementationStep(**step_dict)
+                step
             )
 
     def create_default_implementation_step(self, step: DefaultImplementationStep):

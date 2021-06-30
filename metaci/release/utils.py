@@ -5,7 +5,6 @@ from calendar import timegm
 from datetime import datetime
 
 import jwt
-import pytz
 import requests
 from django.conf import settings
 from django.db import transaction
@@ -14,26 +13,19 @@ from django.utils.dateparse import parse_date
 logger = logging.getLogger(__name__)
 
 
-def implementation_payload(role, config_item, release):
-    if role and config_item and release:
+def implementation_payload(role, config_item, infra_type,release):
+    if role and config_item and release and infra_type:
         return {
             "description": role,
             "owner": settings.GUS_BUS_OWNER_ID,
-            "start_time": pytz.timezone("US/Pacific")
-            .localize(
-                release.implementation_steps.get(plan__role=role).start_time.replace(
-                    tzinfo=None
-                )
-            )
+            "start_time": release.implementation_steps.get(plan__role=role)
+            .start_time.astimezone(None)
             .isoformat(),
-            "end_time": pytz.timezone("US/Pacific")
-            .localize(
-                release.implementation_steps.get(plan__role=role).stop_time.replace(
-                    tzinfo=None
-                )
-            )
+            "end_time": release.implementation_steps.get(plan__role=role)
+            .stop_time.astimezone(None)
             .isoformat(),
             "configuration_item": config_item,
+            "infrastructure_type": infra_type,
             "implementation_steps": role,
         }
     raise Exception("Please check your plan's role and org's configuration item.")
@@ -103,7 +95,7 @@ def send_release_webhook(release, config_item=None):
     if config_item and settings.METACI_START_STOP_WEBHOOK and settings.GUS_BUS_OWNER_ID:
         implementation_steps = release.implementation_steps.all()
         steps = [
-            implementation_payload(implementation_step.plan.role, config_item, release)
+            implementation_payload(implementation_step.plan.role, config_item, "Release Deploy",release)
             for implementation_step in implementation_steps
         ]
     payload = {
