@@ -7,9 +7,9 @@ from metaci.conftest import RepositoryFactory
 from metaci.fixtures.factories import PlanFactory, PlanRepositoryFactory
 from metaci.release.models import (
     ChangeCaseTemplate,
+    DefaultImplementationStep,
     ImplementationStep,
     Release,
-    DefaultImplementationStep,
 )
 from metaci.repository.models import Repository
 
@@ -93,9 +93,4 @@ class TestRelease:
             change_case_template=ChangeCaseTemplate(),
         )
         default_step = DefaultImplementationStep(**wrong_step)
-        assert (
-            release.create_default_implementation_step(
-                default_step
-            )
-            is None
-        )
+        assert release.create_default_implementation_step(default_step) is None
