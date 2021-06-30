@@ -1,6 +1,7 @@
 import datetime
 
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
@@ -54,18 +55,17 @@ class DefaultImplementationStep(BaseModel):
     duration: int
     role: str
 
-    def start(self, release, implementation_step):
-        if self and implementation_step:
-            return datetime.datetime.combine(
+    def start(self, release):
+        return timezone.make_aware(
+            datetime.datetime.combine(
                 release.release_creation_date
-                + datetime.timedelta(
-                    days=implementation_step.get("start_date_offset", 0)
-                ),
-                datetime.time(implementation_step["start_time"]),
+                + datetime.timedelta(days=self.start_date_offset),
+                datetime.time(self.start_time),
             )
+        )
 
-    def end(self, start, implementation_step):
-        return start + datetime.timedelta(hours=implementation_step["duration"])
+    def end(self, start):
+        return start + datetime.timedelta(hours=self.duration)
 
 
 class Release(StatusModel):
@@ -144,21 +144,16 @@ class Release(StatusModel):
     def save(self, *args, **kw):
         super().save(*args, **kw)
         for step_dict in self.repo.default_implementation_steps:
-            step_info = DefaultImplementationStep(**step_dict)
-            start = step_info.start(self, step_dict)
-            end = step_info.end(start, step_dict)
             self.create_default_implementation_step(
-                step_dict["role"],
-                start,
-                end,
+                DefaultImplementationStep(**step_dict)
             )
 
-    def create_default_implementation_step(self, role, start, end):
+    def create_default_implementation_step(self, step: DefaultImplementationStep):
         """Create default implementation steps"""
-        if len(self.implementation_steps.filter(plan__role=f"{role}")) < 1:
+        if len(self.implementation_steps.filter(plan__role=f"{step.role}")) < 1:
             try:
                 planrepo = self.repo.planrepository_set.should_run().get(
-                    plan__role=f"{role}"
+                    plan__role=f"{step.role}"
                 )
             except (
                 PlanRepository.DoesNotExist,
@@ -166,9 +161,10 @@ class Release(StatusModel):
             ):
                 pass
             else:
+                start = step.start(self)
                 ImplementationStep(
                     release=self,
                     plan=planrepo.plan,
                     start_time=start,
-                    stop_time=end,
+                    stop_time=step.end(start),
                 ).save()
