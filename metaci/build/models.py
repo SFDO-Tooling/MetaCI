@@ -332,12 +332,22 @@ class Build(models.Model):
 
             # Look up or spin up the org
             org_config = self.get_org(project_config)
-            if self.plan.change_traffic_control:
-                send_start_webhook(
-                    self.release,
-                    self.plan.role,
-                    self.org.configuration_item,
-                )
+            if (
+                self.plan.change_traffic_control
+            ):
+                try:
+                    send_start_webhook(
+                        self.release,
+                        self.plan.role,
+                        self.org.configuration_item,
+                    )
+                except Exception as err:
+                    message = f"Error while sending implementation start step webhook: {err}"
+                    self.logger.error(message)
+                    set_build_info(
+                        build, status="error", exception=message, time_end=timezone.now()
+                    )
+                    return
 
         except Exception as e:
             self.logger.error(str(e))
@@ -412,15 +422,19 @@ class Build(models.Model):
             self.logger = init_logger(self)
             self.logger.error(str(e))
             self.delete_build_dir()
-            if self.plan.change_traffic_control:
+            if (
+                self.plan.change_traffic_control
+            ):
                 try:
                     send_stop_webhook(
                         self.release,
                         self.plan.role,
                         self.org.configuration_item,
+                        "Failed - no impact",
                     )
                 except Exception as err:
-                    self.logger.error(str(err))
+                    message = f"Error while sending implementation stop step webhook: {err}"
+                    self.logger.error(message)
             self.flush_log()
             return
 
@@ -432,15 +446,19 @@ class Build(models.Model):
         self.delete_build_dir()
         self.flush_log()
 
-        if self.plan.change_traffic_control:
+        if (
+            self.plan.change_traffic_control
+        ):
             try:
                 send_stop_webhook(
                     self.release,
                     self.plan.role,
                     self.org.configuration_item,
+                    "Implemented - per plan"
                 )
             except Exception as err:
-                self.logger.error(str(err))
+                message = f"Error while sending implementation stop step webhook: {err}"
+                self.logger.error(message)
                 return
 
         if self.plan.role == "qa":

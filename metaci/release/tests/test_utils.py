@@ -226,7 +226,7 @@ def test_send_start_webhook(mocked_responses, mocker, transactional_db):
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/implementation/1000/start/",
+        "https://webhook/implementation/1000/start",
         json={
             "results": [{"success": True, "id": "a2d0u000000tDYeAAM"}],
             "hasErrors": False,
@@ -270,7 +270,7 @@ def test_send_start_webhook_failed_result_with_config(
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/implementation/1000/start/",
+        "https://webhook/implementation/1000/start",
         json={
             "results": [
                 {
@@ -371,7 +371,7 @@ def test_send_stop_webhook(mocked_responses, mocker, transactional_db):
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/implementation/1000/stop/",
+        "https://webhook/implementation/1000/stop?status=Implemented - per plan",
         json={
             "results": [{"success": True, "id": "a2d0u000000tDYeAAM"}],
             "hasErrors": False,
@@ -415,7 +415,7 @@ def test_send_stop_webhook_failed_result_with_config(
     )
     mocked_responses.add(
         "POST",
-        "https://webhook/implementation/1000/stop/",
+        "https://webhook/implementation/1000/stop?status=Implemented - per plan",
         json={
             "results": [
                 {
