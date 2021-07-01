@@ -31,8 +31,8 @@ def test_implementation_payload(mocker, transactional_db):
                 release=release,
                 plan=PlanFactory(role="foo"),
                 external_id="1000",
-                start_time="2021-06-08T08:00:00+00:00",
-                stop_time="2021-06-08T18:00:00+00:00",
+                start_time="2021-06-08T08:00:00-07:00",
+                stop_time="2021-06-08T18:00:00-07:00",
             ),
         ],
         bulk=False,
@@ -41,8 +41,8 @@ def test_implementation_payload(mocker, transactional_db):
     assert result == {
         "description": "foo",
         "owner": "00G",
-        "start_time": "2021-06-08T01:00:00-07:00",
-        "end_time": "2021-06-08T11:00:00-07:00",
+        "start_time": "2021-06-08T15:00:00+00:00",
+        "end_time": "2021-06-09T01:00:00+00:00",
         "configuration_item": "123",
         "infrastructure_type": "Release Deploy",
         "implementation_steps": "foo",
@@ -200,18 +200,8 @@ def test_send_submit_webhook__error(mocked_responses, mocker, transactional_db):
         "POST",
         "https://webhook/case/None/submit",
         json={
-            "results": [
-                {
-                    "success": False,
-                    "errors": [
-                        {
-                            "message": "Update failed. First exception on row 0 with id 5000u000001DwaTAAS; first error: FIELD_CUSTOM_VALIDATION_EXCEPTION, Only Case Owners are allowed to submit for approval",
-                            "errorCode": "System.DmlException",
-                        }
-                    ],
-                }
-            ],
-            "hasErrors": True,
+            "success": False,
+            "errors": ["Error submitting change case."],
         },
     )
 
@@ -275,51 +265,8 @@ def test_send_start_webhook_failed_result_with_config(
         "POST",
         "https://webhook/implementation/1000/start",
         json={
-            "results": [
-                {
-                    "success": False,
-                    "id": "a2d0u000000tEzHAAU",
-                    "errors": [
-                        {
-                            "message": {
-                                "blockedLock": {
-                                    "configurationItem": {
-                                        "id": "a7JB0000000LajBMAS",
-                                        "name": "NA91",
-                                        "path": "Salesforce.SFDC_Core.IA2.IA2-SP1.NA91",
-                                    },
-                                    "title": "Free Text",
-                                },
-                                "blockingLocks": [
-                                    {
-                                        "blockingLock": {
-                                            "configurationItem": {
-                                                "id": "a7JB00000004GHBMA2",
-                                                "path": "Salesforce.SFDC_Core.IA2",
-                                            },
-                                            "id": "a8L0u0000004MFrEAM",
-                                            "lockCase": {},
-                                            "lockOwner": {
-                                                "email": "phiggins@salesforce.com",
-                                                "id": "005B0000000h4eWIAQ",
-                                                "name": "Paul Higgins",
-                                            },
-                                            "lockType": {
-                                                "id": "a8KB0000000CcbxMAC",
-                                                "name": "Moratorium",
-                                            },
-                                        }
-                                    }
-                                ],
-                                "message": "Conflicts Detected! Found 1 lock(s) for CI: NA91",
-                            },
-                            "fields": [],
-                            "errorCode": "FIELD_CUSTOM_VALIDATION_EXCEPTION",
-                        }
-                    ],
-                }
-            ],
-            "hasErrors": True,
+            "success": False,
+            "errors": ["Error starting implementation step."],
         },
     )
     release = ReleaseFactory()
@@ -335,7 +282,9 @@ def test_send_start_webhook_failed_result_with_config(
         ],
         bulk=False,
     )
-    with pytest.raises(Exception):
+    with pytest.raises(
+        Exception, match="Error while sending implementation start step webhook"
+    ):
         send_start_webhook(release, "foo", "INFRA.instance1")
 
 
@@ -360,7 +309,7 @@ def test_send_start_webhook_failed_result_no_config(mocker, transactional_db):
         ],
         bulk=False,
     )
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match="please include a configuration item"):
         send_start_webhook(release, "foo", None)
 
 
@@ -420,51 +369,8 @@ def test_send_stop_webhook_failed_result_with_config(
         "POST",
         "https://webhook/implementation/1000/stop?status=Implemented - per plan",
         json={
-            "results": [
-                {
-                    "success": False,
-                    "id": "a2d0u000000tEzHAAU",
-                    "errors": [
-                        {
-                            "message": {
-                                "blockedLock": {
-                                    "configurationItem": {
-                                        "id": "a7JB0000000LajBMAS",
-                                        "name": "NA91",
-                                        "path": "Salesforce.SFDC_Core.IA2.IA2-SP1.NA91",
-                                    },
-                                    "title": "Free Text",
-                                },
-                                "blockingLocks": [
-                                    {
-                                        "blockingLock": {
-                                            "configurationItem": {
-                                                "id": "a7JB00000004GHBMA2",
-                                                "path": "Salesforce.SFDC_Core.IA2",
-                                            },
-                                            "id": "a8L0u0000004MFrEAM",
-                                            "lockCase": {},
-                                            "lockOwner": {
-                                                "email": "phiggins@salesforce.com",
-                                                "id": "005B0000000h4eWIAQ",
-                                                "name": "Paul Higgins",
-                                            },
-                                            "lockType": {
-                                                "id": "a8KB0000000CcbxMAC",
-                                                "name": "Moratorium",
-                                            },
-                                        }
-                                    }
-                                ],
-                                "message": "Conflicts Detected! Found 1 lock(s) for CI: NA91",
-                            },
-                            "fields": [],
-                            "errorCode": "FIELD_CUSTOM_VALIDATION_EXCEPTION",
-                        }
-                    ],
-                }
-            ],
-            "hasErrors": True,
+            "success": False,
+            "errors": ["Error stopping implementation step."],
         },
     )
     release = ReleaseFactory()
@@ -480,7 +386,9 @@ def test_send_stop_webhook_failed_result_with_config(
         ],
         bulk=False,
     )
-    with pytest.raises(Exception):
+    with pytest.raises(
+        Exception, match="Error while sending implementation stop step webhook"
+    ):
         send_stop_webhook(release, "foo", "INFRA.instance1", "Implemented - per plan")
 
 
@@ -505,5 +413,5 @@ def test_send_stop_webhook_failed_result_no_config(mocker, transactional_db):
         ],
         bulk=False,
     )
-    with pytest.raises(Exception):
-        send_stop_webhook(release, "foo", None)
+    with pytest.raises(Exception, match="please include a configuration item"):
+        send_stop_webhook(release, "foo", None, "Implemented - per plan")
