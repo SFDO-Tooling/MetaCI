@@ -100,6 +100,10 @@ class Plan(models.Model):
         blank=True,
         help_text="Template for the commit message set after a successful build.",
     )
+    change_traffic_control = models.BooleanField(
+        default=False,
+        help_text="Default is set to False, set to true to toggle change traffic control integration on this plan.",
+    )
     active = models.BooleanField(default=True)
     keep_org_on_error = models.BooleanField(default=False)
     keep_org_on_fail = models.BooleanField(default=False)

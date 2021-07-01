@@ -332,9 +332,7 @@ class Build(models.Model):
 
             # Look up or spin up the org
             org_config = self.get_org(project_config)
-            if (
-                self.org and self.org.name and self.org.name.lower() == "packaging"
-            ):  # Calling for any actions taken against packaging org
+            if self.plan.change_traffic_control:
                 send_start_webhook(
                     self.release,
                     self.plan.role,
@@ -410,9 +408,20 @@ class Build(models.Model):
             )
             if org_config.created:
                 self.delete_org(org_config)
+
             self.logger = init_logger(self)
             self.logger.error(str(e))
             self.delete_build_dir()
+            if self.plan.change_traffic_control:
+                try:
+                    send_stop_webhook(
+                        self.release,
+                        self.plan.role,
+                        self.org.configuration_item,
+                        "Failed - no impact",
+                    )
+                except Exception as err:
+                    self.logger.error(str(err))
             self.flush_log()
             return
 
@@ -422,24 +431,18 @@ class Build(models.Model):
             self.delete_org(org_config)
 
         self.delete_build_dir()
-        self.flush_log()
-
-        if (
-            self.org and self.org.name and self.org.name.lower() == "packaging"
-        ):  # Calling for any actions taken against packaging org
+        if self.plan.change_traffic_control:
             try:
                 send_stop_webhook(
                     self.release,
                     self.plan.role,
                     self.org.configuration_item,
+                    "Implemented - per plan"
                 )
             except Exception as err:
-                message = f"Error while sending implementation stop step webhook: {err}"
-                self.logger.error(message)
-                set_build_info(
-                    build, status="error", exception=message, time_end=timezone.now()
-                )
+                self.logger.error(str(err))
                 return
+        self.flush_log()
 
         if self.plan.role == "qa":
             set_build_info(
