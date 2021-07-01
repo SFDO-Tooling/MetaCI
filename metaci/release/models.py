@@ -1,11 +1,12 @@
 import datetime
 
 from django.db import models
-from django.utils.timezone import make_aware
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from model_utils.models import StatusModel
+from pydantic import BaseModel
 
 from metaci.plan.models import PlanRepository
 from metaci.release.utils import update_release_from_github
@@ -46,6 +47,25 @@ def get_default_sandbox_date():
 
 def get_default_production_date():
     return datetime.date.today() + datetime.timedelta(days=6)
+
+
+class DefaultImplementationStep(BaseModel):
+    start_date_offset: int = 0
+    start_time: int
+    duration: int
+    role: str
+
+    def start(self, release):
+        return timezone.make_aware(
+            datetime.datetime.combine(
+                release.release_creation_date
+                + datetime.timedelta(days=self.start_date_offset),
+                datetime.time(self.start_time),
+            )
+        )
+
+    def end(self, start):
+        return start + datetime.timedelta(hours=self.duration)
 
 
 class Release(StatusModel):
@@ -123,43 +143,16 @@ class Release(StatusModel):
 
     def save(self, *args, **kw):
         super().save(*args, **kw)
-        self.create_default_implementation_step(
-            "release_deploy",
-            get_default_sandbox_date(),
-            get_default_sandbox_date(),
-            datetime.time(8),
-            datetime.time(18),
-        )
-        self.create_default_implementation_step(
-            "release",
-            get_default_sandbox_date(),
-            get_default_sandbox_date(),
-            datetime.time(8),
-            datetime.time(18),
-        )
-        self.create_default_implementation_step(
-            "push_sandbox",
-            get_default_sandbox_date(),
-            get_default_sandbox_date(),
-            datetime.time(18),
-            datetime.time(23, 59),
-        )  # time will vary depending on product
-        self.create_default_implementation_step(
-            "push_production",
-            get_default_production_date(),
-            get_default_production_date(),
-            datetime.time(18),
-            datetime.time(23, 59),
-        )  # time will vary depending on product
+        for step_dict in self.repo.default_implementation_steps:
+            step = DefaultImplementationStep(**step_dict)
+            self.create_default_implementation_step(step)
 
-    def create_default_implementation_step(
-        self, role, start_date=None, end_date=None, start_time=None, stop_time=None
-    ):
+    def create_default_implementation_step(self, step: DefaultImplementationStep):
         """Create default implementation steps"""
-        if len(self.implementation_steps.filter(plan__role=f"{role}")) < 1:
+        if len(self.implementation_steps.filter(plan__role=f"{step.role}")) < 1:
             try:
                 planrepo = self.repo.planrepository_set.should_run().get(
-                    plan__role=f"{role}"
+                    plan__role=f"{step.role}"
                 )
             except (
                 PlanRepository.DoesNotExist,
@@ -167,13 +160,10 @@ class Release(StatusModel):
             ):
                 pass
             else:
+                start = step.start(self)
                 ImplementationStep(
                     release=self,
                     plan=planrepo.plan,
-                    start_time=make_aware(
-                        datetime.datetime.combine(start_date, start_time)
-                    ),
-                    stop_time=make_aware(
-                        datetime.datetime.combine(end_date, stop_time)
-                    ),
+                    start_time=start,
+                    stop_time=step.end(start),
                 ).save()

@@ -82,10 +82,16 @@ def run_build(build_id, lock_id=None):
             res_status = set_github_status.delay(build_id)
             build.task_id_status_end = res_status.id
 
-        build.set_status("error")
         build.log += "\nERROR: The build raised an exception\n"
         build.log += str(e)
+        build.traceback = "".join(traceback.format_tb(e.__traceback__))
         build.save()
+        set_build_info(
+            build.get_build(),
+            exception=str(e),
+            status="error",
+            time_end=timezone.now(),
+        )
 
         build_complete.send(
             sender=build.__class__, build=build, status=build.get_status()
