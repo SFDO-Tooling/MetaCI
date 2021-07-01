@@ -456,9 +456,6 @@ METACI_LONG_RUNNING_BUILD_CONFIG = json.loads(
     env("METACI_LONG_RUNNING_BUILD_CONFIG", default="{}")
 )
 
-# GUS BUS Enablement
-METACI_START_STOP_WEBHOOK = env("METACI_START_STOP_WEBHOOK", default=False)
-
 # GUS BUS OWNER ID
 GUS_BUS_OWNER_ID = env("GUS_BUS_OWNER_ID", default="")
 

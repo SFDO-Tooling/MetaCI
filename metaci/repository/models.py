@@ -33,8 +33,8 @@ class Repository(models.Model):
     owner = models.CharField(max_length=255)
     github_id = models.IntegerField(null=True, blank=True)
     url = models.URLField(max_length=255)
-
     release_tag_regex = models.CharField(max_length=255, blank=True, null=True)
+    default_implementation_steps = models.JSONField(null=True, default=[])
 
     objects = RepositoryQuerySet.as_manager()
 
