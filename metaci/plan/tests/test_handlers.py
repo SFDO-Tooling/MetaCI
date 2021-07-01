@@ -1,5 +1,8 @@
 from unittest import mock
 
+import github3
+import pytest
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
 from metaci.build.models import Build
@@ -55,7 +58,10 @@ class PlanHandlerTestCase(TestCase):
             branch="main",
         )
         self.build = Build.objects.create(
-            repo=self.source_repo, planrepo=self.source_plan_repo, plan=self.source_plan
+            repo=self.source_repo,
+            planrepo=self.source_plan_repo,
+            plan=self.source_plan,
+            log="",
         )
 
     @mock.patch("metaci.plan.models.PlanRepositoryTrigger._get_commit")
@@ -75,3 +81,15 @@ class PlanHandlerTestCase(TestCase):
         enqueued_build = Build.objects.get(repo=self.target_repo)
         self.assertIsNotNone(enqueued_build)
         self.assertIsNotNone(enqueued_build.task_id_check)  # build has been queued
+
+    @mock.patch("metaci.plan.models.PlanRepositoryTrigger._get_commit")
+    def test_trigger_errors_are_logged(self, get_commit):
+        get_commit.side_effect = github3.exceptions.NotFoundError
+        build_complete.send(sender="sender", build=self.build, status="success")
+        assert (
+            "Could not trigger plan [TestOwner/TriggeredRepo] Target Plan (main branch)"
+            in self.build.log
+        )
+        # confirm trigger was not successful
+        with pytest.raises(ObjectDoesNotExist):
+            Build.objects.get(repo=self.target_repo)
