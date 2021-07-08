@@ -113,7 +113,10 @@ def send_release_webhook(release, config_item=None):
     result = response.json()
     if result["success"]:
         with transaction.atomic():
-            if "implementationSteps" in result:
+            if (
+                "implementationSteps" in result
+                and len(result["implementationSteps"]) > 0
+            ):
                 for step_model, step_result in zip(
                     implementation_steps, result["implementationSteps"]
                 ):
