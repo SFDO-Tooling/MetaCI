@@ -54,7 +54,7 @@ cryptography==3.4.7
     #   jwcrypto
     #   pyjwt
     #   sfdo-template-helpers
-cumulusci==3.38.0
+cumulusci==3.39.0
     # via -r requirements/prod.in
 defusedxml==0.7.1
     # via python3-openid
