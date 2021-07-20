@@ -16,11 +16,11 @@ authlib==0.15.4
     # via
     #   cumulusci
     #   simple-salesforce
-bleach==3.3.0
+bleach==3.3.1
     # via sfdo-template-helpers
-boto3==1.17.111
+boto3==1.18.3
     # via -r requirements/prod.in
-botocore==1.20.111
+botocore==1.21.3
     # via
     #   boto3
     #   s3transfer
@@ -67,7 +67,7 @@ django-anymail==8.4
     # via -r requirements/prod.in
 django-crispy-forms==1.12.0
     # via -r requirements/prod.in
-django-defender==0.9.0
+django-defender==0.9.1
     # via -r requirements/prod.in
 django-environ==0.4.5
     # via -r requirements/prod.in
@@ -270,7 +270,7 @@ rq==1.9.0
     #   rq-scheduler
 rst2ansi==0.1.5
     # via cumulusci
-s3transfer==0.4.2
+s3transfer==0.5.0
     # via boto3
 salesforce-bulk==2.2.0
     # via cumulusci
@@ -326,7 +326,7 @@ urllib3==1.26.6
     #   selenium
 webencodings==0.5.1
     # via bleach
-whitenoise==5.2.0
+whitenoise==5.3.0
     # via -r requirements/prod.in
 wrapt==1.12.1
     # via
