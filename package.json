@@ -12,7 +12,7 @@
     "@salesforce/design-system-react": "^0.10.35",
     "@sentry/browser": "^6.7.2",
     "del": "^6.0.0",
-    "i18next": "^20.3.2",
+    "i18next": "^20.3.4",
     "i18next-browser-languagedetector": "^6.1.2",
     "i18next-http-backend": "^1.2.6",
     "js-cookie": "^2.2.1",
