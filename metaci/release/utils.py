@@ -111,6 +111,7 @@ def send_release_webhook(release, config_item=None):
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
+    
     if result["success"]:
         with transaction.atomic():
             if (
