@@ -150,6 +150,7 @@ def send_submit_webhook(release, config_item=None):
         headers={"Authorization": f"Bearer {token}"},
     )
     result = response.json()
+
     if (
         "results" in result
         and len(result["results"]) > 0
