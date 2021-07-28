@@ -704,16 +704,23 @@ class BuildFlow(models.Model):
         if (
             self.build.plan.role == "push_sandbox" and self.build.release
         ):  # override lives in MetaCI
-            options["push_sandbox"] = {
-                "version": f"{self.build.release.version_number}",
-            }
+            try:
+                options["push_sandbox"] = {
+                    "version": f"{self.build.release.version_number}",
+                    "start_time": self.build.release.implementation_steps.get(plan__id=self.build.plan.id).start_time.strftime("%Y-%m-%dT%H:%M")
+                }
+            except Exception:
+                raise Exception(f"Ensure that you have declared an implementation step with the {self.build.plan.role}.")
         if (
             self.build.plan.role == "push_production" and self.build.release
         ):  # override lives in MetaCI
-            options["push_all"] = {
-                "version": f"{self.build.release.version_number}",
-            }
-
+            try:
+                options["push_all"] = {
+                    "version": f"{self.build.release.version_number}",
+                    "start_time": self.build.release.implementation_steps.get(plan__id=self.build.plan.id).start_time.strftime("%Y-%m-%dT%H:%M")
+                }
+            except Exception:
+                raise Exception(f"Ensure that you have declared an implementation step with the {self.build.plan.role}.")
         return options
 
     def set_commit_status(self):
