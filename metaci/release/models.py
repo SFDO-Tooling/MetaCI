@@ -27,7 +27,9 @@ class ImplementationStep(models.Model):
     plan = models.ForeignKey(
         "plan.Plan", on_delete=models.CASCADE, related_name="implementation_steps"
     )
+
     start_time = models.DateTimeField(_("start_time"))
+    push_time = models.DateTimeField(_("push_time"), null=True, blank=False)
     stop_time = models.DateTimeField(_("stop_time"))
     external_id = models.CharField(
         _("external id"), max_length=255, null=True, blank=True
@@ -51,6 +53,7 @@ def get_default_production_date():
 
 class DefaultImplementationStep(BaseModel):
     start_date_offset: int = 0
+    push_time: int
     start_time: int
     duration: int
     role: str
@@ -66,6 +69,9 @@ class DefaultImplementationStep(BaseModel):
 
     def end(self, start):
         return start + datetime.timedelta(hours=self.duration)
+
+    def _push_time(self,start):
+        return start + datetime.timedelta(hours=self.push_time)
 
 
 class Release(StatusModel):
@@ -162,9 +168,11 @@ class Release(StatusModel):
                 pass
             else:
                 start = step.start(self)
+                push = step._push_time(start)
                 ImplementationStep(
                     release=self,
                     plan=planrepo.plan,
+                    push_time=push,
                     start_time=start,
                     stop_time=step.end(start),
                 ).save()

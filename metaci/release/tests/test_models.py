@@ -58,6 +58,7 @@ class TestRelease:
                 {
                     "role": "release",
                     "duration": 10,
+                    "push_time": 21,
                     "start_time": 8,
                     "start_date_offset": 0,
                 },
@@ -79,12 +80,14 @@ class TestRelease:
         release_step = {
             "role": "release",
             "duration": 10,
+            "push_time": 21,
             "start_time": 8,
             "start_date_offset": 0,
         }
         wrong_step = {
             "role": "ale",
             "duration": 10,
+            "push_time": 21,
             "start_time": 8,
             "start_date_offset": 0,
         }
