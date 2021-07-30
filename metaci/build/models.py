@@ -710,7 +710,7 @@ class BuildFlow(models.Model):
                     "start_time": self.build.release.implementation_steps.get(plan__id=self.build.plan.id).push_time
                 }
             except Exception:
-                raise Exception(f"Ensure that you have declared an implementation step with the {self.build.plan.role}.")
+                raise Exception(f"Ensure that you have declared an implementation step the plan {self.build.plan.name}.")
         if (
             self.build.plan.role == "push_production" and self.build.release
         ):  # override lives in MetaCI
@@ -720,7 +720,7 @@ class BuildFlow(models.Model):
                     "start_time": self.build.release.implementation_steps.get(plan__id=self.build.plan.id).push_time
                 }
             except Exception:
-                raise Exception(f"Ensure that you have declared an implementation step with the {self.build.plan.role}.")
+                raise Exception(f"Ensure that you have declared an implementation step with the plan {self.build.plan.name}.")
         return options
 
     def set_commit_status(self):

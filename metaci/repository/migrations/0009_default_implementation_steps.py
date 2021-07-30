@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="repository",
             name="default_implementation_steps",
-            field=models.JSONField(default=list, null=True),
+            field=models.JSONField(default=[], null=True),
         ),
     ]
