@@ -309,6 +309,7 @@ def test_send_start_webhook_failed_result_no_config(mocker, transactional_db, ca
         ],
         bulk=False,
     )
+    caplog.clear()
     assert send_start_webhook(release, "foo", None) is None
     assert (
         "Error sending start webhook, please include a configuration item, which can be defined on the org object."
