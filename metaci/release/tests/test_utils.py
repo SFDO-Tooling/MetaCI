@@ -309,8 +309,7 @@ def test_send_start_webhook_failed_result_no_config(mocker, transactional_db):
         ],
         bulk=False,
     )
-    with pytest.raises(Exception, match="please include a configuration item"):
-        send_start_webhook(release, "foo", None)
+    assert send_start_webhook(release, "foo", None) is None
 
 
 def test_send_stop_webhook(mocked_responses, mocker, transactional_db):
@@ -413,5 +412,4 @@ def test_send_stop_webhook_failed_result_no_config(mocker, transactional_db):
         ],
         bulk=False,
     )
-    with pytest.raises(Exception, match="please include a configuration item"):
-        send_stop_webhook(release, "foo", None, "Implemented - per plan")
+    assert send_stop_webhook(release, "foo", None, "Implemented - per plan") is None

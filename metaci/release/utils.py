@@ -164,9 +164,10 @@ def send_start_webhook(release, role, config_item):
     if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
         return
     if not config_item:
-        raise Exception(
-            "Error sending start webhook, please include a configuration item, which can be defined on the org."
+        logger.warning(
+            "Error sending start webhook, please include a configuration item, which can be defined on the org object."
         )
+        return
     logger.info(
         f"Sending start webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
@@ -201,9 +202,10 @@ def send_stop_webhook(release, role, config_item, status):
     if release is None or not settings.METACI_RELEASE_WEBHOOK_URL:
         return
     if not config_item:
-        raise Exception(
-            "Error sending stop webhook, please include a configuration item, which can be defined on the org."
+        logger.warning(
+            "Error sending stop webhook, please include a configuration item, which can be defined on the org object."
         )
+        return
     logger.info(
         f"Sending stop webhook for {release} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
