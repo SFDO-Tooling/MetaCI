@@ -28,7 +28,7 @@ certifi==2021.5.30
     # via
     #   -c requirements/prod.txt
     #   requests
-charset-normalizer==2.0.3
+charset-normalizer==2.0.4
     # via
     #   -c requirements/prod.txt
     #   requests
@@ -65,7 +65,7 @@ factory-boy==3.2.0
     # via
     #   -r requirements/dev.in
     #   pytest-factoryboy
-faker==8.10.1
+faker==8.11.0
     # via
     #   -c requirements/prod.txt
     #   factory-boy
@@ -85,9 +85,9 @@ ipdb==0.13.9
     # via -r requirements/dev.in
 ipython-genutils==0.2.0
     # via traitlets
-ipython==7.25.0
+ipython==7.26.0
     # via ipdb
-isort==5.9.2
+isort==5.9.3
     # via -r requirements/dev.in
 jedi==0.18.0
     # via ipython
@@ -162,7 +162,7 @@ pytz==2021.1
     #   -c requirements/prod.txt
     #   babel
     #   django
-regex==2021.7.6
+regex==2021.8.3
     # via black
 requests==2.26.0
     # via
@@ -179,7 +179,7 @@ six==1.16.0
     #   responses
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==4.1.1
+sphinx==4.1.2
     # via -r requirements/dev.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
@@ -208,7 +208,7 @@ toml==0.10.2
     # via
     #   ipdb
     #   pytest
-tomli==1.1.0
+tomli==1.2.0
     # via black
 traitlets==5.0.5
     # via

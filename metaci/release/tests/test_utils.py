@@ -288,7 +288,7 @@ def test_send_start_webhook_failed_result_with_config(
         send_start_webhook(release, "foo", "INFRA.instance1")
 
 
-def test_send_start_webhook_failed_result_no_config(mocker, transactional_db):
+def test_send_start_webhook_failed_result_no_config(mocker, transactional_db, caplog):
     mocker.patch(
         "metaci.release.utils.settings",
         METACI_RELEASE_WEBHOOK_URL="https://webhook",
@@ -309,8 +309,11 @@ def test_send_start_webhook_failed_result_no_config(mocker, transactional_db):
         ],
         bulk=False,
     )
-    with pytest.raises(Exception, match="please include a configuration item"):
-        send_start_webhook(release, "foo", None)
+    assert send_start_webhook(release, "foo", None) is None
+    assert (
+        "Error sending start webhook, please include a configuration item, which can be defined on the org object."
+        in caplog.text
+    )
 
 
 def test_send_stop_webhook(mocked_responses, mocker, transactional_db):
@@ -392,7 +395,7 @@ def test_send_stop_webhook_failed_result_with_config(
         send_stop_webhook(release, "foo", "INFRA.instance1", "Implemented - per plan")
 
 
-def test_send_stop_webhook_failed_result_no_config(mocker, transactional_db):
+def test_send_stop_webhook_failed_result_no_config(mocker, transactional_db, caplog):
     mocker.patch(
         "metaci.release.utils.settings",
         METACI_RELEASE_WEBHOOK_URL="https://webhook",
@@ -413,5 +416,8 @@ def test_send_stop_webhook_failed_result_no_config(mocker, transactional_db):
         ],
         bulk=False,
     )
-    with pytest.raises(Exception, match="please include a configuration item"):
-        send_stop_webhook(release, "foo", None, "Implemented - per plan")
+    assert send_stop_webhook(release, "foo", None, "Implemented - per plan") is None
+    assert (
+        "Error sending stop webhook, please include a configuration item, which can be defined on the org object."
+        in caplog.text
+    )
