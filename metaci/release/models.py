@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 from django.db import models
 from django.utils import timezone
@@ -53,7 +54,7 @@ def get_default_production_date():
 
 class DefaultImplementationStep(BaseModel):
     start_date_offset: int = 0
-    push_time: int
+    push_time: Optional[int]
     start_time: int
     duration: int
     role: str
@@ -70,7 +71,9 @@ class DefaultImplementationStep(BaseModel):
     def end(self, start):
         return start + datetime.timedelta(hours=self.duration)
 
-    def _push_time(self,start):
+    def _push_time(self, start):
+        if self.push_time is None:
+            return None
         return start + datetime.timedelta(hours=self.push_time)
 
 
