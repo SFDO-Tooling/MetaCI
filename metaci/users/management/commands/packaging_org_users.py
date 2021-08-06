@@ -70,4 +70,4 @@ def _handle_packaging_org(org):
         return {"repo": org.repo.name, "error": f"Expired: {e}"}
     except Exception as e:
         print(f"{type(e)}: {e}", file=sys.stderr)
-        return {"repo": org.repo.name, "error": f"Error: {e}"}
+        return {"repo": org.repo.name, "error": f"{type(e)}: {e}"}
