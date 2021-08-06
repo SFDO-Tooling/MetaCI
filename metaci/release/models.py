@@ -54,7 +54,7 @@ def get_default_production_date():
 
 class DefaultImplementationStep(BaseModel):
     start_date_offset: int = 0
-    push_time: Optional[int]
+    push_time: Optional[int] = None
     start_time: int
     duration: int
     role: str
