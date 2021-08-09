@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="implementationstep",
             name="push_time",
-            field=models.DateTimeField(null=True, verbose_name="push_time"),
+            field=models.DateTimeField(null=True, verbose_name="push_time", blank=True),
         ),
     ]

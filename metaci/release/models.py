@@ -30,7 +30,7 @@ class ImplementationStep(models.Model):
     )
 
     start_time = models.DateTimeField(_("start_time"))
-    push_time = models.DateTimeField(_("push_time"), null=True, blank=False)
+    push_time = models.DateTimeField(_("push_time"), null=True, blank=True)
     stop_time = models.DateTimeField(_("stop_time"))
     external_id = models.CharField(
         _("external id"), max_length=255, null=True, blank=True
