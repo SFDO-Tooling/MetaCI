@@ -137,6 +137,10 @@ class Plan(models.Model):
             raise ValidationError(
                 "Only Plans with a Commit Status trigger may specify a Commit Status Regex."
             )
+        if self.trigger == "status" and not self.commit_status_regex:
+            raise ValidationError(
+                "Plans with a Commit Status trigger must specify a Commit Status Regex."
+            )
 
     def get_absolute_url(self):
         return reverse("plan_detail", kwargs={"plan_id": self.id})
@@ -148,6 +152,14 @@ class Plan(models.Model):
         for repo in self.repos.all():
             yield repo
 
+    def _check_ref_regex(self, payload):
+        if not payload["ref"].startswith("refs/heads/"):
+            return False
+        branch = payload["ref"][11:]
+
+        # Check the branch against regex
+        return re.match(self.regex, branch)
+
     def check_github_event(self, event, payload):
         run_build = False
         commit = None
@@ -157,12 +169,7 @@ class Plan(models.Model):
             # Handle commit events
             if self.trigger == "commit":
                 # Check if the event was triggered by a commit
-                if not payload["ref"].startswith("refs/heads/"):
-                    return run_build, commit, commit_message
-                branch = payload["ref"][11:]
-
-                # Check the branch against regex
-                if not re.match(self.regex, branch):
+                if not self._check_ref_regex(payload):
                     return run_build, commit, commit_message
 
                 run_build = True
@@ -205,14 +212,8 @@ class Plan(models.Model):
                 return run_build, commit, commit_message
 
             # If we also have a branch regex filter, run it.
-            if self.regex:
-                if not payload["ref"].startswith("refs/heads/"):
-                    return run_build, commit, commit_message
-
-                branch = payload["ref"][11:]
-                # Check the branch against regex
-                if not re.match(self.regex, branch):
-                    return run_build, commit, commit_message
+            if self.regex and not self._check_ref_regex(payload):
+                return run_build, commit, commit_message
 
             run_build = True
             commit = payload["sha"]

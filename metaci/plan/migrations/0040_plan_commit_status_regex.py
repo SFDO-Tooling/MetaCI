@@ -14,6 +14,15 @@ def migrate_regexes(apps, schema_editor):
             plan.save()
 
 
+def migrate_regexes_reverse(apps, schema_editor):
+    Plan = apps.get_model("plan", "Plan")
+    for plan in Plan.objects.filter(trigger="status").iterator():
+        if plan.commit_status_regex:
+            plan.regex = plan.commit_status_regex
+            plan.commit_status_regex = None
+            plan.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -31,5 +40,5 @@ class Migration(migrations.Migration):
                 null=True,
             ),
         ),
-        migrations.RunPython(migrate_regexes),
+        migrations.RunPython(migrate_regexes, migrate_regexes_reverse),
     ]

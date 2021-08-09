@@ -160,6 +160,15 @@ class PlanTestCase(TestCase):
         ):
             self.commit_plan.clean()
 
+    def test_commit_plan_saved_without_regex(self):
+        self.commit_plan.commit_status_regex = None
+        self.commit_plan.trigger = "status"
+        with pytest.raises(
+            ValidationError,
+            match="Plans with a Commit Status trigger must specify a Commit Status Regex.",
+        ):
+            self.commit_plan.clean()
+
     def test_non_commit_status_plan_saved_with_status_regex(self):
         self.commit_plan.commit_status_regex = "foo"
         self.commit_plan.trigger = "manual"
