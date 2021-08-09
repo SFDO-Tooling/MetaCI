@@ -86,7 +86,7 @@ class PlanTestCase(TestCase):
             name="Test Plan",
             role="feature",
             trigger="status",
-            regex="Package Upload",
+            commit_status_regex="Package Upload",
             flows="test_flow",
             org="test_org",
             context="test case",
@@ -94,6 +94,63 @@ class PlanTestCase(TestCase):
         run_build, commit, commit_message = plan.check_github_event("status", payload)
         assert run_build
         assert commit == "SHA"
+
+    def test_check_github_event__status_event_negative(self):
+        payload = {"context": "Package Upload", "state": "success", "sha": "SHA"}
+        plan = Plan(
+            name="Test Plan",
+            role="feature",
+            trigger="status",
+            commit_status_regex="Commit Status",
+            flows="test_flow",
+            org="test_org",
+            context="test case",
+        )
+        run_build, commit, commit_message = plan.check_github_event("status", payload)
+        assert not run_build
+
+    def test_check_github_event__status_event_with_branch_regex(self):
+        payload = {
+            "context": "Package Upload",
+            "state": "success",
+            "sha": "SHA",
+            "ref": "refs/heads/test/matches",
+            "head_commit": None,
+        }
+        plan = Plan(
+            name="Test Plan",
+            role="feature",
+            trigger="status",
+            regex="test/",
+            commit_status_regex="Package Upload",
+            flows="test_flow",
+            org="test_org",
+            context="test case",
+        )
+        run_build, commit, commit_message = plan.check_github_event("status", payload)
+        assert run_build
+        assert commit == "SHA"
+
+    def test_check_github_event__status_event_with_branch_regex_negative(self):
+        payload = {
+            "context": "Package Upload",
+            "state": "success",
+            "sha": "SHA",
+            "ref": "refs/heads/test/matches",
+            "head_commit": None,
+        }
+        plan = Plan(
+            name="Test Plan",
+            role="feature",
+            trigger="status",
+            regex="feature/",
+            commit_status_regex="Package Upload",
+            flows="test_flow",
+            org="test_org",
+            context="test case",
+        )
+        run_build, commit, commit_message = plan.check_github_event("status", payload)
+        assert not run_build
 
     def test_check_github_event__status_event_no_match(self):
         payload = {"context": "something", "state": "success", "sha": "SHA"}
@@ -114,5 +171,14 @@ class PlanTestCase(TestCase):
         with pytest.raises(
             ValidationError,
             match="Plans with a non-manual trigger type must also specify a regex.",
+        ):
+            self.commit_plan.clean()
+
+    def test_non_commit_status_plan_saved_with_status_regex(self):
+        self.commit_plan.commit_status_regex = "foo"
+        self.commit_plan.trigger = "manual"
+        with pytest.raises(
+            ValidationError,
+            match="Only Plans with a Commit Status trigger may specify a Commit Status Regex.",
         ):
             self.commit_plan.clean()
