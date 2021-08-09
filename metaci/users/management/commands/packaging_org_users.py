@@ -2,7 +2,6 @@ import json
 import sys
 
 from django.core.management.base import BaseCommand
-from requests.exceptions import HTTPError
 from simple_salesforce.exceptions import (
     SalesforceExpiredSession,
     SalesforceMalformedRequest,
@@ -69,6 +68,6 @@ def _handle_packaging_org(org):
     except SalesforceExpiredSession as e:
         print(f"Expired: {e}", file=sys.stderr)
         return {"repo": org.repo.name, "error": f"Expired: {e}"}
-    except HTTPError as e:
-        print(f"Error: {e}", file=sys.stderr)
-        return {"repo": org.repo.name, "error": f"Error: {e}"}
+    except Exception as e:
+        print(f"{type(e).__name__}: {e}", file=sys.stderr)
+        return {"repo": org.repo.name, "error": f"{type(e).__name__}: {e}"}

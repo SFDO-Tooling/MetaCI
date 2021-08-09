@@ -106,6 +106,6 @@ class TestPackagingOrgUsers(TestCase):
                     "repo": "RepoB",
                     "error": "Expired: Expired session for A. Response content: D",
                 },
-                {"repo": "RepoC", "error": "Error: [Errno E] F: 'G'"},
+                {"repo": "RepoC", "error": "HTTPError: [Errno E] F: 'G'"},
             ],
         }
