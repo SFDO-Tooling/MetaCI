@@ -152,25 +152,11 @@ class PlanTestCase(TestCase):
         run_build, commit, commit_message = plan.check_github_event("status", payload)
         assert not run_build
 
-    def test_check_github_event__status_event_no_match(self):
-        payload = {"context": "something", "state": "success", "sha": "SHA"}
-        plan = Plan(
-            name="Test Plan",
-            role="feature",
-            trigger="status",
-            regex="something else",
-            flows="test_flow",
-            org="test_org",
-            context="test case",
-        )
-        run_build, commit, commit_message = plan.check_github_event("status", payload)
-        assert not run_build
-
     def test_plan_saved_without_regex(self):
         self.commit_plan.regex = None
         with pytest.raises(
             ValidationError,
-            match="Plans with a non-manual trigger type must also specify a regex.",
+            match="Plans with a trigger type other than Manual or Commit Status must also specify a regex to match tags or branches.",
         ):
             self.commit_plan.clean()
 
