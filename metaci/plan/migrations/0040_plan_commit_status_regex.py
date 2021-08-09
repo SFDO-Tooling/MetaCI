@@ -5,8 +5,8 @@ from django.db import migrations, models
 
 def migrate_regexes(apps, schema_editor):
     Plan = apps.get_model("plan", "Plan")
-    for plan in Plan.objects.all():
-        if plan.trigger == "status" and plan.regex:
+    for plan in Plan.objects.filter(trigger="status").iterator():
+        if plan.regex:
             # Migrate the regex to the new commit_status_regex field.
 
             plan.commit_status_regex = plan.regex
