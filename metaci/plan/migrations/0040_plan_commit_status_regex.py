@@ -3,7 +3,7 @@
 from django.db import migrations, models
 
 
-def combine_names(apps, schema_editor):
+def migrate_regexes(apps, schema_editor):
     Plan = apps.get_model("plan", "Plan")
     for plan in Plan.objects.all():
         if plan.trigger == "status" and plan.regex:
