@@ -86,6 +86,12 @@ class Plan(models.Model):
     role = models.CharField(max_length=16, choices=BUILD_ROLES)
     queue = models.CharField(max_length=16, choices=QUEUES, default="default")
     regex = models.CharField(max_length=255, null=True, blank=True)
+    commit_status_regex = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="For Plans that use the trigger Commit Status, run builds when the commit status matches this regex.",
+    )
     flows = models.CharField(max_length=255)
     org = models.CharField(max_length=255)
     context = models.CharField(
@@ -123,9 +129,13 @@ class Plan(models.Model):
         ordering = ["name", "active", "context"]
 
     def clean(self):
-        if self.trigger != "manual" and not self.regex:
+        if self.trigger not in ["manual", "status"] and not self.regex:
             raise ValidationError(
-                "Plans with a non-manual trigger type must also specify a regex."
+                "Plans with a trigger type other than Manual or Commit Status must also specify a regex to match tags or branches."
+            )
+        if self.trigger != "status" and self.commit_status_regex:
+            raise ValidationError(
+                "Only Plans with a Commit Status trigger may specify a Commit Status Regex."
             )
 
     def get_absolute_url(self):
@@ -191,8 +201,18 @@ class Plan(models.Model):
             and self.trigger == "status"
             and payload["state"] == "success"
         ):
-            if not re.match(self.regex, payload["context"]):
+            if not re.match(self.commit_status_regex, payload["context"]):
                 return run_build, commit, commit_message
+
+            # If we also have a branch regex filter, run it.
+            if self.regex:
+                if not payload["ref"].startswith("refs/heads/"):
+                    return run_build, commit, commit_message
+
+                branch = payload["ref"][11:]
+                # Check the branch against regex
+                if not re.match(self.regex, branch):
+                    return run_build, commit, commit_message
 
             run_build = True
             commit = payload["sha"]
