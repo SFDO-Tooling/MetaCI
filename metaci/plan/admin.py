@@ -11,7 +11,16 @@ class PlanRepositoryInline(admin.TabularInline):
 
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
-    list_display = ("name", "trigger", "role", "flows", "org", "regex", "active")
+    list_display = (
+        "name",
+        "trigger",
+        "role",
+        "flows",
+        "org",
+        "regex",
+        "commit_status_regex",
+        "active",
+    )
     list_filter = ("active", "trigger", "role", "org", "repos")
     inlines = [PlanRepositoryInline]
 
