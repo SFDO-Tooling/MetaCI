@@ -11,6 +11,7 @@ class PlanSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             "id",
             "active",
+            "commit_status_regex",
             "context",
             "description",
             "flows",
