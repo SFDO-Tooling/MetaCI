@@ -5,7 +5,6 @@ from unittest import mock
 
 import pytest
 from cumulusci.core.config import OrgConfig
-from django.utils import timezone
 
 from metaci.build.models import Build
 from metaci.conftest import (
@@ -167,38 +166,40 @@ class TestBuildFlow:
         ] == datetime.date.today() + datetime.timedelta(days=6)
 
     def test_get_flow_options_push_sandbox_no_push_time(self):
-        build_flow = BuildFlowFactory()
-        build_flow.build.plan = PlanFactory(
-            role="push_sandbox", change_traffic_control=True
-        )
-        build_flow.build.plan.save()
-        build_flow.build.repo = RepositoryFactory(
-            default_implementation_steps=[
-                {
-                    "role": "push_sandbox",
-                    "duration": 10,
-                    "push_time": None,
-                    "start_time": 8,
-                    "start_date_offset": 0,
-                },
-            ],
-        )
-        build_flow.build.repo.save()
-        planrepo = PlanRepositoryFactory(
-            plan=build_flow.build.plan, repo=build_flow.build.repo
-        )
-        planrepo.save()
-        change_case_template = ChangeCaseTemplate()
-        change_case_template.save()
-        build_flow.build.release = Release(
-            repo=build_flow.build.repo,
-            change_case_template=change_case_template,
-        )
-        build_flow.build.release.version_number = "1.0"
-        build_flow.build.release.save()
-        options = build_flow._get_flow_options()
-        assert options["push_sandbox"]["version"] == "1.0"
-        assert options["push_sandbox"]["start_time"] is None
+        with pytest.raises(Exception):
+
+            build_flow = BuildFlowFactory()
+            build_flow.build.plan = PlanFactory(
+                role="push_sandbox", change_traffic_control=True
+            )
+            build_flow.build.plan.save()
+            build_flow.build.repo = RepositoryFactory(
+                default_implementation_steps=[
+                    {
+                        "role": "push_sandbox",
+                        "duration": 10,
+                        "push_time": None,
+                        "start_time": 8,
+                        "start_date_offset": 0,
+                    },
+                ],
+            )
+            build_flow.build.repo.save()
+            planrepo = PlanRepositoryFactory(
+                plan=build_flow.build.plan, repo=build_flow.build.repo
+            )
+            planrepo.save()
+            change_case_template = ChangeCaseTemplate()
+            change_case_template.save()
+            build_flow.build.release = Release(
+                repo=build_flow.build.repo,
+                change_case_template=change_case_template,
+            )
+            build_flow.build.release.version_number = "1.0"
+            build_flow.build.release.save()
+            options = build_flow._get_flow_options()
+            assert options["push_sandbox"]["version"] == "1.0"
+            assert options["push_sandbox"]["start_time"] is None
 
     def test_get_flow_options_push_sandbox(self):
         build_flow = BuildFlowFactory()
@@ -232,9 +233,9 @@ class TestBuildFlow:
         build_flow.build.release.save()
         options = build_flow._get_flow_options()
         assert options["push_sandbox"]["version"] == "1.0"
-        assert options["push_sandbox"]["start_time"] == timezone.make_aware(
-            datetime.datetime.combine(datetime.datetime.now().date(), datetime.time(20)).strftime('%Y-%m-%dT%H:%M')
-        )
+        assert options["push_sandbox"]["start_time"] == datetime.datetime.combine(
+            datetime.datetime.now().date(), datetime.time(20)
+        ).strftime("%Y-%m-%dT%H:%M")
 
     def test_get_flow_options_push_sandbox_exception(self):
         with pytest.raises(Exception):
@@ -277,9 +278,9 @@ class TestBuildFlow:
         build_flow.build.release.save()
         options = build_flow._get_flow_options()
         assert options["push_all"]["version"] == "1.0"
-        assert options["push_all"]["start_time"] == timezone.make_aware(
-            datetime.datetime.combine(datetime.datetime.now().date(), datetime.time(21)).strftime('%Y-%m-%dT%H:%M')
-        )
+        assert options["push_all"]["start_time"] == datetime.datetime.combine(
+            datetime.datetime.now().date(), datetime.time(21)
+        ).strftime("%Y-%m-%dT%H:%M")
 
     def test_get_flow_options_push_production_exception(self):
         with pytest.raises(Exception):
