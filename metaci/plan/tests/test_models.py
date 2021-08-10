@@ -114,8 +114,16 @@ class PlanTestCase(TestCase):
             "context": "Package Upload",
             "state": "success",
             "sha": "SHA",
-            "ref": "refs/heads/test/matches",
-            "head_commit": None,
+            "branches": [
+                {
+                    "name": "test/somefeature",
+                    "commit": {
+                        "sha": "SHA",
+                        "url": "https://api.github.com/repos/Test/Test/commits/SHA",
+                    },
+                    "protected": False,
+                }
+            ],
         }
         plan = Plan(
             name="Test Plan",
@@ -136,8 +144,16 @@ class PlanTestCase(TestCase):
             "context": "Package Upload",
             "state": "success",
             "sha": "SHA",
-            "ref": "refs/heads/test/matches",
-            "head_commit": None,
+            "branches": [
+                {
+                    "name": "test/somefeature",
+                    "commit": {
+                        "sha": "SHA",
+                        "url": "https://api.github.com/repos/Test/Test/commits/SHA",
+                    },
+                    "protected": False,
+                }
+            ],
         }
         plan = Plan(
             name="Test Plan",

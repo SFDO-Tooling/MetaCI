@@ -160,6 +160,12 @@ class Plan(models.Model):
         # Check the branch against regex
         return re.match(self.regex, branch)
 
+    def _check_status_event_branch_regex(self, payload):
+        return any(
+            re.match(self.regex, branch["name"])
+            for branch in payload.get("branches", [])
+        )
+
     def check_github_event(self, event, payload):
         run_build = False
         commit = None
@@ -212,7 +218,7 @@ class Plan(models.Model):
                 return run_build, commit, commit_message
 
             # If we also have a branch regex filter, run it.
-            if self.regex and not self._check_ref_regex(payload):
+            if self.regex and not self._check_status_event_branch_regex(payload):
                 return run_build, commit, commit_message
 
             run_build = True
