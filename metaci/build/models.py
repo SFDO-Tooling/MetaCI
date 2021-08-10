@@ -707,7 +707,7 @@ class BuildFlow(models.Model):
             try:
                 options["push_sandbox"] = {
                     "version": f"{self.build.release.version_number}",
-                    "start_time": self.build.release.implementation_steps.get(plan__id=self.build.plan.id).push_time
+                    "start_time": self.build.release.implementation_steps.get(plan__id=self.build.plan.id).push_time.strftime('%Y-%m-%dT%H:%M')
                 }
             except Exception:
                 raise Exception(f"Ensure that you have declared an implementation step with the plan {self.build.plan.name}.")
@@ -717,7 +717,7 @@ class BuildFlow(models.Model):
             try:
                 options["push_all"] = {
                     "version": f"{self.build.release.version_number}",
-                    "start_time": self.build.release.implementation_steps.get(plan__id=self.build.plan.id).push_time
+                    "start_time": self.build.release.implementation_steps.get(plan__id=self.build.plan.id).push_time.strftime('%Y-%m-%dT%H:%M')
                 }
             except Exception:
                 raise Exception(f"Ensure that you have declared an implementation step with the plan {self.build.plan.name}.")

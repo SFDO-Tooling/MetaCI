@@ -74,9 +74,7 @@ class DefaultImplementationStep(BaseModel):
     def _push_time(self, start):
         if self.push_time is None:
             return None
-        return timezone.make_aware(
-            datetime.datetime.combine(start.date(), datetime.time(self.push_time))
-        )
+        return timezone.make_aware(datetime.datetime.combine(start.date(), datetime.time(self.push_time)))
 
 
 class Release(StatusModel):

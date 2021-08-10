@@ -230,13 +230,10 @@ class TestBuildFlow:
         )
         build_flow.build.release.version_number = "1.0"
         build_flow.build.release.save()
-        # step = DefaultImplementationStep(**build_flow.build.repo.default_implementation_steps[0])
-        # start = step.start(build_flow.build.release)
-        # push_time = step._push_time(start)
         options = build_flow._get_flow_options()
         assert options["push_sandbox"]["version"] == "1.0"
         assert options["push_sandbox"]["start_time"] == timezone.make_aware(
-            datetime.datetime.combine(datetime.datetime.now().date(), datetime.time(20))
+            datetime.datetime.combine(datetime.datetime.now().date(), datetime.time(20)).strftime('%Y-%m-%dT%H:%M')
         )
 
     def test_get_flow_options_push_sandbox_exception(self):
@@ -281,7 +278,7 @@ class TestBuildFlow:
         options = build_flow._get_flow_options()
         assert options["push_all"]["version"] == "1.0"
         assert options["push_all"]["start_time"] == timezone.make_aware(
-            datetime.datetime.combine(datetime.datetime.now().date(), datetime.time(21))
+            datetime.datetime.combine(datetime.datetime.now().date(), datetime.time(21)).strftime('%Y-%m-%dT%H:%M')
         )
 
     def test_get_flow_options_push_production_exception(self):
