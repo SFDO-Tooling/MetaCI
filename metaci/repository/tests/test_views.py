@@ -420,7 +420,7 @@ class TestRepositoryViews(TestCase):
         assert tag_name == tagged_release
 
     @pytest.mark.django_db
-    def test_create_builds(self):
+    def test_create_builds__no_regex(self):
         """A plan without a regex, that has a trigger of 'commit',
         'tag', or 'status', should fail to create a build"""
         self.plan.regex = None

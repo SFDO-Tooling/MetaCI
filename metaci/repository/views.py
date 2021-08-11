@@ -219,11 +219,6 @@ def create_builds(event, payload, repo, branch, release):
     for pr in repo.planrepository_set.should_run().filter(
         plan__trigger__in=["commit", "tag", "status"]
     ):
-        if not pr.plan.regex:
-            logger.warning(
-                f"Skipping build creation for Plan without regex: {pr.plan.name}"
-            )
-            continue
         plan = pr.plan
         run_build, commit, commit_message = plan.check_github_event(event, payload)
         if run_build:
