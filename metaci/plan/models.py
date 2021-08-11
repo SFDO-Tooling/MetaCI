@@ -173,7 +173,7 @@ class Plan(models.Model):
 
         if event == "push":
             # Handle commit events
-            if self.trigger == "commit":
+            if self.trigger == "commit" and self.regex:
                 # Check if the event was triggered by a commit
                 if not self._check_ref_regex(payload):
                     return run_build, commit, commit_message
@@ -196,7 +196,7 @@ class Plan(models.Model):
                     commit = None
 
             # Handle tag events
-            elif self.trigger == "tag":
+            elif self.trigger == "tag" and self.regex:
                 # Check if the event was triggered by a tag
                 if not payload["ref"].startswith("refs/tags/"):
                     return run_build, commit, commit_message
