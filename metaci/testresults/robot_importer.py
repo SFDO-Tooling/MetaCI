@@ -276,3 +276,7 @@ def render_robot_test_xml(root, test):
 
     test_xml = ET.tostring(testroot, encoding="unicode")
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)
+
+
+def gus_bus_test_manager() -> None:
+    print("here")

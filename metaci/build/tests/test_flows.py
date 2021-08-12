@@ -117,10 +117,19 @@ def test_post_task__single_robot_task(get_spec):
 
 
 @pytest.mark.django_db
-def test_post_task__multiple_robot_tasks(get_spec):
+def test_post_task__multiple_robot_tasks(get_spec, mocker):
     """Test for scenario where there are multiple Robot tasks defined
     in a single flow. We want to make sure that test results and related
     assets are created and associated with the correct related objects."""
+    mocker.patch(
+        "metaci.build.flows.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+        DJANGO_TIME_ZONE="US/Pacific",
+        GUS_BUS_OWNER_ID="00G",
+        TEST_MANAGER_ENABLED=True,
+    )
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
 

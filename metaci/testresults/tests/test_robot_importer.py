@@ -316,3 +316,27 @@ def test_import_perf_results():
         ("Set Time and Also Metric", 0.0),
     ]:
         assert durations[name] == value
+
+
+@pytest.mark.django_db
+def test_gus_bus_test_manager(mocker):
+    """Verifies that we import all tests in a suite"""
+    mocker.patch(
+        "metaci.build.flows.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_CHANGE_CASE_URL_TEMPLATE="{case_id}",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+        DJANGO_TIME_ZONE="US/Pacific",
+        GUS_BUS_OWNER_ID="00G",
+    )
+
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
+        assert (
+            robot_importer.gus_bus_test_manager() is None
+        )  # lines 332-338 are useless for this test if just trying to call gus_bus test manager endpoint.

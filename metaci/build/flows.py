@@ -1,13 +1,17 @@
 from cumulusci.core.flowrunner import FlowCallback
+from django.conf import settings
 from django.utils import timezone
 
-from metaci.testresults.robot_importer import import_robot_test_results
+from metaci.testresults.robot_importer import (
+    gus_bus_test_manager,
+    import_robot_test_results,
+)
 
 from .models import FlowTask
 
 
 class MetaCIFlowCallback(FlowCallback):
-    """ An implementation of FlowCallback that logs task execution to the database. """
+    """An implementation of FlowCallback that logs task execution to the database."""
 
     def __init__(self, buildflow_id):
         self.buildflow_id = buildflow_id
@@ -42,3 +46,6 @@ class MetaCIFlowCallback(FlowCallback):
 
         if "robot_outputdir" in result.return_values:
             import_robot_test_results(flowtask, result.return_values["robot_outputdir"])
+
+        if settings.TEST_MANGER_ENABLED:
+            gus_bus_test_manager()
