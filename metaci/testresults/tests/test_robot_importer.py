@@ -324,7 +324,6 @@ def test_gus_bus_test_manager(mocker):
     mocker.patch(
         "metaci.build.flows.settings",
         METACI_RELEASE_WEBHOOK_URL="https://webhook",
-        METACI_CHANGE_CASE_URL_TEMPLATE="{case_id}",
         METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
         METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
         DJANGO_TIME_ZONE="US/Pacific",
