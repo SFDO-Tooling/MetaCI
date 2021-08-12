@@ -437,7 +437,7 @@ class Build(models.Model):
                     self.release,
                     self.plan.role,
                     self.org.configuration_item,
-                    "Implemented - per plan"
+                    "Implemented - per plan",
                 )
             except Exception as err:
                 self.logger.error(str(err))
@@ -696,23 +696,39 @@ class BuildFlow(models.Model):
 
     def _get_flow_options(self) -> dict:
         options = {}
+
+        # Set push dates in release notes from the Release object
         if self.build.plan.role == "release" and self.build.release:
             options["github_release_notes"] = {
                 "sandbox_date": self.build.release.sandbox_push_date,
                 "production_date": self.build.release.production_push_date,
             }
+
         if (
-            self.build.plan.role == "push_sandbox" and self.build.release
-        ):  # override lives in MetaCI
-            options["push_sandbox"] = {
+            self.build.plan.role in ("push_sandbox", "push_production")
+            and self.build.release
+        ):
+            # Set version for push task from the Release object
+            task_name = (
+                "push_all"
+                if self.build.plan.role == "push_production"
+                else "push_sandbox"
+            )
+            options[task_name] = task_options = {
                 "version": f"{self.build.release.version_number}",
             }
-        if (
-            self.build.plan.role == "push_production" and self.build.release
-        ):  # override lives in MetaCI
-            options["push_all"] = {
-                "version": f"{self.build.release.version_number}",
-            }
+            # If there is an implementation step linked to this plan,
+            # set the start_time option based on it.
+            try:
+                implementation_step = self.build.release.implementation_steps.get(
+                    plan__id=self.build.plan.id
+                )
+            except ObjectDoesNotExist:
+                pass
+            else:
+                push_time = implementation_step.push_time
+                if push_time:
+                    task_options["start_time"] = push_time.isoformat()
 
         return options
 
