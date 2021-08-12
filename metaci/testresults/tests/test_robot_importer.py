@@ -329,6 +329,14 @@ def test_gus_bus_test_manager(mocker):
         DJANGO_TIME_ZONE="US/Pacific",
         GUS_BUS_OWNER_ID="00G",
     )
-    assert (
-        robot_importer.gus_bus_test_manager() is None
-    ) # Empty test
+
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
+        assert (
+            robot_importer.export_robot_test_results(FlowTaskFactory(), output_dir)
+            is None
+        )

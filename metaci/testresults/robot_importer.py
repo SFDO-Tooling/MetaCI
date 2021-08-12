@@ -278,5 +278,5 @@ def render_robot_test_xml(root, test):
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)
 
 
-def gus_bus_test_manager() -> None:
+def export_robot_test_results(flowtask, results_dir: str) -> None:
     print("here")

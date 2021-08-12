@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from metaci.testresults.robot_importer import (
-    gus_bus_test_manager,
+    export_robot_test_results,
     import_robot_test_results,
 )
 
@@ -46,6 +46,7 @@ class MetaCIFlowCallback(FlowCallback):
 
         if "robot_outputdir" in result.return_values:
             import_robot_test_results(flowtask, result.return_values["robot_outputdir"])
-
-        if settings.TEST_MANGER_ENABLED:
-            gus_bus_test_manager()
+            if settings.RESULT_EXPORT_ENABLED:
+                export_robot_test_results(
+                    flowtask, result.return_values["robot_outputdir"]
+                )

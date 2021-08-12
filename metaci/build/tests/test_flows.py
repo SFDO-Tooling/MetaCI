@@ -128,7 +128,7 @@ def test_post_task__multiple_robot_tasks(get_spec, mocker):
         METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
         DJANGO_TIME_ZONE="US/Pacific",
         GUS_BUS_OWNER_ID="00G",
-        TEST_MANAGER_ENABLED=True,
+        RESULT_EXPORT_ENABLED=True,
     )
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
