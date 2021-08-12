@@ -124,7 +124,7 @@ To configure autoscaling:
 
 
 One-Off Builds
-~~~~~~~~~~~~~~
+--------------
 
 In some environments, such as Heroku, it is helpful to run builds in
 environments which are spun up for just a single build. In Heroku, builds
@@ -153,6 +153,6 @@ if your usage never approaches its quota then this will not
 cause problems for you. This is not a tested or supported configuration.
 
 Email Server
-^^^^^^^^^^^^
+------------
 
 In Production, set up Mailgun as a Heroku addon.
