@@ -297,9 +297,13 @@ def export_robot_test_results(build, results_dir: str) -> None:
         "build": {
             "name": build.plan.name,
             "number": build.id,
-            "url": build.get_external_url(),
+            "url": "http://www.example.com",  # build.get_external_url() returns 'detail': [{'loc': ['body', 'build', 'url'], 'msg': 'URL host invalid, top level domain required', 'type': 'value_error.url.host'}] when sent to gus-bus,
             "metadata": build.repo.metadata,
         },
+        #####################################################################
+        ##### NEED TO PARSE TEST RESULTS OF ROBOT TESTS FOR THIS PAYLOAD ####
+        ############# THIS IS CURRENTLY DUMMY DATA BELOW ####################
+        #####################################################################
         "tests": [
             {
                 "name": "Test #1",
@@ -320,6 +324,6 @@ def export_robot_test_results(build, results_dir: str) -> None:
     result = response.json()
 
     if result["success"]:
-        print("GREAT SUCCESS!")
+        print("GREAT SUCCESS!")  # do something here.
     else:
         raise Exception("\n".join(err["message"] for err in result["errors"]))
