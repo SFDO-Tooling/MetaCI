@@ -48,5 +48,5 @@ class MetaCIFlowCallback(FlowCallback):
             import_robot_test_results(flowtask, result.return_values["robot_outputdir"])
             if settings.RESULT_EXPORT_ENABLED:
                 export_robot_test_results(
-                    flowtask, result.return_values["robot_outputdir"]
+                    flowtask.build_flow.build, result.return_values["robot_outputdir"]
                 )

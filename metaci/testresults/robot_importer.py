@@ -1,14 +1,18 @@
+import logging
 import os
 import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import requests
 from cumulusci.utils import elementtree_parse_file
 from cumulusci.utils.xml.robot_xml import pattern as ELAPSED_TIME_PATTERN
+from django.conf import settings
 from django.core.files.base import ContentFile
 
 from metaci.build.exceptions import BuildError
+from metaci.release.utils import jwt_for_webhook
 from metaci.testresults.models import TestClass, TestMethod, TestResult, TestResultAsset
 
 
@@ -278,5 +282,44 @@ def render_robot_test_xml(root, test):
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)
 
 
-def export_robot_test_results(flowtask, results_dir: str) -> None:
-    print("here")
+def export_robot_test_results(build, results_dir: str) -> None:
+    logger = logging.getLogger(__name__)
+    if (
+        not settings.METACI_RELEASE_WEBHOOK_URL
+        or not settings.GUS_BUS_OWNER_ID
+        or not build
+    ):
+        return  # should we better error handle this for individual case message error handling?
+    logger.info(
+        f"Sending test results webhook for {build.get_external_url()} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+    )
+    payload = {
+        "build": {
+            "name": build.plan.name,
+            "number": build.id,
+            "url": build.get_external_url(),
+            "metadata": build.repo.metadata,
+        },
+        "tests": [
+            {
+                "name": "Test #1",
+                "group": "Suite #1",
+                "status": "Pass",
+                "start_time": "2021-04-01 01:23:45",
+                "end_time": "2021-04-01 01:45:00",
+            }
+        ],
+    }  # leaving tests section for Bryan
+
+    token = jwt_for_webhook()
+    response = requests.post(
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    result = response.json()
+
+    if result["success"]:
+        print("GREAT SUCCESS!")
+    else:
+        raise Exception("\n".join(err["message"] for err in result["errors"]))
