@@ -348,7 +348,10 @@ def test_gus_bus_test_manager(mocker):
         responses.add(
             "POST",
             f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
-            json={"success": True, "id": "123"},
+            json={
+                "success": "True",
+                "id": "123",
+            },  # why does a boolean give  raise TypeError("Expected a string value")
         )
         assert robot_importer.export_robot_test_results(FlowTaskFactory()) is None
         assert len(responses.calls) == 1
@@ -384,7 +387,10 @@ def test_gus_bus_test_manager_failure(mocker):
             responses.add(
                 "POST",
                 f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
-                json={"success": False, "errors": ["error goes here"]},
+                json={
+                    "success": "",
+                    "errors": ["error goes here"],
+                },  # Boolean value will raise TypeError("Expected a string value") in CI tests.
             )
             robot_importer.export_robot_test_results(FlowTaskFactory())
 
