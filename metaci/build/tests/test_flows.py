@@ -3,9 +3,11 @@ from shutil import copyfile
 from unittest import mock
 
 import pytest
+import responses
 from cumulusci.core.flowrunner import StepResult, StepSpec
 from cumulusci.tasks.robotframework.robotframework import Robot
 from cumulusci.utils import temporary_dir, touch
+from django.conf import settings
 
 from metaci.build.flows import MetaCIFlowCallback
 from metaci.build.models import BuildFlowAsset, FlowTask
@@ -72,7 +74,11 @@ def test_post_task__result_has_exception(get_spec):
 
 
 @pytest.mark.django_db
-def test_post_task__single_robot_task(get_spec):
+def test_post_task__single_robot_task(mocker, get_spec):
+    mocker.patch(
+        "metaci.build.flows.settings",
+        RESULT_EXPORT_ENABLED=False,
+    )
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
         touch(output_dir / "selenium-screenshot-1.png")
@@ -117,7 +123,7 @@ def test_post_task__single_robot_task(get_spec):
 
 
 @pytest.mark.django_db
-def test_post_task__multiple_robot_tasks(get_spec, mocker):
+def test_post_task__multiple_robot_task_test_results_disabled(get_spec, mocker):
     """Test for scenario where there are multiple Robot tasks defined
     in a single flow. We want to make sure that test results and related
     assets are created and associated with the correct related objects."""
@@ -127,8 +133,7 @@ def test_post_task__multiple_robot_tasks(get_spec, mocker):
         METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
         METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
         DJANGO_TIME_ZONE="US/Pacific",
-        GUS_BUS_OWNER_ID="00G",
-        RESULT_EXPORT_ENABLED=True,
+        RESULT_EXPORT_ENABLED=False,
     )
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
@@ -205,6 +210,73 @@ def test_post_task__multiple_robot_tasks(get_spec, mocker):
 
         # Three tests total between the two output files
         assert 3 == TestMethod.objects.all().count()
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_responses):
+    """Test for scenario where there are multiple Robot tasks defined
+    in a single flow. We want to make sure that test results and related
+    assets are created and associated with the correct related objects and that
+    the proper api endpoint is called."""
+    mocker.patch(
+        "metaci.build.flows.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+        DJANGO_TIME_ZONE="US/Pacific",
+        RESULT_EXPORT_ENABLED=True,
+    )
+    mocker.patch(
+        "metaci.build.tests.test_flows.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+    )
+    mocker.patch(
+        "metaci.testresults.robot_importer.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+    )
+    with temporary_dir() as output_dir:
+        output_dir = Path(output_dir)
+
+        copyfile(
+            (TEST_ROBOT_OUTPUT_FILES / "robot_1.xml"),
+            (output_dir / "output.xml"),
+        )
+
+        step_spec = get_spec("1", name="Robot", cls=Robot)
+        step_result = StepResult(
+            step_num="1",
+            task_name="Robot",
+            path="Robot",
+            result="Pass",
+            return_values={"robot_outputdir": str(output_dir)},
+            exception=None,
+        )
+
+        responses.add(
+            "POST",
+            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+            json={
+                "success": True,
+            },
+        )
+        build_flow = BuildFlowFactory()
+        metaci_callbacks = MetaCIFlowCallback(build_flow.id)
+        metaci_callbacks.post_task(step_spec, step_result)
+        # For output_1 we should have a single BuildFlowAsset,
+        # a single TestResult, and no TestResultAssets (screenshots)
+        assert (
+            1
+            == BuildFlowAsset.objects.filter(
+                category="robot-output", build_flow=build_flow
+            ).count()
+        )
+        assert 1 == TestResult.objects.all().count()
+        assert 0 == TestResultAsset.objects.all().count()
+        assert len(responses.calls) == 1
+        assert responses.calls[0].request.url == "https://webhook/test-results/"
 
 
 class TestException(Exception):

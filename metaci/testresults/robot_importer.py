@@ -15,6 +15,8 @@ from metaci.build.exceptions import BuildError
 from metaci.release.utils import jwt_for_webhook
 from metaci.testresults.models import TestClass, TestMethod, TestResult, TestResultAsset
 
+logger = logging.getLogger(__name__)
+
 
 def import_robot_test_results(flowtask, results_dir: str) -> None:
     """Given a flowtask for a robot task, and a path to the
@@ -282,23 +284,18 @@ def render_robot_test_xml(root, test):
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)
 
 
-def export_robot_test_results(build, results_dir: str) -> None:
-    logger = logging.getLogger(__name__)
-    if (
-        not settings.METACI_RELEASE_WEBHOOK_URL
-        or not settings.GUS_BUS_OWNER_ID
-        or not build
-    ):
+def export_robot_test_results(flowtest) -> None:
+    if not settings.METACI_RELEASE_WEBHOOK_URL or not flowtest:
         return  # should we better error handle this for individual case message error handling?
     logger.info(
-        f"Sending test results webhook for {build.get_external_url()} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+        f"Sending test results webhook for {flowtest.build_flow.build.get_external_url()} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
     payload = {
         "build": {
-            "name": build.plan.name,
-            "number": build.id,
+            "name": flowtest.build_flow.build.plan.name,
+            "number": flowtest.id,
             "url": "http://www.example.com",  # build.get_external_url() returns 'detail': [{'loc': ['body', 'build', 'url'], 'msg': 'URL host invalid, top level domain required', 'type': 'value_error.url.host'}] when sent to gus-bus,
-            "metadata": build.repo.metadata,
+            "metadata": flowtest.build_flow.build.repo.metadata,
         },
         #####################################################################
         ##### NEED TO PARSE TEST RESULTS OF ROBOT TESTS FOR THIS PAYLOAD ####
@@ -323,7 +320,11 @@ def export_robot_test_results(build, results_dir: str) -> None:
     )
     result = response.json()
 
-    if result["success"]:
-        print("GREAT SUCCESS!")  # do something here.
+    if "success" in result and result["success"]:
+        logger.info(
+            f"Successfully sent test results to {settings.METACI_RELEASE_WEBHOOK_URL}/test-results/"
+        )
+        return
     else:
-        raise Exception("\n".join(err["message"] for err in result["errors"]))
+        msg = "\n".join(err for err in result["details"])
+        raise Exception(f"Error while sending test-results webhook: {msg}")
