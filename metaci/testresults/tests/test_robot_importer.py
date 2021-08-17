@@ -348,7 +348,7 @@ def test_gus_bus_test_manager(mocker):
         responses.add(
             "POST",
             f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
-            json={"success": True, "id": 123},
+            json={"success": True, "id": "123"},
         )
         assert robot_importer.export_robot_test_results(FlowTaskFactory()) is None
         assert len(responses.calls) == 1
