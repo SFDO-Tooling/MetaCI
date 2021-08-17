@@ -320,11 +320,11 @@ def export_robot_test_results(flowtest) -> None:
     )
     result = response.json()
 
-    if "success" in result and result["success"]:
+    if result["success"]:
         logger.info(
             f"Successfully sent test results to {settings.METACI_RELEASE_WEBHOOK_URL}/test-results/"
         )
         return
     else:
-        msg = "\n".join(err for err in result["details"])
+        msg = "\n".join(err for err in result["errors"])
         raise Exception(f"Error while sending test-results webhook: {msg}")

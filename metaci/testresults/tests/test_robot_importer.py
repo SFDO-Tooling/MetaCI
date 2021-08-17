@@ -322,7 +322,7 @@ def test_import_perf_results():
 
 @responses.activate
 @pytest.mark.django_db
-def test_gus_bus_test_manager(mocker, caplog):
+def test_gus_bus_test_manager(mocker):
     """Verifies that we import all tests in a suite"""
     mocker.patch(
         "metaci.testresults.robot_importer.settings",
@@ -348,7 +348,7 @@ def test_gus_bus_test_manager(mocker, caplog):
         responses.add(
             "POST",
             f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
-            json={"success": True},
+            json={"success": True, "id": 123},
         )
         assert robot_importer.export_robot_test_results(FlowTaskFactory()) is None
         assert len(responses.calls) == 1
@@ -357,7 +357,41 @@ def test_gus_bus_test_manager(mocker, caplog):
 
 @responses.activate
 @pytest.mark.django_db
-def test_gus_bus_test_manager_no_flowtask(mocker, caplog):
+def test_gus_bus_test_manager_failure(mocker):
+    """Verifies that we import all tests in a suite"""
+    mocker.patch(
+        "metaci.testresults.robot_importer.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
+    )
+    mocker.patch(
+        "metaci.build.flows.settings",
+        RESULT_EXPORT_ENABLED=True,
+    )
+    mocker.patch(
+        "metaci.testresults.tests.test_robot_importer.settings",
+        METACI_RELEASE_WEBHOOK_URL="https://webhook",
+    )
+    with pytest.raises(Exception):
+        flow_task = FlowTaskFactory()
+        with temporary_dir() as output_dir:
+            copyfile(
+                TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+                Path(output_dir) / "output.xml",
+            )
+            robot_importer.import_robot_test_results(flow_task, output_dir)
+            responses.add(
+                "POST",
+                f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+                json={"success": False, "errors": ["error goes here"]},
+            )
+            robot_importer.export_robot_test_results(FlowTaskFactory())
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_gus_bus_test_manager_no_flowtask(mocker):
     """Verifies that we import all tests in a suite"""
     mocker.patch(
         "metaci.testresults.robot_importer.settings",
