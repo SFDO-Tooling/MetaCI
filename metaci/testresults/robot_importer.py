@@ -311,7 +311,7 @@ def render_robot_test_xml(root, test):
 
 def export_robot_test_results(flowtest, test_results) -> None:
     if not settings.METACI_RELEASE_WEBHOOK_URL or not flowtest:
-        return  # should we better error handle this for individual case message error handling?
+        return
     logger.info(
         f"Sending test results webhook for {flowtest.build_flow.build.get_external_url()} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
