@@ -338,6 +338,12 @@ def test_gus_bus_test_manager(mocker):
         "metaci.testresults.tests.test_robot_importer.settings",
         METACI_RELEASE_WEBHOOK_URL="https://webhook",
     )
+    mocker.patch(
+        "metaci.release.utils.settings",
+        METACI_RELEASE_WEBHOOK_ISSUER="https://webhook",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="12345",
+    )
+
     flow_task = FlowTaskFactory()
     with temporary_dir() as output_dir:
         copyfile(

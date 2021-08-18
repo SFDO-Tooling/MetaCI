@@ -237,6 +237,12 @@ def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_respons
         METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
         METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
     )
+    mocker.patch(
+        "metaci.release.utils.settings",
+        METACI_RELEASE_WEBHOOK_ISSUER="https://webhook",
+        METACI_RELEASE_WEBHOOK_AUTH_KEY="12345",
+    )
+
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
 
