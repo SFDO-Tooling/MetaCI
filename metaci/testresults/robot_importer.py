@@ -4,6 +4,7 @@ import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import List
 
 import requests
 from cumulusci.utils import elementtree_parse_file
@@ -18,7 +19,7 @@ from metaci.testresults.models import TestClass, TestMethod, TestResult, TestRes
 logger = logging.getLogger(__name__)
 
 
-def import_robot_test_results(flowtask, results_dir: str) -> None:
+def import_robot_test_results(flowtask, results_dir: str) -> List:
     """Given a flowtask for a robot task, and a path to the
     test results output file:
 
@@ -34,6 +35,7 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
     @param1 (FlowTask) The flowtask associated with the robot task
     @param1 (str) The filepath to the robot results
     """
+    results = []
     results_dir = Path(results_dir)
     results_file = results_dir / "output.xml"  # robot output filename
 
@@ -132,7 +134,18 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
                 testresult.robot_xml = testresult.robot_xml.replace(
                     f'"{screenshot}"', f'"buildflowasset://{asset_id}"'
                 )
+
             testresult.save()
+        results.append(
+            {
+                "name": f"{result['name']}",
+                "group": f"{result['suite']['name']}",
+                "status": f"{result['status'].capitalize()}",
+                "start_time": f"{result['start_time']}",
+                "end_time": f"{result['end_time']}",
+            }
+        )
+    return results
 
 
 def parse_robot_output(path):
@@ -149,8 +162,7 @@ def get_robot_tests(root, elem, parents=()):
         if child.tag == "suite":
             has_children_suites = True
             tests += get_robot_tests(root, child, parents + (child,))
-
-    if not has_children_suites:
+    if not has_children_suites:  # base case of recursion
         suite_file = elem.attrib["source"].replace(os.getcwd(), "")
         setup = elem.find("kw[@type='SETUP']")
         teardown = elem.find("kw[@type='TEARDOWN']")
@@ -165,7 +177,6 @@ def get_robot_tests(root, elem, parents=()):
         }
         for test in elem.iter("test"):
             tests.append(parse_test(test, suite, root))
-
     return tests
 
 
@@ -186,8 +197,20 @@ def parse_test(test, suite, root):
     zero = timedelta(seconds=0)
     setup_time = _robot_duration(setup.find("status")) if setup else zero
     teardown_time = _robot_duration(teardown.find("status")) if teardown else zero
-
-    # I'm not 100% convinced this is what we want. It's great in the
+    start_time = datetime.now().astimezone(None).isoformat()
+    end_time = datetime.now().astimezone(None).isoformat()
+    if setup:
+        start_time = (
+            _parse_robot_time(setup.find("status").attrib["starttime"])
+            .astimezone(None)
+            .isoformat()
+        )
+        end_time = (
+            _parse_robot_time(setup.find("status").attrib["endtime"])
+            .astimezone(None)
+            .isoformat()
+        )
+        # I'm not 100% convinced this is what we want. It's great in the
     # normal case, but it's possible for a test to have multiple failing
     # keywords. We'll tackle that when it becomes an issue. For now,
     # we just grab the first failing keyword.
@@ -208,6 +231,8 @@ def parse_test(test, suite, root):
         # Note: robot status should always be PASS, FAIL, or SKIP, so
         # it's a simple transformation to become one of the values from
         # OUTCOME_CHOICES in testresults/choices.py
+        "start_time": start_time,
+        "end_time": end_time,
         "status": status.attrib["status"].capitalize(),
         "screenshots": [],
         "message": status.text,
@@ -284,7 +309,7 @@ def render_robot_test_xml(root, test):
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)
 
 
-def export_robot_test_results(flowtest) -> None:
+def export_robot_test_results(flowtest, test_results) -> None:
     if not settings.METACI_RELEASE_WEBHOOK_URL or not flowtest:
         return  # should we better error handle this for individual case message error handling?
     logger.info(
@@ -294,23 +319,11 @@ def export_robot_test_results(flowtest) -> None:
         "build": {
             "name": flowtest.build_flow.build.plan.name,
             "number": flowtest.id,
-            "url": "http://www.example.com",  # build.get_external_url() returns 'detail': [{'loc': ['body', 'build', 'url'], 'msg': 'URL host invalid, top level domain required', 'type': 'value_error.url.host'}] when sent to gus-bus,
+            "url": "https://www.example.com/",  # flowtest.build_flow.build.get_external_url(),  # returns 'detail': [{'loc': ['body', 'build', 'url'], 'msg': 'URL host invalid, top level domain required', 'type': 'value_error.url.host'}] when sent to gus-bus,
             "metadata": flowtest.build_flow.build.repo.metadata,
         },
-        #####################################################################
-        ##### NEED TO PARSE TEST RESULTS OF ROBOT TESTS FOR THIS PAYLOAD ####
-        ############# THIS IS CURRENTLY DUMMY DATA BELOW ####################
-        #####################################################################
-        "tests": [
-            {
-                "name": "Test #1",
-                "group": "Suite #1",
-                "status": "Pass",
-                "start_time": "2021-04-01 01:23:45",
-                "end_time": "2021-04-01 01:45:00",
-            }
-        ],
-    }  # leaving tests section for Bryan
+        "tests": test_results,
+    }
 
     token = jwt_for_webhook()
     response = requests.post(
@@ -326,5 +339,5 @@ def export_robot_test_results(flowtest) -> None:
         )
         return
     else:
-        msg = "\n".join(err for err in result["errors"])
+        msg = "\n".join(err["msg"] for err in result["errors"])
         raise Exception(f"Error while sending test-results webhook: {msg}")
