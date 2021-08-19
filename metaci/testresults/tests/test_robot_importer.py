@@ -5,6 +5,8 @@ from pathlib import Path, PurePath
 from shutil import copyfile
 from unittest import mock
 
+
+
 import pytest
 import responses
 from cumulusci.utils import elementtree_parse_file, temporary_dir
@@ -322,28 +324,9 @@ def test_import_perf_results():
 
 @responses.activate
 @pytest.mark.django_db
+@mock.patch("django.conf.settings")
 def test_gus_bus_test_manager(mocker):
     """Verifies that we import all tests in a suite"""
-    mocker.patch(
-        "metaci.testresults.robot_importer.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
-        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
-    )
-    mocker.patch(
-        "metaci.build.flows.settings",
-        RESULT_EXPORT_ENABLED=True,
-    )
-    mocker.patch(
-        "metaci.testresults.tests.test_robot_importer.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-    )
-    mocker.patch(
-        "metaci.release.utils.settings",
-        METACI_RELEASE_WEBHOOK_ISSUER="https://webhook",
-        METACI_RELEASE_WEBHOOK_AUTH_KEY="12345",
-    )
-
     flow_task = FlowTaskFactory()
     with temporary_dir() as output_dir:
         copyfile(
@@ -366,65 +349,37 @@ def test_gus_bus_test_manager(mocker):
 
 @responses.activate
 @pytest.mark.django_db
+@mock.patch("django.conf.settings")
 def test_gus_bus_test_manager_failure(mocker):
     """Verifies that we import all tests in a suite"""
     mocker.patch(
-        "metaci.testresults.robot_importer.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
-        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
-    )
-    mocker.patch(
         "metaci.build.flows.settings",
-        RESULT_EXPORT_ENABLED=True,
+        METACI_RESULT_EXPORT_ENABLED=True,
     )
-    mocker.patch(
-        "metaci.testresults.tests.test_robot_importer.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-    )
-    mocker.patch(
-        "metaci.release.utils.settings",
-        METACI_RELEASE_WEBHOOK_ISSUER="https://webhook",
-        METACI_RELEASE_WEBHOOK_AUTH_KEY="12345",
-    )
-
-    with pytest.raises(Exception):
-        flow_task = FlowTaskFactory()
-        with temporary_dir() as output_dir:
-            copyfile(
-                TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
-                Path(output_dir) / "output.xml",
-            )
-            robot_importer.import_robot_test_results(flow_task, output_dir)
-            responses.add(
-                "POST",
-                f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
-                json={
-                    "success": False,
-                    "errors": ["error goes here"],
-                },  # Boolean value will raise TypeError("Expected a string value") in CI tests.
-            )
+    flow_task = FlowTaskFactory()
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(flow_task, output_dir)
+        responses.add(
+            "POST",
+            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+            json={
+                "success": False,
+                "errors": [{"msg": "error goes here"}],
+            },  # Boolean value will raise TypeError("Expected a string value") in CI tests.
+        )
+        with pytest.raises(Exception, match="Error while sending test-results webhook: error goes here"):
             robot_importer.export_robot_test_results(FlowTaskFactory(), [])
 
 
 @responses.activate
 @pytest.mark.django_db
+@mock.patch("django.conf.settings")
 def test_gus_bus_test_manager_no_flowtask(mocker):
     """Verifies that we import all tests in a suite"""
-    mocker.patch(
-        "metaci.testresults.robot_importer.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
-        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
-    )
-    mocker.patch(
-        "metaci.build.flows.settings",
-        RESULT_EXPORT_ENABLED=True,
-    )
-    mocker.patch(
-        "metaci.testresults.tests.test_robot_importer.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-    )
     with temporary_dir() as output_dir:
         copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",

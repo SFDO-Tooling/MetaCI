@@ -50,9 +50,8 @@ class MetaCIFlowCallback(FlowCallback):
             test_results = import_robot_test_results(
                 flowtask, result.return_values["robot_outputdir"]
             )
-            if settings.RESULT_EXPORT_ENABLED:
+            if settings.METACI_RESULT_EXPORT_ENABLED:
                 try:
                     export_robot_test_results(flowtask, test_results)
-                except (Exception):
-                    logger.info("Failed to send test results.")
-                    pass
+                except (Exception) as e:
+                    logger.info(f"Error exporting test result: {e.message}")

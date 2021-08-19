@@ -319,8 +319,9 @@ def export_robot_test_results(flowtask, test_results) -> None:
     payload = {
         "build": {
             "name": flowtask.build_flow.build.plan.name,
+            "org": flowtask.build_flow.build.org.name,
             "number": flowtask.id,
-            "url": "https://www.example.com/",  # flowtask.build_flow.build.get_external_url(),  # returns 'detail': [{'loc': ['body', 'build', 'url'], 'msg': 'URL host invalid, top level domain required', 'type': 'value_error.url.host'}] when sent to gus-bus,
+            "url": f"{flowtask.build_flow.build.get_external_url()}",  # if SITE_URL is set and still returning a 422 try setting an additional 127.0.0.1 domain in you /etc/hosts file
             "metadata": flowtask.build_flow.build.repo.metadata,
         },
         "tests": test_results,
@@ -332,6 +333,7 @@ def export_robot_test_results(flowtask, test_results) -> None:
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
+    response.raise_for_status()
     result = response.json()
 
     if result["success"]:

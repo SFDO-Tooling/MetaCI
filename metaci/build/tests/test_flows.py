@@ -75,10 +75,10 @@ def test_post_task__result_has_exception(get_spec):
 
 @pytest.mark.django_db
 def test_post_task__single_robot_task(mocker, get_spec):
-    # mocker.patch(
-    #     "metaci.build.flows.settings",
-    #     RESULT_EXPORT_ENABLED=False,
-    # )
+    mocker.patch(
+        "metaci.build.flows.settings",
+        METACI_RESULT_EXPORT_ENABLED=False,
+    )
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
         touch(output_dir / "selenium-screenshot-1.png")
@@ -127,14 +127,6 @@ def test_post_task__multiple_robot_task_test_results_disabled(get_spec, mocker):
     """Test for scenario where there are multiple Robot tasks defined
     in a single flow. We want to make sure that test results and related
     assets are created and associated with the correct related objects."""
-    mocker.patch(
-        "metaci.build.flows.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
-        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
-        DJANGO_TIME_ZONE="US/Pacific",
-        RESULT_EXPORT_ENABLED=False,
-    )
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
 
@@ -214,6 +206,7 @@ def test_post_task__multiple_robot_task_test_results_disabled(get_spec, mocker):
 
 @responses.activate
 @pytest.mark.django_db
+@mock.patch("django.conf.settings")
 def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_responses):
     """Test for scenario where there are multiple Robot tasks defined
     in a single flow. We want to make sure that test results and related
@@ -221,26 +214,7 @@ def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_respons
     the proper api endpoint is called."""
     mocker.patch(
         "metaci.build.flows.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
-        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
-        DJANGO_TIME_ZONE="US/Pacific",
-        RESULT_EXPORT_ENABLED=True,
-    )
-    mocker.patch(
-        "metaci.build.tests.test_flows.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-    )
-    mocker.patch(
-        "metaci.testresults.robot_importer.settings",
-        METACI_RELEASE_WEBHOOK_URL="https://webhook",
-        METACI_RELEASE_WEBHOOK_ISSUER="MetaCI",
-        METACI_RELEASE_WEBHOOK_AUTH_KEY="test",
-    )
-    mocker.patch(
-        "metaci.release.utils.settings",
-        METACI_RELEASE_WEBHOOK_ISSUER="https://webhook",
-        METACI_RELEASE_WEBHOOK_AUTH_KEY="12345",
+        METACI_RESULT_EXPORT_ENABLED=True,
     )
 
     with temporary_dir() as output_dir:
