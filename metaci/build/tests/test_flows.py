@@ -75,10 +75,10 @@ def test_post_task__result_has_exception(get_spec):
 
 @pytest.mark.django_db
 def test_post_task__single_robot_task(mocker, get_spec):
-    mocker.patch(
-        "metaci.build.flows.settings",
-        RESULT_EXPORT_ENABLED=False,
-    )
+    # mocker.patch(
+    #     "metaci.build.flows.settings",
+    #     RESULT_EXPORT_ENABLED=False,
+    # )
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
         touch(output_dir / "selenium-screenshot-1.png")

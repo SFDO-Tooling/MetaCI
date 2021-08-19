@@ -1,3 +1,5 @@
+import logging
+
 from cumulusci.core.flowrunner import FlowCallback
 from django.conf import settings
 from django.utils import timezone
@@ -8,6 +10,8 @@ from metaci.testresults.robot_importer import (
 )
 
 from .models import FlowTask
+
+logger = logging.getLogger(__name__)
 
 
 class MetaCIFlowCallback(FlowCallback):
@@ -47,4 +51,7 @@ class MetaCIFlowCallback(FlowCallback):
                 flowtask, result.return_values["robot_outputdir"]
             )
             if settings.RESULT_EXPORT_ENABLED:
-                export_robot_test_results(flowtask, test_results)
+                try:
+                    export_robot_test_results(flowtask, test_results)
+                except (Exception):
+                    logger.info("Failed to send test results.")

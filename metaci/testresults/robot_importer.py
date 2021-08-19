@@ -138,11 +138,11 @@ def import_robot_test_results(flowtask, results_dir: str) -> List:
             testresult.save()
         results.append(
             {
-                "name": f"{result['name']}",
-                "group": f"{result['suite']['name']}",
-                "status": f"{result['status'].capitalize()}",
-                "start_time": f"{result['start_time']}",
-                "end_time": f"{result['end_time']}",
+                "name": result["name"],
+                "group": result["suite"]["name"],
+                "status": result["status"].capitalize(),
+                "start_time": result["start_time"],
+                "end_time": result["end_time"],
             }
         )
     return results
@@ -309,18 +309,19 @@ def render_robot_test_xml(root, test):
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)
 
 
-def export_robot_test_results(flowtest, test_results) -> None:
-    if not settings.METACI_RELEASE_WEBHOOK_URL or not flowtest:
+def export_robot_test_results(flowtask, test_results) -> None:
+    """Sends robot test results to test-manager via api call to gus-bus."""
+    if not settings.METACI_RELEASE_WEBHOOK_URL or not flowtask:
         return  # should we better error handle this for individual case message error handling?
     logger.info(
-        f"Sending test results webhook for {flowtest.build_flow.build.get_external_url()} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+        f"Sending test results webhook for {flowtask.build_flow.build.get_external_url()} to {settings.METACI_RELEASE_WEBHOOK_URL}"
     )
     payload = {
         "build": {
-            "name": flowtest.build_flow.build.plan.name,
-            "number": flowtest.id,
-            "url": "https://www.example.com/",  # flowtest.build_flow.build.get_external_url(),  # returns 'detail': [{'loc': ['body', 'build', 'url'], 'msg': 'URL host invalid, top level domain required', 'type': 'value_error.url.host'}] when sent to gus-bus,
-            "metadata": flowtest.build_flow.build.repo.metadata,
+            "name": flowtask.build_flow.build.plan.name,
+            "number": flowtask.id,
+            "url": "https://www.example.com/",  # flowtask.build_flow.build.get_external_url(),  # returns 'detail': [{'loc': ['body', 'build', 'url'], 'msg': 'URL host invalid, top level domain required', 'type': 'value_error.url.host'}] when sent to gus-bus,
+            "metadata": flowtask.build_flow.build.repo.metadata,
         },
         "tests": test_results,
     }
@@ -337,7 +338,6 @@ def export_robot_test_results(flowtest, test_results) -> None:
         logger.info(
             f"Successfully sent test results to {settings.METACI_RELEASE_WEBHOOK_URL}/test-results/"
         )
-        return
     else:
         msg = "\n".join(err["msg"] for err in result["errors"])
         raise Exception(f"Error while sending test-results webhook: {msg}")
