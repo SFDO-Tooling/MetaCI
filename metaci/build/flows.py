@@ -53,5 +53,5 @@ class MetaCIFlowCallback(FlowCallback):
             if settings.METACI_RESULT_EXPORT_ENABLED:
                 try:
                     export_robot_test_results(flowtask, test_results)
-                except (Exception) as e:
-                    logger.info(f"Error exporting test result: {e.message}")
+                except Exception as e:
+                    logger.info(f"Error exporting test result: {e}")

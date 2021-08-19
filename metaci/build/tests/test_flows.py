@@ -234,6 +234,7 @@ def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_respons
             return_values={"robot_outputdir": str(output_dir)},
             exception=None,
         )
+        step_spec.save()
 
         responses.add(
             "POST",
@@ -245,6 +246,7 @@ def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_respons
         build_flow = BuildFlowFactory()
         metaci_callbacks = MetaCIFlowCallback(build_flow.id)
         metaci_callbacks.post_task(step_spec, step_result)
+
         # For output_1 we should have a single BuildFlowAsset,
         # a single TestResult, and no TestResultAssets (screenshots)
         assert (

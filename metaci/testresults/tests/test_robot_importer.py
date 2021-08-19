@@ -1,10 +1,10 @@
 import fnmatch
+from metaci.fixtures.factories import OrgFactory
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
 from shutil import copyfile
 from unittest import mock
-
 
 
 import pytest
@@ -328,6 +328,7 @@ def test_import_perf_results():
 def test_gus_bus_test_manager(mocker):
     """Verifies that we import all tests in a suite"""
     flow_task = FlowTaskFactory()
+    flow_task.build_flow.build.org = OrgFactory()
     with temporary_dir() as output_dir:
         copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
@@ -342,7 +343,13 @@ def test_gus_bus_test_manager(mocker):
                 "id": "123",
             },
         )
-        assert robot_importer.export_robot_test_results(FlowTaskFactory(), []) is None
+        assert (
+            robot_importer.export_robot_test_results(
+                flow_task,
+                []
+            )
+            is None
+        )
         assert len(responses.calls) == 1
         assert responses.calls[0].request.url == "https://webhook/test-results/"
 
@@ -357,6 +364,7 @@ def test_gus_bus_test_manager_failure(mocker):
         METACI_RESULT_EXPORT_ENABLED=True,
     )
     flow_task = FlowTaskFactory()
+    flow_task.build_flow.build.org = OrgFactory()
     with temporary_dir() as output_dir:
         copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
@@ -369,10 +377,12 @@ def test_gus_bus_test_manager_failure(mocker):
             json={
                 "success": False,
                 "errors": [{"msg": "error goes here"}],
-            },  # Boolean value will raise TypeError("Expected a string value") in CI tests.
+            },
         )
-        with pytest.raises(Exception, match="Error while sending test-results webhook: error goes here"):
-            robot_importer.export_robot_test_results(FlowTaskFactory(), [])
+        with pytest.raises(
+            Exception, match="Error while sending test-results webhook: error goes here"
+        ):
+            robot_importer.export_robot_test_results(flow_task, [])
 
 
 @responses.activate
