@@ -210,7 +210,7 @@ def parse_test(test, suite, root):
             .astimezone(None)
             .isoformat()
         )
-        # I'm not 100% convinced this is what we want. It's great in the
+    # I'm not 100% convinced this is what we want. It's great in the
     # normal case, but it's possible for a test to have multiple failing
     # keywords. We'll tackle that when it becomes an issue. For now,
     # we just grab the first failing keyword.
