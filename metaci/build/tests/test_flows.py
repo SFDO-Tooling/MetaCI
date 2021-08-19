@@ -11,7 +11,7 @@ from django.conf import settings
 
 from metaci.build.flows import MetaCIFlowCallback
 from metaci.build.models import BuildFlowAsset, FlowTask
-from metaci.fixtures.factories import BuildFlowFactory
+from metaci.fixtures.factories import BuildFlowFactory, FlowTaskFactory
 from metaci.testresults.models import TestMethod, TestResult, TestResultAsset
 
 # Path to the test robot output files
@@ -234,7 +234,6 @@ def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_respons
             return_values={"robot_outputdir": str(output_dir)},
             exception=None,
         )
-        step_spec.save()
 
         responses.add(
             "POST",
@@ -243,8 +242,19 @@ def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_respons
                 "success": True,
             },
         )
-        build_flow = BuildFlowFactory()
+        build_flow = BuildFlowFactory(
+            flow=FlowTask(
+                stepnum="1",
+                path="Robot",
+                result="Pass",
+                return_values={"robot_outputdir": str(output_dir)},
+                exception=None,
+            )
+        )
+        FlowTask.objects.find_task = mock.MagicMock()
+        FlowTask.objects.find_task.return_value = FlowTaskFactory(build_flow=build_flow)
         metaci_callbacks = MetaCIFlowCallback(build_flow.id)
+
         metaci_callbacks.post_task(step_spec, step_result)
 
         # For output_1 we should have a single BuildFlowAsset,
