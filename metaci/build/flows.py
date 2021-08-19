@@ -55,3 +55,4 @@ class MetaCIFlowCallback(FlowCallback):
                     export_robot_test_results(flowtask, test_results)
                 except (Exception):
                     logger.info("Failed to send test results.")
+                    pass
