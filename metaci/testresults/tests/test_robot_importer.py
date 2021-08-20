@@ -474,6 +474,9 @@ def test_gus_bus_payload():
         expected = {
             "build": {
                 "name": flowtask.build_flow.build.plan.name,
+                "repo_name": flowtask.build_flow.build.repo.name,
+                "branch_name": flowtask.build_flow.build.branch.name,
+                "branch_commit": flowtask.build_flow.build.commit,
                 "org": flowtask.build_flow.build.org.name,
                 "number": flowtask.build_flow.build.id,
                 "url": flowtask.build_flow.build.get_external_url(),
