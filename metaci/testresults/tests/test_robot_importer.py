@@ -325,14 +325,14 @@ def test_import_perf_results():
 @pytest.mark.django_db
 def test_importer_returns_tests():
     """Verifies that the robot importer returns expected test results"""
-    flow_task = FlowTaskFactory()
-    flow_task.build_flow.build.org = OrgFactory()
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
     with temporary_dir() as output_dir:
         copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
             Path(output_dir) / "output.xml",
         )
-        actual = robot_importer.import_robot_test_results(flow_task, output_dir)
+        actual = robot_importer.import_robot_test_results(flowtask, output_dir)
         expected = [
             {
                 "name": "Passing test",
@@ -386,14 +386,14 @@ def test_importer_returns_tests():
 @pytest.mark.django_db
 def test_gus_bus_test_manager():
     """Verifies that we import all tests in a suite"""
-    flow_task = FlowTaskFactory()
-    flow_task.build_flow.build.org = OrgFactory()
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
     with temporary_dir() as output_dir:
         copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
             Path(output_dir) / "output.xml",
         )
-        robot_importer.import_robot_test_results(flow_task, output_dir)
+        robot_importer.import_robot_test_results(flowtask, output_dir)
         responses.add(
             "POST",
             f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
@@ -402,7 +402,7 @@ def test_gus_bus_test_manager():
                 "id": "123",
             },
         )
-        assert robot_importer.export_robot_test_results(flow_task, []) is None
+        assert robot_importer.export_robot_test_results(flowtask, []) is None
         assert len(responses.calls) == 1
         assert responses.calls[0].request.url == "https://webhook/test-results/"
 
@@ -416,14 +416,14 @@ def test_gus_bus_test_manager_failure(mocker):
         "metaci.build.flows.settings",
         METACI_RESULT_EXPORT_ENABLED=True,
     )
-    flow_task = FlowTaskFactory()
-    flow_task.build_flow.build.org = OrgFactory()
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
     with temporary_dir() as output_dir:
         copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
             Path(output_dir) / "output.xml",
         )
-        robot_importer.import_robot_test_results(flow_task, output_dir)
+        robot_importer.import_robot_test_results(flowtask, output_dir)
         responses.add(
             "POST",
             f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
@@ -435,7 +435,7 @@ def test_gus_bus_test_manager_failure(mocker):
         with pytest.raises(
             Exception, match="Error while sending test-results webhook: error goes here"
         ):
-            robot_importer.export_robot_test_results(flow_task, [])
+            robot_importer.export_robot_test_results(flowtask, [])
 
 
 @responses.activate
@@ -456,8 +456,8 @@ def test_gus_bus_test_manager_no_flowtask():
 @responses.activate
 @pytest.mark.django_db
 def test_gus_bus_payload():
-    flow_task = FlowTaskFactory()
-    flow_task.build_flow.build.org = OrgFactory()
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
     responses.add(
         "POST",
         f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
@@ -468,14 +468,14 @@ def test_gus_bus_payload():
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
             Path(output_dir) / "output.xml",
         )
-        test_results = robot_importer.import_robot_test_results(flow_task, output_dir)
-        robot_importer.export_robot_test_results(flow_task, test_results)
+        test_results = robot_importer.import_robot_test_results(flowtask, output_dir)
+        robot_importer.export_robot_test_results(flowtask, test_results)
         expected = {
             "build": {
-                "name": flow_task.build_flow.build.plan.name,
-                "org": flow_task.build_flow.build.org.name,
-                "number": flow_task.id,
-                "url": flow_task.build_flow.build.get_external_url(),
+                "name": flowtask.build_flow.build.plan.name,
+                "org": flowtask.build_flow.build.org.name,
+                "number": flowtask.id,
+                "url": flowtask.build_flow.build.get_external_url(),
                 "metadata": {},
             },
             "tests": test_results,
