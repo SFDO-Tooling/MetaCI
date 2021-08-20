@@ -15,6 +15,7 @@ from metaci.conftest import (
     PlanRepositoryFactory,
     PlanScheduleFactory,
     RepositoryFactory,
+    ScratchOrgInstanceFactory,
 )
 from metaci.release.models import ChangeCaseTemplate, Release
 
@@ -78,55 +79,55 @@ class TestBuild:
         assert "Build flow test completed successfully" in build.log
         assert "running test flow" in build.flows.get().log
 
-    # def test_delete_org(self):
-    #     build = BuildFactory()
-    #     build.org_instance = ScratchOrgInstanceFactory(org__repo=build.repo)
-    #     build.org_instance.delete_org = mock.Mock()
-    #     org_config = OrgConfig({"scratch": True}, "dev")
-    #     build.delete_org(org_config)
-    #     build.org_instance.delete_org.assert_called_once()
-    #     detach_logger(build)
+    def test_delete_org(self):
+        build = BuildFactory()
+        build.org_instance = ScratchOrgInstanceFactory(org__repo=build.repo)
+        build.org_instance.delete_org = mock.Mock()
+        org_config = OrgConfig({"scratch": True}, "dev")
+        build.delete_org(org_config)
+        build.org_instance.delete_org.assert_called_once()
+        detach_logger(build)
 
-    # def test_delete_org__not_scratch(self):
-    #     build = BuildFactory()
-    #     build.org_instance = ScratchOrgInstanceFactory(org__repo=build.repo)
-    #     build.org_instance.delete_org = mock.Mock()
-    #     org_config = OrgConfig({}, "dev")
-    #     build.delete_org(org_config)
-    #     build.org_instance.delete_org.assert_not_called()
-    #     detach_logger(build)
+    def test_delete_org__not_scratch(self):
+        build = BuildFactory()
+        build.org_instance = ScratchOrgInstanceFactory(org__repo=build.repo)
+        build.org_instance.delete_org = mock.Mock()
+        org_config = OrgConfig({}, "dev")
+        build.delete_org(org_config)
+        build.org_instance.delete_org.assert_not_called()
+        detach_logger(build)
 
-    # def test_delete_org__keep_org(self):
-    #     build = BuildFactory(keep_org=True)
-    #     org = ScratchOrgInstanceFactory()
-    #     org.delete_org = mock.Mock()
-    #     build.org_instance = org
-    #     org_config = OrgConfig({"scratch": True}, "dev")
-    #     build.delete_org(org_config)
-    #     org.delete_org.assert_not_called()
-    #     detach_logger(build)
+    def test_delete_org__keep_org(self):
+        build = BuildFactory(keep_org=True)
+        org = ScratchOrgInstanceFactory()
+        org.delete_org = mock.Mock()
+        build.org_instance = org
+        org_config = OrgConfig({"scratch": True}, "dev")
+        build.delete_org(org_config)
+        org.delete_org.assert_not_called()
+        detach_logger(build)
 
-    # def test_delete_org__keep_org_on_error(self):
-    #     build = BuildFactory(status="error")
-    #     build.plan.keep_org_on_error = True
-    #     org = ScratchOrgInstanceFactory()
-    #     org.delete_org = mock.Mock()
-    #     build.org_instance = org
-    #     org_config = OrgConfig({"scratch": True}, "dev")
-    #     build.delete_org(org_config)
-    #     org.delete_org.assert_not_called()
-    #     detach_logger(build)
+    def test_delete_org__keep_org_on_error(self):
+        build = BuildFactory(status="error")
+        build.plan.keep_org_on_error = True
+        org = ScratchOrgInstanceFactory()
+        org.delete_org = mock.Mock()
+        build.org_instance = org
+        org_config = OrgConfig({"scratch": True}, "dev")
+        build.delete_org(org_config)
+        org.delete_org.assert_not_called()
+        detach_logger(build)
 
-    # def test_delete_org__keep_org_on_fail(self):
-    #     build = BuildFactory(status="fail")
-    #     build.plan.keep_org_on_fail = True
-    #     org = ScratchOrgInstanceFactory()
-    #     org.delete_org = mock.Mock()
-    #     build.org_instance = org
-    #     org_config = OrgConfig({"scratch": True}, "dev")
-    #     build.delete_org(org_config)
-    #     org.delete_org.assert_not_called()
-    #     detach_logger(build)
+    def test_delete_org__keep_org_on_fail(self):
+        build = BuildFactory(status="fail")
+        build.plan.keep_org_on_fail = True
+        org = ScratchOrgInstanceFactory()
+        org.delete_org = mock.Mock()
+        build.org_instance = org
+        org_config = OrgConfig({"scratch": True}, "dev")
+        build.delete_org(org_config)
+        org.delete_org.assert_not_called()
+        detach_logger(build)
 
     @mock.patch.dict(os.environ, clear=True)
     def test_no_worker_id(self):
