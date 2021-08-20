@@ -458,6 +458,7 @@ def test_gus_bus_test_manager_no_flowtask():
 def test_gus_bus_payload():
     flowtask = FlowTaskFactory()
     flowtask.build_flow.build.org = OrgFactory()
+    flowtask.build_flow.build.repo.metadata = {"key1": True, "key2": "hello, world"}
     responses.add(
         "POST",
         f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
@@ -476,7 +477,7 @@ def test_gus_bus_payload():
                 "org": flowtask.build_flow.build.org.name,
                 "number": flowtask.build_flow.build.id,
                 "url": flowtask.build_flow.build.get_external_url(),
-                "metadata": {},
+                "metadata": {"key1": True, "key2": "hello, world"},
             },
             "tests": test_results,
         }
