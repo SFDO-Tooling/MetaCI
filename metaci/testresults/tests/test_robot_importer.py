@@ -1,4 +1,5 @@
 import fnmatch
+import json
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
@@ -339,6 +340,9 @@ def test_importer_returns_tests():
                 "status": "Pass",
                 "start_time": "2020-06-23T18:49:20.955000+00:00",
                 "end_time": "2020-06-23T18:49:20.956000+00:00",
+                "exception": "Life is good, yo.",
+                "doc": "",
+                "tags": ["tag one", "tag two"],
             },
             {
                 "name": "Failing test 1",
@@ -346,6 +350,9 @@ def test_importer_returns_tests():
                 "status": "Fail",
                 "start_time": "2020-06-23T18:49:20.957000+00:00",
                 "end_time": "2020-06-23T18:49:20.960000+00:00",
+                "exception": "Danger, Will Robinson!",
+                "doc": "A test that fails with a keyword directly in the test",
+                "tags": [],
             },
             {
                 "name": "Failing test 2",
@@ -353,6 +360,9 @@ def test_importer_returns_tests():
                 "status": "Fail",
                 "start_time": "2020-06-23T18:49:20.960000+00:00",
                 "end_time": "2020-06-23T18:49:20.963000+00:00",
+                "doc": "A test that fails due to a failure in a lower level keyword.",
+                "exception": "I'm sorry, Dave. I'm afraid I can't do that.",
+                "tags": [],
             },
             {
                 "name": "Failing test 3",
@@ -360,6 +370,13 @@ def test_importer_returns_tests():
                 "status": "Fail",
                 "start_time": "2020-06-23T18:49:21.017000+00:00",
                 "end_time": "2020-06-23T18:49:21.024000+00:00",
+                "exception": (
+                    "Several failures occurred:\n\n"
+                    "      1) First failure\n\n"
+                    "      2) Second failure"
+                ),
+                "doc": "A test that has multiple keyword failures",
+                "tags": [],
             },
         ]
         assert actual == expected
@@ -367,8 +384,7 @@ def test_importer_returns_tests():
 
 @responses.activate
 @pytest.mark.django_db
-@mock.patch("django.conf.settings")
-def test_gus_bus_test_manager(mocker):
+def test_gus_bus_test_manager():
     """Verifies that we import all tests in a suite"""
     flow_task = FlowTaskFactory()
     flow_task.build_flow.build.org = OrgFactory()
@@ -435,3 +451,36 @@ def test_gus_bus_test_manager_no_flowtask():
 
         assert robot_importer.export_robot_test_results(None, []) is None
         assert len(responses.calls) == 0
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_gus_bus_payload():
+    flow_task = FlowTaskFactory()
+    flow_task.build_flow.build.org = OrgFactory()
+    responses.add(
+        "POST",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        json={"success": True},
+    )
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        test_results = robot_importer.import_robot_test_results(flow_task, output_dir)
+        robot_importer.export_robot_test_results(flow_task, test_results)
+        expected = {
+            "build": {
+                "name": flow_task.build_flow.build.plan.name,
+                "org": flow_task.build_flow.build.org.name,
+                "number": flow_task.id,
+                "url": flow_task.build_flow.build.get_external_url(),
+                "metadata": {},
+            },
+            "tests": test_results,
+        }
+        actual = json.loads(responses.calls[0].request.body)
+        assert actual == expected
+        # responses.calls[0].request.body
+        print("feh")

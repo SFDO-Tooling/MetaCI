@@ -9,6 +9,8 @@
         Life is good, yo.</msg>
 <status status="PASS" starttime="20200623 18:49:20.956" endtime="20200623 18:49:20.956"/>
 </kw>
+<tag>tag one</tag>
+<tag>tag two</tag>
 <status status="PASS" starttime="20200623 18:49:20.955" endtime="20200623 18:49:20.956">Life is good, yo.</status>
 </test>
 <test id="s1-t2" name="Failing test 1">

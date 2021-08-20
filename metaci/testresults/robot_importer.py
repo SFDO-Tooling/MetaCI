@@ -110,7 +110,7 @@ def import_robot_test_results(flowtask, results_dir: str) -> List:
             message=result["message"],
             robot_keyword=result["failing_keyword"],
             robot_xml=result["xml"],
-            robot_tags=result["robot_tags"],
+            robot_tags=",".join(result["tags"]),
             task=flowtask,
         )
         testresult.save()
@@ -143,6 +143,9 @@ def import_robot_test_results(flowtask, results_dir: str) -> List:
                 "status": result["status"].capitalize(),
                 "start_time": result["start_time"],
                 "end_time": result["end_time"],
+                "exception": result["message"],
+                "tags": result["tags"],
+                "doc": result["doc"],
             }
         )
     return results
@@ -192,6 +195,7 @@ def _robot_duration(status_element):
 
 def parse_test(test, suite, root):
     status = test.find("status")
+    doc = test.find("doc")
     setup = test.find("kw[@type='SETUP']")
     teardown = test.find("kw[@type='TEARDOWN']")
     zero = timedelta(seconds=0)
@@ -214,11 +218,12 @@ def parse_test(test, suite, root):
             if library:
                 keyword = f"{library}.{keyword}"
 
-    robot_tags = ",".join(sorted([tag.text for tag in test.iterfind("tag")]))
+    tags = sorted([tag.text for tag in test.iterfind("tag")])
     test_info = {
         "suite": suite,
         "name": test.attrib.get("name") or "<no name>",
         "elem": test,
+        "doc": "" if doc is None else doc.text,
         # Note: robot status should always be PASS, FAIL, or SKIP, so
         # it's a simple transformation to become one of the values from
         # OUTCOME_CHOICES in testresults/choices.py
@@ -228,7 +233,7 @@ def parse_test(test, suite, root):
         "screenshots": [],
         "message": status.text,
         "failing_keyword": keyword,
-        "robot_tags": robot_tags,
+        "tags": tags,
     }
     duration = duration_from_performance_keywords(test)
     if duration is not None:
