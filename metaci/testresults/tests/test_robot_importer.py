@@ -474,7 +474,7 @@ def test_gus_bus_payload():
             "build": {
                 "name": flowtask.build_flow.build.plan.name,
                 "org": flowtask.build_flow.build.org.name,
-                "number": flowtask.id,
+                "number": flowtask.build_flow.build.id,
                 "url": flowtask.build_flow.build.get_external_url(),
                 "metadata": {},
             },

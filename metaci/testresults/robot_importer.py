@@ -316,7 +316,7 @@ def export_robot_test_results(flowtask, test_results) -> None:
         "build": {
             "name": flowtask.build_flow.build.plan.name,
             "org": flowtask.build_flow.build.org.name,
-            "number": flowtask.id,
+            "number": flowtask.build_flow.build.id,
             "url": f"{flowtask.build_flow.build.get_external_url()}",  # if SITE_URL is set and still returning a 422 try setting an additional 127.0.0.1 domain in you /etc/hosts file
             "metadata": flowtask.build_flow.build.repo.metadata,
         },
