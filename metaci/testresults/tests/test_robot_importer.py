@@ -1,11 +1,9 @@
 import fnmatch
-from metaci.fixtures.factories import OrgFactory
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
 from shutil import copyfile
 from unittest import mock
-
 
 import pytest
 import responses
@@ -17,6 +15,7 @@ from metaci.build.exceptions import BuildError
 from metaci.build.models import BuildFlowAsset
 from metaci.build.tests.test_flows import TEST_ROBOT_OUTPUT_FILES
 from metaci.conftest import FlowTaskFactory
+from metaci.fixtures.factories import OrgFactory
 from metaci.testresults import models, robot_importer
 
 
@@ -322,6 +321,50 @@ def test_import_perf_results():
         assert durations[name] == value
 
 
+@pytest.mark.django_db
+def test_importer_returns_tests():
+    """Verifies that the robot importer returns expected test results"""
+    flow_task = FlowTaskFactory()
+    flow_task.build_flow.build.org = OrgFactory()
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        actual = robot_importer.import_robot_test_results(flow_task, output_dir)
+        expected = [
+            {
+                "name": "Passing test",
+                "group": "Robot Fail",
+                "status": "Pass",
+                "start_time": "2020-06-23T18:49:20.955000+00:00",
+                "end_time": "2020-06-23T18:49:20.956000+00:00",
+            },
+            {
+                "name": "Failing test 1",
+                "group": "Robot Fail",
+                "status": "Fail",
+                "start_time": "2020-06-23T18:49:20.957000+00:00",
+                "end_time": "2020-06-23T18:49:20.960000+00:00",
+            },
+            {
+                "name": "Failing test 2",
+                "group": "Robot Fail",
+                "status": "Fail",
+                "start_time": "2020-06-23T18:49:20.960000+00:00",
+                "end_time": "2020-06-23T18:49:20.963000+00:00",
+            },
+            {
+                "name": "Failing test 3",
+                "group": "Robot Fail",
+                "status": "Fail",
+                "start_time": "2020-06-23T18:49:21.017000+00:00",
+                "end_time": "2020-06-23T18:49:21.024000+00:00",
+            },
+        ]
+        assert actual == expected
+
+
 @responses.activate
 @pytest.mark.django_db
 @mock.patch("django.conf.settings")
@@ -343,13 +386,7 @@ def test_gus_bus_test_manager(mocker):
                 "id": "123",
             },
         )
-        assert (
-            robot_importer.export_robot_test_results(
-                flow_task,
-                []
-            )
-            is None
-        )
+        assert robot_importer.export_robot_test_results(flow_task, []) is None
         assert len(responses.calls) == 1
         assert responses.calls[0].request.url == "https://webhook/test-results/"
 
@@ -387,8 +424,7 @@ def test_gus_bus_test_manager_failure(mocker):
 
 @responses.activate
 @pytest.mark.django_db
-@mock.patch("django.conf.settings")
-def test_gus_bus_test_manager_no_flowtask(mocker):
+def test_gus_bus_test_manager_no_flowtask():
     """Verifies that we import all tests in a suite"""
     with temporary_dir() as output_dir:
         copyfile(

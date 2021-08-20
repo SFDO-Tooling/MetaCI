@@ -197,19 +197,10 @@ def parse_test(test, suite, root):
     zero = timedelta(seconds=0)
     setup_time = _robot_duration(setup.find("status")) if setup else zero
     teardown_time = _robot_duration(teardown.find("status")) if teardown else zero
-    start_time = datetime.now().astimezone(None).isoformat()
-    end_time = datetime.now().astimezone(None).isoformat()
-    if setup:
-        start_time = (
-            _parse_robot_time(setup.find("status").attrib["starttime"])
-            .astimezone(None)
-            .isoformat()
-        )
-        end_time = (
-            _parse_robot_time(setup.find("status").attrib["endtime"])
-            .astimezone(None)
-            .isoformat()
-        )
+    start_time = (
+        _parse_robot_time(status.attrib["starttime"]).astimezone(None).isoformat()
+    )
+    end_time = _parse_robot_time(status.attrib["endtime"]).astimezone(None).isoformat()
     # I'm not 100% convinced this is what we want. It's great in the
     # normal case, but it's possible for a test to have multiple failing
     # keywords. We'll tackle that when it becomes an issue. For now,
