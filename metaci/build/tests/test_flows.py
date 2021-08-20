@@ -3,7 +3,6 @@ from shutil import copyfile
 from unittest import mock
 
 import pytest
-import responses
 from cumulusci.core.flowrunner import StepResult, StepSpec
 from cumulusci.tasks.robotframework.robotframework import Robot
 from cumulusci.utils import temporary_dir, touch
@@ -11,7 +10,7 @@ from django.conf import settings
 
 from metaci.build.flows import MetaCIFlowCallback
 from metaci.build.models import BuildFlowAsset, FlowTask
-from metaci.fixtures.factories import BuildFlowFactory, FlowTaskFactory, OrgFactory
+from metaci.fixtures.factories import BuildFlowFactory, FlowTaskFactory
 from metaci.testresults.models import TestMethod, TestResult, TestResultAsset
 
 # Path to the test robot output files
@@ -204,9 +203,7 @@ def test_post_task__multiple_robot_task_test_results_disabled(get_spec, mocker):
         assert 3 == TestMethod.objects.all().count()
 
 
-@responses.activate
 @pytest.mark.django_db
-@mock.patch("django.conf.settings")
 def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_responses):
     """Test for scenario where there are multiple Robot tasks defined
     in a single flow. We want to make sure that test results and related
@@ -235,41 +232,20 @@ def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_respons
             exception=None,
         )
 
-        responses.add(
+        mocked_responses.add(
             "POST",
             f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
             json={
                 "success": True,
             },
         )
-        build_flow = BuildFlowFactory(
-            flow=FlowTask(
-                stepnum="1",
-                path="Robot",
-                result="Pass",
-                return_values={"robot_outputdir": str(output_dir)},
-                exception=None,
-            ),
-            build__org=OrgFactory(name="Robot"),
-        )
-        FlowTask.objects.find_task = mock.MagicMock()
-        FlowTask.objects.find_task.return_value = FlowTaskFactory(build_flow=build_flow)
-        metaci_callbacks = MetaCIFlowCallback(build_flow.id)
+        flowtask = FlowTaskFactory(stepnum="1", path="Robot")
+        metaci_callbacks = MetaCIFlowCallback(flowtask.build_flow.id)
 
         metaci_callbacks.post_task(step_spec, step_result)
 
-        # For output_1 we should have a single BuildFlowAsset,
-        # a single TestResult, and no TestResultAssets (screenshots)
-        assert (
-            1
-            == BuildFlowAsset.objects.filter(
-                category="robot-output", build_flow=build_flow
-            ).count()
-        )
-        assert 1 == TestResult.objects.all().count()
-        assert 0 == TestResultAsset.objects.all().count()
-        assert len(responses.calls) == 1
-        assert responses.calls[0].request.url == "https://webhook/test-results/"
+        # The mocked_responses fixture takes care of asserting
+        # that the expected requests were made
 
 
 class TestException(Exception):
