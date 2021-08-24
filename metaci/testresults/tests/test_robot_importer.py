@@ -8,6 +8,7 @@ from unittest import mock
 
 import pytest
 import responses
+import robot
 from cumulusci.utils import elementtree_parse_file, temporary_dir
 from django.conf import settings
 from django.utils import timezone
@@ -456,9 +457,9 @@ def test_gus_bus_test_manager_no_flowtask():
 @responses.activate
 @pytest.mark.django_db
 def test_gus_bus_payload():
+    """Verify that we're sending a valid payload with all required fields"""
     flowtask = FlowTaskFactory()
     flowtask.build_flow.build.org = OrgFactory()
-    flowtask.build_flow.build.repo.metadata = {"key1": True, "key2": "hello, world"}
     responses.add(
         "POST",
         f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
@@ -474,17 +475,42 @@ def test_gus_bus_payload():
         expected = {
             "build": {
                 "name": flowtask.build_flow.build.plan.name,
-                "repo_name": flowtask.build_flow.build.repo.name,
                 "branch_name": flowtask.build_flow.build.branch.name,
-                "branch_commit": flowtask.build_flow.build.commit,
                 "org": flowtask.build_flow.build.org.name,
                 "number": flowtask.build_flow.build.id,
                 "url": flowtask.build_flow.build.get_external_url(),
-                "metadata": {"key1": True, "key2": "hello, world"},
+                "metadata": {
+                    "test_framework": f"Robotframework/{robot.__version__}",
+                },
             },
             "tests": test_results,
         }
         actual = json.loads(responses.calls[0].request.body)
         assert actual == expected
-        # responses.calls[0].request.body
-        print("feh")
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_gus_bus_payload_metadata():
+    """Verify that all build-specific metadata is added to the payload"""
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
+    flowtask.build_flow.build.repo.metadata = {"key1": True, "key2": "hello, world"}
+    responses.add(
+        "POST",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        json={"success": True},
+    )
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        test_results = robot_importer.import_robot_test_results(flowtask, output_dir)
+        robot_importer.export_robot_test_results(flowtask, test_results)
+        response = json.loads(responses.calls[0].request.body)
+        assert response["build"]["metadata"] == {
+            "test_framework": f"Robotframework/{robot.__version__}",
+            "key1": True,
+            "key2": "hello, world",
+        }
