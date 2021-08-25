@@ -24,7 +24,6 @@ honcho
 Pillow
 psycopg2-binary
 PyJWT
-raven
 redis
 rq
 rq-scheduler

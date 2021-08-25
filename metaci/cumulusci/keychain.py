@@ -2,6 +2,7 @@ from cumulusci.core.config import OrgConfig, ScratchOrgConfig, ServiceConfig
 from cumulusci.core.exceptions import ServiceNotConfigured
 from cumulusci.core.keychain import BaseProjectKeychain
 from django.conf import settings
+from django.utils import timezone
 
 from metaci.cumulusci.logger import init_logger
 from metaci.cumulusci.models import Org, ScratchOrgInstance, Service
@@ -80,7 +81,7 @@ class MetaCIProjectKeychain(BaseProjectKeychain):
             sf_org_id=info["org_id"],
             username=info["username"],
             json=org_config.config,
-            expiration_date=org_config.expires,
+            expiration_date=timezone.make_aware(org_config.expires, timezone.utc),
             org_note=self.build.org_note,
         )
         instance.save()

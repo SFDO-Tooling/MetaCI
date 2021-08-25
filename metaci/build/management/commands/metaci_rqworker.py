@@ -20,9 +20,6 @@ class Command(BaseCommand):
             # This ensures that workers exit in a way that can requeue running jobs.
             options["worker_class"] = "rq.worker.HerokuWorker"
 
-        if "sentry_dsn" not in options:
-            options["sentry_dsn"] = ""
-
         return super().handle(*args, **options)
 
 
