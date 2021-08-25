@@ -21,7 +21,6 @@ from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
 from cumulusci.utils import elementtree_parse_file
 from django.apps import apps
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -889,11 +888,11 @@ class FlowTask(models.Model):
         max_length=2048, help_text="dotted path e.g. flow1.flow2.task_name"
     )
     class_path = models.TextField(null=True, blank=True)
-    options = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
-    result = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
-    return_values = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
+    options = models.JSONField(null=True, blank=True, encoder=GnarlyEncoder)
+    result = models.JSONField(null=True, blank=True, encoder=GnarlyEncoder)
+    return_values = models.JSONField(null=True, blank=True, encoder=GnarlyEncoder)
     exception = models.CharField(max_length=255, null=True, blank=True)
-    exception_value = JSONField(null=True, blank=True, encoder=GnarlyEncoder)
+    exception_value = models.JSONField(null=True, blank=True, encoder=GnarlyEncoder)
 
     status = models.CharField(
         max_length=16, choices=FLOW_TASK_STATUSES, default="queued"
