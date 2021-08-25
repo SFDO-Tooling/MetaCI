@@ -508,8 +508,8 @@ def test_gus_bus_payload_metadata():
         )
         test_results = robot_importer.import_robot_test_results(flowtask, output_dir)
         robot_importer.export_robot_test_results(flowtask, test_results)
-        response = json.loads(responses.calls[0].request.body)
-        assert response["build"]["metadata"] == {
+        actual = json.loads(responses.calls[0].request.body)
+        assert actual["build"]["metadata"] == {
             "test_framework": f"Robotframework/{robot.__version__}",
             "key1": True,
             "key2": "hello, world",
