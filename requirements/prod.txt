@@ -231,8 +231,6 @@ pyyaml==5.4.1
     # via
     #   cumulusci
     #   snowfakery
-raven==6.10.0
-    # via -r requirements/prod.in
 redis==3.5.3
     # via
     #   -r requirements/prod.in

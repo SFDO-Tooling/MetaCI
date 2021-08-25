@@ -6,9 +6,6 @@ Production Configurations
 - Use Mailgun to send emails
 - Use Redis for cache
 
-- Use sentry for error logging
-
-
 """
 import json
 import ssl
@@ -26,17 +23,11 @@ DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", cast=nl_separated_bytes_list)
 # This ensures that Django will be able to detect a secure connection
 # properly on Heroku.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# raven sentry client
-# See https://docs.getsentry.com/hosted/clients/python/integrations/django/
-INSTALLED_APPS += ("raven.contrib.django.raven_compat",)
+
 INSTALLED_APPS += ("defender",)
 
 # Use Whitenoise to serve static files
 # See: https://whitenoise.readthedocs.io/
-RAVEN_MIDDLEWARE = (
-    "raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware",
-)
-MIDDLEWARE = RAVEN_MIDDLEWARE + MIDDLEWARE
 DEFENDER_MIDDLEWARE = ("defender.middleware.FailedLoginMiddleware",)
 MIDDLEWARE = MIDDLEWARE + DEFENDER_MIDDLEWARE
 
@@ -186,7 +177,6 @@ LOGGING = {
     },
     "loggers": {
         "django": {"level": "ERROR", "handlers": ["console_w_req"], "propagate": False},
-        "raven": {"level": "DEBUG", "handlers": ["console_w_req"], "propagate": False},
         "log_request_id.middleware": {
             "handlers": ["console_w_req"],
             "level": "DEBUG",
@@ -196,27 +186,6 @@ LOGGING = {
         "metaci": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
-
-# Sentry Configuration
-SENTRY_DSN = env("DJANGO_SENTRY_DSN", default=None)
-SENTRY_CLIENT = env(
-    "DJANGO_SENTRY_CLIENT", default="raven.contrib.django.raven_compat.DjangoClient"
-)
-
-RAVEN_CONFIG = {}
-if SENTRY_DSN:
-    RAVEN_CONFIG["DSN"] = SENTRY_DSN
-    LOGGING["handlers"]["sentry"] = {
-        "level": "ERROR",
-        "class": "raven.contrib.django.raven_compat.handlers.SentryHandler",
-    }
-    LOGGING["loggers"]["sentry.errors"] = {
-        "level": "DEBUG",
-        "handlers": ["console"],
-        "propagate": False,
-    }
-    LOGGING["root"]["handlers"].append("sentry")
-    LOGGING["loggers"]["django"]["handlers"].append("sentry")
 
 # Add the HireFire middleware for monitoring queue to scale dynos
 # See: https://hirefire.readthedocs.io/
