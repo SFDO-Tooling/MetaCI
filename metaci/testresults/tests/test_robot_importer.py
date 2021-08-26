@@ -1,4 +1,5 @@
 import fnmatch
+import json
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path, PurePath
@@ -6,13 +7,17 @@ from shutil import copyfile
 from unittest import mock
 
 import pytest
+import responses
+import robot
 from cumulusci.utils import elementtree_parse_file, temporary_dir
+from django.conf import settings
 from django.utils import timezone
 
 from metaci.build.exceptions import BuildError
 from metaci.build.models import BuildFlowAsset
 from metaci.build.tests.test_flows import TEST_ROBOT_OUTPUT_FILES
 from metaci.conftest import FlowTaskFactory
+from metaci.fixtures.factories import OrgFactory
 from metaci.testresults import models, robot_importer
 
 
@@ -316,3 +321,196 @@ def test_import_perf_results():
         ("Set Time and Also Metric", 0.0),
     ]:
         assert durations[name] == value
+
+
+@pytest.mark.django_db
+def test_importer_returns_tests():
+    """Verifies that the robot importer returns expected test results"""
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        actual = robot_importer.import_robot_test_results(flowtask, output_dir)
+        expected = [
+            {
+                "name": "Passing test",
+                "group": "Robot Fail",
+                "status": "Pass",
+                "start_time": "2020-06-23T18:49:20.955000+00:00",
+                "end_time": "2020-06-23T18:49:20.956000+00:00",
+                "exception": "Life is good, yo.",
+                "doc": "",
+                "tags": ["tag one", "tag two"],
+            },
+            {
+                "name": "Failing test 1",
+                "group": "Robot Fail",
+                "status": "Fail",
+                "start_time": "2020-06-23T18:49:20.957000+00:00",
+                "end_time": "2020-06-23T18:49:20.960000+00:00",
+                "exception": "Danger, Will Robinson!",
+                "doc": "A test that fails with a keyword directly in the test",
+                "tags": [],
+            },
+            {
+                "name": "Failing test 2",
+                "group": "Robot Fail",
+                "status": "Fail",
+                "start_time": "2020-06-23T18:49:20.960000+00:00",
+                "end_time": "2020-06-23T18:49:20.963000+00:00",
+                "doc": "A test that fails due to a failure in a lower level keyword.",
+                "exception": "I'm sorry, Dave. I'm afraid I can't do that.",
+                "tags": [],
+            },
+            {
+                "name": "Failing test 3",
+                "group": "Robot Fail",
+                "status": "Fail",
+                "start_time": "2020-06-23T18:49:21.017000+00:00",
+                "end_time": "2020-06-23T18:49:21.024000+00:00",
+                "exception": (
+                    "Several failures occurred:\n\n"
+                    "      1) First failure\n\n"
+                    "      2) Second failure"
+                ),
+                "doc": "A test that has multiple keyword failures",
+                "tags": [],
+            },
+        ]
+        assert actual == expected
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_gus_bus_test_manager():
+    """Verifies that we import all tests in a suite"""
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(flowtask, output_dir)
+        responses.add(
+            "POST",
+            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+            json={
+                "success": True,
+                "id": "123",
+            },
+        )
+        assert robot_importer.export_robot_test_results(flowtask, []) is None
+        assert len(responses.calls) == 1
+        assert responses.calls[0].request.url == "https://webhook/test-results/"
+
+
+@responses.activate
+@pytest.mark.django_db
+@mock.patch("django.conf.settings")
+def test_gus_bus_test_manager_failure(mocker):
+    """Verifies that we import all tests in a suite"""
+    mocker.patch(
+        "metaci.build.flows.settings",
+        METACI_RESULT_EXPORT_ENABLED=True,
+    )
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(flowtask, output_dir)
+        responses.add(
+            "POST",
+            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+            json={
+                "success": False,
+                "errors": [{"msg": "error goes here"}],
+            },
+        )
+        with pytest.raises(
+            Exception, match="Error while sending test-results webhook: error goes here"
+        ):
+            robot_importer.export_robot_test_results(flowtask, [])
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_gus_bus_test_manager_no_flowtask():
+    """Verifies that we import all tests in a suite"""
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        robot_importer.import_robot_test_results(FlowTaskFactory(), output_dir)
+
+        assert robot_importer.export_robot_test_results(None, []) is None
+        assert len(responses.calls) == 0
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_gus_bus_payload():
+    """Verify that we're sending a valid payload with all required fields"""
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
+    responses.add(
+        "POST",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        json={"success": True},
+    )
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        test_results = robot_importer.import_robot_test_results(flowtask, output_dir)
+        robot_importer.export_robot_test_results(flowtask, test_results)
+        expected = {
+            "build": {
+                "name": flowtask.build_flow.build.plan.name,
+                "branch_name": flowtask.build_flow.build.branch.name,
+                "org": flowtask.build_flow.build.org.name,
+                "number": flowtask.build_flow.build.id,
+                "url": flowtask.build_flow.build.get_external_url(),
+                "metadata": {
+                    "test_framework": f"Robotframework/{robot.__version__}",
+                },
+            },
+            "tests": test_results,
+        }
+        actual = json.loads(responses.calls[0].request.body)
+        assert actual == expected
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_gus_bus_payload_metadata():
+    """Verify that all build-specific metadata is added to the payload"""
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
+    flowtask.build_flow.build.repo.metadata = {"key1": True, "key2": "hello, world"}
+    responses.add(
+        "POST",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        json={"success": True},
+    )
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        test_results = robot_importer.import_robot_test_results(flowtask, output_dir)
+        robot_importer.export_robot_test_results(flowtask, test_results)
+        actual = json.loads(responses.calls[0].request.body)
+        assert actual["build"]["metadata"] == {
+            "test_framework": f"Robotframework/{robot.__version__}",
+            "key1": True,
+            "key2": "hello, world",
+        }

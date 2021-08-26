@@ -1,18 +1,26 @@
+import logging
 import os
 import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import List
 
+import requests
+import robot
 from cumulusci.utils import elementtree_parse_file
 from cumulusci.utils.xml.robot_xml import pattern as ELAPSED_TIME_PATTERN
+from django.conf import settings
 from django.core.files.base import ContentFile
 
 from metaci.build.exceptions import BuildError
+from metaci.release.utils import jwt_for_webhook
 from metaci.testresults.models import TestClass, TestMethod, TestResult, TestResultAsset
 
+logger = logging.getLogger(__name__)
 
-def import_robot_test_results(flowtask, results_dir: str) -> None:
+
+def import_robot_test_results(flowtask, results_dir: str) -> List:
     """Given a flowtask for a robot task, and a path to the
     test results output file:
 
@@ -28,6 +36,7 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
     @param1 (FlowTask) The flowtask associated with the robot task
     @param1 (str) The filepath to the robot results
     """
+    results = []
     results_dir = Path(results_dir)
     results_file = results_dir / "output.xml"  # robot output filename
 
@@ -102,7 +111,7 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
             message=result["message"],
             robot_keyword=result["failing_keyword"],
             robot_xml=result["xml"],
-            robot_tags=result["robot_tags"],
+            robot_tags=",".join(result["tags"]),
             task=flowtask,
         )
         testresult.save()
@@ -126,7 +135,21 @@ def import_robot_test_results(flowtask, results_dir: str) -> None:
                 testresult.robot_xml = testresult.robot_xml.replace(
                     f'"{screenshot}"', f'"buildflowasset://{asset_id}"'
                 )
+
             testresult.save()
+        results.append(
+            {
+                "name": result["name"],
+                "group": result["suite"]["name"],
+                "status": result["status"].capitalize(),
+                "start_time": result["start_time"],
+                "end_time": result["end_time"],
+                "exception": result["message"],
+                "tags": result["tags"],
+                "doc": result["doc"],
+            }
+        )
+    return results
 
 
 def parse_robot_output(path):
@@ -143,8 +166,7 @@ def get_robot_tests(root, elem, parents=()):
         if child.tag == "suite":
             has_children_suites = True
             tests += get_robot_tests(root, child, parents + (child,))
-
-    if not has_children_suites:
+    if not has_children_suites:  # base case of recursion
         suite_file = elem.attrib["source"].replace(os.getcwd(), "")
         setup = elem.find("kw[@type='SETUP']")
         teardown = elem.find("kw[@type='TEARDOWN']")
@@ -159,7 +181,6 @@ def get_robot_tests(root, elem, parents=()):
         }
         for test in elem.iter("test"):
             tests.append(parse_test(test, suite, root))
-
     return tests
 
 
@@ -175,12 +196,16 @@ def _robot_duration(status_element):
 
 def parse_test(test, suite, root):
     status = test.find("status")
+    doc = test.find("doc")
     setup = test.find("kw[@type='SETUP']")
     teardown = test.find("kw[@type='TEARDOWN']")
     zero = timedelta(seconds=0)
     setup_time = _robot_duration(setup.find("status")) if setup else zero
     teardown_time = _robot_duration(teardown.find("status")) if teardown else zero
-
+    start_time = (
+        _parse_robot_time(status.attrib["starttime"]).astimezone(None).isoformat()
+    )
+    end_time = _parse_robot_time(status.attrib["endtime"]).astimezone(None).isoformat()
     # I'm not 100% convinced this is what we want. It's great in the
     # normal case, but it's possible for a test to have multiple failing
     # keywords. We'll tackle that when it becomes an issue. For now,
@@ -194,19 +219,22 @@ def parse_test(test, suite, root):
             if library:
                 keyword = f"{library}.{keyword}"
 
-    robot_tags = ",".join(sorted([tag.text for tag in test.iterfind("tag")]))
+    tags = sorted([tag.text for tag in test.iterfind("tag")])
     test_info = {
         "suite": suite,
         "name": test.attrib.get("name") or "<no name>",
         "elem": test,
+        "doc": "" if doc is None else doc.text,
         # Note: robot status should always be PASS, FAIL, or SKIP, so
         # it's a simple transformation to become one of the values from
         # OUTCOME_CHOICES in testresults/choices.py
+        "start_time": start_time,
+        "end_time": end_time,
         "status": status.attrib["status"].capitalize(),
         "screenshots": [],
         "message": status.text,
         "failing_keyword": keyword,
-        "robot_tags": robot_tags,
+        "tags": tags,
     }
     duration = duration_from_performance_keywords(test)
     if duration is not None:
@@ -276,3 +304,43 @@ def render_robot_test_xml(root, test):
 
     test_xml = ET.tostring(testroot, encoding="unicode")
     return re.sub(r"sid=.*<", "sid=MASKED<", test_xml)
+
+
+def export_robot_test_results(flowtask, test_results) -> None:
+    """Sends robot test results to test-manager via api call to gus-bus."""
+    if not settings.METACI_RELEASE_WEBHOOK_URL or not flowtask:
+        return
+    logger.info(
+        f"Sending test results webhook for {flowtask.build_flow.build.get_external_url()} to {settings.METACI_RELEASE_WEBHOOK_URL}"
+    )
+    payload = {
+        "build": {
+            "name": flowtask.build_flow.build.plan.name,
+            "branch_name": flowtask.build_flow.build.branch.name,
+            "org": flowtask.build_flow.build.org.name,
+            "number": flowtask.build_flow.build.id,
+            "url": f"{flowtask.build_flow.build.get_external_url()}",
+            "metadata": {
+                "test_framework": f"Robotframework/{robot.__version__}",
+                **flowtask.build_flow.build.repo.metadata,
+            },
+        },
+        "tests": test_results,
+    }
+
+    token = jwt_for_webhook()
+    response = requests.post(
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    response.raise_for_status()
+    result = response.json()
+
+    if result["success"]:
+        logger.info(
+            f"Successfully sent test results to {settings.METACI_RELEASE_WEBHOOK_URL}/test-results/"
+        )
+    else:
+        msg = "\n".join(err["msg"] for err in result["errors"])
+        raise Exception(f"Error while sending test-results webhook: {msg}")

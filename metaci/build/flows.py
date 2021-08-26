@@ -1,13 +1,21 @@
+import logging
+
 from cumulusci.core.flowrunner import FlowCallback
+from django.conf import settings
 from django.utils import timezone
 
-from metaci.testresults.robot_importer import import_robot_test_results
+from metaci.testresults.robot_importer import (
+    export_robot_test_results,
+    import_robot_test_results,
+)
 
 from .models import FlowTask
 
+logger = logging.getLogger(__name__)
+
 
 class MetaCIFlowCallback(FlowCallback):
-    """ An implementation of FlowCallback that logs task execution to the database. """
+    """An implementation of FlowCallback that logs task execution to the database."""
 
     def __init__(self, buildflow_id):
         self.buildflow_id = buildflow_id
@@ -37,8 +45,13 @@ class MetaCIFlowCallback(FlowCallback):
             flowtask.status = "error"
         else:
             flowtask.status = "complete"
-
         flowtask.save()
-
         if "robot_outputdir" in result.return_values:
-            import_robot_test_results(flowtask, result.return_values["robot_outputdir"])
+            test_results = import_robot_test_results(
+                flowtask, result.return_values["robot_outputdir"]
+            )
+            if settings.METACI_RESULT_EXPORT_ENABLED:
+                try:
+                    export_robot_test_results(flowtask, test_results)
+                except Exception as e:
+                    logger.info(f"Error exporting test result: {e}")

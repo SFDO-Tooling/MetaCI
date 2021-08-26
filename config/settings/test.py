@@ -74,3 +74,9 @@ AUTOSCALERS = {
 
 METACI_LONG_RUNNING_BUILD_CONFIG = {"app_name": "test-app"}
 METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.LocalOneOffBuilder"
+
+METACI_RELEASE_WEBHOOK_AUTH_KEY = "12345"
+METACI_RELEASE_WEBHOOK_ISSUER = "MetaCI"
+METACI_RELEASE_WEBHOOK_URL = "https://webhook"
+
+SITE_URL = "https://webhook"

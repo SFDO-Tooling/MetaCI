@@ -79,6 +79,7 @@ class OrgFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Org
 
+    name = "test"
     repo = factory.SubFactory(RepositoryFactory)
     json = {}
 
@@ -111,6 +112,7 @@ class BuildFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Build
 
+    org = factory.LazyAttribute(lambda build: OrgFactory(repo=build.planrepo.repo))
     planrepo = factory.SubFactory(PlanRepositoryFactory)
     plan = factory.SelfAttribute("planrepo.plan")
     repo = factory.SelfAttribute("planrepo.repo")

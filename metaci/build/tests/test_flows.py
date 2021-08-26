@@ -6,10 +6,11 @@ import pytest
 from cumulusci.core.flowrunner import StepResult, StepSpec
 from cumulusci.tasks.robotframework.robotframework import Robot
 from cumulusci.utils import temporary_dir, touch
+from django.conf import settings
 
 from metaci.build.flows import MetaCIFlowCallback
 from metaci.build.models import BuildFlowAsset, FlowTask
-from metaci.fixtures.factories import BuildFlowFactory
+from metaci.fixtures.factories import BuildFlowFactory, FlowTaskFactory
 from metaci.testresults.models import TestMethod, TestResult, TestResultAsset
 
 # Path to the test robot output files
@@ -72,7 +73,11 @@ def test_post_task__result_has_exception(get_spec):
 
 
 @pytest.mark.django_db
-def test_post_task__single_robot_task(get_spec):
+def test_post_task__single_robot_task(mocker, get_spec):
+    mocker.patch(
+        "metaci.build.flows.settings",
+        METACI_RESULT_EXPORT_ENABLED=False,
+    )
     with temporary_dir() as output_dir:
         output_dir = Path(output_dir)
         touch(output_dir / "selenium-screenshot-1.png")
@@ -117,7 +122,7 @@ def test_post_task__single_robot_task(get_spec):
 
 
 @pytest.mark.django_db
-def test_post_task__multiple_robot_tasks(get_spec):
+def test_post_task__multiple_robot_task_test_results_disabled(get_spec, mocker):
     """Test for scenario where there are multiple Robot tasks defined
     in a single flow. We want to make sure that test results and related
     assets are created and associated with the correct related objects."""
@@ -196,6 +201,51 @@ def test_post_task__multiple_robot_tasks(get_spec):
 
         # Three tests total between the two output files
         assert 3 == TestMethod.objects.all().count()
+
+
+@pytest.mark.django_db
+def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_responses):
+    """Test for scenario where there are multiple Robot tasks defined
+    in a single flow. We want to make sure that test results and related
+    assets are created and associated with the correct related objects and that
+    the proper api endpoint is called."""
+    mocker.patch(
+        "metaci.build.flows.settings",
+        METACI_RESULT_EXPORT_ENABLED=True,
+    )
+
+    with temporary_dir() as output_dir:
+        output_dir = Path(output_dir)
+
+        copyfile(
+            (TEST_ROBOT_OUTPUT_FILES / "robot_1.xml"),
+            (output_dir / "output.xml"),
+        )
+
+        step_spec = get_spec("1", name="Robot", cls=Robot)
+        step_result = StepResult(
+            step_num="1",
+            task_name="Robot",
+            path="Robot",
+            result="Pass",
+            return_values={"robot_outputdir": str(output_dir)},
+            exception=None,
+        )
+
+        mocked_responses.add(
+            "POST",
+            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+            json={
+                "success": True,
+            },
+        )
+        flowtask = FlowTaskFactory(stepnum="1", path="Robot")
+        metaci_callbacks = MetaCIFlowCallback(flowtask.build_flow.id)
+
+        metaci_callbacks.post_task(step_spec, step_result)
+
+        # The mocked_responses fixture takes care of asserting
+        # that the expected requests were made
 
 
 class TestException(Exception):
