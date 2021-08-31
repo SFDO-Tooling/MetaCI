@@ -526,14 +526,24 @@ def test_gus_bus_bad_payload_metadata():
     responses.add(
         "POST",
         f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
-        json={"success": True},
+        json={
+            "detail": [
+                {
+                    "loc": ["body", "build", "metadata", "productTagGusId"],
+                    "msg": "field required",
+                    "type": "value_error.missing",
+                }
+            ]
+        },
         status=422,
+        stream="error",
     )
+
     with temporary_dir() as output_dir:
         copyfile(
             TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
             Path(output_dir) / "output.xml",
         )
         test_results = robot_importer.import_robot_test_results(flowtask, output_dir)
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="error"):
             robot_importer.export_robot_test_results(flowtask, test_results)
