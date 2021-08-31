@@ -397,7 +397,7 @@ def test_gus_bus_test_manager():
         robot_importer.import_robot_test_results(flowtask, output_dir)
         responses.add(
             "POST",
-            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results",
             json={
                 "success": True,
                 "id": "123",
@@ -405,7 +405,7 @@ def test_gus_bus_test_manager():
         )
         assert robot_importer.export_robot_test_results(flowtask, []) is None
         assert len(responses.calls) == 1
-        assert responses.calls[0].request.url == "https://webhook/test-results/"
+        assert responses.calls[0].request.url == "https://webhook/test-results"
 
 
 @responses.activate
@@ -427,7 +427,7 @@ def test_gus_bus_test_manager_failure(mocker):
         robot_importer.import_robot_test_results(flowtask, output_dir)
         responses.add(
             "POST",
-            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results",
             json={
                 "success": False,
                 "errors": [{"msg": "error goes here"}],
@@ -462,7 +462,7 @@ def test_gus_bus_payload():
     flowtask.build_flow.build.org = OrgFactory()
     responses.add(
         "POST",
-        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results",
         json={"success": True},
     )
     with temporary_dir() as output_dir:
@@ -498,7 +498,7 @@ def test_gus_bus_payload_metadata():
     flowtask.build_flow.build.repo.metadata = {"key1": True, "key2": "hello, world"}
     responses.add(
         "POST",
-        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results",
         json={"success": True},
     )
     with temporary_dir() as output_dir:
@@ -521,11 +521,10 @@ def test_gus_bus_payload_metadata():
 def test_gus_bus_bad_payload_metadata():
     """Verify that all build-specific metadata is added to the payload"""
     flowtask = FlowTaskFactory()
-    flowtask.build_flow.build.org = OrgFactory()
     flowtask.build_flow.build.repo.metadata = {"key1": True, "key2": "hello, world"}
     responses.add(
         "POST",
-        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results",
         json={
             "detail": [
                 {
@@ -536,7 +535,6 @@ def test_gus_bus_bad_payload_metadata():
             ]
         },
         status=422,
-        stream="error",
     )
 
     with temporary_dir() as output_dir:
@@ -545,5 +543,5 @@ def test_gus_bus_bad_payload_metadata():
             Path(output_dir) / "output.xml",
         )
         test_results = robot_importer.import_robot_test_results(flowtask, output_dir)
-        with pytest.raises(Exception, match="error"):
+        with pytest.raises(Exception, match="value_error.missing"):
             robot_importer.export_robot_test_results(flowtask, test_results)

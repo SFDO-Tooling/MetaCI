@@ -330,7 +330,7 @@ def export_robot_test_results(flowtask, test_results) -> None:
 
     token = jwt_for_webhook()
     response = requests.post(
-        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results",
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
