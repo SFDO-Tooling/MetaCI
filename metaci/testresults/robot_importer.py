@@ -334,7 +334,8 @@ def export_robot_test_results(flowtask, test_results) -> None:
         json=payload,
         headers={"Authorization": f"Bearer {token}"},
     )
-    response.raise_for_status()
+    if response.status_code >= 400:
+        raise Exception(response.text)
     result = response.json()
 
     if result["success"]:

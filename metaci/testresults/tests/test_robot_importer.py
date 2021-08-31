@@ -514,3 +514,26 @@ def test_gus_bus_payload_metadata():
             "key1": True,
             "key2": "hello, world",
         }
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_gus_bus_bad_payload_metadata():
+    """Verify that all build-specific metadata is added to the payload"""
+    flowtask = FlowTaskFactory()
+    flowtask.build_flow.build.org = OrgFactory()
+    flowtask.build_flow.build.repo.metadata = {"key1": True, "key2": "hello, world"}
+    responses.add(
+        "POST",
+        f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+        json={"success": True},
+        status=422,
+    )
+    with temporary_dir() as output_dir:
+        copyfile(
+            TEST_ROBOT_OUTPUT_FILES / "robot_with_failures.xml",
+            Path(output_dir) / "output.xml",
+        )
+        test_results = robot_importer.import_robot_test_results(flowtask, output_dir)
+        with pytest.raises(Exception):
+            robot_importer.export_robot_test_results(flowtask, test_results)

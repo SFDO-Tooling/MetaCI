@@ -11,7 +11,7 @@ from metaci.testresults.robot_importer import (
 
 from .models import FlowTask
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("cumulusci")
 
 
 class MetaCIFlowCallback(FlowCallback):
