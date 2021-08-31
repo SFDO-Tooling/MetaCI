@@ -340,7 +340,7 @@ def export_robot_test_results(flowtask, test_results) -> None:
 
     if result["success"]:
         logger.info(
-            f"Successfully sent test results to {settings.METACI_RELEASE_WEBHOOK_URL}/test-results/"
+            f"Successfully sent test results to {settings.METACI_RELEASE_WEBHOOK_URL}/test-results"
         )
     else:
         msg = "\n".join(err["msg"] for err in result["errors"])
