@@ -234,7 +234,7 @@ def test_post_task_gus_bus_test_results_enabled(get_spec, mocker, mocked_respons
 
         mocked_responses.add(
             "POST",
-            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results/",
+            f"{settings.METACI_RELEASE_WEBHOOK_URL}/test-results",
             json={
                 "success": True,
             },
