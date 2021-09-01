@@ -55,7 +55,7 @@ def check_change_traffic_control():
         params={
             "sm_business_name_id": settings.ctc_sm_business_name_id,
             "source_url": source_url,
-            "heroku_app_name": settings.heroku_app_name,
+            "step_description": settings.heroku_app_name,
         },
     )
     step_id = result["implementation_step_id"]
