@@ -96,7 +96,7 @@
     "stylelint": "^13.13.1",
     "stylelint-config-recommended-scss": "^4.3.0",
     "stylelint-scss": "^3.20.1",
-    "typescript": "^4.3.4",
+    "typescript": "^4.4.2",
     "url-loader": "^4.1.1",
     "webpack": "^5.48.0",
     "webpack-bundle-analyzer": "^4.4.2",
