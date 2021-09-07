@@ -100,7 +100,7 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.48.0",
     "webpack-bundle-analyzer": "^4.4.2",
-    "webpack-cli": "^4.7.2",
+    "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.0.0-0",
     "webpack-merge": "^5.8.0"
   },
