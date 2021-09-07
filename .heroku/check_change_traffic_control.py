@@ -47,7 +47,7 @@ def call_ctc(endpoint, **kw):
 
 def check_change_traffic_control():
     source_url = f"{settings.ctc_repo_url}/commit/{settings.heroku_slug_commit}"
-    logger.info("Checking change traffic control for {source_url}")
+    logger.info(f"Checking change traffic control for {source_url}")
 
     # find Case and start implementation step
     result = call_ctc(
