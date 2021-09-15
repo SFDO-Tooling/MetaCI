@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 
-from metaci.release.models import ChangeCaseTemplate, ImplementationStep, Release
+from metaci.release.models import (
+    ChangeCaseTemplate,
+    ImplementationStep,
+    Release,
+    ReleaseCohort,
+)
 from metaci.release.utils import send_release_webhook, send_submit_webhook
 from metaci.repository.models import Repository
 
@@ -43,6 +48,7 @@ class ReleaseAdmin(admin.ModelAdmin):
                     "release_creation_date",
                     ("sandbox_push_date", "production_push_date"),
                     "work_item_link",
+                    "release_cohort",
                     "change_case_template",
                     "change_case_link",
                 )
@@ -89,3 +95,4 @@ class ReleaseAdmin(admin.ModelAdmin):
 
 admin.site.register(ChangeCaseTemplate)
 admin.site.register(ImplementationStep)
+admin.site.register(ReleaseCohort)
