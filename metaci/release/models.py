@@ -18,12 +18,12 @@ class ReleaseCohort(models.Model):
     status_choices = [
         ("Planned", "Planned"),
         ("Active", "Active"),
-        ("Cancelled", "Cancelled"),
+        ("Canceled", "Canceled"),
     ]
     status = models.CharField(
         max_length=9,
         choices=status_choices,
-        default="Cancelled",
+        default="Planned",
     )
     merge_freeze_start = models.DateTimeField(_("Merge Freeze Start Time"))
     merge_freeze_end = models.DateTimeField(_("Merge Freeze End Time"))
