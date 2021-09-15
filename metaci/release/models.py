@@ -142,12 +142,6 @@ class Release(StatusModel):
         blank=True,
         default=get_default_production_date,
     )
-    product_merge_freeze_start = models.DateTimeField(
-        _("Product Specific Merge Freeze Start Time"), null=True, blank=True
-    )
-    product_merge_freeze_end = models.DateTimeField(
-        _("Product Specific Merge Freeze End Time"), null=True, blank=True
-    )
     created_from_commit = models.CharField(
         _("created from commit"), max_length=1024, null=True, blank=True
     )

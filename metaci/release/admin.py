@@ -49,7 +49,6 @@ class ReleaseAdmin(admin.ModelAdmin):
                     ("sandbox_push_date", "production_push_date"),
                     "work_item_link",
                     "release_cohort",
-                    ("product_merge_freeze_start", "product_merge_freeze_end"),
                     "change_case_template",
                     "change_case_link",
                 )
