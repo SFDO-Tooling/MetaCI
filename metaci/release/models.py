@@ -16,15 +16,14 @@ from metaci.release.utils import update_release_from_github
 class ReleaseCohort(models.Model):
     name = models.CharField(_("name"), max_length=255)
     status_choices = [
-        ("None", "None"),
+        ("Planned", "Planned"),
         ("Active", "Active"),
         ("Cancelled", "Cancelled"),
-        ("Planned", "Planned"),
     ]
     status = models.CharField(
         max_length=9,
         choices=status_choices,
-        default="None",
+        default="Cancelled",
     )
     merge_freeze_start = models.DateTimeField(_("Merge Freeze Start Time"))
     merge_freeze_end = models.DateTimeField(_("Merge Freeze End Time"))
@@ -158,7 +157,7 @@ class Release(StatusModel):
         "release.ReleaseCohort",
         on_delete=models.PROTECT,
         null=True,
-        blank=False,
+        blank=True,
         default=None,
     )
     change_case_link = models.CharField(
