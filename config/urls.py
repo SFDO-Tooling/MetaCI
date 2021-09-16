@@ -31,6 +31,7 @@ urlpatterns = [
     re_path(r"^search$", build_views.build_search, name="search"),
     re_path(r"^api/", include("metaci.api.urls")),
     re_path(r"^builds/", include("metaci.build.urls")),
+    re_path(r"^cohorts/", include("metaci.release.urls")),
     re_path(r"^create-org/", include("metaci.create_org.urls")),
     re_path(r"^notifications/", include("metaci.notification.urls")),
     re_path(r"^tests/", include("metaci.testresults.urls")),
