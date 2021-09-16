@@ -18,7 +18,7 @@ babel==2.9.1
     # via sphinx
 backcall==0.2.0
     # via ipython
-black==21.8b0
+black==21.9b0
     # via -r requirements/dev.in
 certifi==2021.5.30
     # via
@@ -38,7 +38,7 @@ coverage==5.5
     #   coveralls
 coveralls==3.2.0
     # via -r requirements/dev.in
-decorator==5.0.9
+decorator==5.1.0
     # via
     #   ipdb
     #   ipython
@@ -175,7 +175,7 @@ six==1.16.0
     #   responses
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==4.1.2
+sphinx==4.2.0
     # via -r requirements/dev.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
@@ -189,7 +189,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via
     #   -c requirements/prod.txt
     #   django
@@ -225,7 +225,7 @@ werkzeug==1.0.1
     # via -r requirements/dev.in
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==57.4.0
+setuptools==58.0.3
     # via
     #   -c requirements/prod.txt
     #   ipdb
