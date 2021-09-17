@@ -1,5 +1,7 @@
 {% extends 'layout_full.html' %}
 
+<!-- TODO: link back to /cohorts -->
+
 {% block layout_header_text %}
     <div class="slds-page-header__row">
       <div class="slds-text-body_regular">Release Cohort</div>
@@ -54,23 +56,21 @@
   <p>
     A merge freeze is a period of time where repositories are restricted to not
     merging any pull requests with their main branches.
-    This allows us ensure that no untested changes are inadvertently included in a product version that is released to customers.
+    This allows release engineering and the product teams to ensure that no untested changes are inadvertently included in a product version that is released to customers.
     When a merge freeze is active, all repositories listed below will be
     have pull requests blocked by a check in GitHub titled "Merge Freeze" that will fail.
     When the merge freeze is lifted, these checks will be reran and will begin passing again.
-    For more information on merge freezes,
-    or support during a merge freeze, see the docs at <INSERT_DOC_LINK>.
   </p>
 </div>
 
 <div>
-    <p class="slds-text-heading_medium slds-p-top_large">Products In This Release Cohort</p>
+    <p class="slds-text-heading_medium slds-p-top_large slds-p-bottom_small">Products In This Release Cohort</p>
 </div>
 <table class="slds-table slds-table--bordered slds-table--cell-buffer">
   <thead>
     <tr class="slds-text-title--caps">
       <th scope="col">
-        <div class="slds-truncate" title="">Product Repository</div>
+        <div class="slds-truncate" title="">Repository</div>
       </th>
       <th scope="col">
         <div class="slds-truncate" title="">Version Number</div>

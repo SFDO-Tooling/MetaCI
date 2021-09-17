@@ -6,11 +6,11 @@ urlpatterns = [
     re_path(
         r"^$",
         views.cohort_list,
-        name="home"
+        name="cohort_list"
     ),
     re_path(
         r"^(?P<cohort_id>\w+)$",
         views.cohort_detail,
-        name="home"
+        name="cohort_detail"
     ),
 ]
