@@ -18,9 +18,9 @@ authlib==0.15.4
     #   simple-salesforce
 bleach==3.3.1
     # via sfdo-template-helpers
-boto3==1.18.38
+boto3==1.18.43
     # via -r requirements/prod.in
-botocore==1.21.38
+botocore==1.21.43
     # via
     #   boto3
     #   s3transfer
@@ -49,18 +49,18 @@ contextvars==2.4
     #   snowfakery
 croniter==1.0.15
     # via rq-scheduler
-cryptography==3.4.7
+cryptography==3.4.8
     # via
     #   authlib
     #   cumulusci
     #   jwcrypto
     #   pyjwt
     #   sfdo-template-helpers
-cumulusci==3.43.0
+cumulusci==3.44.0
     # via -r requirements/prod.in
 defusedxml==0.7.1
     # via python3-openid
-deprecated==1.2.12
+deprecated==1.2.13
     # via
     #   cumulusci
     #   jwcrypto
@@ -72,7 +72,7 @@ django-crispy-forms==1.12.0
     # via -r requirements/prod.in
 django-defender==0.9.1
     # via -r requirements/prod.in
-django-environ==0.6.0
+django-environ==0.7.0
     # via -r requirements/prod.in
 django-filter==2.4.0
     # via
@@ -269,7 +269,7 @@ robotframework-stacktrace==0.4.1
     # via
     #   cumulusci
     #   robotframework-pabot
-robotframework==4.1
+robotframework==4.1.1
     # via
     #   cumulusci
     #   robotframework-lint
@@ -279,7 +279,7 @@ robotframework==4.1
     #   robotframework-stacktrace
 rq-scheduler==0.11.0
     # via -r requirements/prod.in
-rq==1.9.0
+rq==1.10.0
     # via
     #   -r requirements/prod.in
     #   django-rq
@@ -316,7 +316,7 @@ sqlalchemy==1.4.22
     # via
     #   cumulusci
     #   snowfakery
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via django
 terminaltables==3.1.0
     # via cumulusci
@@ -361,7 +361,7 @@ zipp==3.5.0
     #   snowfakery
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==57.4.0
+setuptools==58.0.3
     # via
     #   -r requirements/prod.in
     #   cumulusci
