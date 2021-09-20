@@ -159,6 +159,7 @@ class Release(StatusModel):
         null=True,
         blank=True,
         default=None,
+        related_name="releases"
     )
     change_case_link = models.CharField(
         _("change case ID"), max_length=1024, null=True, blank=True
