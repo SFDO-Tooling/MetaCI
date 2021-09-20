@@ -31,6 +31,15 @@ class ReleaseCohort(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def in_scope(self):
+        now = datetime.datetime.now()
+        return (
+            self.status == "Active"
+            and self.merge_freeze_start <= now
+            and self.merge_freeze_end >= now
+        )
+
 
 class ChangeCaseTemplate(models.Model):
     name = models.CharField(_("name"), max_length=255)
@@ -159,7 +168,7 @@ class Release(StatusModel):
         null=True,
         blank=True,
         default=None,
-        related_name="releases"
+        related_name="releases",
     )
     change_case_link = models.CharField(
         _("change case ID"), max_length=1024, null=True, blank=True
