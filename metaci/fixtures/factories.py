@@ -16,7 +16,7 @@ from metaci.build.models import (
 )
 from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.plan.models import Plan, PlanRepository, PlanSchedule
-from metaci.release.models import ChangeCaseTemplate, Release
+from metaci.release.models import ChangeCaseTemplate, Release, ReleaseCohort
 from metaci.repository.models import Branch, Repository
 from metaci.testresults.models import (
     TestClass,
@@ -244,6 +244,15 @@ class ChangeCaseTemplateFactory(factory.django.DjangoModelFactory):
 class ReleaseFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Release
+
+    change_case_template = factory.SubFactory(ChangeCaseTemplateFactory)
+    repo = factory.SubFactory(RepositoryFactory)
+    git_tag = "release/1.0"
+
+
+class ReleaseCohortFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ReleaseCohort
 
     change_case_template = factory.SubFactory(ChangeCaseTemplateFactory)
     repo = factory.SubFactory(RepositoryFactory)
