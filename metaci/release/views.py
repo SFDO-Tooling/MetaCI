@@ -21,8 +21,7 @@ def cohort_detail(request, cohort_id):
 
 
 def can_view_cohorts(user):
-    """To access Cohort views you need to either be an
-    admin, or in a group that has the 'view cohorts'
-    permission.
-    """
+    """To access Cohort views user need to be
+    authenticated and either be an admin, or
+    in a group that has the 'view cohorts' permission."""
     return user.is_authenticated and user.has_perm('release.view_releasecohort')
