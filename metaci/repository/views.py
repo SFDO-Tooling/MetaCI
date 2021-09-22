@@ -184,6 +184,8 @@ def github_webhook(request):
 
     # If this is a PR event, make sure we set the right
     # merge freeze commit status.
+    gh_repo = repo.get_github_api()
+
     if (
         event == "pull_request"
         and payload.get("action")
@@ -192,10 +194,10 @@ def github_webhook(request):
             "reopened",
             "synchronize",
         ]
-        and payload["head"]["repo"]["id"]
-        == payload["base"]["repo"]["id"]  # do we care if it's a fork?
+        and payload["base"]["ref"] == gh_repo.default_branch
+        and payload["head"]["repo"]["id"] == payload["base"]["repo"]["id"]
     ):
-        # TODO: only apply on PRs to main branch
+        # TODO: document the main branch semantics here.
         if Release.objects.filter(repo=repo, release_cohort__status="Active").count():
             set_merge_freeze_status_for_commit(
                 repo, payload["head"]["sha"], freeze=True

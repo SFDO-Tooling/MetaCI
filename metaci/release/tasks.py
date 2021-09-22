@@ -12,26 +12,29 @@ from github3.repos.repo import Repository as GitHubRepository
 
 
 @job
-def update_cohort_status():
-    """Determine if any merge freeze windows have started/stopped.
-    If a window on a release cohort has started then we need to apply
-    a failing merge freeze check to open pull requests in the repo.
-    If a window on a release cohort has ended, then we need to apply a
-    passing merge freeze check to all open pull requests."""
+def update_cohort_status() -> str:
+    """Run every minute to update Release Cohorts to Active once they pass their start date
+    and to Completed once they pass their start date."""
     now = datetime.now(tz=timezone.utc)
 
     # Signals will trigger the updating of merge freezes upon save.
+    names_ended = []
     for rc in ReleaseCohort.objects.filter(
-        status="Active", merge_freeze_end_date__lt=now
+        status="Active", merge_freeze_end__lt=now
     ).all():
         rc.status = "Completed"
         rc.save()
+        names_ended.append(rc.name)
 
+    names_started = []
     for rc in ReleaseCohort.objects.filter(
-        status="Planned", merge_freeze_start_date__lt=now, merge_freeze_end_date__gt=now
+        status="Planned", merge_freeze_start__lt=now, merge_freeze_end__gt=now
     ).all():
         rc.status = "Active"
         rc.save()
+        names_started.append(rc.name)
+
+    return f"Enabled merge freeze on {', '.join(names_started)} and ended merge freeze on {', '.join(names_ended)}."
 
 
 def set_merge_freeze_status(repo: Repository, *, freeze: bool):
