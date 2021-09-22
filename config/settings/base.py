@@ -398,6 +398,10 @@ CRON_JOBS = {
         "func": "metaci.repository.tasks.prune_branches",
         "cron_string": "0 * * * *",
     },
+    "update_cohort_status": {
+        "func": "metaci.release.tasks.update_cohort_status",
+        "cron_string": "* * * * *",
+    },
 }
 # There is a default dict of cron jobs,
 # and the cron_string can be optionally overridden

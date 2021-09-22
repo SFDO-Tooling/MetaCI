@@ -40,10 +40,10 @@ class ReleaseCohort(models.Model):
         super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        now = datetime.datetime.now()
-        if (
-            self.merge_freeze_start <= now and self.merge_freeze_end >= now
-        ) ^ self.status == "Active":
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        if (self.merge_freeze_start <= now and self.merge_freeze_end >= now) ^ (
+            self.status == "Active"
+        ):
             raise ValidationError(
                 _(
                     "A Release Cohort must be in Active status during its merge freeze date range."
