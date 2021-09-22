@@ -185,7 +185,8 @@ def github_webhook(request):
     # If this is a PR event, make sure we set the right
     # merge freeze commit status.
     gh_repo = repo.get_github_api()
-
+    logger.warning(f"I have GitHub event {event} and payload {payload}")
+    logger.warning(f"I have GitHub default branch {gh_repo.default_branch}")
     if (
         event == "pull_request"
         and payload.get("action")
@@ -194,13 +195,14 @@ def github_webhook(request):
             "reopened",
             "synchronize",
         ]
-        and payload["base"]["ref"] == gh_repo.default_branch
-        and payload["head"]["repo"]["id"] == payload["base"]["repo"]["id"]
+        and payload["pull_request"]["base"]["ref"] == gh_repo.default_branch
+        and payload["pull_request"]["head"]["repo"]["id"]
+        == payload["pull_request"]["base"]["repo"]["id"]
     ):
         # TODO: document the main branch semantics here.
         if Release.objects.filter(repo=repo, release_cohort__status="Active").count():
             set_merge_freeze_status_for_commit(
-                repo, payload["head"]["sha"], freeze=True
+                repo, payload["pull_request"]["head"]["sha"], freeze=True
             )
 
     return HttpResponse("OK")
