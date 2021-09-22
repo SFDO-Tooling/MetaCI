@@ -11,7 +11,7 @@ from metaci.repository.models import Repository
 from github3.repos.repo import Repository as GitHubRepository
 
 
-@job("short")
+@job
 def update_cohort_status():
     """Determine if any merge freeze windows have started/stopped.
     If a window on a release cohort has started then we need to apply
@@ -37,9 +37,7 @@ def update_cohort_status():
 def set_merge_freeze_status(repo: Repository, *, freeze: bool):
     # Get all open PRs in this repository
     github_repo = repo.get_github_api()
-    for pr in github_repo.pull_requests(
-        state="open", base=None
-    ):  # TODO: set base to main branch
+    for pr in github_repo.pull_requests(state="open", base=github_repo.default_branch):
         # For each PR, get the head commit and apply the freeze status
         set_merge_freeze_status_for_commit(github_repo, pr.head.sha, freeze=freeze)
 

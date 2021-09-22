@@ -2,7 +2,6 @@ import hmac
 import json
 import logging
 from metaci.release.tasks import (
-    set_merge_freeze_status,
     set_merge_freeze_status_for_commit,
 )
 import re
@@ -197,8 +196,10 @@ def github_webhook(request):
         == payload["base"]["repo"]["id"]  # do we care if it's a fork?
     ):
         # TODO: only apply on PRs to main branch
-
-        set_merge_freeze_status_for_commit(repo, payload["head"]["sha"], freeze=True)
+        if Release.objects.filter(repo=repo, release_cohort__status="Active").count():
+            set_merge_freeze_status_for_commit(
+                repo, payload["head"]["sha"], freeze=True
+            )
 
     return HttpResponse("OK")
 
