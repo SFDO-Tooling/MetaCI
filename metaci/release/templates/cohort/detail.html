@@ -1,7 +1,5 @@
 {% extends 'layout_full.html' %}
 
-<!-- TODO: link back to /cohorts -->
-
 {% block layout_header_text %}
     <div class="slds-page-header__row">
       <div class="slds-text-body_regular">Release Cohort</div>
@@ -55,11 +53,11 @@
 <div class="slds-box">
   <p>
     A merge freeze is a period of time where repositories are restricted to not
-    merging any pull requests with their main branches.
+    merging any new code into their main branches.
     This allows release engineering and the product teams to ensure that no untested changes are inadvertently included in a product version that is released to customers.
-    When a merge freeze is active, all repositories listed below will be
-    have pull requests blocked by a check in GitHub titled "Merge Freeze" that will fail.
-    When the merge freeze is lifted, these checks will be reran and will begin passing again.
+    When a merge freeze is active, all repositories listed below will 
+    have pull requests blocked by a failing check in GitHub titled "Merge Freeze".
+    When the merge freeze is lifted, these checks will be reran and will begin passing.
   </p>
 </div>
 
