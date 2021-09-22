@@ -185,8 +185,9 @@ def github_webhook(request):
     # If this is a PR event, make sure we set the right
     # merge freeze commit status.
     gh_repo = repo.get_github_api()
-    logger.warning(f"I have GitHub event {event} and payload {payload}")
-    logger.warning(f"I have GitHub default branch {gh_repo.default_branch}")
+    if event == "pull_request":
+        logger.warning(f"I have GitHub event {event} and payload {payload}")
+
     if (
         event == "pull_request"
         and payload.get("action")
