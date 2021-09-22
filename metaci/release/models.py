@@ -33,13 +33,7 @@ class ReleaseCohort(models.Model):
     def __str__(self):
         return self.name
 
-    def delete(self, *args, **kwargs):
-        if self.status == "Active":
-            raise ValidationError(_("You cannot delete an Active Release Cohort"))
-
-        super().delete(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
+    def clean(self):
         now = datetime.datetime.now(tz=datetime.timezone.utc)
         if (self.merge_freeze_start <= now and self.merge_freeze_end >= now) ^ (
             self.status == "Active"
@@ -66,8 +60,6 @@ class ReleaseCohort(models.Model):
                     "A Release Cohort may not be in Completed status until after its merge freeze date range."
                 )
             )
-
-        super().save(*args, **kwargs)
 
 
 class ChangeCaseTemplate(models.Model):

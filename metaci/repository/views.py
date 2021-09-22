@@ -178,13 +178,13 @@ def github_webhook(request):
     if not branch_name:
         return HttpResponse("No branch found")
 
-    branch = get_or_create_branch(branch_name, repo)
-    release = get_release_if_applicable(payload, repo)
-    create_builds(event, payload, repo, branch, release)
+    if event == "push":
+        branch = get_or_create_branch(branch_name, repo)
+        release = get_release_if_applicable(payload, repo)
+        create_builds(event, payload, repo, branch, release)
 
     # If this is a PR event, make sure we set the right
     # merge freeze commit status.
-    gh_repo = repo.get_github_api()
     if event == "pull_request":
         logger.warning(f"I have GitHub event {event} and payload {payload}")
 
@@ -196,7 +196,8 @@ def github_webhook(request):
             "reopened",
             "synchronize",
         ]
-        and payload["pull_request"]["base"]["ref"] == gh_repo.default_branch
+        and payload["pull_request"]["base"]["ref"]
+        == repo.get_github_api().default_branch
         and payload["pull_request"]["head"]["repo"]["id"]
         == payload["pull_request"]["base"]["repo"]["id"]
     ):
