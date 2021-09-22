@@ -1,5 +1,6 @@
 import datetime
 from typing import Optional
+from django.core.exceptions import ValidationError
 
 from django.db import models
 from django.utils import timezone
@@ -19,6 +20,7 @@ class ReleaseCohort(models.Model):
         ("Planned", "Planned"),
         ("Active", "Active"),
         ("Canceled", "Canceled"),
+        ("Completed", "Completed"),
     ]
     status = models.CharField(
         max_length=9,
@@ -31,14 +33,41 @@ class ReleaseCohort(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def in_scope(self):
+    def delete(self, *args, **kwargs):
+        if self.status == "Active":
+            raise ValidationError(_("You cannot delete an Active Release Cohort"))
+
+        super().delete(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
         now = datetime.datetime.now()
-        return (
-            self.status == "Active"
-            and self.merge_freeze_start <= now
-            and self.merge_freeze_end >= now
-        )
+        if (
+            self.merge_freeze_start <= now and self.merge_freeze_end >= now
+        ) ^ self.status == "Active":
+            raise ValidationError(
+                _(
+                    "A Release Cohort must be in Active status during its merge freeze date range."
+                )
+            )
+
+        if (self.merge_freeze_end <= now) and self.status not in [
+            "Completed",
+            "Canceled",
+        ]:
+            raise ValidationError(
+                _(
+                    "A Release Cohort must be in Completed or Canceled status after its merge freeze date range."
+                )
+            )
+
+        if self.merge_freeze_end > now and self.status == "Completed":
+            raise ValidationError(
+                _(
+                    "A Release Cohort may not be in Completed status until after its merge freeze date range."
+                )
+            )
+
+        super().save(*args, **kwargs)
 
 
 class ChangeCaseTemplate(models.Model):

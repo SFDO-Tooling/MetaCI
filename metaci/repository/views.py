@@ -1,6 +1,10 @@
 import hmac
 import json
 import logging
+from metaci.release.tasks import (
+    set_merge_freeze_status,
+    set_merge_freeze_status_for_commit,
+)
 import re
 from hashlib import sha1
 
@@ -178,6 +182,23 @@ def github_webhook(request):
     branch = get_or_create_branch(branch_name, repo)
     release = get_release_if_applicable(payload, repo)
     create_builds(event, payload, repo, branch, release)
+
+    # If this is a PR event, make sure we set the right
+    # merge freeze commit status.
+    if (
+        event == "pull_request"
+        and payload.get("action")
+        in [
+            "opened",
+            "reopened",
+            "synchronize",
+        ]
+        and payload["head"]["repo"]["id"]
+        == payload["base"]["repo"]["id"]  # do we care if it's a fork?
+    ):
+        # TODO: only apply on PRs to main branch
+
+        set_merge_freeze_status_for_commit(repo, payload["head"]["sha"], freeze=True)
 
     return HttpResponse("OK")
 
