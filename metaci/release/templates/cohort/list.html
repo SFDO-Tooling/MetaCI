@@ -1,0 +1,32 @@
+{% extends 'layout_full.html' %}
+{% load humanize %}
+
+{% block layout_parent_link %} {% endblock %}
+{% block layout_header_text %}Release Cohorts{% endblock %}
+
+{% block layout_body %}
+<div class="slds-box">
+  <div class="slds-box--body">
+    <table class="slds-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Merge Freeze Start</th>
+          <th>Merge Freeze End</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in cohorts %}
+        <tr>
+          <td><a href="/cohorts/{{ c.id }}">{{ c.name }}</a></td>
+          <td>{{ c.status }}</td>
+          <td>{{ c.merge_freeze_start }}</td>
+          <td>{{ c.merge_freeze_end }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
