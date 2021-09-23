@@ -198,9 +198,8 @@ def github_webhook(request):
         and payload["pull_request"]["head"]["repo"]["id"]
         == payload["pull_request"]["base"]["repo"]["id"]
     ):
-        # TODO: document the main branch semantics here.
         set_merge_freeze_status_for_commit(
-            repo,
+            repo.get_github_api(),
             payload["pull_request"]["head"]["sha"],
             freeze=not Release.objects.filter(
                 repo=repo, release_cohort__status="Active"
