@@ -4,6 +4,7 @@ from django.dispatch.dispatcher import receiver
 from django_rq import job
 from django.utils.translation import gettext as _
 from django.db.models.signals import post_delete, post_save
+from django.urls import reverse
 
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
@@ -51,7 +52,7 @@ def set_merge_freeze_status_for_commit(
     if freeze:
         state = "error"
         description = _("This repository is under merge freeze.")
-        target_url = ""  # TODO: the url of the release cohort view
+        target_url = reverse("cohort_list")
     else:
         state = "success"
         description = ""

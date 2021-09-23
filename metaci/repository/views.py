@@ -202,10 +202,13 @@ def github_webhook(request):
         == payload["pull_request"]["base"]["repo"]["id"]
     ):
         # TODO: document the main branch semantics here.
-        if Release.objects.filter(repo=repo, release_cohort__status="Active").count():
-            set_merge_freeze_status_for_commit(
-                repo, payload["pull_request"]["head"]["sha"], freeze=True
-            )
+        set_merge_freeze_status_for_commit(
+            repo,
+            payload["pull_request"]["head"]["sha"],
+            freeze=not Release.objects.filter(
+                repo=repo, release_cohort__status="Active"
+            ).count(),
+        )
 
     return HttpResponse("OK")
 
