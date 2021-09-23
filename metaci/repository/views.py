@@ -167,20 +167,18 @@ def github_webhook(request):
     validate_github_webhook(request)
     event = request.META.get("HTTP_X_GITHUB_EVENT")
     payload = json.loads(request.body)
-    if event not in ["status", "push"]:
-        logger.warning(f"I have GitHub event {event} and payload {payload}")
 
     try:
         repo = get_repository(payload)
     except Repository.DoesNotExist:
         return HttpResponse("Not listening for this repository")
 
-    branch_name = get_branch_name_from_payload(payload)
-
-    if not branch_name:
-        return HttpResponse("No branch found")
-
     if event == "push":
+        branch_name = get_branch_name_from_payload(payload)
+
+        if not branch_name:
+            return HttpResponse("No branch found")
+
         branch = get_or_create_branch(branch_name, repo)
         release = get_release_if_applicable(payload, repo)
         create_builds(event, payload, repo, branch, release)
