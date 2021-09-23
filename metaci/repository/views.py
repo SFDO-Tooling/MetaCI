@@ -182,12 +182,11 @@ def github_webhook(request):
         branch = get_or_create_branch(branch_name, repo)
         release = get_release_if_applicable(payload, repo)
         create_builds(event, payload, repo, branch, release)
+    else:
+        logger.warning(f"I have GitHub event {event} and payload {payload}")
 
     # If this is a PR event, make sure we set the right
     # merge freeze commit status.
-    if event == "pull_request":
-        logger.warning(f"I have GitHub event {event} and payload {payload}")
-
     if (
         event == "pull_request"
         and payload.get("action")
