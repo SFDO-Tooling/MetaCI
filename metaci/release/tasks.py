@@ -66,13 +66,13 @@ def set_merge_freeze_status_for_commit(
         target_url = ""
 
     logging.getLogger(__name__).warning(
-        f"About to set merge status with sha {commit}, freeze {freeze}"
+        f"About to set merge status with sha {commit}, freeze {freeze}, target_url {target_url}"
     )
 
     repo.create_status(
         sha=commit,
         state=state,
-        target_url=target_url,
+        target_url="",
         description=description,
         context=_("Merge Freeze"),
     )
