@@ -1,6 +1,7 @@
 import hmac
 import json
 import logging
+from typing import Optional
 from metaci.release.tasks import (
     set_merge_freeze_status_for_commit,
 )
@@ -166,7 +167,6 @@ def validate_github_webhook(request):
 def github_webhook(request):
     validate_github_webhook(request)
     event = request.META.get("HTTP_X_GITHUB_EVENT")
-    print(f"I have {request.META}")
     payload = json.loads(request.body)
 
     try:
@@ -174,31 +174,52 @@ def github_webhook(request):
     except Repository.DoesNotExist:
         return HttpResponse("Not listening for this repository")
 
+    response = None
     if event == "push":
-        branch_name = get_branch_name_from_payload(payload)
+        response = handle_github_push_webhook(event, payload, repo)
+    elif event == "pull_request":
+        response = handle_github_pr_webhook(event, payload, repo)
 
-        if not branch_name:
-            return HttpResponse("No branch found")
+    return response or HttpResponse("OK")
 
-        branch = get_or_create_branch(branch_name, repo)
-        release = get_release_if_applicable(payload, repo)
-        create_builds(event, payload, repo, branch, release)
 
+def handle_github_push_webhook(
+    event: str, payload: dict, repo: Repository
+) -> Optional[HttpResponse]:
+    branch_name = get_branch_name_from_payload(payload)
+
+    if not branch_name:
+        return HttpResponse("No branch found")
+
+    branch = get_or_create_branch(branch_name, repo)
+    release = get_release_if_applicable(payload, repo)
+    create_builds(event, payload, repo, branch, release)
+
+
+def handle_github_pr_webhook(
+    event: str, payload: dict, repo: Repository
+) -> Optional[HttpResponse]:
     # If this is a PR event, make sure we set the right
     # merge freeze commit status.
-    if (
-        event == "pull_request"
-        and payload.get("action")
-        in [
-            "opened",
-            "reopened",
-            "synchronize",
-        ]
-        and payload["pull_request"]["base"]["ref"]
-        == repo.get_github_api().default_branch
-        and payload["pull_request"]["head"]["repo"]["id"]
+    valid_action = payload.get("action") in [
+        "opened",
+        "reopened",
+        "synchronize",
+    ]
+    on_main_branch = (
+        payload["pull_request"]["base"]["ref"] == repo.get_github_api().default_branch
+    )
+    not_a_fork = (
+        payload["pull_request"]["head"]["repo"]["id"]
         == payload["pull_request"]["base"]["repo"]["id"]
-    ):
+    )
+
+    logger.warning(
+        f"Handling PR event {payload.get('action')}. {on_main_branch}, {not_a_fork}."
+    )
+    logger.warning(f"Payload: {payload}")
+
+    if valid_action and on_main_branch and not_a_fork:
         set_merge_freeze_status_for_commit(
             repo.get_github_api(),
             payload["pull_request"]["head"]["sha"],
@@ -206,8 +227,6 @@ def github_webhook(request):
                 repo=repo, release_cohort__status="Active"
             ).count(),
         )
-
-    return HttpResponse("OK")
 
 
 def get_repository(event):
