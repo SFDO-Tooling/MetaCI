@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from django.dispatch.dispatcher import receiver
 
 from django_rq import job
+from django.contrib.sites.models import Site
 from django.utils.translation import gettext as _
 from django.db.models.signals import post_delete, post_save
 from django.urls import reverse
@@ -12,6 +13,7 @@ from metaci.repository.models import Repository
 from github3.repos.repo import Repository as GitHubRepository
 
 import logging
+import urllib
 
 
 @job
@@ -59,7 +61,9 @@ def set_merge_freeze_status_for_commit(
     if freeze:
         state = "error"
         description = _("This repository is under merge freeze.")
-        target_url = reverse("cohort_list")
+        target_url = urllib.parse.urljoin(
+            Site.objects.get_current().domain, reverse("cohort_list")
+        )
     else:
         state = "success"
         description = ""
@@ -72,7 +76,7 @@ def set_merge_freeze_status_for_commit(
     repo.create_status(
         sha=commit,
         state=state,
-        target_url="",
+        target_url=target_url,
         description=description,
         context=_("Merge Freeze"),
     )
