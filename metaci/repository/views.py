@@ -166,6 +166,7 @@ def validate_github_webhook(request):
 def github_webhook(request):
     validate_github_webhook(request)
     event = request.META.get("HTTP_X_GITHUB_EVENT")
+    print(f"I have {request.META}")
     payload = json.loads(request.body)
 
     try:

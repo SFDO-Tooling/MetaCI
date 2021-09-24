@@ -1,3 +1,4 @@
+from datetime import datetime, timezone, timedelta
 import numbers
 import random
 
@@ -254,6 +255,7 @@ class ReleaseCohortFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ReleaseCohort
 
-    change_case_template = factory.SubFactory(ChangeCaseTemplateFactory)
-    repo = factory.SubFactory(RepositoryFactory)
-    git_tag = "release/1.0"
+    name = fake_name()
+    status = "Active"
+    merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
+    merge_freeze_end = datetime.now(tz=timezone.utc) + timedelta(days=1)

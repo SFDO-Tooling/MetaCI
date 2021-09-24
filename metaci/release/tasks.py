@@ -16,6 +16,11 @@ from github3.repos.repo import Repository as GitHubRepository
 def update_cohort_status() -> str:
     """Run every minute to update Release Cohorts to Active once they pass their start date
     and to Completed once they pass their start date."""
+
+    return _update_release_cohorts()
+
+
+def _update_release_cohorts() -> str:
     now = datetime.now(tz=timezone.utc)
 
     # Signals will trigger the updating of merge freezes upon save.
@@ -67,6 +72,12 @@ def set_merge_freeze_status_for_commit(
     )
 
 
+# TODO: bulkification
+def release_merge_freeze_if_safe(repo: Repository):
+    if not Release.objects.filter(repo=repo, release_cohort__status="Active").count():
+        set_merge_freeze_status(repo, freeze=False)
+
+
 @receiver(post_save, sender=ReleaseCohort)
 def react_to_release_cohort_change(instance: ReleaseCohort, **kwargs):
     # We're interested in Release Cohort deletion and updates to the date-time fields and Status.
@@ -110,9 +121,3 @@ def react_to_release_deletion(instance: Release, **kwargs):
     # safely lift merge freeze until we check.
 
     release_merge_freeze_if_safe(instance.repo)
-
-
-# TODO: bulkification
-def release_merge_freeze_if_safe(repo: Repository):
-    if not Release.objects.filter(repo=repo, release_cohort__status="Active").count():
-        set_merge_freeze_status(repo, freeze=False)
