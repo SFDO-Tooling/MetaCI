@@ -61,9 +61,7 @@ def set_merge_freeze_status_for_commit(
     if freeze:
         state = "error"
         description = _("This repository is under merge freeze.")
-        target_url = urllib.parse.urljoin(
-            Site.objects.get_current().domain, reverse("cohort_list")
-        )
+        target_url = ""  # TODO - must be fully-qualified (`reverse()` doesn't work)
     else:
         state = "success"
         description = ""
