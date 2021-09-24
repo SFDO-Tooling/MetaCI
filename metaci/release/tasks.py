@@ -11,6 +11,8 @@ from metaci.repository.models import Repository
 
 from github3.repos.repo import Repository as GitHubRepository
 
+import logging
+
 
 @job
 def update_cohort_status() -> str:
@@ -62,6 +64,10 @@ def set_merge_freeze_status_for_commit(
         state = "success"
         description = ""
         target_url = ""
+
+    logging.getLogger(__name__).warning(
+        f"About to set merge status with sha {commit}, freeze {freeze}"
+    )
 
     repo.create_status(
         sha=commit,

@@ -223,9 +223,12 @@ def handle_github_pr_webhook(
         set_merge_freeze_status_for_commit(
             repo.get_github_api(),
             payload["pull_request"]["head"]["sha"],
-            freeze=not Release.objects.filter(
-                repo=repo, release_cohort__status="Active"
-            ).count(),
+            freeze=(
+                Release.objects.filter(
+                    repo=repo, release_cohort__status="Active"
+                ).count()
+                > 0
+            ),
         )
 
 
