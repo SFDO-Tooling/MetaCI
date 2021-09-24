@@ -2,18 +2,13 @@ from datetime import datetime, timezone
 from django.dispatch.dispatcher import receiver
 
 from django_rq import job
-from django.contrib.sites.models import Site
 from django.utils.translation import gettext as _
 from django.db.models.signals import post_delete, post_save
-from django.urls import reverse
 
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
 
 from github3.repos.repo import Repository as GitHubRepository
-
-import logging
-import urllib
 
 
 @job
@@ -67,10 +62,6 @@ def set_merge_freeze_status_for_commit(
         description = ""
         target_url = ""
 
-    logging.getLogger(__name__).warning(
-        f"About to set merge status with sha {commit}, freeze {freeze}, target_url {target_url}"
-    )
-
     repo.create_status(
         sha=commit,
         state=state,
@@ -80,7 +71,6 @@ def set_merge_freeze_status_for_commit(
     )
 
 
-# TODO: bulkification
 def release_merge_freeze_if_safe(repo: Repository):
     if not Release.objects.filter(repo=repo, release_cohort__status="Active").count():
         set_merge_freeze_status(repo, freeze=False)

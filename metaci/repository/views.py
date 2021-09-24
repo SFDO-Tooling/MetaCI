@@ -199,8 +199,6 @@ def handle_github_push_webhook(
 def handle_github_pr_webhook(
     event: str, payload: dict, repo: Repository
 ) -> Optional[HttpResponse]:
-    # If this is a PR event, make sure we set the right
-    # merge freeze commit status.
     valid_action = payload.get("action") in [
         "opened",
         "reopened",
@@ -213,11 +211,6 @@ def handle_github_pr_webhook(
         payload["pull_request"]["head"]["repo"]["id"]
         == payload["pull_request"]["base"]["repo"]["id"]
     )
-
-    logger.warning(
-        f"Handling PR event {payload.get('action')}. {on_main_branch}, {not_a_fork}."
-    )
-    logger.warning(f"Payload: {payload}")
 
     if valid_action and on_main_branch and not_a_fork:
         set_merge_freeze_status_for_commit(
