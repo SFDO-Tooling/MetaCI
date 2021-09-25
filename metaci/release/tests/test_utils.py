@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -75,7 +75,8 @@ def test_implementation_payload_error(mocker, transactional_db):
         implementation_payload(None, "123", release)
 
 
-def test_send_release_webhook(mocked_responses, mocker, transactional_db):
+@patch("metaci.release.tasks.release_merge_freeze_if_safe")
+def test_send_release_webhook(rmfs_mock, mocked_responses, mocker, transactional_db):
     mocker.patch(
         "metaci.release.utils.settings",
         METACI_RELEASE_WEBHOOK_URL="https://webhook",

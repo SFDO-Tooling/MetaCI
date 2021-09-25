@@ -52,7 +52,7 @@ def test_set_merge_freeze_status__on():
     repo.get_github_api.return_value.create_status.assert_called_once_with(
         sha=pr.head.sha,
         state="error",
-        target_url=reverse("cohort_list"),
+        target_url="",
         description="This repository is under merge freeze.",
         context="Merge Freeze",
     )
