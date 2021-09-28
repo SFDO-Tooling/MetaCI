@@ -1,4 +1,5 @@
 import json
+from metaci.fixtures.factories import ReleaseCohortFactory
 from unittest import mock
 from unittest.mock import patch
 
@@ -280,24 +281,17 @@ class TestRepositoryViews(TestCase):
         assert response.content == b"Not listening for this repository"
 
     @pytest.mark.django_db
-    @mock.patch("metaci.repository.views.validate_github_webhook")
-    def test_github_webhook__no_branch_found(self, validate):
-        self.client.force_login(self.user)
-        url = reverse("github_webhook")
+    def test_handle_github_push_webhook__no_branch_found(self):
         push_data = {
             "repository": {"id": self.repo.github_id},
             "head_commit": "aR4Zd84F1i3No8",
         }
 
-        response = self.client.post(
-            url,
-            data=json.dumps(push_data),
-            content_type="application/json",
-            headers={"X-GitHub-Event": "push"},
-        )
+        response = views.handle_github_push_webhook("push", push_data, self.repo)
         assert response.status_code == 200
         assert response.content == b"No branch found"
 
+    # TODO: this test is essentially a no-op and should be revised.
     @pytest.mark.django_db
     @mock.patch("metaci.repository.views.validate_github_webhook")
     def test_github_webhook__with_tag(self, validate):
@@ -319,10 +313,7 @@ class TestRepositoryViews(TestCase):
         assert response.content == b"OK"
 
     @pytest.mark.django_db
-    @mock.patch("metaci.repository.views.validate_github_webhook")
-    def test_github_webhook__with_branch(self, validate):
-        self.client.force_login(self.user)
-        url = reverse("github_webhook")
+    def test_handle_github_push_webhook__with_branch(self):
         branch_name = "feature-branch-1"
         push_data = {
             "repository": {"id": self.repo.github_id},
@@ -330,15 +321,90 @@ class TestRepositoryViews(TestCase):
             "head_commit": {"id": "aR4Zd84F1i3No8"},
         }
 
-        response = self.client.post(
-            url,
-            data=json.dumps(push_data),
-            content_type="application/json",
-            headers={"X-GitHub-Event": "push"},
-        )
+        response = views.handle_github_push_webhook("push", push_data, self.repo)
+        assert response is None
+        assert Branch.objects.filter(name=branch_name).count() == 1
+
+    @pytest.mark.django_db
+    @patch("metaci.repository.views.set_merge_freeze_status_for_commit")
+    def test_handle_github_pr_webhook__freeze_off(self, smfsc_mock):
+        payload = {
+            "repository": {"id": self.repo.github_id},
+            "action": "opened",
+            "pull_request": {
+                "base": {"ref": "main", "repo": {"id": self.repo.github_id}},
+                "head": {"repo": {"id": self.repo.github_id}, "sha": "abcdef123"},
+            },
+        }
+        with patch.object(self.repo, "get_github_api") as api:
+            api.return_value.default_branch = "main"
+            response = views.handle_github_pr_webhook(
+                "pull_request", payload, self.repo
+            )
+            assert response is None
+            smfsc_mock.assert_called_once_with(
+                api.return_value, "abcdef123", freeze=False
+            )
+
+    @pytest.mark.django_db
+    @patch("metaci.repository.views.set_merge_freeze_status_for_commit")
+    @patch("metaci.release.tasks.set_merge_freeze_status")
+    def test_handle_github_pr_webhook__freeze_on(self, smfs_mock, smfsc_mock):
+        cohort = ReleaseCohortFactory()
+        release = ReleaseFactory(release_cohort=cohort, repo=self.repo)
+
+        payload = {
+            "repository": {"id": self.repo.github_id},
+            "action": "opened",
+            "pull_request": {
+                "base": {"ref": "main", "repo": {"id": self.repo.github_id}},
+                "head": {"repo": {"id": self.repo.github_id}, "sha": "abcdef123"},
+            },
+        }
+        with patch.object(self.repo, "get_github_api") as api:
+            api.return_value.default_branch = "main"
+            response = views.handle_github_pr_webhook(
+                "pull_request", payload, self.repo
+            )
+            assert response is None
+            smfsc_mock.assert_called_once_with(
+                api.return_value, "abcdef123", freeze=True
+            )
+
+    @pytest.mark.django_db
+    @mock.patch("metaci.repository.views.handle_github_push_webhook")
+    @mock.patch("metaci.repository.views.handle_github_pr_webhook")
+    @mock.patch("metaci.repository.views.validate_github_webhook")
+    def test_github_webhook__push(self, validate, pr_webhook, push_webhook):
+        self.client.force_login(self.user)
+        url = reverse("github_webhook")
+        push_data = {
+            "repository": {"id": self.repo.github_id},
+        }
+
+        # When we use the test client, `X-` HTTP headers are not
+        # transformed into `request.META` entries, which our code
+        # requires. Fake it with a Mock.
+        # This is not a clean approach.
+        request = mock.Mock()
+        request.META = {"HTTP_X_GITHUB_EVENT": "push"}
+        request.body = json.dumps(push_data)
+        request.method = "POST"
+
+        request.META = {"HTTP_X_GITHUB_EVENT": "push"}
+        response = views.github_webhook(request)
+        assert response == push_webhook.return_value
+        push_webhook.assert_called_once_with("push", push_data, self.repo)
+
+        request.META = {"HTTP_X_GITHUB_EVENT": "pull_request"}
+        response = views.github_webhook(request)
+        assert response == pr_webhook.return_value
+        pr_webhook.assert_called_once_with("pull_request", push_data, self.repo)
+
+        request.META = {"HTTP_X_GITHUB_EVENT": "status"}
+        response = views.github_webhook(request)
         assert response.status_code == 200
         assert response.content == b"OK"
-        assert Branch.objects.filter(name=branch_name).count() == 1
 
     @pytest.mark.django_db
     def test_get_repository(self):

@@ -1,6 +1,10 @@
 import hmac
 import json
 import logging
+from typing import Optional
+from metaci.release.tasks import (
+    set_merge_freeze_status_for_commit,
+)
 import re
 from hashlib import sha1
 
@@ -170,6 +174,18 @@ def github_webhook(request):
     except Repository.DoesNotExist:
         return HttpResponse("Not listening for this repository")
 
+    response = None
+    if event == "push":
+        response = handle_github_push_webhook(event, payload, repo)
+    elif event == "pull_request":
+        response = handle_github_pr_webhook(event, payload, repo)
+
+    return response or HttpResponse("OK")
+
+
+def handle_github_push_webhook(
+    event: str, payload: dict, repo: Repository
+) -> Optional[HttpResponse]:
     branch_name = get_branch_name_from_payload(payload)
 
     if not branch_name:
@@ -179,7 +195,34 @@ def github_webhook(request):
     release = get_release_if_applicable(payload, repo)
     create_builds(event, payload, repo, branch, release)
 
-    return HttpResponse("OK")
+
+def handle_github_pr_webhook(
+    event: str, payload: dict, repo: Repository
+) -> Optional[HttpResponse]:
+    valid_action = payload.get("action") in [
+        "opened",
+        "reopened",
+        "synchronize",
+    ]
+    on_main_branch = (
+        payload["pull_request"]["base"]["ref"] == repo.get_github_api().default_branch
+    )
+    not_a_fork = (
+        payload["pull_request"]["head"]["repo"]["id"]
+        == payload["pull_request"]["base"]["repo"]["id"]
+    )
+
+    if valid_action and on_main_branch and not_a_fork:
+        set_merge_freeze_status_for_commit(
+            repo.get_github_api(),
+            payload["pull_request"]["head"]["sha"],
+            freeze=(
+                Release.objects.filter(
+                    repo=repo, release_cohort__status="Active"
+                ).count()
+                > 0
+            ),
+        )
 
 
 def get_repository(event):

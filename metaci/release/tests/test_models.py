@@ -4,7 +4,11 @@ import pytest
 from model_utils import Choices
 
 from metaci.conftest import RepositoryFactory
-from metaci.fixtures.factories import PlanFactory, PlanRepositoryFactory
+from metaci.fixtures.factories import (
+    PlanFactory,
+    PlanRepositoryFactory,
+    ReleaseCohortFactory,
+)
 from metaci.release.models import (
     ChangeCaseTemplate,
     DefaultImplementationStep,
@@ -12,6 +16,8 @@ from metaci.release.models import (
     Release,
 )
 from metaci.repository.models import Repository
+
+from django.core.exceptions import ValidationError
 
 
 @pytest.mark.django_db
@@ -94,3 +100,32 @@ class TestRelease:
         )
         default_step = DefaultImplementationStep(**wrong_step)
         assert release.create_default_implementation_step(default_step) is None
+
+
+@pytest.mark.django_db
+class TestReleaseCohort:
+    def test_validation_active(self):
+        cohort = ReleaseCohortFactory()
+        with pytest.raises(ValidationError) as e:
+            cohort.status = "Completed"
+            cohort.clean()
+            assert "must be in Active status" in str(e)
+
+    def test_validation_date_without_completed(self):
+        cohort = ReleaseCohortFactory()
+        with pytest.raises(ValidationError) as e:
+            cohort.merge_freeze_start = datetime.datetime.now(
+                tz=datetime.timezone.utc
+            ) - datetime.timedelta(days=8)
+            cohort.merge_freeze_end = datetime.datetime.now(
+                tz=datetime.timezone.utc
+            ) - datetime.timedelta(days=7)
+            cohort.clean()
+            assert "must be in Completed or Canceled status" in str(e)
+
+    def test_validation_completed_without_date(self):
+        cohort = ReleaseCohortFactory()
+        with pytest.raises(ValidationError) as e:
+            cohort.status = "Completed"
+            cohort.clean()
+            assert "may not be in Completed status" in str(e)
