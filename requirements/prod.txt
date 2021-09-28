@@ -18,9 +18,9 @@ authlib==0.15.4
     #   simple-salesforce
 bleach==3.3.1
     # via sfdo-template-helpers
-boto3==1.18.43
+boto3==1.18.49
     # via -r requirements/prod.in
-botocore==1.21.43
+botocore==1.21.49
     # via
     #   boto3
     #   s3transfer
@@ -56,7 +56,7 @@ cryptography==3.4.8
     #   jwcrypto
     #   pyjwt
     #   sfdo-template-helpers
-cumulusci==3.44.0
+cumulusci==3.44.1
     # via -r requirements/prod.in
 defusedxml==0.7.1
     # via python3-openid
@@ -68,7 +68,7 @@ django-allauth==0.45.0
     # via -r requirements/prod.in
 django-anymail==8.4
     # via -r requirements/prod.in
-django-crispy-forms==1.12.0
+django-crispy-forms==1.13.0
     # via -r requirements/prod.in
 django-defender==0.9.1
     # via -r requirements/prod.in
@@ -298,7 +298,7 @@ selenium==3.141.0
     #   robotframework-seleniumlibrary
 https://github.com/SFDO-Tooling/sfdo-template-helpers/archive/v0.16.0.tar.gz
     # via -r requirements/prod.in
-simple-salesforce==1.11.3
+simple-salesforce==1.11.4
     # via
     #   cumulusci
     #   salesforce-bulk
@@ -361,7 +361,7 @@ zipp==3.5.0
     #   snowfakery
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==58.0.3
+setuptools==58.0.4
     # via
     #   -r requirements/prod.in
     #   cumulusci

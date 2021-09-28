@@ -79,7 +79,7 @@ iniconfig==1.1.1
     # via pytest
 ipdb==0.13.9
     # via -r requirements/dev.in
-ipython==7.27.0
+ipython==7.28.0
     # via ipdb
 isort==5.9.3
     # via -r requirements/dev.in
@@ -112,7 +112,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-platformdirs==2.3.0
+platformdirs==2.4.0
     # via black
 pluggy==1.0.0
     # via pytest
@@ -158,7 +158,7 @@ pytz==2021.1
     #   -c requirements/prod.txt
     #   babel
     #   django
-regex==2021.8.28
+regex==2021.9.24
     # via black
 requests==2.26.0
     # via
@@ -225,7 +225,7 @@ werkzeug==1.0.1
     # via -r requirements/dev.in
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==58.0.3
+setuptools==58.0.4
     # via
     #   -c requirements/prod.txt
     #   ipdb
