@@ -1,6 +1,7 @@
 from datetime import datetime, timezone, timedelta
 import unittest
 
+from django.conf import settings
 from django.urls.base import reverse
 
 from metaci.fixtures.factories import (
@@ -11,7 +12,6 @@ from metaci.fixtures.factories import (
 from metaci.release.tasks import (
     _update_release_cohorts,
     release_merge_freeze_if_safe,
-    set_merge_freeze_status_for_commit,
     set_merge_freeze_status,
 )
 
@@ -52,7 +52,7 @@ def test_set_merge_freeze_status__on():
     repo.get_github_api.return_value.create_status.assert_called_once_with(
         sha=pr.head.sha,
         state="error",
-        target_url="",
+        target_url=settings.SITE_URL + reverse("cohort_list"),
         description="This repository is under merge freeze.",
         context="Merge Freeze",
     )

@@ -2,7 +2,9 @@ from datetime import datetime, timezone
 from django.dispatch.dispatcher import receiver
 
 from django_rq import job
+from django.conf import settings
 from django.utils.translation import gettext as _
+from django.urls import reverse
 from django.db.models.signals import post_delete, post_save
 
 from metaci.release.models import Release, ReleaseCohort
@@ -56,7 +58,7 @@ def set_merge_freeze_status_for_commit(
     if freeze:
         state = "error"
         description = _("This repository is under merge freeze.")
-        target_url = ""  # TODO - must be fully-qualified (`reverse()` doesn't work)
+        target_url = settings.SITE_URL + reverse("cohort_list")
     else:
         state = "success"
         description = ""
