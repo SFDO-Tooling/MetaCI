@@ -8,7 +8,7 @@
     "url": "https://github.com/SFDO-Tooling/MetaCI.git"
   },
   "dependencies": {
-    "@salesforce-ux/design-system": "^2.15.9",
+    "@salesforce-ux/design-system": "^2.16.2",
     "@salesforce/design-system-react": "^0.10.35",
     "del": "^6.0.0",
     "i18next": "^20.3.5",
