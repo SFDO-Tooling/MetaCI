@@ -24,7 +24,7 @@ certifi==2021.5.30
     # via
     #   -c requirements/prod.txt
     #   requests
-charset-normalizer==2.0.4
+charset-normalizer==2.0.6
     # via
     #   -c requirements/prod.txt
     #   requests
@@ -61,7 +61,7 @@ factory-boy==3.2.0
     # via
     #   -r requirements/dev.in
     #   pytest-factoryboy
-faker==8.10.3
+faker==8.14.0
     # via
     #   -c requirements/prod.txt
     #   factory-boy
@@ -128,6 +128,7 @@ pyflakes==2.3.1
     # via flake8
 pygments==2.10.0
     # via
+    #   -c requirements/prod.txt
     #   ipython
     #   sphinx
 pyparsing==2.4.7
@@ -158,7 +159,7 @@ pytz==2021.1
     #   -c requirements/prod.txt
     #   babel
     #   django
-regex==2021.9.24
+regex==2021.9.30
     # via black
 requests==2.26.0
     # via
@@ -210,11 +211,11 @@ traitlets==5.1.0
     # via
     #   ipython
     #   matplotlib-inline
-typing-extensions==3.10.0.0
+typing-extensions==3.10.0.2
     # via
     #   -c requirements/prod.txt
     #   black
-urllib3==1.26.6
+urllib3==1.26.7
     # via
     #   -c requirements/prod.txt
     #   requests
@@ -225,7 +226,7 @@ werkzeug==1.0.1
     # via -r requirements/dev.in
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==58.0.4
+setuptools==58.1.0
     # via
     #   -c requirements/prod.txt
     #   ipdb
