@@ -1,12 +1,9 @@
 import hmac
 import json
 import logging
-from typing import Optional
-from metaci.release.tasks import (
-    set_merge_freeze_status_for_commit,
-)
 import re
 from hashlib import sha1
+from typing import Optional
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -18,6 +15,7 @@ from django.views.decorators.http import require_POST
 from metaci.build.models import Build
 from metaci.build.utils import view_queryset
 from metaci.release.models import Release
+from metaci.release.tasks import set_merge_freeze_status_for_commit
 from metaci.repository.models import Branch, Repository
 
 logger = logging.getLogger(__name__)
@@ -174,16 +172,16 @@ def github_webhook(request):
     except Repository.DoesNotExist:
         return HttpResponse("Not listening for this repository")
 
-    response = None
-    if event == "push":
-        response = handle_github_push_webhook(event, payload, repo)
+    if event in ("push", "status"):
+        handle_github_push_or_status_webhook(event, payload, repo)
     elif event == "pull_request":
-        response = handle_github_pr_webhook(event, payload, repo)
+        handle_github_pr_webhook(event, payload, repo)
+    else:
+        return HttpResponse("Unrecognized event")
+    return HttpResponse("OK")
 
-    return response or HttpResponse("OK")
 
-
-def handle_github_push_webhook(
+def handle_github_push_or_status_webhook(
     event: str, payload: dict, repo: Repository
 ) -> Optional[HttpResponse]:
     branch_name = get_branch_name_from_payload(payload)
