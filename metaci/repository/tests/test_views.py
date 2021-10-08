@@ -349,7 +349,7 @@ class TestRepositoryViews(TestCase):
         response = views.handle_github_push_or_status_webhook(
             "push", push_data, self.repo
         )
-        assert response is None
+        assert response.content == b"OK"
         assert Branch.objects.filter(name=branch_name).count() == 1
 
     @pytest.mark.django_db
@@ -368,7 +368,7 @@ class TestRepositoryViews(TestCase):
             response = views.handle_github_pr_webhook(
                 "pull_request", payload, self.repo
             )
-            assert response is None
+            assert response.content == b"OK"
             smfsc_mock.assert_called_once_with(
                 api.return_value, "abcdef123", freeze=False
             )
@@ -393,7 +393,7 @@ class TestRepositoryViews(TestCase):
             response = views.handle_github_pr_webhook(
                 "pull_request", payload, self.repo
             )
-            assert response is None
+            assert response.content == b"OK"
             smfsc_mock.assert_called_once_with(
                 api.return_value, "abcdef123", freeze=True
             )
@@ -419,18 +419,18 @@ class TestRepositoryViews(TestCase):
 
         request.META = {"HTTP_X_GITHUB_EVENT": "push"}
         response = views.github_webhook(request)
-        assert response.content == b"OK"
+        assert response == push_webhook.return_value
         push_webhook.assert_called_once_with("push", push_data, self.repo)
 
         request.META = {"HTTP_X_GITHUB_EVENT": "pull_request"}
         response = views.github_webhook(request)
-        assert response.content == b"OK"
+        assert response == pr_webhook.return_value
         pr_webhook.assert_called_once_with("pull_request", push_data, self.repo)
 
         push_webhook.reset_mock()
         request.META = {"HTTP_X_GITHUB_EVENT": "status"}
         response = views.github_webhook(request)
-        assert response.content == b"OK"
+        assert response == push_webhook.return_value
         push_webhook.assert_called_once_with("status", push_data, self.repo)
 
     @pytest.mark.django_db

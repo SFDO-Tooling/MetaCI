@@ -173,12 +173,11 @@ def github_webhook(request):
         return HttpResponse("Not listening for this repository")
 
     if event in ("push", "status"):
-        handle_github_push_or_status_webhook(event, payload, repo)
+        return handle_github_push_or_status_webhook(event, payload, repo)
     elif event == "pull_request":
-        handle_github_pr_webhook(event, payload, repo)
+        return handle_github_pr_webhook(event, payload, repo)
     else:
         return HttpResponse("Unrecognized event")
-    return HttpResponse("OK")
 
 
 def handle_github_push_or_status_webhook(
@@ -192,6 +191,7 @@ def handle_github_push_or_status_webhook(
     branch = get_or_create_branch(branch_name, repo)
     release = get_release_if_applicable(payload, repo)
     create_builds(event, payload, repo, branch, release)
+    return HttpResponse("OK")
 
 
 def handle_github_pr_webhook(
@@ -221,6 +221,7 @@ def handle_github_pr_webhook(
                 > 0
             ),
         )
+    return HttpResponse("OK")
 
 
 def get_repository(event):
