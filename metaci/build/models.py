@@ -671,11 +671,9 @@ class BuildFlow(models.Model):
         # If it's a release build, pass the dates in
         options = self._get_flow_options()
 
-        callbacks = None
-        if settings.METACI_FLOW_CALLBACK_ENABLED:
-            from metaci.build.flows import MetaCIFlowCallback
+        from metaci.build.flows import MetaCIFlowCallback
 
-            callbacks = MetaCIFlowCallback(buildflow_id=self.pk)
+        callbacks = MetaCIFlowCallback(buildflow_id=self.pk)
 
         # Create the flow and handle initialization exceptions
         self.flow_instance = FlowCoordinator(
