@@ -4778,10 +4778,10 @@ i18next-scanner@^3.0.0:
     vinyl "^2.2.0"
     vinyl-fs "^3.0.1"
 
-i18next@*, i18next@^21.1.1:
-  version "21.1.1"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-21.1.1.tgz#e7569de4d9fea2972c28ca4c334d13799b94ce76"
-  integrity sha512-oBEi+3MI/jEv0DifAmA+e47WAS55Sv6yG2CmZ0Kpz/VGu8rTQARJGRkwhMcLhcIi+JYmxmfBD/DQ/7Ho3FYryw==
+i18next@*, i18next@^21.3.0:
+  version "21.3.0"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-21.3.0.tgz#679b9bdc27a26ccca4799436cf2195107ad6feeb"
+  integrity sha512-MiarmWb/a+5z8C7QvihkcJf2YofuyhGvH28Wlip/c1YTSvHijYBFmc7dH6RrNkc2O44ApTdHnkK4FaM/S33C0w==
   dependencies:
     "@babel/runtime" "^7.12.0"
 
