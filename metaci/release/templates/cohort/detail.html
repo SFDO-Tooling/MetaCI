@@ -11,19 +11,19 @@
 {% block layout_header_details %}
   <ul class="slds-grid slds-page-header__detail-row">
     <li class="slds-page-header__detail-block">
-      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">Merge Freeze Active</p>
+      <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Status">Merge Freeze Status</p>
       <p class="slds-text-body--regular slds-truncate" title="{{ cohort.merge_freeze_start }}">
         <div class="slds-badge
-          {% if cohort.merge_freeze_start > now and cohort.merge_freeze_end < now %}
-            slds-theme--error
+          {% if merge_freeze_active %}
+            slds-theme_error
           {% else %} 
-            slds-theme--success
+            slds-theme_success
           {% endif %} 
          ">
-          {% if cohort.merge_freeze_start > now and cohort.merge_freeze_end < now %}
-            Yes 
+          {% if merge_freeze_active %}
+            Active 
           {% else %} 
-            No
+            Inactive
           {% endif %} 
         </div>
       </p>
