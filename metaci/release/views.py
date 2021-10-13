@@ -31,8 +31,7 @@ def cohort_detail(request, cohort_id):
 
 def is_merge_freeze_active(cohort: ReleaseCohort) -> bool:
     return (
-        cohort.merge_freeze_start < timezone.now()
-        and timezone.now() < cohort.merge_freeze_end
+        cohort.merge_freeze_start < timezone.now() < cohort.merge_freeze_end
     )
 
 
