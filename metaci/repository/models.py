@@ -1,4 +1,5 @@
 import github3.exceptions
+from cumulusci.core.exceptions import GithubException
 from cumulusci.core.github import get_github_api_for_repo
 from django.apps import apps
 from django.db import models
@@ -99,6 +100,6 @@ class Branch(SoftDeletableModel):
     def get_github_api(self):
         try:
             branch = self.repo.get_github_api().branch(self.name)
-        except github3.exceptions.NotFoundError:
+        except (github3.exceptions.NotFoundError, GithubException):
             branch = None
         return branch
