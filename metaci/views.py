@@ -5,7 +5,6 @@ import sys
 
 import cumulusci
 import django
-from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
@@ -46,8 +45,6 @@ class AboutView(TemplateView):
         ]
         for var in heroku_env_vars:
             context[var] = os.environ.get(var, "Heroku dyno metadata not found")
-
-        context["METACI_FLOW_CALLBACK_ENABLED"] = settings.METACI_FLOW_CALLBACK_ENABLED
 
         return context
 
