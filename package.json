@@ -161,6 +161,9 @@
       "isort",
       "black",
       "flake8"
+    ],
+    "package.json": [
+      "./bin/update-nvmrc"
     ]
   }
 }

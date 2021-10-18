@@ -1,0 +1,21 @@
+#!/bin/sh
+
+CHANGED=$(git diff --cached --name-only)
+
+if [[ $CHANGED == *"package.json"* ]]; then
+    NVM_RC_VERSION="$(command head -n 1 .nvmrc | command tr -d '\r')"
+    if command -v jq; then
+        NODE_VERSION=$(jq --raw-output '.engines.node' package.json)
+    elif command -v node; then
+        NODE_VERSION=$(node -e "const pkg = require('./package.json'); console.log(pkg.engines.node);")
+    fi
+
+    if test "$NVM_RC_VERSION" = "$NODE_VERSION"; then
+        echo "Node versions OK, nvmrc: ${NVM_RC_VERSION}, engines.node: ${NODE_VERSION}"
+        exit 0
+    else
+        echo "Node versions do not match! nvmrc: ${NVM_RC_VERSION}, engines.node: ${NODE_VERSION}"
+        echo "$NODE_VERSION" > .nvmrc
+        exit 0
+    fi
+fi
