@@ -74,7 +74,7 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "fetch-mock": "^9.11.0",
     "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.3.2",
+    "html-webpack-plugin": "^5.4.0",
     "husky": "^4.3.8",
     "i18next-scanner-webpack": "^0.8.2",
     "isomorphic-fetch": "^3.0.0",
