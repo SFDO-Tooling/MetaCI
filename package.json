@@ -78,7 +78,7 @@
     "husky": "^4.3.8",
     "i18next-scanner-webpack": "^0.8.2",
     "isomorphic-fetch": "^3.0.0",
-    "jest": "^27.2.5",
+    "jest": "^27.3.1",
     "jest-junit": "^13.0.0",
     "lint-staged": "^11.2.3",
     "mini-css-extract-plugin": "^2.4.2",
