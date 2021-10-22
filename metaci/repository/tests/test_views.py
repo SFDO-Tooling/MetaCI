@@ -399,39 +399,54 @@ class TestRepositoryViews(TestCase):
             )
 
     @pytest.mark.django_db
-    @mock.patch("metaci.repository.views.handle_github_push_or_status_webhook")
-    @mock.patch("metaci.repository.views.handle_github_pr_webhook")
     @mock.patch("metaci.repository.views.validate_github_webhook")
-    def test_github_webhook__push(self, validate, pr_webhook, push_webhook):
+    def test_github_webhook(self, validate):
         self.client.force_login(self.user)
+        url = reverse("github_webhook")
         push_data = {
             "repository": {"id": self.repo.github_id},
+            "ref": "refs/tags/beta",
+            "head_commit": {"id": "aR4Zd84F1i3No8"},
         }
 
-        # When we use the test client, `X-` HTTP headers are not
-        # transformed into `request.META` entries, which our code
-        # requires. Fake it with a Mock.
-        # This is not a clean approach.
-        request = mock.Mock()
-        request.META = {"HTTP_X_GITHUB_EVENT": "push"}
-        request.body = json.dumps(push_data)
-        request.method = "POST"
+        with patch.object(
+            views,
+            "handle_github_push_or_status_webhook",
+            wraps=views.handle_github_push_or_status_webhook,
+        ) as handler_mock:
+            self.client.post(
+                url,
+                data=json.dumps(push_data),
+                content_type="application/json",
+                HTTP_X_GITHUB_EVENT="push",
+            )
+            handler_mock.assert_called_once_with("push", push_data, self.repo)
 
-        request.META = {"HTTP_X_GITHUB_EVENT": "push"}
-        response = views.github_webhook(request)
-        assert response == push_webhook.return_value
-        push_webhook.assert_called_once_with("push", push_data, self.repo)
+        with patch.object(
+            views,
+            "handle_github_push_or_status_webhook",
+            wraps=views.handle_github_push_or_status_webhook,
+        ) as handler_mock:
+            self.client.post(
+                url,
+                data=json.dumps(push_data),
+                content_type="application/json",
+                HTTP_X_GITHUB_EVENT="status",
+            )
+            handler_mock.assert_called_once_with("status", push_data, self.repo)
 
-        request.META = {"HTTP_X_GITHUB_EVENT": "pull_request"}
-        response = views.github_webhook(request)
-        assert response == pr_webhook.return_value
-        pr_webhook.assert_called_once_with("pull_request", push_data, self.repo)
-
-        push_webhook.reset_mock()
-        request.META = {"HTTP_X_GITHUB_EVENT": "status"}
-        response = views.github_webhook(request)
-        assert response == push_webhook.return_value
-        push_webhook.assert_called_once_with("status", push_data, self.repo)
+        with patch.object(
+            views,
+            "handle_github_pr_webhook",
+            wraps=views.handle_github_push_or_status_webhook,
+        ) as handler_mock:
+            self.client.post(
+                url,
+                data=json.dumps(push_data),
+                content_type="application/json",
+                HTTP_X_GITHUB_EVENT="pull_request",
+            )
+            handler_mock.assert_called_once_with("pull_request", push_data, self.repo)
 
     @pytest.mark.django_db
     def test_get_repository(self):

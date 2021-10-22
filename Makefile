@@ -1,5 +1,6 @@
 .PHONY: clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
+CLASS_PATH = metaci
 define BROWSER_PYSCRIPT
 import os, webbrowser, sys
 try:
@@ -25,7 +26,7 @@ test:
 # Use CLASS_PATH to run coverage for a subset of tests. 
 # $ make coverage CLASS_PATH="cumulusci/core/tests"
 coverage: clean-test
-	coverage run --source metaci -m pytest $(CLASS_PATH)
+	coverage run --source $(CLASS_PATH) -m pytest $(CLASS_PATH)
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
