@@ -6,8 +6,6 @@
 #
 alabaster==0.7.12
     # via sphinx
-appnope==0.1.2
-    # via ipython
 asgiref==3.4.1
     # via
     #   -c requirements/prod.txt
@@ -42,7 +40,7 @@ decorator==5.1.0
     # via
     #   ipdb
     #   ipython
-django==3.1.13
+django==3.2.8
     # via
     #   -c requirements/prod.txt
     #   django-debug-toolbar
