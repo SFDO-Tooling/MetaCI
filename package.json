@@ -28,7 +28,7 @@
     "redux-devtools-extension": "^2.13.9",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.0",
-    "reselect": "^4.1.0",
+    "reselect": "^4.1.1",
     "run-p": "^0.0.0",
     "sarcastic": "^1.5.0",
     "whatwg-fetch": "^3.5.0"
