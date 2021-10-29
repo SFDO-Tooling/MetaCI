@@ -129,7 +129,7 @@ class DefaultImplementationStep(BaseModel):
 
 
 class Release(StatusModel):
-    STATUS = Choices("draft", "published", "hidden")
+    STATUS = Choices("draft", "failed", "completed", "inprogress", "waiting", "blocked")
     created = AutoCreatedField(_("created"))
     modified = AutoLastModifiedField(_("modified"))
     repo = models.ForeignKey(
@@ -152,6 +152,7 @@ class Release(StatusModel):
     trialforce_id = models.CharField(
         _("trialforce template id"), max_length=18, null=True, blank=True
     )
+    error_message = models.TextField(_("error message"), null=True, blank=True)
 
     release_creation_date = models.DateField(
         _("release creation date"),
@@ -172,7 +173,7 @@ class Release(StatusModel):
         default=get_default_production_date,
     )
     created_from_commit = models.CharField(
-        _("created from commit"), max_length=1024, null=True, blank=True
+        _("created from commit"), max_length=1024, null=True, blank=False
     )
     work_item_link = models.URLField(
         _("work item link"), max_length=1024, null=True, blank=True

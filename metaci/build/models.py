@@ -202,7 +202,11 @@ class Build(models.Model):
         max_length=50, choices=RELEASE_REL_TYPES, null=True, blank=True
     )
     release = models.ForeignKey(
-        "release.Release", on_delete=models.PROTECT, null=True, blank=True
+        "release.Release",
+        related_name="builds",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     org_note = models.CharField(max_length=255, default="", blank=True, null=True)
     org_api_version = models.CharField(max_length=5, blank=True, null=True)

@@ -255,7 +255,9 @@ class PlanRepositoryQuerySet(models.QuerySet):
 
 class PlanRepository(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
-    repo = models.ForeignKey(Repository, on_delete=models.CASCADE)
+    repo = models.ForeignKey(
+        Repository, on_delete=models.CASCADE, related_name="planrepos"
+    )
     active = models.BooleanField(default=True)
 
     objects = PlanRepositoryQuerySet.as_manager()

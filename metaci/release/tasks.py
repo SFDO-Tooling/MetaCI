@@ -1,4 +1,9 @@
+from collections import defaultdict
 from datetime import datetime, timezone
+import operator
+from typing import List
+from django.db.models.query import QuerySet
+
 from django.dispatch.dispatcher import receiver
 
 from django_rq import job
@@ -6,11 +11,128 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 from django.urls import reverse
 from django.db.models.signals import post_delete, post_save
+from metaci.build.models import BUILD_STATUSES, Build
+from metaci.plan.models import PlanRepository
 
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
 
 from github3.repos.repo import Repository as GitHubRepository
+
+
+def _run_planrepo_for_release(release: Release, planrepo: PlanRepository):
+    build = Build(
+        repo=release.repo,
+        plan=planrepo.plan,
+        planrepo=planrepo,
+        commit=release.created_from_commit,
+        build_type="auto",
+        release=release,
+        release_relationship_type="automation",
+    )
+    build.save()
+    if release.status != Release.STATUS.inprogress:
+        release.status = Release.STATUS.inprogress
+        release.save()
+
+
+def find_active_planrepos(release: Release, role: str) -> QuerySet[PlanRepository]:
+    return release.repo.planrepos.filter(plan__role=role, active=True)
+
+
+def _run_release_builds(release: Release):
+    FAILED_STATUSES = [BUILD_STATUSES.error, BUILD_STATUSES.fail]
+    COMPLETED_STATUSES = [BUILD_STATUSES.success, *FAILED_STATUSES]
+
+    def running(builds: List[Build]) -> bool:
+        return bool(builds) and not all(b.status in COMPLETED_STATUSES for b in builds)
+
+    def succeeded(builds: List[Build]) -> bool:
+        return (
+            bool(builds)
+            and not running(builds)
+            and builds[-1].status == BUILD_STATUSES.success
+        )
+
+    def failed(builds: List[Build]) -> bool:
+        return (
+            bool(builds)
+            and not running(builds)
+            and builds[-1].status in FAILED_STATUSES
+        )
+
+    def any_failed(builds: List[Build]) -> bool:
+        return bool(builds) and any(b.status in FAILED_STATUSES for b in builds)
+
+    if release.status in [Release.STATUS.failed, Release.STATUS.completed]:
+        # Release manager must manually set the status back to In Progress if they're attempting
+        # to retry any failed builds.
+        return
+
+    # Locate builds associated with this Release.
+    builds = defaultdict(list)
+    for build in release.builds.all():
+        if build.plan.role in ["Upload Release", "Release Deploy", "Release Test"]:
+            builds[build.plan.role].append(build)
+
+    # Sort Builds so that we can find the latest of each Role.
+    # This supports multi-build retries (rather than rerunning a single Build).
+    # Note that our predicates (succeeded() et al.) check for running builds
+    # and return False if builds are still running, which is why we can
+    # reasonably use `time_end`.
+    for plan_role in ["Upload Release", "Release Deploy", "Release Test"]:
+        builds[plan_role] = sorted(
+            builds[plan_role], key=operator.attrgetter("time_end")
+        )
+
+    # Determine what state we are in.
+
+    # Release Test is running or has run.
+    if builds["Release Test"]:
+        if succeeded(builds["Release Test"]):
+            release.status = Release.STATUS.completed
+        if any_failed(builds["Release Test"]):
+            # Plans may run multiple builds with the role Release Test
+            # All of them must pass.
+            release.status = Release.STATUS.failed
+            release.error_message = "One or more release builds failed."
+
+        release.save()
+        return
+
+    has_release_deploy = bool(find_active_planrepos(release, "Release Deploy"))
+
+    # We ran, or do not have, Release Deploy and need to run Upload Release.
+    if not builds["Upload Release"] and (
+        not has_release_deploy or builds["Release Deploy"]
+    ):
+        if not has_release_deploy or succeeded(builds["Release Deploy"]):
+            # Locate the Upload Release plan and planrepo.
+            upload_release_planrepos = find_active_planrepos(release, "Upload Release")
+            if upload_release_planrepos.count() == 0:
+                release.error_message = _("No Upload Release plan is available")
+                release.save()
+                return
+
+            upload_release_planrepo = upload_release_planrepos.first()
+
+            _run_planrepo_for_release(release, upload_release_planrepo)
+            return
+        elif has_release_deploy and failed(builds["Release Deploy"]):
+            release.status = Release.STATUS.failed
+            release.error_message = "One or more release builds failed."
+            release.save()
+            return
+
+    # We have a Release Deploy build and it has not yet run.
+    if has_release_deploy and not builds["Release Deploy"]:
+        _run_planrepo_for_release(
+            release, find_active_planrepos(release, "Release Deploy").first()
+        )
+        release.status = Release.STATUS.inprogress
+        release.save()
+
+    # The release is running - no new builds required.
 
 
 @job
