@@ -6,8 +6,6 @@
 #
 alabaster==0.7.12
     # via sphinx
-appnope==0.1.2
-    # via ipython
 asgiref==3.4.1
     # via
     #   -c requirements/prod.txt
@@ -148,7 +146,7 @@ pytest-factoryboy==2.1.0
     # via -r requirements/dev.in
 pytest-mock==3.6.1
     # via -r requirements/dev.in
-pytest-tap==3.2
+pytest-tap==3.3
     # via -r requirements/dev.in
 python-dateutil==2.8.2
     # via
