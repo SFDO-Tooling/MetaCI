@@ -1,6 +1,6 @@
 ansi2html
 boto3
-cumulusci==3.47.0.dev0
+cumulusci==3.47.0
 django<3.2
 django-allauth
 django-anymail
