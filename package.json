@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@salesforce-ux/design-system": "^2.15.9",
-    "@salesforce/design-system-react": "^0.10.35",
+    "@salesforce/design-system-react": "^0.10.39",
     "del": "^6.0.0",
     "i18next": "^21.3.3",
     "i18next-browser-languagedetector": "^6.1.2",
