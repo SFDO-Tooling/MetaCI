@@ -6,8 +6,6 @@
 #
 alabaster==0.7.12
     # via sphinx
-appnope==0.1.2
-    # via ipython
 asgiref==3.4.1
     # via
     #   -c requirements/prod.txt
@@ -18,7 +16,7 @@ babel==2.9.1
     # via sphinx
 backcall==0.2.0
     # via ipython
-black==21.9b0
+black==21.10b0
     # via -r requirements/dev.in
 certifi==2021.10.8
     # via
