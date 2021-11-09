@@ -21,6 +21,7 @@ class ReleaseCohort(models.Model):
         ("Active", "Active"),
         ("Canceled", "Canceled"),
         ("Completed", "Completed"),
+        ("Failed", "Failed")
     ]
     status = models.CharField(
         max_length=9,
