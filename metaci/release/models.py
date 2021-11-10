@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
-from django.core.exceptions import ValidationError
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -16,17 +16,18 @@ from metaci.release.utils import update_release_from_github
 
 class ReleaseCohort(models.Model):
     name = models.CharField(_("name"), max_length=255)
-    status_choices = [
-        ("Planned", "Planned"),
-        ("Active", "Active"),
-        ("Canceled", "Canceled"),
-        ("Completed", "Completed"),
-        ("Failed", "Failed")
-    ]
+    STATUS = Choices(
+        ("planned", _("Planned")),
+        ("approved", _("Approved")),
+        ("active", _("Active")),
+        ("canceled", _("Canceled")),
+        ("completed", _("Completed")),
+        ("failed", _("Failed")),
+    )
     status = models.CharField(
         max_length=9,
-        choices=status_choices,
-        default="Planned",
+        choices=STATUS,
+        default=STATUS.planned,
     )
     merge_freeze_start = models.DateTimeField(_("Merge Freeze Start Time"))
     merge_freeze_end = models.DateTimeField(_("Merge Freeze End Time"))
@@ -37,7 +38,7 @@ class ReleaseCohort(models.Model):
     def clean(self):
         now = datetime.datetime.now(tz=datetime.timezone.utc)
         if (self.merge_freeze_start <= now and self.merge_freeze_end >= now) ^ (
-            self.status == "Active"
+            self.status == ReleaseCohort.STATUS.active
         ):
             raise ValidationError(
                 _(
@@ -46,16 +47,20 @@ class ReleaseCohort(models.Model):
             )
 
         if (self.merge_freeze_end <= now) and self.status not in [
-            "Completed",
-            "Canceled",
+            ReleaseCohort.STATUS.completed,
+            ReleaseCohort.STATUS.canceled,
+            ReleaseCohort.STATUS.failed,
         ]:
             raise ValidationError(
                 _(
-                    "A Release Cohort must be in Completed or Canceled status after its merge freeze date range."
+                    "A Release Cohort must be in a completion status after its merge freeze date range."
                 )
             )
 
-        if self.merge_freeze_end > now and self.status == "Completed":
+        if (
+            self.merge_freeze_end > now
+            and self.status == ReleaseCohort.STATUS.completed
+        ):
             raise ValidationError(
                 _(
                     "A Release Cohort may not be in Completed status until after its merge freeze date range."
