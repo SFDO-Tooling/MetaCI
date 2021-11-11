@@ -1,22 +1,20 @@
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import List
-from django.db.models.query import QuerySet
 
-from django.dispatch.dispatcher import receiver
-
-from django_rq import job
 from django.conf import settings
-from django.utils.translation import gettext as _
-from django.urls import reverse
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_delete, post_save
+from django.dispatch.dispatcher import receiver
+from django.urls import reverse
+from django.utils.translation import gettext as _
+from django_rq import job
+from github3.repos.repo import Repository as GitHubRepository
+
 from metaci.build.models import BUILD_STATUSES, Build
 from metaci.plan.models import PlanRepository
-
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
-
-from github3.repos.repo import Repository as GitHubRepository
 
 
 def _run_planrepo_for_release(release: Release, planrepo: PlanRepository):
@@ -162,17 +160,19 @@ def _update_release_cohorts() -> str:
     # Signals will trigger the updating of merge freezes upon save.
     names_ended = []
     for rc in ReleaseCohort.objects.filter(
-        status="Active", merge_freeze_end__lt=now
+        status=ReleaseCohort.STATUS.active, merge_freeze_end__lt=now
     ).all():
-        rc.status = "Completed"
+        rc.status = ReleaseCohort.STATUS.completed
         rc.save()
         names_ended.append(rc.name)
 
     names_started = []
     for rc in ReleaseCohort.objects.filter(
-        status="Planned", merge_freeze_start__lt=now, merge_freeze_end__gt=now
+        status=ReleaseCohort.STATUS.planned,
+        merge_freeze_start__lt=now,
+        merge_freeze_end__gt=now,
     ).all():
-        rc.status = "Active"
+        rc.status = ReleaseCohort.STATUS.active
         rc.save()
         names_started.append(rc.name)
 
@@ -209,7 +209,9 @@ def set_merge_freeze_status_for_commit(
 
 
 def release_merge_freeze_if_safe(repo: Repository):
-    if not Release.objects.filter(repo=repo, release_cohort__status="Active").count():
+    if not Release.objects.filter(
+        repo=repo, release_cohort__status=ReleaseCohort.STATUS.active
+    ).count():
         set_merge_freeze_status(repo, freeze=False)
 
 
@@ -219,7 +221,7 @@ def react_to_release_cohort_change(instance: ReleaseCohort, **kwargs):
     # Cohort Creation alone won't trigger merge freeze (associating a Release to the Cohort will)
 
     # If the Release Cohort is currently in scope, add merge freeze on all of its repos.
-    if instance.status == "Active":
+    if instance.status == ReleaseCohort.STATUS.active:
         for release in instance.releases.all():
             set_merge_freeze_status(release.repo, freeze=True)
     else:
@@ -236,11 +238,17 @@ def react_to_release_change(instance: Release, **kwargs):
 
     if kwargs.get("created", False):
         # There is no case where Release creation would lead to lifting merge freeze.
-        if instance.release_cohort and instance.release_cohort.status == "Active":
+        if (
+            instance.release_cohort
+            and instance.release_cohort.status == ReleaseCohort.STATUS.active
+        ):
             set_merge_freeze_status(instance.repo, freeze=True)
     else:
         # A Release was updated - if it was added to an in-scope Cohort, set merge freeze.
-        if instance.release_cohort and instance.release_cohort.status == "Active":
+        if (
+            instance.release_cohort
+            and instance.release_cohort.status == ReleaseCohort.STATUS.active
+        ):
             set_merge_freeze_status(instance.repo, freeze=True)
         else:
             # This Release might have been moved from an in-scope release cohort to an out-of-scope Release Cohort or None

@@ -135,7 +135,14 @@ class DefaultImplementationStep(BaseModel):
 
 
 class Release(StatusModel):
-    STATUS = Choices("draft", "failed", "completed", "inprogress", "waiting", "blocked")
+    STATUS = Choices(
+        ("draft", _("Draft")),
+        ("failed", _("Failed")),
+        ("completed", _("Completed")),
+        ("inprogress", _("In Progress")),
+        ("waiting", _("Waiting")),
+        ("blocked", _("Blocked")),
+    )
     created = AutoCreatedField(_("created"))
     modified = AutoLastModifiedField(_("modified"))
     repo = models.ForeignKey(
