@@ -6,8 +6,6 @@
 #
 alabaster==0.7.12
     # via sphinx
-appnope==0.1.2
-    # via ipython
 asgiref==3.4.1
     # via
     #   -c requirements/prod.txt
@@ -167,7 +165,7 @@ requests==2.26.0
     #   coveralls
     #   responses
     #   sphinx
-responses==0.13.4
+responses==0.15.0
     # via -r requirements/dev.in
 six==1.16.0
     # via
