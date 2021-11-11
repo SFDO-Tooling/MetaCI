@@ -226,7 +226,7 @@ class Release(StatusModel):
         """Create default implementation steps"""
         if len(self.implementation_steps.filter(plan__role=f"{step.role}")) < 1:
             try:
-                planrepo = self.repo.planrepository_set.should_run().get(
+                planrepo = self.repo.planrepos.should_run().get(
                     plan__role=f"{step.role}"
                 )
             except (

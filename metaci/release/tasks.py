@@ -1,6 +1,5 @@
 from collections import defaultdict
 from datetime import datetime, timezone
-import operator
 from typing import List
 from django.db.models.query import QuerySet
 
@@ -48,7 +47,7 @@ def fail_release_with_message(release: Release, message: str):
     release.save()
 
     release.release_cohort.error_message = _("One or more releases failed.")
-    release.release_cohort.status = "Failed"
+    release.release_cohort.status = Release.STATUS.failed
     release.release_cohort.save()
 
 
@@ -91,8 +90,8 @@ def _run_release_builds(release: Release):
     # reasonably use `time_end`.
 
     builds = defaultdict(list)
-    for build in release.builds.filter(
-        build__plan__role__in=["Upload Release", "Release Deploy", "Release Test"]
+    for build in release.build_set.filter(
+        plan__role__in=["Upload Release", "Release Deploy", "Release Test"]
     ).order_by("time_end"):
         builds[build.plan.role].append(build)
 
@@ -145,8 +144,6 @@ def _run_release_builds(release: Release):
         _run_planrepo_for_release(
             release, find_active_planrepos_by_role(release, "Release Deploy").first()
         )
-        release.status = Release.STATUS.inprogress
-        release.save()
 
     # The release is running - no new builds required.
 

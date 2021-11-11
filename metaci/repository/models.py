@@ -19,7 +19,7 @@ class RepositoryQuerySet(models.QuerySet):
             perms = "plan.view_builds"
         PlanRepository = apps.get_model("plan.PlanRepository")
         return self.filter(
-            planrepository__in=PlanRepository.objects.for_user(user, perms)
+            planrepos__in=PlanRepository.objects.for_user(user, perms)
         ).distinct()
 
     def get_for_user_or_404(self, user, query, perms=None):

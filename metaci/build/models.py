@@ -7,6 +7,7 @@ import traceback
 import zipfile
 from glob import iglob
 from io import BytesIO
+from model_utils import Choices
 
 from cumulusci import __version__ as cumulusci_version
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
@@ -27,6 +28,7 @@ from django.db import models
 from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from jinja2.sandbox import ImmutableSandboxedEnvironment
 
 from metaci.build.tasks import set_github_status
@@ -41,14 +43,14 @@ from metaci.release.utils import (
 from metaci.testresults.importer import import_test_results
 from metaci.utils import generate_hash
 
-BUILD_STATUSES = (
-    ("queued", "Queued"),
-    ("waiting", "Waiting"),
-    ("running", "Running"),
-    ("success", "Success"),
-    ("error", "Error"),
-    ("fail", "Failed"),
-    ("qa", "QA Testing"),
+BUILD_STATUSES = Choices(
+    ("queued", _("Queued")),
+    ("waiting", _("Waiting")),
+    ("running", _("Running")),
+    ("success", _("Success")),
+    ("error", _("Error")),
+    ("fail", _("Failed")),
+    ("qa", _("QA Testing")),
 )
 BUILD_FLOW_STATUSES = (
     ("queued", "Queued"),
@@ -203,7 +205,6 @@ class Build(models.Model):
     )
     release = models.ForeignKey(
         "release.Release",
-        related_name="builds",
         on_delete=models.PROTECT,
         null=True,
         blank=True,

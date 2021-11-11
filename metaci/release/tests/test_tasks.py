@@ -8,14 +8,219 @@ from metaci.fixtures.factories import (
     ReleaseCohortFactory,
     ReleaseFactory,
     RepositoryFactory,
+    PlanRepositoryFactory,
+    BuildFactory,
+    PlanFactory,
 )
 from metaci.release.tasks import (
     _update_release_cohorts,
     release_merge_freeze_if_safe,
     set_merge_freeze_status,
+    _run_release_builds, _run_planrepo_for_release
 )
+from metaci.build.models import BUILD_STATUSES
+from metaci.release.models import Release, ReleaseCohort
 
 import pytest
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@pytest.mark.django_db
+def test_run_planrepo_for_release(smfs_mock):
+    plan = PlanFactory(name="Plan1", role="Release Test")
+    repo = RepositoryFactory(name="PublicRepo")
+    planrepo = PlanRepositoryFactory(plan=plan, repo=repo)
+    release = ReleaseFactory(repo=repo, created_from_commit='abc')
+    
+    _run_planrepo_for_release(release, planrepo)
+
+    assert release.status == Release.STATUS.inprogress
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@pytest.mark.django_db
+def test_run_release_builds__failed_release_test(smfs_mock):
+    plan = PlanFactory(name="Plan1", role="Release Test")
+    repo = RepositoryFactory(name="PublicRepo")
+    planrepo = PlanRepositoryFactory(plan=plan, repo=repo)
+    cohort = ReleaseCohortFactory()
+    release = ReleaseFactory(repo=repo, release_cohort=cohort)
+    BuildFactory(
+        release=release,
+        repo=repo,
+        plan=plan,
+        planrepo=planrepo,
+        status=BUILD_STATUSES.fail,
+    )
+    BuildFactory(
+        release=release,
+        repo=repo,
+        plan=plan,
+        planrepo=planrepo,
+        status=BUILD_STATUSES.success,
+    )
+
+    _run_release_builds(release)
+
+    assert release.status == Release.STATUS.failed
+    assert release.error_message == "One or more release builds failed."
+    assert cohort.status == ReleaseCohort.STATUS.failed
+    assert cohort.error_message == "One or more releases failed."
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@pytest.mark.django_db
+def test_run_release_builds__succeeded_release_test(smfs_mock):
+    plan = PlanFactory(name="Plan1", role="Release Test")
+    repo = RepositoryFactory(name="PublicRepo")
+    planrepo = PlanRepositoryFactory(plan=plan, repo=repo)
+    cohort = ReleaseCohortFactory()
+    release = ReleaseFactory(repo=repo, release_cohort=cohort)
+    BuildFactory(
+        release=release,
+        repo=repo,
+        plan=plan,
+        planrepo=planrepo,
+        status=BUILD_STATUSES.success,
+    )
+
+    _run_release_builds(release)
+
+    assert release.status == Release.STATUS.completed
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@pytest.mark.django_db
+def test_run_release_builds__no_release_deploy(smfs_mock):
+    cohort = ReleaseCohortFactory()
+    release = ReleaseFactory(release_cohort=cohort)
+    BuildFactory(release=release, status=BUILD_STATUSES.success)
+
+    _run_release_builds(release)
+
+    assert release.status == Release.STATUS.failed
+    assert release.error_message == "No Upload Release plan is available"
+    assert cohort.status == ReleaseCohort.STATUS.failed
+    assert cohort.error_message == "One or more releases failed."
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@pytest.mark.django_db
+def test_run_release_builds__succeeded_release_deploy__no_upload_release(smfs_mock):
+    plan = PlanFactory(name="Plan1", role="Release Deploy")
+    repo = RepositoryFactory(name="PublicRepo")
+    planrepo = PlanRepositoryFactory(plan=plan, repo=repo, active=True)
+    cohort = ReleaseCohortFactory()
+    release = ReleaseFactory(repo=repo, release_cohort=cohort)
+    BuildFactory(
+        release=release,
+        repo=repo,
+        plan=plan,
+        planrepo=planrepo,
+        status=BUILD_STATUSES.success,
+    )
+
+    _run_release_builds(release)
+
+    assert release.status == Release.STATUS.failed
+    assert release.error_message == "No Upload Release plan is available"
+    assert cohort.status == ReleaseCohort.STATUS.failed
+    assert cohort.error_message == "One or more releases failed."
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@unittest.mock.patch("metaci.release.tasks._run_planrepo_for_release")
+@pytest.mark.django_db
+def test_run_release_builds__succeeded_release_deploy(rpr_mock, smfs_mock):
+    plan1 = PlanFactory(name="Plan1", role="Release Deploy")
+    repo = RepositoryFactory(name="PublicRepo")
+    plan2 = PlanFactory(name="Plan2", role="Upload Release")
+    planrepo1 = PlanRepositoryFactory(plan=plan1, repo=repo, active=True)
+    planrepo2 = PlanRepositoryFactory(plan=plan2, repo=repo, active=True)
+    cohort = ReleaseCohortFactory()
+    release = ReleaseFactory(repo=repo, release_cohort=cohort)
+    BuildFactory(
+        release=release,
+        repo=repo,
+        plan=plan1,
+        planrepo=planrepo1,
+        status=BUILD_STATUSES.success,
+    )
+
+    _run_release_builds(release)
+
+    rpr_mock.assert_called_once_with(release, planrepo2)
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@pytest.mark.django_db
+def test_run_release_builds__failed_release_deploy(smfs_mock):
+    plan1 = PlanFactory(name="Plan1", role="Release Deploy")
+    repo = RepositoryFactory(name="PublicRepo")
+    plan2 = PlanFactory(name="Plan2", role="Upload Release")
+    planrepo1 = PlanRepositoryFactory(plan=plan1, repo=repo, active=True)
+    PlanRepositoryFactory(plan=plan2, repo=repo, active=True)
+    cohort = ReleaseCohortFactory()
+    release = ReleaseFactory(repo=repo, release_cohort=cohort)
+    BuildFactory(
+        release=release,
+        repo=repo,
+        plan=plan1,
+        planrepo=planrepo1,
+        status=BUILD_STATUSES.fail,
+    )
+
+    _run_release_builds(release)
+
+    assert release.status == Release.STATUS.failed
+    assert release.error_message == "One or more release builds failed."
+    assert cohort.status == ReleaseCohort.STATUS.failed
+    assert cohort.error_message == "One or more releases failed."
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@unittest.mock.patch("metaci.release.tasks._run_planrepo_for_release")
+@pytest.mark.django_db
+def test_run_release_builds__unrun_release_deploy(rpr_mock, smfs_mock):
+    repo = RepositoryFactory(name="PublicRepo")
+    plan = PlanFactory(name="Plan1", role="Release Deploy")
+    planrepo = PlanRepositoryFactory(plan=plan, repo=repo, active=True)
+    cohort = ReleaseCohortFactory()
+    release = ReleaseFactory(repo=repo, release_cohort=cohort)
+
+    _run_release_builds(release)
+
+    rpr_mock.assert_called_once_with(release, planrepo)
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@unittest.mock.patch("metaci.release.tasks._run_planrepo_for_release")
+@pytest.mark.django_db
+def test_run_release_builds__failed_release_no_action(rpr_mock, smfs_mock):
+    repo = RepositoryFactory(name="PublicRepo")
+    plan = PlanFactory(name="Plan1", role="Release Deploy")
+    PlanRepositoryFactory(plan=plan, repo=repo, active=True)
+    cohort = ReleaseCohortFactory()
+    release = ReleaseFactory(repo=repo, release_cohort=cohort, status=Release.STATUS.failed)
+
+    _run_release_builds(release)
+
+    rpr_mock.assert_not_called()
+
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@unittest.mock.patch("metaci.release.tasks._run_planrepo_for_release")
+@pytest.mark.django_db
+def test_run_release_builds__succeeded_release_no_action(rpr_mock, smfs_mock):
+    repo = RepositoryFactory(name="PublicRepo")
+    plan = PlanFactory(name="Plan1", role="Release Deploy")
+    PlanRepositoryFactory(plan=plan, repo=repo, active=True)
+    cohort = ReleaseCohortFactory()
+    release = ReleaseFactory(repo=repo, release_cohort=cohort, status=Release.STATUS.completed)
+
+    _run_release_builds(release)
+
+    rpr_mock.assert_not_called()
 
 
 @pytest.mark.django_db
