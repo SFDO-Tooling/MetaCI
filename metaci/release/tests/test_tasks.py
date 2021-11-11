@@ -1,6 +1,7 @@
-from datetime import datetime, timezone, timedelta
 import unittest
+from datetime import datetime, timedelta, timezone
 
+import pytest
 from django.conf import settings
 from django.urls.base import reverse
 
@@ -14,8 +15,6 @@ from metaci.release.tasks import (
     release_merge_freeze_if_safe,
     set_merge_freeze_status,
 )
-
-import pytest
 
 
 @pytest.mark.django_db

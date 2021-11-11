@@ -1,16 +1,15 @@
 from datetime import datetime, timezone
-from django.dispatch.dispatcher import receiver
 
-from django_rq import job
 from django.conf import settings
-from django.utils.translation import gettext as _
-from django.urls import reverse
 from django.db.models.signals import post_delete, post_save
+from django.dispatch.dispatcher import receiver
+from django.urls import reverse
+from django.utils.translation import gettext as _
+from django_rq import job
+from github3.repos.repo import Repository as GitHubRepository
 
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
-
-from github3.repos.repo import Repository as GitHubRepository
 
 
 @job
