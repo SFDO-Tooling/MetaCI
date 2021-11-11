@@ -36,7 +36,7 @@ def _run_planrepo_for_release(release: Release, planrepo: PlanRepository):
 def find_active_planrepos_by_role(
     release: Release, role: str
 ) -> QuerySet[PlanRepository]:
-    return release.repo.planrepos.filter(plan__role=role, active=True)
+    return release.repo.planrepos.should_run().filter(plan__role=role)
 
 
 def fail_release_with_message(release: Release, message: str):
@@ -44,19 +44,24 @@ def fail_release_with_message(release: Release, message: str):
     release.status = Release.STATUS.failed
     release.save()
 
-    release.release_cohort.error_message = _("One or more releases failed.")
-    release.release_cohort.status = Release.STATUS.failed
-    release.release_cohort.save()
+    if release.release_cohort:
+        release.release_cohort.error_message = _("One or more releases failed.")
+        release.release_cohort.status = Release.STATUS.failed
+        release.release_cohort.save()
 
 
 def _run_release_builds(release: Release):
+    """
+    Inspect a Release and run the next appropriate Build and maintain Release Status automatically.
+    Triggered by a cronjob every minute.
+    """
     FAILED_STATUSES = [BUILD_STATUSES.error, BUILD_STATUSES.fail]
     COMPLETED_STATUSES = [BUILD_STATUSES.success, *FAILED_STATUSES]
 
     # NOTE: bug where MetaCI builds can hang in In Progress forever
     # will be painful here.
     def running(builds: List[Build]) -> bool:
-        return bool(builds) and not all(b.status in COMPLETED_STATUSES for b in builds)
+        return any(b.status not in COMPLETED_STATUSES for b in builds)
 
     def last_succeeded(builds: List[Build]) -> bool:
         return (
@@ -73,7 +78,7 @@ def _run_release_builds(release: Release):
         )
 
     def any_failed(builds: List[Build]) -> bool:
-        return bool(builds) and any(b.status in FAILED_STATUSES for b in builds)
+        return any(b.status in FAILED_STATUSES for b in builds)
 
     if release.status in [Release.STATUS.failed, Release.STATUS.completed]:
         # Release manager must manually set the status back to In Progress if they're attempting
@@ -89,19 +94,19 @@ def _run_release_builds(release: Release):
 
     builds = defaultdict(list)
     for build in release.build_set.filter(
-        plan__role__in=["Upload Release", "Release Deploy", "Release Test"]
+        plan__role__in=["release", "release_deploy", "release_test"]
     ).order_by("time_end"):
         builds[build.plan.role].append(build)
 
     # Determine what state we are in.
 
     # Release Test is running or has run.
-    if builds["Release Test"]:
-        if any_failed(builds["Release Test"]):
-            # Plans may run multiple builds with the role Release Test
+    if builds["release_test"]:
+        if any_failed(builds["release_test"]):
+            # Plans may run multiple builds with the role release_test
             # All of them must pass.
             fail_release_with_message(release, "One or more release builds failed.")
-        elif last_succeeded(builds["Release Test"]):
+        elif last_succeeded(builds["release_test"]):
             release.status = Release.STATUS.completed
             release.save()
 
@@ -109,38 +114,32 @@ def _run_release_builds(release: Release):
         # No further action is required.
         return
 
-    # Check our state for the Upload Release plan
-    # Does this repo have an active Release Deploy planrepo?
-    has_release_deploy = bool(find_active_planrepos_by_role(release, "Release Deploy"))
+    # Check our state for the "release" plan
+    # Does this repo have an active release_deploy planrepo?
+    has_release_deploy = bool(find_active_planrepos_by_role(release, "release_deploy"))
 
-    # We ran, or do not have, Release Deploy and need to run Upload Release.
-    if not builds["Upload Release"] and (
-        not has_release_deploy or builds["Release Deploy"]
-    ):
-        if not has_release_deploy or last_succeeded(builds["Release Deploy"]):
-            # Locate the Upload Release plan and planrepo.
-            upload_release_planrepos = find_active_planrepos_by_role(
-                release, "Upload Release"
-            )
+    # We ran, or do not have, release_deploy and need to run "release".
+    if not builds["release"] and (not has_release_deploy or builds["release_deploy"]):
+        if not has_release_deploy or last_succeeded(builds["release_deploy"]):
+            # Locate the "release" plan and planrepo.
+            upload_release_planrepos = find_active_planrepos_by_role(release, "release")
             if upload_release_planrepos.count() == 0:
                 # This shouldn't happen, but because the user can directly
                 # mutate the database, it's possible it's changed since
                 # the automated release process started.
-                fail_release_with_message(
-                    release, "No Upload Release plan is available"
-                )
+                fail_release_with_message(release, "No 'Release' plan is available")
                 return
 
             _run_planrepo_for_release(release, upload_release_planrepos.first())
             return
-        elif has_release_deploy and last_failed(builds["Release Deploy"]):
+        elif has_release_deploy and last_failed(builds["release_deploy"]):
             fail_release_with_message(release, "One or more release builds failed.")
             return
 
-    # We have a Release Deploy build and it has not yet run.
-    if has_release_deploy and not builds["Release Deploy"]:
+    # We have a release_deploy build and it has not yet run.
+    if has_release_deploy and not builds["release_deploy"]:
         _run_planrepo_for_release(
-            release, find_active_planrepos_by_role(release, "Release Deploy").first()
+            release, find_active_planrepos_by_role(release, "release_deploy").first()
         )
 
     # The release is running - no new builds required.
