@@ -1,11 +1,10 @@
-import pytest
 from datetime import timedelta
 
+import pytest
 from django.urls import reverse
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 
-from metaci.release import views
 from metaci.release.models import ReleaseCohort
 
 

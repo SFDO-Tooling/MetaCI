@@ -1,6 +1,6 @@
-from datetime import datetime, timezone, timedelta
 import numbers
 import random
+from datetime import datetime, timedelta
 
 import factory
 import factory.fuzzy

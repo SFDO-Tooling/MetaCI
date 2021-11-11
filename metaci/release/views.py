@@ -1,9 +1,8 @@
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
-from metaci.release.models import ReleaseCohort, Release
+from metaci.release.models import Release, ReleaseCohort
 
 
 def cohort_list(request):
@@ -30,9 +29,7 @@ def cohort_detail(request, cohort_id):
 
 
 def is_merge_freeze_active(cohort: ReleaseCohort) -> bool:
-    return (
-        cohort.merge_freeze_start < timezone.now() < cohort.merge_freeze_end
-    )
+    return cohort.merge_freeze_start < timezone.now() < cohort.merge_freeze_end
 
 
 def can_view_cohorts(user):

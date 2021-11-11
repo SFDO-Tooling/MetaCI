@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from django.core.exceptions import ValidationError
 from model_utils import Choices
 
 from metaci.conftest import RepositoryFactory
@@ -16,8 +17,6 @@ from metaci.release.models import (
     Release,
 )
 from metaci.repository.models import Repository
-
-from django.core.exceptions import ValidationError
 
 
 @pytest.mark.django_db
