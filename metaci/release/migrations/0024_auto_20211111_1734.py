@@ -3,6 +3,14 @@
 from django.db import migrations, models
 
 
+def migrate_release_cohort_choices(apps, schema_editor):
+    ReleaseCohort = apps.get_model("release.ReleaseCohort")
+
+    for rc in ReleaseCohort.objects.all():
+        rc.status = rc.status.lower()
+        rc.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -26,4 +34,5 @@ class Migration(migrations.Migration):
                 max_length=9,
             ),
         ),
+        migrations.RunPython(migrate_release_cohort_choices),
     ]
