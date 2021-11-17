@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import json
 from django.dispatch.dispatcher import receiver
 
 from django_rq import job
@@ -11,6 +12,97 @@ from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
 
 from github3.repos.repo import Repository as GitHubRepository
+
+from collections import defaultdict
+from typing import DefaultDict, List, Set
+
+from cumulusci.core.config.project_config import BaseProjectConfig
+from cumulusci.core.dependencies.dependencies import (
+    Dependency,
+    DynamicDependency,
+    PackageNamespaceVersionDependency,
+    PackageVersionIdDependency,
+    StaticDependency,
+)
+from cumulusci.core.dependencies.resolvers import DependencyResolutionStrategy
+
+
+def get_dependency_graph(
+    context: BaseProjectConfig,
+    releases: List[Release],
+) -> DefaultDict[Release, Set[Release]]:
+
+    deps = defaultdict(set)
+    strategy = [DependencyResolutionStrategy.RELEASE_TAG]
+
+    for d in dependencies:
+        this_dep = d
+        if isinstance(this_dep, DynamicDependency) and not d.is_resolved:
+            this_dep.resolve(context, strategy)
+
+        if this_dep not in deps and hasattr(this_dep, "managed_dependency"):
+            transitive_deps = this_dep.flatten(context)
+            managed_transitive_deps = set()
+            for this_transitive_dep in transitive_deps:
+                if this_transitive_dep == this_dep.managed_dependency:
+                    continue
+                if not this_transitive_dep.is_resolved:
+                    this_transitive_dep.resolve(context, strategy)
+                if isinstance(
+                    this_transitive_dep,
+                    (PackageNamespaceVersionDependency, PackageVersionIdDependency),
+                ):
+                    managed_transitive_deps.add(this_transitive_dep)
+                elif hasattr(this_transitive_dep, "managed_dependency") and getattr(
+                    this_transitive_dep, "managed_dependency"
+                ):
+                    managed_transitive_deps.add(this_transitive_dep.managed_dependency)
+
+            deps[this_dep.managed_dependency] = managed_transitive_deps
+            dependencies.extend(transitive_deps)
+
+    return deps
+
+
+@job
+def execute_active_release_cohorts() -> str:
+    # First, identify Release Cohorts that need their dependency trees created.
+    for rc in ReleaseCohort.objects.filter(
+        status=ReleaseCohort.STATUS.approved, dependency_graph=None
+    ):
+        rc.dependency_graph = generate_dependency_graph(rc)
+        r.save()
+
+    # Next, identify in-progress Release Cohorts that have reached a successful conclusion.
+    # Release Cohorts whose component Releases fail are updated to a failure state by Release automation.
+    for rc in ReleaseCohort.objects.filter(
+        status__ne=ReleaseCohort.STATUS.completed
+    ).exclude(release__status__ne=Release.STATUS.completed):
+        rc.status = ReleaseCohort.STATUS.completed
+        rc.save()
+
+    # Next, identify in-progress Release Cohorts that need to be advanced.
+    for rc in ReleaseCohort.objects.filter(
+        status=ReleaseCohort.STATUS.active
+    ).prefetch_related("releases"):
+        # This Release Cohort can potentially advance. Grab our dependency graph,
+        # then iterate through Releases that are ready to advance and call
+        # the function that advances them.
+        dependency_graph = json.loads(rc.dependency_graph)
+        for release in rc.releases:
+            if release.status not in Release.COMPLETED_STATUSES:
+                # Find this Release's dependencies and check if they're satisfied.
+                deps = dependency_graph[release.github]
+                if (
+                    release.status == Release.STATUS.inprogress
+                    or not deps
+                    or all(
+                        get_release_for_dep(d).status == Release.STATUS.completed
+                        for d in deps
+                    )
+                ):
+                    # This Release is ready to advance.
+                    run_release_builds(release)
 
 
 @job
@@ -25,23 +117,19 @@ def _update_release_cohorts() -> str:
     now = datetime.now(tz=timezone.utc)
 
     # Signals will trigger the updating of merge freezes upon save.
-    names_ended = []
-    for rc in ReleaseCohort.objects.filter(
-        status="Active", merge_freeze_end__lt=now
-    ).all():
-        rc.status = "Completed"
-        rc.save()
-        names_ended.append(rc.name)
-
     names_started = []
     for rc in ReleaseCohort.objects.filter(
-        status="Planned", merge_freeze_start__lt=now, merge_freeze_end__gt=now
+        status=ReleaseCohort.STATUS.approved,
+        merge_freeze_start__lt=now,
+        merge_freeze_end__gt=now,
     ).all():
-        rc.status = "Active"
+        rc.status = ReleaseCohort.STATUS.active
         rc.save()
         names_started.append(rc.name)
 
-    return f"Enabled merge freeze on {', '.join(names_started)} and ended merge freeze on {', '.join(names_ended)}."
+    # Moving into a completed status is handled by release process automation.
+
+    return f"Enabled merge freeze on {', '.join(names_started)}."
 
 
 def set_merge_freeze_status(repo: Repository, *, freeze: bool):
