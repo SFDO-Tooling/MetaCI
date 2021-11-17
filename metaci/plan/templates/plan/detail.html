@@ -1,98 +1,68 @@
-{% extends 'layout_full.html' %} {% block layout_header_text %}
+{% extends 'layout_full.html' %}
+
+{% block layout_header_text %}
 <div class="slds-page-header__row">
-  <div class="slds-text-body_regular">Plan</div>
-</div>
-{{ plan.name }} {% endblock %} {% block layout_header_details %}
+    <div class="slds-text-body_regular">
+      Plan
+    </div>
+  </div>
+  {{ plan.name }}
+{% endblock %}
+
+{% block layout_header_details %}
 <ul class="slds-grid slds-page-header__detail-row">
   <li class="slds-page-header__detail-block">
-    <p
-      class="slds-text-title slds-truncate slds-m-bottom--xx-small"
-      title="Role"
-    >
-      Role
-    </p>
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Role">Role</p>
     <p class="slds-text-body--regular slds-truncate" title="{{ plan.role }}">
       {{ plan.role }}
     </p>
   </li>
   <li class="slds-page-header__detail-block">
-    <p
-      class="slds-text-title slds-truncate slds-m-bottom--xx-small"
-      title="Trigger"
-    >
-      Trigger
-    </p>
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Trigger">Trigger</p>
     <p class="slds-text-body--regular slds-truncate" title="{{ plan.trigger }}">
       {{ plan.trigger }}
     </p>
   </li>
   <li class="slds-page-header__detail-block">
-    <p
-      class="slds-text-title slds-truncate slds-m-bottom--xx-small"
-      title="Regex"
-    >
-      Regex
-    </p>
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Regex">Regex</p>
     <p class="slds-text-body--regular slds-truncate" title="{{ plan.regex }}">
       {{ plan.regex }}
     </p>
   </li>
   <li class="slds-page-header__detail-block">
-    <p
-      class="slds-text-title slds-truncate slds-m-bottom--xx-small"
-      title="Org"
-    >
-      Org
-    </p>
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Org">Org</p>
     <p class="slds-text-body--regular slds-truncate" title="{{ plan.org }}">
       {{ plan.org }}
     </p>
   </li>
   <li class="slds-page-header__detail-block">
-    <p
-      class="slds-text-title slds-truncate slds-m-bottom--xx-small"
-      title="Flows"
-    >
-      Flows
-    </p>
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Flows">Flows</p>
     <p class="slds-text-body--regular slds-truncate" title="{{ plan.flows }}">
       {{ plan.flows }}
     </p>
   </li>
   <li class="slds-page-header__detail-block">
-    <p
-      class="slds-text-title slds-truncate slds-m-bottom--xx-small"
-      title="Active?"
-    >
-      Active?
-    </p>
-    <p
-      class="
-        slds-text-body--regular
-        slds-truncate slds-badge
-        {%
-        if
-        plan.active
-        %}slds-theme--success{%
-        else
-        %}slds-theme--error{%
-        endif
-        %}
-      "
-      title="{{ build.get_status }}"
-      title="{{ plan.active }}"
-    >
+    <p class="slds-text-title slds-truncate slds-m-bottom--xx-small" title="Active?">Active?</p>
+    <p class="slds-text-body--regular slds-truncate slds-badge {% if plan.active %}slds-theme--success{% else %}slds-theme--error{% endif %}"
+      title="{{ build.get_status }}" title="{{ plan.active }}">
       {{ plan.active }}
     </p>
   </li>
 </ul>
-{% endblock %} {% block layout_header_buttons %} {% if can_run_plan %}
+{% endblock %}
+
+{% block layout_header_buttons %}
+{% if can_run_plan %}
 <a href="{{ plan.get_absolute_url }}/run">
   <button class="slds-button slds-button--neutral slds-button--last">
     Run
   </button>
 </a>
-{% endif %} {% endblock %} {% block layout_body %} {% if plan.description %}
+{% endif %}
+{% endblock %}
+
+{% block layout_body %}
+{% if plan.description %}
 <div class="slds-box">
   <h3 class="slds-heading slds-heading--large">Description</h3>
   <p>{{ plan.description }}</p>
@@ -102,6 +72,7 @@
 <table class="slds-table slds-table--bordered slds-table--cell-buffer">
   <thead>
     <tr class="slds-text-title--caps">
+
       <th scope="col">
         <div class="slds-truncate" title="">Repository</div>
       </th>
@@ -114,14 +85,17 @@
     {% for pr in plan.planrepos.all %}
     <tr>
       <th data-label="Repository">
-        <div class="slds-truncate" title="{{ pr.repo.name }}">
-          <a href="{{ pr.get_absolute_url }}">{{ pr.repo.name }}</a>
+        <div class="slds-truncate" title="{{ pr.repo.name }}"><a href="{{ pr.get_absolute_url }}">{{ pr.repo.name }}</a>
         </div>
       </th>
-      <td data-label="Active">{{ pr.active|yesno }}</td>
+      <td data-label="Active">
+        {{ pr.active|yesno }}
+      </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 
-{% include "build/build_table.html" %} {% endblock %}
+{% include "build/build_table.html" %}
+
+{% endblock %}
