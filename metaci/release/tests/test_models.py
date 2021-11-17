@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-from model_utils import Choices
 
 from metaci.conftest import RepositoryFactory
 from metaci.fixtures.factories import (
@@ -43,7 +42,6 @@ class TestRelease:
             == datetime.date.today() + datetime.timedelta(days=6)
         )
 
-        assert release.STATUS == Choices("draft", "published", "hidden")
         assert release.created
         assert release.modified
         assert not release.version_name  # checking default set to None

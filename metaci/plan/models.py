@@ -63,7 +63,7 @@ class PlanQuerySet(models.QuerySet):
         if perms is None:
             perms = "plan.view_builds"
         return self.filter(
-            planrepository__in=PlanRepository.objects.for_user(user, perms)
+            planrepos__in=PlanRepository.objects.for_user(user, perms)
         ).distinct()
 
     def get_for_user_or_404(self, user, query, perms=None):
@@ -254,8 +254,10 @@ class PlanRepositoryQuerySet(models.QuerySet):
 
 
 class PlanRepository(models.Model):
-    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
-    repo = models.ForeignKey(Repository, on_delete=models.CASCADE)
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name="planrepos")
+    repo = models.ForeignKey(
+        Repository, on_delete=models.CASCADE, related_name="planrepos"
+    )
     active = models.BooleanField(default=True)
 
     objects = PlanRepositoryQuerySet.as_manager()

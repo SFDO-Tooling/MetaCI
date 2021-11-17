@@ -61,7 +61,7 @@ def plan_run(request, plan_id):
     if not can_run_plan(request.user, plan_id):
         raise PermissionDenied("You are not authorized to run this plan")
 
-    context = {"plan": plan, "planrepos": plan.planrepository_set.should_run().all()}
+    context = {"plan": plan, "planrepos": plan.planrepos.should_run().all()}
     return render(request, "plan/run_select_repo.html", context=context)
 
 

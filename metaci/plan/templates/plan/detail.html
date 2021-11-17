@@ -82,7 +82,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for pr in plan.planrepository_set.all %}
+    {% for pr in plan.planrepos.all %}
     <tr>
       <th data-label="Repository">
         <div class="slds-truncate" title="{{ pr.repo.name }}"><a href="{{ pr.get_absolute_url }}">{{ pr.repo.name }}</a>
