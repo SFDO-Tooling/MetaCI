@@ -1,8 +1,9 @@
 from collections import defaultdict
 from datetime import datetime, timezone
 import json
+import logging
 from django.dispatch.dispatcher import receiver
-from typing import List
+from typing import Iterable, List, Optional
 
 from django.conf import settings
 from django.db.models.query import QuerySet
@@ -14,6 +15,7 @@ from django_rq import job
 from github3.repos.repo import Repository as GitHubRepository
 
 from metaci.build.models import BUILD_STATUSES, Build
+from metaci.cumulusci.keychain import GitHubSettingsKeychain
 from metaci.plan.models import PlanRepository
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
@@ -25,6 +27,8 @@ from cumulusci.core.dependencies.dependencies import (
     GitHubDynamicDependency,
 )
 from cumulusci.core.dependencies.resolvers import DependencyResolutionStrategy
+from cumulusci.core.github import get_github_api_for_repo
+from cumulusci.utils.git import split_repo_url
 
 
 class DependencyGraphError(Exception):
@@ -157,6 +161,23 @@ def _run_release_builds(release: Release):
     # The release is running - no new builds required.
 
 
+# Construct an object we can use as a ProjectConfig equivalent
+# for the `flatten()` method. All it needs is the .logger property
+# and the method `get_repo_from_url()`.
+# This is a bit fragile.
+class NonProjectConfig:
+    def get_repo_from_url(self, url: str) -> Optional[GitHubRepository]:
+        owner, name = split_repo_url(url)
+
+        return get_github_api_for_repo(
+            GitHubSettingsKeychain(), owner, name
+        ).repository(owner, name)
+
+    @property
+    def logger(self):
+        return logging.getLogger(__name__)
+
+
 def get_dependency_graph(
     releases: List[Release],
 ) -> DefaultDict[str, Set[str]]:
@@ -166,6 +187,7 @@ def get_dependency_graph(
     Releases."""
     deps = defaultdict(set)
     to_process = [(r.repo.github_url, r.created_from_commit) for r in releases]
+    context = NonProjectConfig()
 
     while True:
         try:
@@ -176,7 +198,6 @@ def get_dependency_graph(
         # Construct a dependency representing this Release.
         this_dep = GitHubDynamicDependency(github=this_dep_url, ref=this_dep_commit)
 
-        # FIXME: where do we get our context?
         # We're only interested in dependencies on other GitHub repos (== Releases)
         transitive_deps = [
             td
@@ -218,22 +239,39 @@ def get_dependency_graph(
     return deps
 
 
+def create_dependency_tree(rc: ReleaseCohort):
+    try:
+        graph = get_dependency_graph(rc.releases)
+    except DependencyGraphError as e:
+        rc.status = ReleaseCohort.STATUS.failed
+        rc.error_message = str(e)
+        rc.save()
+        return
+
+    rc.dependency_graph = graph
+    rc.save()
+
+
+def advance_releases(rc: ReleaseCohort):
+    dependency_graph = rc.dependency_graph
+    for release in rc.releases:
+        if release.status not in Release.COMPLETED_STATUSES:
+            # Find this Release's dependencies and check if they're satisfied.
+            deps = dependency_graph[release.github]
+            if release.status == Release.STATUS.inprogress or all_deps_satisfied(
+                list(deps), dependency_graph, rc.releases
+            ):
+                # This Release is ready to advance.
+                _run_release_builds(release)
+
+
 @job
 def execute_active_release_cohorts():
     # First, identify Release Cohorts that need their dependency trees created.
     for rc in ReleaseCohort.objects.filter(
         status=ReleaseCohort.STATUS.approved, dependency_graph=None
     ):
-        try:
-            graph = get_dependency_graph(rc)
-        except DependencyGraphError as e:
-            rc.status = ReleaseCohort.STATUS.failed
-            rc.error_message = str(e)
-            rc.save()
-            return
-
-        rc.dependency_graph = json.dumps(graph)
-        rc.save()
+        create_dependency_tree(rc)
 
     # Next, identify in-progress Release Cohorts that have reached a successful conclusion.
     # Release Cohorts whose component Releases fail are updated to a failure state by Release automation.
@@ -250,18 +288,7 @@ def execute_active_release_cohorts():
         # This Release Cohort can potentially advance. Grab our dependency graph,
         # then iterate through Releases that are ready to advance and call
         # the function that advances them.
-        dependency_graph = json.loads(rc.dependency_graph)
-        for release in rc.releases:
-            if release.status not in Release.COMPLETED_STATUSES:
-                # Find this Release's dependencies and check if they're satisfied.
-                deps = dependency_graph[release.github]
-                if (
-                    release.status == Release.STATUS.inprogress
-                    or not deps
-                    or all_deps_satisfied(list(deps), dependency_graph, rc.releases)
-                ):
-                    # This Release is ready to advance.
-                    _run_release_builds(release)
+        advance_releases(rc)
 
 
 def all_deps_satisfied(

@@ -31,6 +31,8 @@ class ReleaseCohort(models.Model):
     )
     merge_freeze_start = models.DateTimeField(_("Merge Freeze Start Time"))
     merge_freeze_end = models.DateTimeField(_("Merge Freeze End Time"))
+    error_message = models.TextField()
+    dependency_graph = models.JSONField()
 
     def __str__(self):
         return self.name
