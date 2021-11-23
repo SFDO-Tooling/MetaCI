@@ -18,6 +18,18 @@ from metaci.plan.models import PlanRepository
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
 
+from collections import defaultdict
+from typing import DefaultDict, List, Set
+
+from cumulusci.core.dependencies.dependencies import (
+    GitHubDynamicDependency,
+)
+from cumulusci.core.dependencies.resolvers import DependencyResolutionStrategy
+
+
+class DependencyGraphError(Exception):
+    pass
+
 
 def _run_planrepo_for_release(release: Release, planrepo: PlanRepository):
     build = Build(
@@ -57,13 +69,11 @@ def _run_release_builds(release: Release):
     Inspect a Release and run the next appropriate Build and maintain Release Status automatically.
     Triggered by a cronjob every minute.
     """
-    FAILED_STATUSES = [BUILD_STATUSES.error, BUILD_STATUSES.fail]
-    COMPLETED_STATUSES = [BUILD_STATUSES.success, *FAILED_STATUSES]
 
     # NOTE: bug where MetaCI builds can hang in In Progress forever
     # will be painful here.
     def running(builds: List[Build]) -> bool:
-        return any(b.status not in COMPLETED_STATUSES for b in builds)
+        return any(b.status not in Build.COMPLETED_STATUSES for b in builds)
 
     def last_succeeded(builds: List[Build]) -> bool:
         return (
@@ -76,11 +86,11 @@ def _run_release_builds(release: Release):
         return (
             bool(builds)
             and not running(builds)
-            and builds[-1].status in FAILED_STATUSES
+            and builds[-1].status in Build.FAILED_STATUSES
         )
 
     def any_failed(builds: List[Build]) -> bool:
-        return any(b.status in FAILED_STATUSES for b in builds)
+        return any(b.status in Build.FAILED_STATUSES for b in builds)
 
     if release.status in [Release.STATUS.failed, Release.STATUS.completed]:
         # Release manager must manually set the status back to In Progress if they're attempting
@@ -146,65 +156,84 @@ def _run_release_builds(release: Release):
 
     # The release is running - no new builds required.
 
-from collections import defaultdict
-from typing import DefaultDict, List, Set
-
-from cumulusci.core.config.project_config import BaseProjectConfig
-from cumulusci.core.dependencies.dependencies import (
-    Dependency,
-    DynamicDependency,
-    PackageNamespaceVersionDependency,
-    PackageVersionIdDependency,
-    StaticDependency,
-)
-from cumulusci.core.dependencies.resolvers import DependencyResolutionStrategy
-
 
 def get_dependency_graph(
-    context: BaseProjectConfig,
     releases: List[Release],
-) -> DefaultDict[Release, Set[Release]]:
-
+) -> DefaultDict[str, Set[str]]:
+    """Turn a list of Releases into a dependency graph, mapping GitHub repo URLs
+    to other GitHub repo URLs on which they depend. Note that the return value
+    may include repo URLs that are not part of this Release Cohort or list of
+    Releases."""
     deps = defaultdict(set)
-    strategy = [DependencyResolutionStrategy.RELEASE_TAG]
+    to_process = [(r.repo.github_url, r.created_from_commit) for r in releases]
 
-    for d in dependencies:
-        this_dep = d
-        if isinstance(this_dep, DynamicDependency) and not d.is_resolved:
-            this_dep.resolve(context, strategy)
+    while True:
+        try:
+            (this_dep_url, this_dep_commit) = to_process.pop(0)
+        except IndexError:
+            break
 
-        if this_dep not in deps and hasattr(this_dep, "managed_dependency"):
-            transitive_deps = this_dep.flatten(context)
-            managed_transitive_deps = set()
-            for this_transitive_dep in transitive_deps:
-                if this_transitive_dep == this_dep.managed_dependency:
-                    continue
-                if not this_transitive_dep.is_resolved:
-                    this_transitive_dep.resolve(context, strategy)
-                if isinstance(
-                    this_transitive_dep,
-                    (PackageNamespaceVersionDependency, PackageVersionIdDependency),
-                ):
-                    managed_transitive_deps.add(this_transitive_dep)
-                elif hasattr(this_transitive_dep, "managed_dependency") and getattr(
-                    this_transitive_dep, "managed_dependency"
-                ):
-                    managed_transitive_deps.add(this_transitive_dep.managed_dependency)
+        # Construct a dependency representing this Release.
+        this_dep = GitHubDynamicDependency(github=this_dep_url, ref=this_dep_commit)
 
-            deps[this_dep.managed_dependency] = managed_transitive_deps
-            dependencies.extend(transitive_deps)
+        # FIXME: where do we get our context?
+        # We're only interested in dependencies on other GitHub repos (== Releases)
+        transitive_deps = [
+            td
+            for td in this_dep.flatten(context)
+            if isinstance(transitive_dep, GitHubDynamicDependency)
+        ]
+        for transitive_dep in transitive_deps:
+            if transitive_dep.github in deps:
+                # Already processed
+                continue
+
+            # Add this specific dependency relationship to the graph
+            deps[this_dep_url].add(transitive_dep.github)
+
+            if (
+                transitive_dep.github not in deps
+                and transitive_dep.github not in to_process
+            ):
+                # We need to process this transitive dependency.
+
+                # Find the ref for this dependency
+                releases_for_transitive_dep = [
+                    r for r in releases if r.repo.github_url == transitive_dep.github
+                ]
+                if len(releases) > 1:
+                    raise DependencyGraphError(
+                        "More than one Release with repo {transitive_dep.github} in Release Cohort."
+                    )
+
+                to_process.append(
+                    (
+                        transitive_dep.github,
+                        releases_for_transitive_dep[0].created_from_commit
+                        if releases_for_transitive_dep
+                        else None,
+                    )
+                )
 
     return deps
 
 
 @job
-def execute_active_release_cohorts() -> str:
+def execute_active_release_cohorts():
     # First, identify Release Cohorts that need their dependency trees created.
     for rc in ReleaseCohort.objects.filter(
         status=ReleaseCohort.STATUS.approved, dependency_graph=None
     ):
-        rc.dependency_graph = generate_dependency_graph(rc)
-        r.save()
+        try:
+            graph = get_dependency_graph(rc)
+        except DependencyGraphError as e:
+            rc.status = ReleaseCohort.STATUS.failed
+            rc.error_message = str(e)
+            rc.save()
+            return
+
+        rc.dependency_graph = json.dumps(graph)
+        rc.save()
 
     # Next, identify in-progress Release Cohorts that have reached a successful conclusion.
     # Release Cohorts whose component Releases fail are updated to a failure state by Release automation.
@@ -229,13 +258,29 @@ def execute_active_release_cohorts() -> str:
                 if (
                     release.status == Release.STATUS.inprogress
                     or not deps
-                    or all(
-                        get_release_for_dep(d).status == Release.STATUS.completed
-                        for d in deps
-                    )
+                    or all_deps_satisfied(list(deps), dependency_graph, rc.releases)
                 ):
                     # This Release is ready to advance.
-                    run_release_builds(release)
+                    _run_release_builds(release)
+
+
+def all_deps_satisfied(
+    deps: List[str], graph: DefaultDict[str, Set[str]], releases: List[Release]
+) -> bool:
+    """Recursively walk the dependency tree to validate that all dependencies are
+    either complete or out of scope."""
+
+    releases_dict = {r.repo.github_url: r for r in releases}
+
+    return all(
+        releases_dict[d].status == Release.STATUS.completed
+        for d in deps
+        if d in releases_dict
+    ) and all(
+        all_deps_satisfied(list(graph[d]), graph, releases)
+        for d in deps
+        if d not in releases_dict
+    )
 
 
 @job
@@ -250,23 +295,9 @@ def _update_release_cohorts() -> str:
     now = datetime.now(tz=timezone.utc)
 
     # Signals will trigger the updating of merge freezes upon save.
-<<<<<<< HEAD
     names_started = []
     for rc in ReleaseCohort.objects.filter(
         status=ReleaseCohort.STATUS.approved,
-=======
-    names_ended = []
-    for rc in ReleaseCohort.objects.filter(
-        status=ReleaseCohort.STATUS.active, merge_freeze_end__lt=now
-    ).all():
-        rc.status = ReleaseCohort.STATUS.completed
-        rc.save()
-        names_ended.append(rc.name)
-
-    names_started = []
-    for rc in ReleaseCohort.objects.filter(
-        status=ReleaseCohort.STATUS.planned,
->>>>>>> feature/release-process-automation__run-release-builds
         merge_freeze_start__lt=now,
         merge_freeze_end__gt=now,
     ).all():

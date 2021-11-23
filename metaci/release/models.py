@@ -143,6 +143,8 @@ class Release(StatusModel):
         ("waiting", _("Waiting")),
         ("blocked", _("Blocked")),
     )
+    FAILED_STATUSES = [STATUS.failed]
+    COMPLETED_STATUSES = [STATUS.completed, *FAILED_STATUSES]
     created = AutoCreatedField(_("created"))
     modified = AutoLastModifiedField(_("modified"))
     repo = models.ForeignKey(

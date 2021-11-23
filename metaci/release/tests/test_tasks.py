@@ -1,4 +1,6 @@
+from collections import defaultdict
 import unittest
+from unittest.mock import Mock
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -20,6 +22,7 @@ from metaci.release.tasks import (
     _run_planrepo_for_release,
     _run_release_builds,
     _update_release_cohorts,
+    all_deps_satisfied,
     release_merge_freeze_if_safe,
     set_merge_freeze_status,
 )
@@ -428,3 +431,36 @@ def test_release_merge_freeze_if_safe__safe(smfs_mock):
     release_merge_freeze_if_safe(release.repo)
 
     smfs_mock.assert_called_once_with(release.repo, freeze=False)
+
+
+def test_all_deps_satisfied():
+    a = Mock()
+    b = Mock()
+    c = Mock()
+
+    # Build a mock release tree where the middle link (b)
+    # is not being released in this Cohort.
+    # C depends on B depends on A.
+    a.repo.github_url = "foo"
+    b.repo.github_url = "bar"
+    c.repo.github_url = "spam"
+    a.status = Release.STATUS.completed
+    c.status = Release.STATUS.blocked
+
+    # Build the dependency graph, a map from GitHub URL
+    # to a set of dependency GitHub URLs.
+    graph = defaultdict(set)
+    graph[b.repo.github_url].add(a.repo.github_url)
+    graph[c.repo.github_url].add(b.repo.github_url)
+
+    # We only have releases for A and C. We're asking,
+    # "Is C ready to start?"
+    assert all_deps_satisfied(list(graph[c.repo.github_url]), graph, [a, c]) is True
+
+    # Validate behavior with empty dependency lists
+    assert all_deps_satisfied([], graph, [a, c]) is True
+    assert all_deps_satisfied(list(graph[a.repo.github_url]), graph, [a, c]) is True
+
+    # Validate the negative case
+    a.status = Release.STATUS.failed
+    assert all_deps_satisfied(list(graph[c.repo.github_url]), graph, [a, c]) is False
