@@ -21,7 +21,7 @@ from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
 
 from collections import defaultdict
-from typing import DefaultDict, List, Set
+from typing import DefaultDict, List
 
 from cumulusci.core.dependencies.dependencies import (
     GitHubDynamicDependency,
@@ -164,7 +164,8 @@ def _run_release_builds(release: Release):
 # Construct an object we can use as a ProjectConfig equivalent
 # for the `flatten()` method. All it needs is the .logger property
 # and the method `get_repo_from_url()`.
-# This is a bit fragile.
+# This is a bit fragile. TODO: refactor flatten() et al to
+# accept an explicitly limited context object.
 class NonProjectConfig:
     def get_repo_from_url(self, url: str) -> Optional[GitHubRepository]:
         owner, name = split_repo_url(url)
@@ -180,13 +181,13 @@ class NonProjectConfig:
 
 def get_dependency_graph(
     releases: List[Release],
-) -> DefaultDict[str, Set[str]]:
+) -> DefaultDict[str, List[str]]:
     """Turn a list of Releases into a dependency graph, mapping GitHub repo URLs
     to other GitHub repo URLs on which they depend. Note that the return value
     may include repo URLs that are not part of this Release Cohort or list of
     Releases."""
-    deps = defaultdict(set)
-    to_process = [(r.repo.github_url, r.created_from_commit) for r in releases]
+    deps = defaultdict(list)
+    to_process = [(r.repo.url, r.created_from_commit) for r in releases]
     context = NonProjectConfig()
 
     while True:
@@ -202,7 +203,7 @@ def get_dependency_graph(
         transitive_deps = [
             td
             for td in this_dep.flatten(context)
-            if isinstance(transitive_dep, GitHubDynamicDependency)
+            if isinstance(td, GitHubDynamicDependency)
         ]
         for transitive_dep in transitive_deps:
             if transitive_dep.github in deps:
@@ -210,7 +211,7 @@ def get_dependency_graph(
                 continue
 
             # Add this specific dependency relationship to the graph
-            deps[this_dep_url].add(transitive_dep.github)
+            deps[this_dep_url].append(transitive_dep.github)
 
             if (
                 transitive_dep.github not in deps
@@ -220,7 +221,7 @@ def get_dependency_graph(
 
                 # Find the ref for this dependency
                 releases_for_transitive_dep = [
-                    r for r in releases if r.repo.github_url == transitive_dep.github
+                    r for r in releases if r.repo.url == transitive_dep.github
                 ]
                 if len(releases) > 1:
                     raise DependencyGraphError(
@@ -254,12 +255,13 @@ def create_dependency_tree(rc: ReleaseCohort):
 
 def advance_releases(rc: ReleaseCohort):
     dependency_graph = rc.dependency_graph
-    for release in rc.releases:
+    releases = rc.releases.all()
+    for release in releases:
         if release.status not in Release.COMPLETED_STATUSES:
             # Find this Release's dependencies and check if they're satisfied.
-            deps = dependency_graph[release.github]
+            deps = dependency_graph[release.repo.url]
             if release.status == Release.STATUS.inprogress or all_deps_satisfied(
-                list(deps), dependency_graph, rc.releases
+                list(deps), dependency_graph, releases
             ):
                 # This Release is ready to advance.
                 _run_release_builds(release)
@@ -292,19 +294,19 @@ def execute_active_release_cohorts():
 
 
 def all_deps_satisfied(
-    deps: List[str], graph: DefaultDict[str, Set[str]], releases: List[Release]
+    deps: List[str], graph: DefaultDict[str, List[str]], releases: List[Release]
 ) -> bool:
     """Recursively walk the dependency tree to validate that all dependencies are
     either complete or out of scope."""
 
-    releases_dict = {r.repo.github_url: r for r in releases}
+    releases_dict = {r.repo.url: r for r in releases}
 
     return all(
         releases_dict[d].status == Release.STATUS.completed
         for d in deps
         if d in releases_dict
     ) and all(
-        all_deps_satisfied(list(graph[d]), graph, releases)
+        all_deps_satisfied(graph[d], graph, releases)
         for d in deps
         if d not in releases_dict
     )
