@@ -278,7 +278,7 @@ def execute_active_release_cohorts():
     # Next, identify in-progress Release Cohorts that have reached a successful conclusion.
     # Release Cohorts whose component Releases fail are updated to a failure state by Release automation.
     for rc in ReleaseCohort.objects.filter(status=ReleaseCohort.STATUS.active).exclude(
-        ~Q(releases__status=Release.STATUS.completed)
+        releases__in=Release.objects.exclude(status=Release.STATUS.completed)
     ):
         rc.status = ReleaseCohort.STATUS.completed
         rc.save()

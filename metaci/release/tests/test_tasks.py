@@ -533,7 +533,10 @@ def test_execute_active_release_cohorts__creates_dependency_trees(
 
 @pytest.mark.django_db
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
-def test_execute_active_release_cohorts__completes_finished_cohorts(smfs_mock):
+@unittest.mock.patch("metaci.release.tasks.advance_releases")
+def test_execute_active_release_cohorts__completes_finished_cohorts(
+    advance_releases_mock, smfs_mock
+):
     rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
     _ = ReleaseFactory(
         repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
@@ -543,7 +546,7 @@ def test_execute_active_release_cohorts__completes_finished_cohorts(smfs_mock):
         status=ReleaseCohort.STATUS.active, dependency_graph={}
     )
     _ = ReleaseFactory(
-        repo__url="bar", release_cohort=rc_progress, status=Release.STATUS.inprogress
+        repo__url="bar", release_cohort=rc_progress, status=Release.STATUS.blocked
     )
     _ = ReleaseFactory(
         repo__url="baz", release_cohort=rc_progress, status=Release.STATUS.completed
