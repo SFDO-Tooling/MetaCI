@@ -10,7 +10,7 @@ def set_planrepository(apps, schema_editor):
     Build = apps.get_model('build', 'Build')
     for build in Build.objects.all().iterator():
         try:
-            build.planrepo = build.plan.planrepository_set.get(repo = build.repo)
+            build.planrepo = build.plan.planrepos.get(repo = build.repo)
         except ObjectDoesNotExist:
             continue
         build.save()

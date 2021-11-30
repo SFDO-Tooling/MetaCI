@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST
 
 from metaci.build.models import Build
 from metaci.build.utils import view_queryset
-from metaci.release.models import Release
+from metaci.release.models import Release, ReleaseCohort
 from metaci.release.tasks import set_merge_freeze_status_for_commit
 from metaci.repository.models import Branch, Repository
 
@@ -216,7 +216,7 @@ def handle_github_pr_webhook(
             payload["pull_request"]["head"]["sha"],
             freeze=(
                 Release.objects.filter(
-                    repo=repo, release_cohort__status="Active"
+                    repo=repo, release_cohort__status=ReleaseCohort.STATUS.active
                 ).count()
                 > 0
             ),
@@ -258,7 +258,7 @@ def get_or_create_branch(branch_name, repo):
 
 
 def create_builds(event, payload, repo, branch, release):
-    for pr in repo.planrepository_set.should_run().filter(
+    for pr in repo.planrepos.should_run().filter(
         plan__trigger__in=["commit", "tag", "status"]
     ):
         plan = pr.plan

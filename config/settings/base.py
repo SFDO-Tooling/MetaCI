@@ -366,6 +366,10 @@ RQ_QUEUES = {
 }
 RQ_EXCEPTION_HANDLERS = ["metaci.build.exceptions.maybe_requeue_job"]
 CRON_JOBS = {
+    "execute_active_release_cohorts": {
+        "func": "metaci.release.tasks.execute_active_release_cohorts_job",
+        "cron_string": "* * * * *",
+    },
     "autoscale": {
         "func": "metaci.build.autoscaling.autoscale",
         "cron_string": "* * * * *",
