@@ -26,6 +26,7 @@ from metaci.release.tasks import (
     advance_releases,
     all_deps_satisfied,
     create_dependency_tree,
+    execute_active_release_cohorts,
     release_merge_freeze_if_safe,
     set_merge_freeze_status,
 )
@@ -511,8 +512,67 @@ def test_advance_releases(set_merge_freeze_status, run_release_builds):
     run_release_builds.assert_has_calls([call(r2), call(r3)], any_order=True)
 
 
-def test_execute_active_release_cohorts():
-    raise NotImplementedError
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.get_dependency_graph")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_execute_active_release_cohorts__creates_dependency_trees(
+    smfs_mock,
+    get_dependency_graph_mock,
+):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.approved)
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.waiting
+    )
+    get_dependency_graph_mock.return_value = {}
+
+    execute_active_release_cohorts()
+    rc.refresh_from_db()
+
+    assert rc.dependency_graph == {}
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_execute_active_release_cohorts__completes_finished_cohorts(smfs_mock):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
+    )
+
+    rc_progress = ReleaseCohortFactory(
+        status=ReleaseCohort.STATUS.active, dependency_graph={}
+    )
+    _ = ReleaseFactory(
+        repo__url="bar", release_cohort=rc_progress, status=Release.STATUS.inprogress
+    )
+    _ = ReleaseFactory(
+        repo__url="baz", release_cohort=rc_progress, status=Release.STATUS.completed
+    )
+
+    execute_active_release_cohorts()
+    rc.refresh_from_db()
+    rc_progress.refresh_from_db()
+
+    assert rc.status == ReleaseCohort.STATUS.completed
+    assert rc_progress.status == ReleaseCohort.STATUS.active
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.advance_releases")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_execute_active_release_cohorts__advances_release_cohorts(
+    smfs_mock,
+    advance_releases_mock,
+):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.inprogress
+    )
+    _ = ReleaseCohortFactory(status=ReleaseCohort.STATUS.completed, dependency_graph={})
+
+    execute_active_release_cohorts()
+
+    advance_releases_mock.assert_called_once_with(rc)
 
 
 def test_get_dependency_graph():

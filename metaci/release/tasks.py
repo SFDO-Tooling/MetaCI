@@ -6,7 +6,7 @@ from django.dispatch.dispatcher import receiver
 from typing import Iterable, List, Optional
 
 from django.conf import settings
-from django.db.models.query import QuerySet
+from django.db.models.query import QuerySet, Q
 from django.db.models.signals import post_delete, post_save
 from django.dispatch.dispatcher import receiver
 from django.urls import reverse
@@ -254,32 +254,32 @@ def create_dependency_tree(rc: ReleaseCohort):
 
 
 def advance_releases(rc: ReleaseCohort):
-    dependency_graph = rc.dependency_graph
+    dependency_graph = defaultdict(list, rc.dependency_graph or {})
     releases = rc.releases.all()
     for release in releases:
         if release.status not in Release.COMPLETED_STATUSES:
             # Find this Release's dependencies and check if they're satisfied.
             deps = dependency_graph[release.repo.url]
             if release.status == Release.STATUS.inprogress or all_deps_satisfied(
-                list(deps), dependency_graph, releases
+                deps, dependency_graph, releases
             ):
                 # This Release is ready to advance.
                 _run_release_builds(release)
 
 
-@job
 def execute_active_release_cohorts():
     # First, identify Release Cohorts that need their dependency trees created.
     for rc in ReleaseCohort.objects.filter(
-        status=ReleaseCohort.STATUS.approved, dependency_graph=None
+        status=ReleaseCohort.STATUS.approved, dependency_graph__isnull=True
     ):
+        print("I found {rc}")
         create_dependency_tree(rc)
 
     # Next, identify in-progress Release Cohorts that have reached a successful conclusion.
     # Release Cohorts whose component Releases fail are updated to a failure state by Release automation.
-    for rc in ReleaseCohort.objects.filter(
-        status__ne=ReleaseCohort.STATUS.completed
-    ).exclude(release__status__ne=Release.STATUS.completed):
+    for rc in ReleaseCohort.objects.filter(status=ReleaseCohort.STATUS.active).exclude(
+        ~Q(releases__status=Release.STATUS.completed)
+    ):
         rc.status = ReleaseCohort.STATUS.completed
         rc.save()
 
@@ -291,6 +291,9 @@ def execute_active_release_cohorts():
         # then iterate through Releases that are ready to advance and call
         # the function that advances them.
         advance_releases(rc)
+
+
+execute_active_release_cohorts_job = job(execute_active_release_cohorts)
 
 
 def all_deps_satisfied(
