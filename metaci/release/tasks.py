@@ -1,12 +1,15 @@
-from collections import defaultdict
-from datetime import datetime, timezone
 import json
 import logging
-from django.dispatch.dispatcher import receiver
-from typing import Iterable, List, Optional
+from collections import defaultdict
+from datetime import datetime, timezone
+from typing import DefaultDict, List, Optional
 
+from cumulusci.core.dependencies.dependencies import GitHubDynamicDependency
+from cumulusci.core.dependencies.resolvers import DependencyResolutionStrategy
+from cumulusci.core.github import get_github_api_for_repo
+from cumulusci.utils.git import split_repo_url
 from django.conf import settings
-from django.db.models.query import QuerySet, Q
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_delete, post_save
 from django.dispatch.dispatcher import receiver
 from django.urls import reverse
@@ -19,16 +22,6 @@ from metaci.cumulusci.keychain import GitHubSettingsKeychain
 from metaci.plan.models import PlanRepository
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
-
-from collections import defaultdict
-from typing import DefaultDict, List
-
-from cumulusci.core.dependencies.dependencies import (
-    GitHubDynamicDependency,
-)
-from cumulusci.core.dependencies.resolvers import DependencyResolutionStrategy
-from cumulusci.core.github import get_github_api_for_repo
-from cumulusci.utils.git import split_repo_url
 
 
 class DependencyGraphError(Exception):
