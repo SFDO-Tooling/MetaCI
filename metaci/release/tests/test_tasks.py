@@ -2,6 +2,10 @@ from collections import defaultdict
 import unittest
 from unittest.mock import Mock, call
 from datetime import datetime, timedelta, timezone
+from cumulusci.core.dependencies.dependencies import (
+    GitHubDynamicDependency,
+    UnmanagedGitHubRefDependency,
+)
 
 import pytest
 from django.conf import settings
@@ -27,6 +31,7 @@ from metaci.release.tasks import (
     all_deps_satisfied,
     create_dependency_tree,
     execute_active_release_cohorts,
+    get_dependency_graph,
     release_merge_freeze_if_safe,
     set_merge_freeze_status,
 )
@@ -578,9 +583,88 @@ def test_execute_active_release_cohorts__advances_release_cohorts(
     advance_releases_mock.assert_called_once_with(rc)
 
 
-def test_get_dependency_graph():
-    raise NotImplementedError
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_get_dependency_graph(smfs_mock):
+    # Create a simulated repo graph that includes:
+    # Two repos depending on the same base, one of which also requires the other.
+    # A repo with no other relationships
+
+    # Create database entries
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    top = ReleaseFactory(
+        repo__url="https://github.com/example/top",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="abc",
+    )
+    left = ReleaseFactory(
+        repo__url="https://github.com/example/left",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="ghi",
+    )
+    right = ReleaseFactory(
+        repo__url="https://github.com/example/right",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="jkl",
+    )
+    separate = ReleaseFactory(
+        repo__url="https://github.com/example/separate",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="mno",
+    )
+
+    # Mock results from GitHubDynamicDependency.flatten()
+    flatten_results = {
+        top.repo.url: [
+            UnmanagedGitHubRefDependency(
+                github=top.repo.url,
+                ref=top.created_from_commit,
+                subfolder="unpackaged/pre/first",
+            ),
+        ],
+        left.repo.url: [GitHubDynamicDependency(github=top.repo.url)],
+        right.repo.url: [
+            GitHubDynamicDependency(github=top.repo.url),
+            GitHubDynamicDependency(github=left.repo.url),
+        ],
+        separate.repo.url: [],
+    }
+
+    def flatten_mock(self, context):
+        return flatten_results[self.github]
+
+    with unittest.mock.patch.object(GitHubDynamicDependency, "flatten", flatten_mock):
+        result = get_dependency_graph([top, left, right, separate])
+
+    assert result == defaultdict(
+        list,
+        {
+            left.repo.url: [top.repo.url],
+            right.repo.url: [top.repo.url, left.repo.url],
+        },
+    )
 
 
-def test_get_dependency_graph__duplicate_releases():
-    raise NotImplementedError
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_get_dependency_graph__duplicate_releases(smfs_mock):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    first = ReleaseFactory(
+        repo__url="https://github.com/example/test1",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="abc",
+    )
+    second = ReleaseFactory(
+        repo__url="https://github.com/example/test1",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="ghi",
+    )
+
+    with pytest.raises(DependencyGraphError):
+        get_dependency_graph([first, second])

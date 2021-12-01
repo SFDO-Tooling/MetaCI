@@ -186,6 +186,14 @@ def get_dependency_graph(
     to other GitHub repo URLs on which they depend. Note that the return value
     may include repo URLs that are not part of this Release Cohort or list of
     Releases."""
+
+    # Ensure we have no more than one Release on the same Repo
+    urls = [r.repo.url for r in releases]
+    if len(urls) != len(set(urls)):
+        raise DependencyGraphError(
+            "More than one Release on the same Repository is present in the Release Cohort."
+        )
+
     deps = defaultdict(list)
     to_process = [(r.repo.url, r.created_from_commit) for r in releases]
     context = NonProjectConfig()
@@ -197,7 +205,8 @@ def get_dependency_graph(
             break
 
         # Construct a dependency representing this Release.
-        this_dep = GitHubDynamicDependency(github=this_dep_url, ref=this_dep_commit)
+        this_dep = GitHubDynamicDependency(github=this_dep_url)
+        this_dep.ref = this_dep_commit
 
         # We're only interested in dependencies on other GitHub repos (== Releases)
         transitive_deps = [
@@ -206,31 +215,25 @@ def get_dependency_graph(
             if isinstance(td, GitHubDynamicDependency)
         ]
         for transitive_dep in transitive_deps:
-            if transitive_dep.github in deps:
-                # Already processed
-                continue
+            url = str(transitive_dep.github)
 
             # Add this specific dependency relationship to the graph
-            deps[this_dep_url].append(transitive_dep.github)
+            deps[this_dep_url].append(url)
 
-            if (
-                transitive_dep.github not in deps
-                and transitive_dep.github not in to_process
-            ):
+            if url in deps:
+                # Already processed, no need to check for deeper transitive deps.
+                continue
+
+            if url not in deps and url not in [x[0] for x in to_process]:
                 # We need to process this transitive dependency.
-
                 # Find the ref for this dependency
-                releases_for_transitive_dep = [
-                    r for r in releases if r.repo.url == transitive_dep.github
-                ]
-                if len(releases) > 1:
-                    raise DependencyGraphError(
-                        "More than one Release with repo {transitive_dep.github} in Release Cohort."
-                    )
+                releases_for_transitive_dep = [r for r in releases if r.repo.url == url]
 
+                # If this is a dependency on a repo that is not in this Cohort,
+                # we use None as its ref (resolve to the latest managed release)
                 to_process.append(
                     (
-                        transitive_dep.github,
+                        url,
                         releases_for_transitive_dep[0].created_from_commit
                         if releases_for_transitive_dep
                         else None,
@@ -272,7 +275,6 @@ def execute_active_release_cohorts():
     for rc in ReleaseCohort.objects.filter(
         status=ReleaseCohort.STATUS.approved, dependency_graph__isnull=True
     ):
-        print("I found {rc}")
         create_dependency_tree(rc)
 
     # Next, identify in-progress Release Cohorts that have reached a successful conclusion.
