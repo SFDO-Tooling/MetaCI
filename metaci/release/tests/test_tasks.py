@@ -5,25 +5,37 @@ from unittest.mock import Mock, call
 
 import pytest
 from cumulusci.core.dependencies.dependencies import (
-    GitHubDynamicDependency, UnmanagedGitHubRefDependency)
+    GitHubDynamicDependency,
+    UnmanagedGitHubRefDependency,
+)
 from django.conf import settings
 from django.urls.base import reverse
 
 from metaci.build.models import BUILD_STATUSES
-from metaci.fixtures.factories import (Build, BuildFactory, PlanFactory,
-                                       PlanRepositoryFactory,
-                                       ReleaseCohortFactory, ReleaseFactory,
-                                       RepositoryFactory)
+from metaci.fixtures.factories import (
+    Build,
+    BuildFactory,
+    PlanFactory,
+    PlanRepositoryFactory,
+    ReleaseCohortFactory,
+    ReleaseFactory,
+    RepositoryFactory,
+)
 from metaci.release.models import Release, ReleaseCohort
-from metaci.release.tasks import (DependencyGraphError,
-                                  _run_planrepo_for_release,
-                                  _run_release_builds, _update_release_cohorts,
-                                  advance_releases, all_deps_satisfied,
-                                  create_dependency_tree,
-                                  execute_active_release_cohorts,
-                                  get_dependency_graph,
-                                  release_merge_freeze_if_safe,
-                                  set_merge_freeze_status)
+from metaci.release.tasks import (
+    DependencyGraphError,
+    NonProjectConfig,
+    _run_planrepo_for_release,
+    _run_release_builds,
+    _update_release_cohorts,
+    advance_releases,
+    all_deps_satisfied,
+    create_dependency_tree,
+    execute_active_release_cohorts,
+    get_dependency_graph,
+    release_merge_freeze_if_safe,
+    set_merge_freeze_status,
+)
 
 
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
@@ -657,3 +669,15 @@ def test_get_dependency_graph__duplicate_releases(smfs_mock):
 
     with pytest.raises(DependencyGraphError):
         get_dependency_graph([first, second])
+
+
+@unittest.mock.patch("metaci.release.tasks.get_github_api_for_repo")
+def test_non_project_config(get_github_api_mock):
+    pc = NonProjectConfig()
+
+    assert (
+        pc.get_repo_from_url("https://github.com/test/foo")
+        == get_github_api_mock.return_value.repository.return_value
+    )
+    get_github_api_mock.return_value.repository.assert_called_once_with("test", "foo")
+    assert pc.logger is not None
