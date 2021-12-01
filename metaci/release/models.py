@@ -3,6 +3,7 @@ from typing import Optional
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
@@ -36,6 +37,9 @@ class ReleaseCohort(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("cohort_detail", kwargs={"cohort_id": str(self.id)})
 
     def clean(self):
         now = datetime.datetime.now(tz=datetime.timezone.utc)
