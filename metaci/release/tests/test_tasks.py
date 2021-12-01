@@ -6,23 +6,15 @@ from django.conf import settings
 from django.urls.base import reverse
 
 from metaci.build.models import BUILD_STATUSES
-from metaci.fixtures.factories import (
-    Build,
-    BuildFactory,
-    PlanFactory,
-    PlanRepositoryFactory,
-    ReleaseCohortFactory,
-    ReleaseFactory,
-    RepositoryFactory,
-)
+from metaci.fixtures.factories import (Build, BuildFactory, PlanFactory,
+                                       PlanRepositoryFactory,
+                                       ReleaseCohortFactory, ReleaseFactory,
+                                       RepositoryFactory)
 from metaci.release.models import Release, ReleaseCohort
-from metaci.release.tasks import (
-    _run_planrepo_for_release,
-    _run_release_builds,
-    _update_release_cohorts,
-    release_merge_freeze_if_safe,
-    set_merge_freeze_status,
-)
+from metaci.release.tasks import (_run_planrepo_for_release,
+                                  _run_release_builds, _update_release_cohorts,
+                                  release_merge_freeze_if_safe,
+                                  set_merge_freeze_status)
 
 
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")

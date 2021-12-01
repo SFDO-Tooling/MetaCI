@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('release', '0020_auto_20210920_2127'),
+        ("release", "0020_auto_20210920_2127"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='releasecohort',
-            name='status',
-            field=models.CharField(choices=[('Planned', 'Planned'), ('Active', 'Active'), ('Canceled', 'Canceled'), ('Completed', 'Completed')], default='Planned', max_length=9),
+            model_name="releasecohort",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("Planned", "Planned"),
+                    ("Active", "Active"),
+                    ("Canceled", "Canceled"),
+                    ("Completed", "Completed"),
+                ],
+                default="Planned",
+                max_length=9,
+            ),
         ),
     ]

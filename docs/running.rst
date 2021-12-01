@@ -24,9 +24,11 @@ Please see `<./docs/configuring.rst>`_ for more details.
 
 To activate the configuration, run::
 
-    source env
+    source env ; rehash
 
 You must do this each time you open a new terminal before working on MetaCI.
+Longer term, you should probably use direnv and .envrc to do the same on new
+terminals so you do not forget to source env each time.
 
 
 Install MetaCI
@@ -62,10 +64,10 @@ Node versions).
 To install the project-local version of Node (and `yarn`_)::
 
     bin/unpack-node
-    rehash
 
 If you can run ``which node`` and see a path inside your project directory ending with
-``.../node/bin/node``, then you've got it set up right and can move on.
+``.../node/bin/node``, then you've got it set up right and can move on. Otherwise go
+back and check if your environment includes the PATH environment variable from env.example
 
 Then use ``yarn`` to install dependencies::
 
