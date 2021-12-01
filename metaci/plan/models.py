@@ -24,6 +24,7 @@ BUILD_ROLES = (
     ("deploy", "Deployment"),
     ("feature", "Feature Test"),
     ("feature_robot", "Feature Test Robot"),
+    ("publish_installer", "Publish Installer"),
     ("other", "Other"),
     ("push_sandbox", "Push Sandbox"),
     ("push_production", "Push Production"),
@@ -83,7 +84,7 @@ class Plan(models.Model):
         through_fields=("plan", "repo"),
     )
     trigger = models.CharField(max_length=8, choices=TRIGGER_TYPES)
-    role = models.CharField(max_length=16, choices=BUILD_ROLES)
+    role = models.CharField(max_length=17, choices=BUILD_ROLES)
     queue = models.CharField(max_length=16, choices=QUEUES, default="default")
     regex = models.CharField(max_length=255, null=True, blank=True)
     commit_status_regex = models.CharField(

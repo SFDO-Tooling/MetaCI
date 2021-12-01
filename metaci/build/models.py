@@ -731,6 +731,17 @@ class BuildFlow(models.Model):
                 if push_time:
                     task_options["start_time"] = push_time.isoformat()
 
+        if (
+            self.build.plan.role == ("publish_installer")
+            and self.build.release
+        ):
+            try:
+                publish_date = self.build.release.production_push_date.isoformat()
+            except AttributeError:
+                raise
+            else:
+                options["publish_date"] = publish_date
+
         return options
 
     def set_commit_status(self):

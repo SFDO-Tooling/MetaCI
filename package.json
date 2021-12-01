@@ -110,7 +110,7 @@
   },
   "scripts": {
     "webpack:serve": "webpack serve --config webpack.dev.js",
-    "django:serve": "python manage.py runserver 0.0.0.0:8000",
+    "django:serve": "python manage.py runserver 0.0.0.0:${PORT:-8000}",
     "redis:clear": "redis-cli FLUSHALL",
     "rq:work": "python manage.py metaci_rqworker short",
     "rq:scheduler": "python manage.py metaci_rqscheduler --queue short",

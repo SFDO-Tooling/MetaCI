@@ -270,13 +270,47 @@ class TestBuildFlow:
         build_flow.build.release = Release(
             repo=build_flow.build.repo,
             change_case_template=change_case_template,
+            version_number="1.0",
         )
-        build_flow.build.release.version_number = "1.0"
         build_flow.build.release.save()
         options = build_flow._get_flow_options()
         assert options["push_all"]["version"] == "1.0"
         expected = f"{datetime.date.today().isoformat()}T21:00:00+00:00"
         assert options["push_all"]["start_time"] == expected
+
+    def test_get_flow_options__publish_installer(self):
+        build_flow = BuildFlowFactory()
+        build_flow.build.plan = PlanFactory(
+            role="publish_installer", change_traffic_control=True
+        )
+        build_flow.build.plan.save()
+        build_flow.build.repo = RepositoryFactory(
+            default_implementation_steps=[
+                {
+                    "role": "publish_installer",
+                    "duration": 10,
+                    "push_time": 21,
+                    "start_time": 8,
+                    "start_date_offset": 0,
+                },
+            ],
+        )
+        build_flow.build.repo.save()
+        planrepo = PlanRepositoryFactory(
+            plan=build_flow.build.plan, repo=build_flow.build.repo
+        )
+        planrepo.save()
+        change_case_template = ChangeCaseTemplate()
+        change_case_template.save()
+        publish_date = datetime.date.today() + datetime.timedelta(days=6)
+        build_flow.build.release = Release(
+            repo=build_flow.build.repo,
+            change_case_template=change_case_template,
+            production_push_date=publish_date,
+            version_number="1.0",
+        )
+        options = build_flow._get_flow_options()
+        assert options["publish_date"] == publish_date.isoformat()
 
 
 def detach_logger(model):

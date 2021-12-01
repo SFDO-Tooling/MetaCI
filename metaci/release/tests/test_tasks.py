@@ -27,6 +27,8 @@ from metaci.release.tasks import (
     all_deps_satisfied,
     create_dependency_tree,
     execute_active_release_cohorts,
+    run_publish_installer_plans,
+    release_has_plans,
     release_merge_freeze_if_safe,
     set_merge_freeze_status,
 )
@@ -578,9 +580,119 @@ def test_execute_active_release_cohorts__advances_release_cohorts(
     advance_releases_mock.assert_called_once_with(rc)
 
 
-def test_get_dependency_graph():
-    raise NotImplementedError
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.run_publish_installer_plans")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_execute_active_release_cohorts__run_publish_installer_plans(
+    smfs_mock,
+    run_publish_installer_plans_mock,
+):
+    other_plan = PlanFactory(role="release", active=True)
+    publish_installer_plan = PlanFactory(role="publish_installer", active=True)
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active)
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
+    )
+
+    execute_active_release_cohorts()
+
+    run_publish_installer_plans_mock.assert_called_once_with(rc, publish_installer_plan)
 
 
-def test_get_dependency_graph__duplicate_releases():
-    raise NotImplementedError
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.release_has_plans")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_run_publish_installer_plans__with_cumulusci_yml_plans(
+    smfs_mock,
+    release_has_plans_mock,
+):
+    publish_installer_plan = PlanFactory(role="publish_installer", active=True)
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active)
+    release = ReleaseFactory(
+        repo__url="foo",
+        release_cohort=rc,
+        status=Release.STATUS.completed,
+        created_from_commit="abc",
+    )
+    release_has_plans_mock.return_value = True
+
+    assert Build.objects.count() == 0
+
+    run_publish_installer_plans(rc, publish_installer_plan)
+
+    assert Build.objects.count() == 1
+    build = Build.objects.first()
+    assert build.release == release
+    assert build.plan == publish_installer_plan
+
+    release_has_plans_mock.assert_called_once_with(release)
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.release_has_plans")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_run_publish_installer_plans__without_cumulusci_yml_plans(
+    smfs_mock,
+    release_has_plans_mock,
+):
+    publish_installer_plan = PlanFactory(role="publish_installer", active=True)
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active)
+    release = ReleaseFactory(
+        repo__url="foo",
+        release_cohort=rc,
+        status=Release.STATUS.completed,
+        created_from_commit="abc",
+    )
+    release_has_plans_mock.return_value = False
+
+    assert Build.objects.count() == 0
+
+    run_publish_installer_plans(rc, publish_installer_plan)
+
+    assert Build.objects.count() == 0
+
+    release_has_plans_mock.assert_called_once_with(release)
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.get_remote_project_config")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_release_has_plans__with_plans(
+    smfs_mock,
+    get_remote_project_config_mock,
+):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active)
+    repo = RepositoryFactory()
+    repo.get_github_api = unittest.mock.Mock()
+    release = ReleaseFactory(
+        repo=repo,
+        repo__url="foo",
+        release_cohort=rc,
+        status=Release.STATUS.completed,
+        created_from_commit="abc",
+    )
+    get_remote_project_config_mock.return_value = {"plans": ["abc", "123"]}
+
+    assert release_has_plans(release)
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.get_remote_project_config")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_release_has_plans__without_plans(
+    smfs_mock,
+    get_remote_project_config_mock,
+):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active)
+    repo = RepositoryFactory()
+    repo.get_github_api = unittest.mock.Mock()
+    release = ReleaseFactory(
+        repo=repo,
+        repo__url="foo",
+        release_cohort=rc,
+        status=Release.STATUS.completed,
+        created_from_commit="abc",
+    )
+    get_remote_project_config_mock.return_value = {}
+
+    assert not release_has_plans(release)

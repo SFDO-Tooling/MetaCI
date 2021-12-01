@@ -1,12 +1,12 @@
 from collections import defaultdict
 from datetime import datetime, timezone
-import json
-import logging
-from django.dispatch.dispatcher import receiver
-from typing import Iterable, List, Optional
+from typing import DefaultDict, List, Optional
 
+from cumulusci.core.dependencies.dependencies import GitHubDynamicDependency
+from cumulusci.core.github import get_github_api_for_repo
+from cumulusci.utils.git import split_repo_url
 from django.conf import settings
-from django.db.models.query import QuerySet, Q
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_delete, post_save
 from django.dispatch.dispatcher import receiver
 from django.urls import reverse
@@ -16,19 +16,12 @@ from github3.repos.repo import Repository as GitHubRepository
 
 from metaci.build.models import BUILD_STATUSES, Build
 from metaci.cumulusci.keychain import GitHubSettingsKeychain
-from metaci.plan.models import PlanRepository
+from metaci.plan.models import PlanRepository, Plan
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
-
-from collections import defaultdict
-from typing import DefaultDict, List
-
-from cumulusci.core.dependencies.dependencies import (
-    GitHubDynamicDependency,
+from cumulusci.core.dependencies.github import (
+    get_remote_project_config,
 )
-from cumulusci.core.dependencies.resolvers import DependencyResolutionStrategy
-from cumulusci.core.github import get_github_api_for_repo
-from cumulusci.utils.git import split_repo_url
 
 
 class DependencyGraphError(Exception):
@@ -174,10 +167,6 @@ class NonProjectConfig:
             GitHubSettingsKeychain(), owner, name
         ).repository(owner, name)
 
-    @property
-    def logger(self):
-        return logging.getLogger(__name__)
-
 
 def get_dependency_graph(
     releases: List[Release],
@@ -272,8 +261,9 @@ def execute_active_release_cohorts():
     for rc in ReleaseCohort.objects.filter(
         status=ReleaseCohort.STATUS.approved, dependency_graph__isnull=True
     ):
-        print("I found {rc}")
         create_dependency_tree(rc)
+
+    publish_installer_plans = Plan.objects.filter(role="publish_installer", active=True)
 
     # Next, identify in-progress Release Cohorts that have reached a successful conclusion.
     # Release Cohorts whose component Releases fail are updated to a failure state by Release automation.
@@ -282,6 +272,9 @@ def execute_active_release_cohorts():
     ):
         rc.status = ReleaseCohort.STATUS.completed
         rc.save()
+
+        if publish_installer_plans.count() == 1:
+            run_publish_installer_plans(rc, publish_installer_plans.first())
 
     # Next, identify in-progress Release Cohorts that need to be advanced.
     for rc in ReleaseCohort.objects.filter(
@@ -294,6 +287,31 @@ def execute_active_release_cohorts():
 
 
 execute_active_release_cohorts_job = job(execute_active_release_cohorts)
+
+
+# Run publish_installer for every repo that has a release in this cohort
+# if that product has a metadeploy plan in its cumulusci.yml
+def run_publish_installer_plans(rc: ReleaseCohort, publish_installer_plan: Plan):
+    for release in rc.releases.all():
+        if release_has_plans(release):
+            build = Build(
+                repo=release.repo,
+                plan=publish_installer_plan,
+                commit=release.created_from_commit,
+                build_type="auto",
+                release=release,
+                release_relationship_type="automation",
+            )
+            build.save()
+
+
+def release_has_plans(release: Release) -> bool:
+    github_repo = release.repo.get_github_api()
+    config = get_remote_project_config(
+        github_repo, release.created_from_commit
+    )  # TODO: exception handling
+    print(config)
+    return len(config.get("plans", {})) > 0
 
 
 def all_deps_satisfied(
