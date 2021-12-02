@@ -5,17 +5,11 @@ from django.core.exceptions import ValidationError
 from model_utils import Choices
 
 from metaci.conftest import RepositoryFactory
-from metaci.fixtures.factories import (
-    PlanFactory,
-    PlanRepositoryFactory,
-    ReleaseCohortFactory,
-)
-from metaci.release.models import (
-    ChangeCaseTemplate,
-    DefaultImplementationStep,
-    ImplementationStep,
-    Release,
-)
+from metaci.fixtures.factories import (PlanFactory, PlanRepositoryFactory,
+                                       ReleaseCohortFactory)
+from metaci.release.models import (ChangeCaseTemplate,
+                                   DefaultImplementationStep,
+                                   ImplementationStep, Release)
 from metaci.repository.models import Repository
 
 

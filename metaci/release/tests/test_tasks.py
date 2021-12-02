@@ -1,37 +1,28 @@
-from collections import defaultdict
 import unittest
-from unittest.mock import Mock, call
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
+from unittest.mock import Mock, call
 
 import pytest
 from django.conf import settings
 from django.urls.base import reverse
 
 from metaci.build.models import BUILD_STATUSES
-from metaci.fixtures.factories import (
-    Build,
-    BuildFactory,
-    PlanFactory,
-    PlanRepositoryFactory,
-    ReleaseCohortFactory,
-    ReleaseFactory,
-    RepositoryFactory,
-)
+from metaci.fixtures.factories import (Build, BuildFactory, PlanFactory,
+                                       PlanRepositoryFactory,
+                                       ReleaseCohortFactory, ReleaseFactory,
+                                       RepositoryFactory)
 from metaci.release.models import Release, ReleaseCohort
-from metaci.release.tasks import (
-    DependencyGraphError,
-    _run_planrepo_for_release,
-    _run_release_builds,
-    _update_release_cohorts,
-    advance_releases,
-    all_deps_satisfied,
-    create_dependency_tree,
-    execute_active_release_cohorts,
-    run_publish_installer_plans,
-    release_has_plans,
-    release_merge_freeze_if_safe,
-    set_merge_freeze_status,
-)
+from metaci.release.tasks import (DependencyGraphError,
+                                  _run_planrepo_for_release,
+                                  _run_release_builds, _update_release_cohorts,
+                                  advance_releases, all_deps_satisfied,
+                                  create_dependency_tree,
+                                  execute_active_release_cohorts,
+                                  release_has_plans,
+                                  release_merge_freeze_if_safe,
+                                  run_publish_installer_plans,
+                                  set_merge_freeze_status)
 
 
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")

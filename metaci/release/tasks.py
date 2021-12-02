@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from typing import DefaultDict, List, Optional
 
 from cumulusci.core.dependencies.dependencies import GitHubDynamicDependency
+from cumulusci.core.dependencies.github import get_remote_project_config
 from cumulusci.core.github import get_github_api_for_repo
 from cumulusci.utils.git import split_repo_url
 from django.conf import settings
@@ -16,12 +17,9 @@ from github3.repos.repo import Repository as GitHubRepository
 
 from metaci.build.models import BUILD_STATUSES, Build
 from metaci.cumulusci.keychain import GitHubSettingsKeychain
-from metaci.plan.models import PlanRepository, Plan
+from metaci.plan.models import Plan, PlanRepository
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
-from cumulusci.core.dependencies.github import (
-    get_remote_project_config,
-)
 
 
 class DependencyGraphError(Exception):
