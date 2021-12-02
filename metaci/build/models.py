@@ -114,6 +114,9 @@ class BuildQuerySet(models.QuerySet):
 
 
 class Build(models.Model):
+    FAILED_STATUSES = [BUILD_STATUSES.error, BUILD_STATUSES.fail]
+    COMPLETED_STATUSES = [BUILD_STATUSES.success, *FAILED_STATUSES]
+
     repo = models.ForeignKey(
         "repository.Repository", related_name="builds", on_delete=models.CASCADE
     )

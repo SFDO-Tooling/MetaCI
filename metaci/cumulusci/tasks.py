@@ -5,6 +5,9 @@ from django_rq import job
 from metaci.cumulusci.models import ScratchOrgInstance
 
 
+import requests
+
+
 @job("short")
 def prune_orgs():
     """An RQ task to mark expired orgs as deleted.
@@ -19,3 +22,7 @@ def prune_orgs():
         deleted=True, time_deleted=timezone.now(), delete_error="Org is expired."
     )
     return f"pruned {count} orgs"
+
+
+def onboard_persistent_org():
+    response = requests.get("{}/services/oauth2/authorize")

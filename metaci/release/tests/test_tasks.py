@@ -1,20 +1,41 @@
 import unittest
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
+from unittest.mock import Mock, call
 
 import pytest
+from cumulusci.core.dependencies.dependencies import (
+    GitHubDynamicDependency,
+    UnmanagedGitHubRefDependency,
+)
 from django.conf import settings
 from django.urls.base import reverse
 
 from metaci.build.models import BUILD_STATUSES
-from metaci.fixtures.factories import (Build, BuildFactory, PlanFactory,
-                                       PlanRepositoryFactory,
-                                       ReleaseCohortFactory, ReleaseFactory,
-                                       RepositoryFactory)
+from metaci.fixtures.factories import (
+    Build,
+    BuildFactory,
+    PlanFactory,
+    PlanRepositoryFactory,
+    ReleaseCohortFactory,
+    ReleaseFactory,
+    RepositoryFactory,
+)
 from metaci.release.models import Release, ReleaseCohort
-from metaci.release.tasks import (_run_planrepo_for_release,
-                                  _run_release_builds, _update_release_cohorts,
-                                  release_merge_freeze_if_safe,
-                                  set_merge_freeze_status)
+from metaci.release.tasks import (
+    DependencyGraphError,
+    NonProjectConfig,
+    _run_planrepo_for_release,
+    _run_release_builds,
+    _update_release_cohorts,
+    advance_releases,
+    all_deps_satisfied,
+    create_dependency_tree,
+    execute_active_release_cohorts,
+    get_dependency_graph,
+    release_merge_freeze_if_safe,
+    set_merge_freeze_status,
+)
 
 
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
@@ -255,12 +276,6 @@ def test_run_release_builds__succeeded_release_no_action(rpr_mock, smfs_mock):
 
 @pytest.mark.django_db
 def test_update_release_cohorts():
-    cohort_ended = ReleaseCohortFactory()
-    cohort_ended.merge_freeze_end = datetime.now(tz=timezone.utc) - timedelta(
-        minutes=20
-    )
-    cohort_ended.save()
-
     cohort_started = ReleaseCohortFactory()
     cohort_started.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(
         minutes=20
@@ -268,12 +283,11 @@ def test_update_release_cohorts():
     cohort_started.merge_freeze_end = datetime.now(tz=timezone.utc) + timedelta(
         minutes=20
     )
-    cohort_started.status = ReleaseCohort.STATUS.planned
+    cohort_started.status = ReleaseCohort.STATUS.approved
     cohort_started.save()
 
     assert (
-        _update_release_cohorts()
-        == f"Enabled merge freeze on {cohort_started.name} and ended merge freeze on {cohort_ended.name}."
+        _update_release_cohorts() == f"Enabled merge freeze on {cohort_started.name}."
     )
 
 
@@ -420,3 +434,254 @@ def test_release_merge_freeze_if_safe__safe(smfs_mock):
     release_merge_freeze_if_safe(release.repo)
 
     smfs_mock.assert_called_once_with(release.repo, freeze=False)
+
+
+def test_all_deps_satisfied():
+    a = Mock()
+    b = Mock()
+    c = Mock()
+
+    # Build a mock release tree where the middle link (b)
+    # is not being released in this Cohort.
+    # C depends on B depends on A.
+    a.repo.url = "foo"
+    b.repo.url = "bar"
+    c.repo.url = "spam"
+    a.status = Release.STATUS.completed
+    c.status = Release.STATUS.blocked
+
+    # Build the dependency graph, a map from GitHub URL
+    # to a set of dependency GitHub URLs.
+    graph = defaultdict(list)
+    graph[b.repo.url].append(a.repo.url)
+    graph[c.repo.url].append(b.repo.url)
+
+    # We only have releases for A and C. We're asking,
+    # "Is C ready to start?"
+    assert all_deps_satisfied(graph[c.repo.url], graph, [a, c]) is True
+
+    # Validate behavior with empty dependency lists
+    assert all_deps_satisfied([], graph, [a, c]) is True
+    assert all_deps_satisfied(graph[a.repo.url], graph, [a, c]) is True
+
+    # Validate the negative case
+    a.status = Release.STATUS.failed
+    assert all_deps_satisfied(graph[c.repo.url], graph, [a, c]) is False
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.get_dependency_graph")
+def test_create_dependency_tree(get_dependency_graph):
+    graph = defaultdict(list)
+    graph["foo"].append("bar")
+    get_dependency_graph.return_value = graph
+    rc = ReleaseCohortFactory()
+
+    create_dependency_tree(rc)
+    assert rc.dependency_graph == {"foo": ["bar"]}
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.get_dependency_graph")
+def test_create_dependency_tree__failure(get_dependency_graph):
+    get_dependency_graph.side_effect = DependencyGraphError("foo")
+    rc = ReleaseCohortFactory()
+
+    create_dependency_tree(rc)
+    assert rc.error_message == str(DependencyGraphError("foo"))
+    assert rc.status == ReleaseCohort.STATUS.failed
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks._run_release_builds")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_advance_releases(set_merge_freeze_status, run_release_builds):
+    graph = defaultdict(list)
+    graph["spam"].append("foo")
+    graph["baz"].append("bar")
+    rc = ReleaseCohortFactory(dependency_graph=graph)
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
+    )
+    r2 = ReleaseFactory(
+        repo__url="bar", release_cohort=rc, status=Release.STATUS.inprogress
+    )
+    r3 = ReleaseFactory(
+        repo__url="spam", release_cohort=rc, status=Release.STATUS.blocked
+    )
+    _ = ReleaseFactory(
+        repo__url="baz", release_cohort=rc, status=Release.STATUS.blocked
+    )
+
+    advance_releases(rc)
+
+    run_release_builds.assert_has_calls([call(r2), call(r3)], any_order=True)
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.get_dependency_graph")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_execute_active_release_cohorts__creates_dependency_trees(
+    smfs_mock,
+    get_dependency_graph_mock,
+):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.approved)
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.waiting
+    )
+    get_dependency_graph_mock.return_value = {}
+
+    execute_active_release_cohorts()
+    rc.refresh_from_db()
+
+    assert rc.dependency_graph == {}
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@unittest.mock.patch("metaci.release.tasks.advance_releases")
+def test_execute_active_release_cohorts__completes_finished_cohorts(
+    advance_releases_mock, smfs_mock
+):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
+    )
+
+    rc_progress = ReleaseCohortFactory(
+        status=ReleaseCohort.STATUS.active, dependency_graph={}
+    )
+    _ = ReleaseFactory(
+        repo__url="bar", release_cohort=rc_progress, status=Release.STATUS.blocked
+    )
+    _ = ReleaseFactory(
+        repo__url="baz", release_cohort=rc_progress, status=Release.STATUS.completed
+    )
+
+    execute_active_release_cohorts()
+    rc.refresh_from_db()
+    rc_progress.refresh_from_db()
+
+    assert rc.status == ReleaseCohort.STATUS.completed
+    assert rc_progress.status == ReleaseCohort.STATUS.active
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.advance_releases")
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_execute_active_release_cohorts__advances_release_cohorts(
+    smfs_mock,
+    advance_releases_mock,
+):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.inprogress
+    )
+    _ = ReleaseCohortFactory(status=ReleaseCohort.STATUS.completed, dependency_graph={})
+
+    execute_active_release_cohorts()
+
+    advance_releases_mock.assert_called_once_with(rc)
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_get_dependency_graph(smfs_mock):
+    # Create a simulated repo graph that includes:
+    # Two repos depending on the same base, one of which also requires the other.
+    # A repo with no other relationships
+
+    # Create database entries
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    top = ReleaseFactory(
+        repo__url="https://github.com/example/top",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="abc",
+    )
+    left = ReleaseFactory(
+        repo__url="https://github.com/example/left",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="ghi",
+    )
+    right = ReleaseFactory(
+        repo__url="https://github.com/example/right",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="jkl",
+    )
+    separate = ReleaseFactory(
+        repo__url="https://github.com/example/separate",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="mno",
+    )
+
+    # Mock results from GitHubDynamicDependency.flatten()
+    flatten_results = {
+        top.repo.url: [
+            UnmanagedGitHubRefDependency(
+                github=top.repo.url,
+                ref=top.created_from_commit,
+                subfolder="unpackaged/pre/first",
+            ),
+        ],
+        left.repo.url: [GitHubDynamicDependency(github=top.repo.url)],
+        right.repo.url: [
+            GitHubDynamicDependency(github=top.repo.url),
+            GitHubDynamicDependency(github=left.repo.url),
+        ],
+        separate.repo.url: [],
+    }
+
+    def flatten_mock(self, context):
+        return flatten_results[self.github]
+
+    expected_result = defaultdict(
+        list,
+        {
+            left.repo.url: [top.repo.url],
+            right.repo.url: [top.repo.url, left.repo.url],
+        },
+    )
+
+    with unittest.mock.patch.object(GitHubDynamicDependency, "flatten", flatten_mock):
+        assert (
+            get_dependency_graph([top, left, right, separate])
+            == get_dependency_graph([left, right, separate])
+            == expected_result
+        )
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_get_dependency_graph__duplicate_releases(smfs_mock):
+    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    first = ReleaseFactory(
+        repo__url="https://github.com/example/test1",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="abc",
+    )
+    second = ReleaseFactory(
+        repo__url="https://github.com/example/test1",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="ghi",
+    )
+
+    with pytest.raises(DependencyGraphError):
+        get_dependency_graph([first, second])
+
+
+@unittest.mock.patch("metaci.release.tasks.get_github_api_for_repo")
+def test_non_project_config(get_github_api_mock):
+    pc = NonProjectConfig()
+
+    assert (
+        pc.get_repo_from_url("https://github.com/test/foo")
+        == get_github_api_mock.return_value.repository.return_value
+    )
+    get_github_api_mock.return_value.repository.assert_called_once_with("test", "foo")
+    assert pc.logger is not None
