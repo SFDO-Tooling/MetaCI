@@ -1,16 +1,17 @@
 import json
-from urllib.parse import urljoin
 from typing import Optional
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseRedirect, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
 from metaci.build.utils import paginate, view_queryset
 from metaci.cumulusci.forms import OrgLockForm, OrgUnlockForm
-from metaci.cumulusci.models import Org, ScratchOrgInstance, OrgPool, PooledOrgRequest
+from metaci.cumulusci.models import Org, OrgPool, PooledOrgRequest, ScratchOrgInstance
+from metaci.cumulusci.signals import org_claimed
 
 
 def request_pooled_org(request):
@@ -23,17 +24,23 @@ def request_pooled_org(request):
     # Otherwise, we'll return the credentials for a prebuilt org
     # and delete the ScratchOrgInstance, and throw the org claimed signal.
 
-    input_data = PooledOrgRequest(**request.post)
+    input_data = PooledOrgRequest(**request.POST)
 
     org_pool = get_org_pool(input_data)
+
+    response_content = []
+
     if org_pool and org_pool.pooled_orgs.count() > 0:
         returned_org = org_pool.pooled_orgs.first()
+        response_content = returned_org.json
+        returned_org.delete()
 
-        return HttpResponse(
-            content=json.dumps(returned_org.json).encode("utf-8"),
-            content_type="text/json",
-            status=200,
-        )
+        org_claimed.send(sender=org_pool.__class__, org_pool=org_pool)
+    return HttpResponse(
+        content=json.dumps(response_content).encode("utf-8"),
+        content_type="text/json",
+        status=200,
+    )
 
 
 def get_org_pool(request: PooledOrgRequest) -> Optional[OrgPool]:
