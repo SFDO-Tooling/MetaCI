@@ -4,6 +4,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.cache import cache
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.http import Http404
 from django.urls import reverse
@@ -113,6 +114,25 @@ class ExpiredOrgManager(models.Manager):
         )
 
 
+class OrgPool(models.Model):
+
+    minimum_lifespan = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(30)]
+    )
+    minimum_org_count = models.IntegerField()
+    cache_key = models.CharField(max_length=32)
+    dependencies = models.JSONField(default=dict)
+    org_shape = models.ForeignKey(
+        "cumulusci.Org", related_name="org_pools", on_delete=models.CASCADE
+    )
+    repository = models.ForeignKey(
+        "repository.Repository", related_name="org_pools", on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{self.repository.name} - {self.minimum_org_count} {self.minimum_lifespan}-day orgs - {self.cache_key}"
+
+
 class ScratchOrgInstance(models.Model):
     id: int
 
@@ -139,6 +159,14 @@ class ScratchOrgInstance(models.Model):
     objects = models.Manager()  # the first manager is used by admin
     active = ActiveOrgManager()
     expired = ExpiredOrgManager()
+
+    org_pool = models.ForeignKey(
+        "cumulusci.OrgPool",
+        related_name="pooled_orgs",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         if self.username:

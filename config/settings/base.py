@@ -402,6 +402,10 @@ CRON_JOBS = {
         "func": "metaci.release.tasks.update_cohort_status",
         "cron_string": "* * * * *",
     },
+    "top_up_org_pools": {
+        "func": "metaci.cumulusci.tasks.top_up_org_pools",
+        "cron_string": "* * * * *"
+    }
 }
 # There is a default dict of cron jobs,
 # and the cron_string can be optionally overridden
