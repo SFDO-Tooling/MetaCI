@@ -2,7 +2,7 @@ from django.dispatch import receiver
 
 from metaci.build.models import BUILD_STATUSES
 from metaci.build.signals import build_complete
-from metaci.cumulusci.signals import org_claimed
+from metaci.cumulusci.tasks import org_claimed
 from metaci.cumulusci.tasks import fill_pool
 
 

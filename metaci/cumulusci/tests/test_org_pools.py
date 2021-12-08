@@ -4,7 +4,6 @@ from unittest.mock import Mock
 import pytest
 
 import metaci.cumulusci.handlers
-import metaci.cumulusci.signals  # noqa: F401
 from metaci.build.signals import build_complete
 from metaci.conftest import (
     OrgFactory,
@@ -13,7 +12,7 @@ from metaci.conftest import (
     ScratchOrgInstanceFactory,
 )
 from metaci.cumulusci.models import OrgPool
-from metaci.cumulusci.signals import org_claimed
+from metaci.cumulusci.tasks import org_claimed
 from metaci.cumulusci.utils import transform_org_pool_frozen_steps
 from metaci.cumulusci.views import request_pooled_org
 

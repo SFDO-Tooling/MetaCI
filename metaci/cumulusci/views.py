@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404, render
 from metaci.build.utils import paginate, view_queryset
 from metaci.cumulusci.forms import OrgLockForm, OrgUnlockForm
 from metaci.cumulusci.models import Org, OrgPool, PooledOrgRequest, ScratchOrgInstance
-from metaci.cumulusci.signals import org_claimed
+from metaci.cumulusci.tasks import org_claimed
 
 
 def request_pooled_org(request):

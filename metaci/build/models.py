@@ -742,7 +742,7 @@ class BuildFlow(models.Model):
 
         if self.build.plan.role == "pool_org" and self.build.org_pool:
             options["update_dependencies"] = transform_org_pool_frozen_steps(
-                self.build.org_pool.frozen_steps
+                self.build.org_pool
             )
 
         return options
