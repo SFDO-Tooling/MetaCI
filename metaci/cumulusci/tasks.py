@@ -33,7 +33,7 @@ def top_up_org_pools():
         # do you have enough orgs w/ required minimum lifespan remaining to satisfy the pool?
         for org in pool.pooled_orgs:
             if org.days > pool.minimum_lifespan:
-                count += 1
+                good_org_count += 1
         orgs_short = pool.minimum_org_count - good_org_count
         if orgs_short > 0:
             fill_pool(pool, orgs_short)
@@ -46,7 +46,7 @@ def fill_pool(pool: OrgPool, count: int):
             repo=pool.repository,
             plan=plan,
             org_pool=pool,
-            branch="main",
+            # branch="main",
             commit="^HEAD",
             keep_org=True,
             build_type="pool",

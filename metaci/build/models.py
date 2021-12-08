@@ -129,7 +129,7 @@ class Build(models.Model):
         on_delete=models.PROTECT,
     )
     org_pool = models.ForeignKey(
-        "cumulusci.OrgPool", related_name="builds", on_delete=models.PROTECT
+        "cumulusci.OrgPool", related_name="builds", null=True, blank=True, on_delete=models.PROTECT
     )
     commit = models.CharField(max_length=64)
     commit_message = models.TextField(null=True, blank=True)

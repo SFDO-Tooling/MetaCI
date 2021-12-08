@@ -7,7 +7,8 @@ from metaci.build.models import BUILD_STATUSES
 @receiver(build_complete)
 def associate_org_instance_to_pool(sender, **kwargs):
     build = kwargs.get("build")
+    status = kwargs.get("status")
 
-    if build.status == BUILD_STATUSES.success:
+    if status == BUILD_STATUSES.success:
         build.org_instance.org_pool = build.org_pool
         build.org_instance.save()
