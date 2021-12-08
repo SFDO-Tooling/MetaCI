@@ -7,6 +7,7 @@ import traceback
 import zipfile
 from glob import iglob
 from io import BytesIO
+from model_utils import Choices
 
 from cumulusci import __version__ as cumulusci_version
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
@@ -27,6 +28,7 @@ from django.db import models
 from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from jinja2.sandbox import ImmutableSandboxedEnvironment
 
 from metaci.build.tasks import set_github_status
@@ -41,14 +43,14 @@ from metaci.release.utils import (
 from metaci.testresults.importer import import_test_results
 from metaci.utils import generate_hash
 
-BUILD_STATUSES = (
-    ("queued", "Queued"),
-    ("waiting", "Waiting"),
-    ("running", "Running"),
-    ("success", "Success"),
-    ("error", "Error"),
-    ("fail", "Failed"),
-    ("qa", "QA Testing"),
+BUILD_STATUSES = Choices(
+    ("queued", _("Queued")),
+    ("waiting", _("Waiting")),
+    ("running", _("Running")),
+    ("success", _("Success")),
+    ("error", _("Error")),
+    ("fail", _("Failed")),
+    ("qa", _("QA Testing")),
 )
 BUILD_FLOW_STATUSES = (
     ("queued", "Queued"),
@@ -69,6 +71,7 @@ BUILD_TYPES = (
     ("scheduled", "Scheduled"),
     ("legacy", "Legacy - Probably Automatic"),
     ("manual-command", "Created from command line"),
+    ("pool", "Org Pooling"),
 )
 RELEASE_REL_TYPES = (
     ("test", "Release Test"),
@@ -112,6 +115,9 @@ class BuildQuerySet(models.QuerySet):
 
 
 class Build(models.Model):
+    FAILED_STATUSES = [BUILD_STATUSES.error, BUILD_STATUSES.fail]
+    COMPLETED_STATUSES = [BUILD_STATUSES.success, *FAILED_STATUSES]
+
     repo = models.ForeignKey(
         "repository.Repository", related_name="builds", on_delete=models.CASCADE
     )
@@ -121,6 +127,9 @@ class Build(models.Model):
         null=True,
         blank=True,
         on_delete=models.PROTECT,
+    )
+    org_pool = models.ForeignKey(
+        "cumulusci.OrgPool", related_name="builds", on_delete=models.PROTECT
     )
     commit = models.CharField(max_length=64)
     commit_message = models.TextField(null=True, blank=True)
@@ -202,7 +211,10 @@ class Build(models.Model):
         max_length=50, choices=RELEASE_REL_TYPES, null=True, blank=True
     )
     release = models.ForeignKey(
-        "release.Release", on_delete=models.PROTECT, null=True, blank=True
+        "release.Release",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     org_note = models.CharField(max_length=255, default="", blank=True, null=True)
     org_api_version = models.CharField(max_length=5, blank=True, null=True)
@@ -722,6 +734,11 @@ class BuildFlow(models.Model):
                 push_time = implementation_step.push_time
                 if push_time:
                     task_options["start_time"] = push_time.isoformat()
+
+        if self.build.plan.role == "pool_org" and self.build.org_pool:
+            options["update_dependencies"] = {
+                "dependencies": self.build.org_pool.dependencies
+            }
 
         return options
 

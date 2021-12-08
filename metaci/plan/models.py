@@ -25,6 +25,7 @@ BUILD_ROLES = (
     ("feature", "Feature Test"),
     ("feature_robot", "Feature Test Robot"),
     ("other", "Other"),
+    ("pool_org", "Pool Org"),
     ("push_sandbox", "Push Sandbox"),
     ("push_production", "Push Production"),
     ("qa", "QA Org"),

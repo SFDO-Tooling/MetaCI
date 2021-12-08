@@ -2,8 +2,9 @@ from django import db
 from django.utils import timezone
 from django_rq import job
 
-from metaci.cumulusci.models import ScratchOrgInstance
+from metaci.cumulusci.models import ScratchOrgInstance, OrgPool
 from metaci.build.models import Build
+from metaci.plan.models import Plan
 
 
 @job("short")
@@ -39,21 +40,16 @@ def top_up_org_pools():
 
 
 def fill_pool(pool: OrgPool, count: int):
-
+    plan = Plan.objects.filter(role="pool_org").first()
     for i in range(count):
         build = Build(
             repo=pool.repository,
-            plan="",
+            plan=plan,
+            org_pool=pool,
             branch="main",
             commit="^HEAD",
             keep_org=True,
-            build_type="manual",
-            user=pool.user,
-            release=release,
-            org_note=org_note,
-            release_relationship_type="manual",
+            build_type="pool",
         )
 
-    build.save()
-
-    return
+        build.save()
