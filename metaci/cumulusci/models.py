@@ -15,6 +15,25 @@ from simple_salesforce.exceptions import SalesforceError
 
 from ..fields import EncryptedJSONField
 
+from hashlib import sha256
+import json
+from typing import List, Optional
+from pydantic import BaseModel
+
+
+class PooledOrgRequest(BaseModel):
+    org_name: str
+    repo_url: str
+    frozen_steps: List[dict]
+    days: Optional[int]
+
+    def cache_key(self):
+        return sha256(
+            (json.dumps(self.frozen_steps) + self.org_name + self.repo_url).encode(
+                "utf-8"
+            )
+        ).hexdigest()
+
 
 def sf_session(jwt):
     return SimpleSalesforce(
@@ -115,13 +134,12 @@ class ExpiredOrgManager(models.Manager):
 
 
 class OrgPool(models.Model):
-
     minimum_lifespan = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(30)]
     )
     minimum_org_count = models.IntegerField()
-    cache_key = models.CharField(max_length=32)
-    dependencies = models.JSONField(default=dict)
+    cache_key = models.CharField(max_length=128, unique=True)
+    frozen_steps = models.JSONField(default=list)
     org_shape = models.ForeignKey(
         "cumulusci.Org", related_name="org_pools", on_delete=models.CASCADE
     )
@@ -131,6 +149,14 @@ class OrgPool(models.Model):
 
     def __str__(self):
         return f"{self.repository.name} - {self.minimum_org_count} {self.minimum_lifespan}-day orgs - {self.cache_key}"
+
+    def save(self, *args, **kwargs):
+        self.cache_key = PooledOrgRequest(
+            org_name=self.org_shape.name,
+            frozen_steps=self.frozen_steps,
+            repo_url=self.repository.url,
+        ).cache_key()
+        super().save(*args, **kwargs)
 
 
 class ScratchOrgInstance(models.Model):

@@ -11,6 +11,7 @@ from metaci.conftest import (
 )
 from metaci.cumulusci.models import OrgPool
 from metaci.cumulusci.signals import org_claimed
+from metaci.cumulusci.utils import transform_org_pool_frozen_steps
 
 
 class TestOrgPools:
@@ -23,13 +24,30 @@ class TestOrgPools:
         )
         org = OrgFactory(name="myorg", repo=repo, scratch=False)
         _ = PlanFactory(role="pool_org")
-        dependencies = [{"version": "1", "namespace": "foo"}]
+        frozen_steps = [
+            {
+                "name": "Install sfdobase 1.0",
+                "kind": "managed",
+                "is_required": True,
+                "path": "customer_org.update_dependencies.1",
+                "step_num": "1/1.1",
+                "task_class": "cumulusci.tasks.salesforce.UpdateDependencies",
+                "task_config": {
+                    "options": {
+                        "packages_only": False,
+                        "dependencies": [{"namespace": "sfdobase", "version": "1.0"}],
+                    },
+                    "checks": [],
+                },
+                "source": None,
+            }
+        ]
         org_pool = OrgPool(
             minimum_org_count=3,
             minimum_lifespan=7,
             repository=repo,
             org_shape=org,
-            dependencies=dependencies,
+            frozen_steps=frozen_steps,
         )
         org_pool.save()
         assert org_pool.builds.count() == 3
@@ -43,3 +61,50 @@ class TestOrgPools:
         assert org_pool.pooled_orgs.count() == 3
         org_claimed.send(sender="sender", org_pool=org_pool)
         assert org_pool.builds.count() == 4
+
+
+def test_transform_org_pool_frozen_steps():
+    frozen_steps = [
+        {
+            "name": "Install sfdobase 1.0",
+            "kind": "managed",
+            "is_required": True,
+            "path": "customer_org.update_dependencies.1",
+            "step_num": "1/1.1",
+            "task_class": "cumulusci.tasks.salesforce.UpdateDependencies",
+            "task_config": {
+                "options": {
+                    "packages_only": False,
+                    "dependencies": [{"namespace": "sfdobase", "version": "1.0"}],
+                },
+                "checks": [],
+            },
+            "source": None,
+        },
+        {
+            "name": "Install PMM 1.0",
+            "kind": "managed",
+            "is_required": True,
+            "path": "customer_org.update_dependencies.1",
+            "step_num": "1/1.1",
+            "task_class": "cumulusci.tasks.salesforce.UpdateDependencies",
+            "task_config": {
+                "options": {
+                    "packages_only": True,
+                    "dependencies": [{"namespace": "pmm", "version": "1.0"}],
+                },
+                "checks": [],
+            },
+            "source": None,
+        },
+    ]
+
+    pool = OrgPool(frozen_steps=frozen_steps)
+
+    assert transform_org_pool_frozen_steps(pool) == {
+        "packages_only": False,
+        "dependencies": [
+            {"namespace": "sfdobase", "version": "1.0"},
+            {"namespace": "pmm", "version": "1.0"},
+        ],
+    }

@@ -1,14 +1,43 @@
+import json
 from urllib.parse import urljoin
+from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from metaci.build.utils import paginate, view_queryset
 from metaci.cumulusci.forms import OrgLockForm, OrgUnlockForm
-from metaci.cumulusci.models import Org, ScratchOrgInstance
+from metaci.cumulusci.models import Org, ScratchOrgInstance, OrgPool, PooledOrgRequest
+
+
+def request_pooled_org(request):
+    # From the input, we need the cache key (the update_dependencies frozensteps)
+    # and the org name, as well as the repo URL.
+    # we transform the frozensteps into options that we can inject in a flow
+    # and find a matching Org Pool instance, if any, with that cache key and repo URL
+
+    # If no org pool matches, we'll return a 200 with an empty body.
+    # Otherwise, we'll return the credentials for a prebuilt org
+    # and delete the ScratchOrgInstance, and throw the org claimed signal.
+
+    input_data = PooledOrgRequest(**request.post)
+
+    org_pool = get_org_pool(input_data)
+    if org_pool and org_pool.pooled_orgs.count() > 0:
+        returned_org = org_pool.pooled_orgs.first()
+
+        return HttpResponse(
+            content=json.dumps(returned_org.json).encode("utf-8"),
+            content_type="text/json",
+            status=200,
+        )
+
+
+def get_org_pool(request: PooledOrgRequest) -> Optional[OrgPool]:
+    return OrgPool.objects.filter(cache_key=request.cache_key()).first()
 
 
 @login_required

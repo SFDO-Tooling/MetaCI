@@ -36,6 +36,7 @@ from metaci.build.utils import format_log, set_build_info
 from metaci.cumulusci.config import MetaCIUniversalConfig
 from metaci.cumulusci.keychain import MetaCIProjectKeychain
 from metaci.cumulusci.logger import init_logger
+from metaci.cumulusci.utils import transform_org_pool_frozen_steps
 from metaci.release.utils import (
     send_start_webhook,
     send_stop_webhook,
@@ -129,7 +130,11 @@ class Build(models.Model):
         on_delete=models.PROTECT,
     )
     org_pool = models.ForeignKey(
-        "cumulusci.OrgPool", related_name="builds", null=True, blank=True, on_delete=models.PROTECT
+        "cumulusci.OrgPool",
+        related_name="builds",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
     )
     commit = models.CharField(max_length=64)
     commit_message = models.TextField(null=True, blank=True)
@@ -736,9 +741,9 @@ class BuildFlow(models.Model):
                     task_options["start_time"] = push_time.isoformat()
 
         if self.build.plan.role == "pool_org" and self.build.org_pool:
-            options["update_dependencies"] = {
-                "dependencies": self.build.org_pool.dependencies
-            }
+            options["update_dependencies"] = transform_org_pool_frozen_steps(
+                self.build.org_pool.frozen_steps
+            )
 
         return options
 
