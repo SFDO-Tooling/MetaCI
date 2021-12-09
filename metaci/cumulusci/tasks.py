@@ -1,21 +1,20 @@
-from django import db
+from django import db, dispatch
+from django.db.models.signals import post_save
 from django.utils import timezone
 from django_rq import job
 
-from metaci.cumulusci.models import ScratchOrgInstance, OrgPool
 from metaci.build.models import Build
+from metaci.cumulusci.models import OrgPool, ScratchOrgInstance
 from metaci.plan.models import Plan
-
-from django import dispatch
-from django.db.models.signals import post_save
 
 # Sent whenever an org is claimed from an org pool
 # provided signal args: 'org_pool'
 org_claimed = dispatch.Signal()
 
 
-def fill_new_pool(sender, instance, **kwargs):
-    fill_pool(instance, instance.minimum_org_count)
+def fill_new_pool(sender, instance, created, **kwargs):
+    if created:
+        fill_pool(instance, instance.minimum_org_count)
 
 
 post_save.connect(fill_new_pool, sender=OrgPool)
