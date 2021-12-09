@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
 
 from metaci.build.utils import paginate, view_queryset
 from metaci.cumulusci.forms import OrgLockForm, OrgUnlockForm
@@ -14,6 +15,7 @@ from metaci.cumulusci.models import Org, OrgPool, PooledOrgRequest, ScratchOrgIn
 from metaci.cumulusci.tasks import org_claimed
 
 
+@csrf_exempt
 def request_pooled_org(request):
     # From the input, we need the cache key (the update_dependencies frozensteps)
     # and the org name, as well as the repo URL.
@@ -24,12 +26,11 @@ def request_pooled_org(request):
     # Otherwise, we'll return the credentials for a prebuilt org
     # and delete the ScratchOrgInstance, and throw the org claimed signal.
 
-    input_data = PooledOrgRequest(**request.POST)
+    input_data = PooledOrgRequest(**json.loads(request.body))
 
     org_pool = get_org_pool(input_data)
 
-    response_content = []
-
+    response_content = {}
     if org_pool and org_pool.pooled_orgs.count() > 0:
         returned_org = org_pool.pooled_orgs.first()
         response_content = returned_org.json
