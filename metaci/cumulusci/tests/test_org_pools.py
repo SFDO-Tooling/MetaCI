@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 import pytest
 
-import metaci.cumulusci.handlers
+import metaci.cumulusci.handlers  # noqa:F401
 from metaci.build.signals import build_complete
 from metaci.conftest import (
     OrgFactory,
@@ -107,11 +107,13 @@ class TestOrgPools:
         assert org_pool.pooled_orgs.count() == 3
         returned_org = org_pool.pooled_orgs.first()
         request = Mock()
-        request.POST = {
-            "org_name": org.name,
-            "frozen_steps": frozen_steps,
-            "repo_url": org_pool.repository.url,
-        }
+        request.body = json.dumps(
+            {
+                "org_name": org.name,
+                "frozen_steps": frozen_steps,
+                "repo_url": org_pool.repository.url,
+            }
+        ).encode("utf-8")
         response = request_pooled_org(request)
         assert response.content == json.dumps(returned_org.json).encode("utf-8")
         assert response.status_code == 200

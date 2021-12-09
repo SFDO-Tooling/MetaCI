@@ -43,10 +43,14 @@ def top_up_org_pools():
     """
     for pool in OrgPool.objects.all():
         good_org_count = 0
+
         # do you have enough orgs w/ required minimum lifespan remaining to satisfy the pool?
         for org in pool.pooled_orgs.all():
             if org.days > pool.minimum_lifespan:
                 good_org_count += 1
+        # or do you have builds already running?
+        good_org_count += pool.builds.filter(status="running")
+
         orgs_short = pool.minimum_org_count - good_org_count
         if orgs_short > 0:
             fill_pool(pool, orgs_short)
