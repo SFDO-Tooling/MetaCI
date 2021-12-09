@@ -15,9 +15,10 @@ from metaci.conftest import (
 
 @pytest.mark.django_db
 @mock.patch("metaci.build.tasks.reset_database_connection", lambda: ...)
+@mock.patch("metaci.cumulusci.handlers.association_helper")
 class TestRunBuild(TestCase):
     @mock.patch("metaci.build.models.Build.run")
-    def test_lock_set(self, run):
+    def test_lock_set(self, association_helper_mock, run):
         repo = RepositoryFactory(name="myrepo")
         org = OrgFactory(name="myorg", repo=repo, scratch=False)
         plan = PlanFactory(name="myplan", org="myorg")

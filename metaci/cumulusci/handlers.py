@@ -2,12 +2,15 @@ from django.dispatch import receiver
 
 from metaci.build.models import BUILD_STATUSES
 from metaci.build.signals import build_complete
-from metaci.cumulusci.tasks import org_claimed
-from metaci.cumulusci.tasks import fill_pool
+from metaci.cumulusci.tasks import fill_pool, org_claimed
 
 
 @receiver(build_complete)
 def associate_org_instance_to_pool(sender, **kwargs):
+    association_helper(sender, **kwargs)
+
+
+def association_helper(sender, **kwargs):
     build = kwargs.get("build")
     status = kwargs.get("status")
 

@@ -65,7 +65,8 @@ class PlanHandlerTestCase(TestCase):
         )
 
     @mock.patch("metaci.plan.models.PlanRepositoryTrigger._get_commit")
-    def test_should_send_on_build_success(self, get_commit):
+    @mock.patch("metaci.cumulusci.handlers.association_helper")
+    def test_should_send_on_build_success(self, association_helper_mock, get_commit):
         get_commit.return_value = "f1d2d2f924e986ac86fdf7b36c94bcdf32beec15"
         with mock.patch(
             "metaci.plan.handlers.trigger_dependent_builds", autospec=True
@@ -83,7 +84,8 @@ class PlanHandlerTestCase(TestCase):
         self.assertIsNotNone(enqueued_build.task_id_check)  # build has been queued
 
     @mock.patch("metaci.plan.models.PlanRepositoryTrigger._get_commit")
-    def test_trigger_errors_are_logged(self, get_commit):
+    @mock.patch("metaci.cumulusci.handlers.association_helper")
+    def test_trigger_errors_are_logged(self, association_helper_mock, get_commit):
         get_commit.side_effect = github3.exceptions.NotFoundError
         build_complete.send(sender="sender", build=self.build, status="success")
         assert (
