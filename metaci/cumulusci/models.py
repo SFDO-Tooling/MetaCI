@@ -30,7 +30,7 @@ class PooledOrgRequest(BaseModel):
     def cache_key(self):
         return sha256(
             (
-                json.dumps(self.frozen_steps, sort_keys=True)
+                json.dumps(self.frozen_steps[0]["task_config"], sort_keys=True)
                 + self.org_name
                 + self.repo_url
             ).encode("utf-8")
