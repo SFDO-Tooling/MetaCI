@@ -2,14 +2,10 @@
 
 
 {% load crispy_forms_tags %}
-{% block layout_parent_link %}<a href="/create-org/">Create Org</a>{% endblock %}
+{% block layout_parent_link %}<a href="/create-org/scratch">Create Org</a>{% endblock %}
 {% block layout_header_text %}Create Scratch Org{% endblock %}
 
 {% block layout_body %}
-<div class="slds-box">
-  <h3 class="slds-text-heading--medium">Create a Scratch Org</h3>
-  <p>Select the repository and plan you wish to run. On the next screen, you'll confirm the branch. This will kick off a build that, when complete, can be logged into and used for evaluating the branch.</p>
-</div>
 <br/>
 <article class="slds-card">
   <div class="slds-card__header">
@@ -22,7 +18,7 @@
       <div class="slds-media__body slds-truncate">
         <h2>
           <a href="javascript:void(0);" class="slds-text-link--reset">
-            <span class="slds-text-heading--small">Available Plans ({{planrepos|length}})</span>
+            <span class="slds-text-heading--small">Org Configurations</span>
           </a>
         </h2>
       </div>
@@ -35,8 +31,7 @@
         <tr>
           <th>Repo</th>
           <th>Plan</th>
-          <th>Flows</th>
-          <th>Actions</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -44,11 +39,10 @@
         <tr class="slds-hint-parent">
           <th scope="row"><a href="{% url 'repo_detail' pr.repo.owner pr.repo.name %}">{{ pr.repo.name }}</a></th>
           <td>{{ pr.plan.name }}</td>
-          <td>{{ pr.plan.flows }}</td>
           <td><div class="slds-shrink-none">
             <div class="slds-button-group" role="group">
                 <a href="{% url 'plan_run_repo' pr.plan.id pr.repo.owner pr.repo.name %}?keep_org=True">
-                  <button class="slds-button slds-button_brand">Go</button></a>
+                  <button class="slds-button slds-button_brand">Select</button></a>
             </div>
           </div></td>
         </tr>

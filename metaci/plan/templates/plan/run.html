@@ -4,7 +4,7 @@
 {% load templatehelpers %}
 
 
-{% block layout_header_text %}Manual build for {{ repo.name }}: {{ plan.name }}{% endblock %}
+{% block layout_header_text %}Create Scratch Org for {{ repo.name }}: {{ plan.name }}{% endblock %}
 
 
 {% block layout_body %}
@@ -17,22 +17,6 @@
       {% else %}
         <a href="{% relative_url '1' 'advanced_mode' request.GET.urlencode %}">Advanced Mode</a>
       {% endif %}
-    </div>
-
-    <div class="slds-col slds-size--1-of-2 slds-p-around--large slds-theme--shade">
-        <div class="slds-box slds-p-around--large">
-            <h3 class="slds-heading slds-heading--large">Run Plan</h3>
-            <p>This form will trigger a new build for this plan against the branch and commit you select.</p>
-            <br/>
-            <p>If you select "Keep Org" for a scratch org based build, the scratch org will become available on your user detail page. <b>It may take 10+ min for scratch org login to begin working after it is signed up.</b></p>
-        </div>
-
-        {% if plan.description %}
-        <div class="slds-box slds-p-around--large">
-            <h3 class="slds-heading slds-heading--large">Plan Description</h3>
-            <p>{{ plan.description }}</p>
-        </div>
-        {% endif %}
     </div>
   </div>
 {% endblock %}

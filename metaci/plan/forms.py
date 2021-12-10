@@ -9,7 +9,7 @@ from metaci.repository.models import Branch
 
 
 class RunPlanForm(forms.Form):
-    branch = forms.ChoiceField(choices=(), label="Branch")
+    branch = forms.ChoiceField(choices=(), label="Branch", required=False)
     commit = forms.CharField(required=False)
     keep_org = forms.BooleanField(required=False)
     release = forms.ModelChoiceField(None, required=False)
@@ -33,21 +33,8 @@ class RunPlanForm(forms.Form):
                 Field("branch", css_class="slds-input"),
                 css_class="slds-form-element",
             ),
-            Fieldset(
-                "A custom note about the org being created",
-                Field("org_note", css_class="slds-input"),
-                css_class="slds-form-element",
-            ),
         )
         org = self.repo.orgs.get(name=self.plan.org)
-        if org.scratch:
-            self.helper.layout.append(
-                Fieldset(
-                    "Keep org after build is done?",
-                    Field("keep_org", css_class="slds-checkbox"),
-                    css_class="slds-form-element",
-                )
-            )
         if is_release_plan(self.plan):
             self.helper.layout.append(
                 Fieldset(
@@ -61,6 +48,21 @@ class RunPlanForm(forms.Form):
         if "advanced_mode" in args[0]:
             self.advanced_mode = args[0]["advanced_mode"] == "1"
         if self.advanced_mode:
+            if org.scratch:
+                self.helper.layout.extend(
+                    (
+                        Fieldset(
+                            "A custom note about the org being created",
+                            Field("org_note", css_class="slds-input"),
+                            css_class="slds-form-element",
+                        ),
+                        Fieldset(
+                            "Keep org after build is done?",
+                            Field("keep_org", css_class="slds-checkbox"),
+                            css_class="slds-form-element",
+                        ),
+                    )
+                )
             self.helper.layout.extend(
                 [
                     Fieldset(
