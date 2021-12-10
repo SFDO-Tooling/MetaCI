@@ -140,7 +140,7 @@ class OrgPool(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(30)]
     )
     minimum_org_count = models.IntegerField()
-    cache_key = models.CharField(max_length=128, unique=True)
+    cache_key = models.CharField(max_length=128, unique=True, blank=True)
     frozen_steps = models.JSONField(default=list)
     org_shape = models.ForeignKey(
         "cumulusci.Org", related_name="org_pools", on_delete=models.CASCADE
@@ -274,3 +274,7 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
+
+
+def get_org_pool(request: PooledOrgRequest) -> Optional[OrgPool]:
+    return OrgPool.objects.filter(cache_key=request.cache_key()).first()

@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from metaci.build.utils import paginate, view_queryset
 from metaci.cumulusci.forms import OrgLockForm, OrgUnlockForm
-from metaci.cumulusci.models import Org, OrgPool, PooledOrgRequest, ScratchOrgInstance
+from metaci.cumulusci.models import Org, get_org_pool, PooledOrgRequest, ScratchOrgInstance
 from metaci.cumulusci.tasks import org_claimed
 
 
@@ -42,10 +42,6 @@ def request_pooled_org(request):
         content_type="text/json",
         status=200,
     )
-
-
-def get_org_pool(request: PooledOrgRequest) -> Optional[OrgPool]:
-    return OrgPool.objects.filter(cache_key=request.cache_key()).first()
 
 
 @login_required

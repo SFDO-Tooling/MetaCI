@@ -5,11 +5,9 @@ from django_rq import job
 
 from metaci.build.models import Build
 from metaci.cumulusci.models import OrgPool, ScratchOrgInstance
+from metaci.cumulusci.signals import org_claimed
 from metaci.plan.models import Plan
 
-# Sent whenever an org is claimed from an org pool
-# provided signal args: 'org_pool'
-org_claimed = dispatch.Signal()
 
 
 def fill_new_pool(sender, instance, created, **kwargs):
@@ -46,10 +44,10 @@ def top_up_org_pools():
 
         # do you have enough orgs w/ required minimum lifespan remaining to satisfy the pool?
         for org in pool.pooled_orgs.all():
-            if org.days > pool.minimum_lifespan:
+            if org.days >= pool.minimum_lifespan:
                 good_org_count += 1
         # or do you have builds already running?
-        good_org_count += pool.builds.filter(status="running")
+        good_org_count += pool.builds.filter(status__in=Build.IN_PROGRESS_STATUSES).count()
 
         orgs_short = pool.minimum_org_count - good_org_count
         if orgs_short > 0:
@@ -63,7 +61,6 @@ def fill_pool(pool: OrgPool, count: int):
             repo=pool.repository,
             plan=plan,
             org_pool=pool,
-            # branch="main",
             commit="main",
             keep_org=True,
             build_type="pool",

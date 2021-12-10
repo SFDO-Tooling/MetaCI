@@ -7,7 +7,9 @@ import traceback
 import zipfile
 from glob import iglob
 from io import BytesIO
+from metaci.cumulusci.models import PooledOrgRequest, get_org_pool
 from model_utils import Choices
+from metaci.cumulusci.signals import org_claimed
 
 from cumulusci import __version__ as cumulusci_version
 from cumulusci.core.config import FAILED_TO_CREATE_SCRATCH_ORG
@@ -19,6 +21,7 @@ from cumulusci.core.exceptions import (
 )
 from cumulusci.core.flowrunner import FlowCoordinator
 from cumulusci.salesforce_api.exceptions import MetadataComponentFailure
+from cumulusci.core.config import ScratchOrgConfig, TaskConfig
 from cumulusci.utils import elementtree_parse_file
 from django.apps import apps
 from django.conf import settings
@@ -118,7 +121,7 @@ class BuildQuerySet(models.QuerySet):
 class Build(models.Model):
     FAILED_STATUSES = [BUILD_STATUSES.error, BUILD_STATUSES.fail]
     COMPLETED_STATUSES = [BUILD_STATUSES.success, *FAILED_STATUSES]
-
+    IN_PROGRESS_STATUSES = [BUILD_STATUSES.queued, BUILD_STATUSES.waiting, BUILD_STATUSES.running]
     repo = models.ForeignKey(
         "repository.Repository", related_name="builds", on_delete=models.CASCADE
     )
@@ -315,6 +318,62 @@ class Build(models.Model):
     def worker_id(self):
         return os.environ.get("DYNO")
 
+    def get_or_create_org(self, project_config):
+        if not self.org_pool:
+            first_flow = [flow.strip() for flow in self.plan.flows.split(",")][0]
+            flow_config = project_config.get_flow(first_flow)
+            self.logger.warning(f"{flow_config.steps}")
+
+            # Create the flow and handle initialization exceptions
+            flow_config = FlowCoordinator(
+                project_config,
+                flow_config,
+                name="Org Pool Check",
+                options={},
+            )
+
+            task_class = flow_config.steps[0].task_class
+            task_class_name = task_class.__module__ + "." + task_class.__name__
+            if task_class_name == (
+                "cumulusci.tasks.salesforce.update_dependencies.UpdateDependencies"
+            ):
+                repo = project_config.repo_url.removesuffix(".git")
+                step = flow_config.steps[0]
+                task = step.task_class(
+                    project_config,
+                    TaskConfig(step.task_config),
+                    name=step.task_name,
+                )
+                org_pool_payload = PooledOrgRequest(
+                    frozen_steps=task.freeze(step),
+                    task_class=task_class_name,
+                    repo_url=repo,
+                    org_name=self.plan.org,
+                )
+
+                org_pool = get_org_pool(org_pool_payload)
+
+                if org_pool and org_pool.pooled_orgs.count() > 0:
+                    returned_org = org_pool.pooled_orgs.first()
+                    returned_org.org_pool = None
+                    returned_org.save()
+
+                    org_claimed.send(sender=org_pool.__class__, org_pool=org_pool)
+
+                    self.org_instance = returned_org
+                    self.org = returned_org.org
+
+                    org_config = ScratchOrgConfig(
+                        returned_org.json, self.org.name, project_config.keychain
+                    )
+
+                    self.logger.info("Using a pooled org for this build")
+
+                    return org_config
+        return self.get_org(project_config)
+
+
+
     def run(self):
         self.logger = init_logger(self)
         worker_str = f"in {self.worker_id}" if self.worker_id else ""
@@ -343,7 +402,7 @@ class Build(models.Model):
             project_config = self.get_project_config()
 
             # Look up or spin up the org
-            org_config = self.get_org(project_config)
+            org_config = self.get_or_create_org(project_config)
             if self.plan.change_traffic_control:
                 send_start_webhook(
                     self.release,
