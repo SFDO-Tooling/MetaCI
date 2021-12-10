@@ -524,7 +524,7 @@ class Build(models.Model):
             )
         else:
             set_build_info(build, status="success", time_end=timezone.now())
-            if self.plan.role == "pool_org":
+            if self.org_pool:
                 self.org_instance.org_pool = self.org_pool
                 self.org_instance.save()
 

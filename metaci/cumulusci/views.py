@@ -1,5 +1,4 @@
 import json
-from typing import Optional
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -13,11 +12,11 @@ from metaci.build.utils import paginate, view_queryset
 from metaci.cumulusci.forms import OrgLockForm, OrgUnlockForm
 from metaci.cumulusci.models import (
     Org,
-    get_org_pool,
     PooledOrgRequest,
     ScratchOrgInstance,
+    get_org_pool,
 )
-from metaci.cumulusci.tasks import org_claimed
+from metaci.cumulusci.signals import org_claimed
 
 
 @csrf_exempt

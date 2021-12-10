@@ -136,6 +136,7 @@ def dispatch_one_off_build(build, lock_id: str = None):
 
 
 def dispatch_queued_build(build, lock_id: str = None):
+    print("Dispatching queued build", run_build, build.id, lock_id, )
     queue = django_rq.get_queue(build.plan.queue)
     result = queue.enqueue(
         run_build, build.id, lock_id, job_timeout=build.plan.build_timeout
@@ -154,6 +155,7 @@ def lock_org(org, build_id, timeout):
 @django_rq.job("short", timeout=60)
 def check_queued_build(build_id):
     reset_database_connection()
+    print("Checking", build_id)
 
     from metaci.build.models import Build
 
@@ -184,12 +186,14 @@ def check_queued_build(build_id):
             build.log = msg
             build.save()
             return msg
+        print("Dispatching build", build)
         res_run = dispatch_build(build)
         return (
             "DevHub has scratch org capacity, running the build "
             + f"as task {res_run.id}"
         )
     else:
+        print("Persistent org?")
         # For persistent orgs, use the cache to lock the org
         status = lock_org(org, build_id, build.plan.build_timeout)
 

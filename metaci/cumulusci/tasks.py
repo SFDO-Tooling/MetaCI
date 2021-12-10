@@ -1,11 +1,10 @@
-from django import db, dispatch
+from django import db
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django_rq import job
 
 from metaci.build.models import Build
 from metaci.cumulusci.models import OrgPool, ScratchOrgInstance
-from metaci.cumulusci.signals import org_claimed
 from metaci.plan.models import Plan
 
 
@@ -56,11 +55,11 @@ def top_up_org_pools():
 
 
 def fill_pool(pool: OrgPool, count: int):
-    plan = Plan.objects.filter(role="pool_org").first()
+    default_plan = Plan.objects.filter(role="pool_org").first()
     for i in range(count):
         build = Build(
             repo=pool.repository,
-            plan=plan,
+            plan=pool.plan or default_plan,
             org_pool=pool,
             commit="main",
             keep_org=True,

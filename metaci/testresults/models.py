@@ -564,7 +564,7 @@ class TestResultPerfWeeklySummary(TestResultPerfSummaryBase):
         # So let's get rid of the old summary files.
         obsolete_objects = cls.objects.filter(week_start=week_start)
         deleted = obsolete_objects.delete()
-        cls.logger.info("Deleted %s", deleted)
+        cls.logger.info("Deleted TestResultSummary Data %s", deleted)
 
         for batch in split_seq(method_contexts, 5000):
             new_objects = [cls(**values) for values in batch]

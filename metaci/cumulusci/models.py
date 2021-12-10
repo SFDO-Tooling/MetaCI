@@ -37,6 +37,21 @@ class PooledOrgRequest(BaseModel):
         ).hexdigest()
 
 
+class PooledFullBuildOrgRequest(BaseModel):
+    repo_url: str
+    plan_name: str
+    commit: str
+
+    def cache_key(self):
+        return sha256(
+            (
+                self.repo_url
+                + self.plan_name
+                + self.commit
+            ).encode("utf-8")
+        ).hexdigest()
+
+
 def sf_session(jwt):
     return SimpleSalesforce(
         instance_url=jwt["instance_url"],
@@ -141,24 +156,41 @@ class OrgPool(models.Model):
     )
     minimum_org_count = models.IntegerField()
     cache_key = models.CharField(max_length=128, unique=True, blank=True)
-    frozen_steps = models.JSONField(default=list)
+    frozen_steps = models.JSONField(default=list, blank=True, null=True)
     org_shape = models.ForeignKey(
-        "cumulusci.Org", related_name="org_pools", on_delete=models.CASCADE
+        "cumulusci.Org", related_name="org_pools", on_delete=models.CASCADE, null=True, blank=True,
     )
     repository = models.ForeignKey(
-        "repository.Repository", related_name="org_pools", on_delete=models.CASCADE
+        "repository.Repository", related_name="org_pools", on_delete=models.CASCADE,
     )
+    plan = models.ForeignKey(
+        "plan.Plan", related_name="org_pools", blank=True, null=True, on_delete=models.CASCADE
+    )
+    commit = models.CharField(max_length=256, blank=True)
 
     def __str__(self):
         return f"{self.repository.name} - {self.minimum_org_count} {self.minimum_lifespan}-day orgs - {self.cache_key}"
 
     def save(self, *args, **kwargs):
-        self.cache_key = PooledOrgRequest(
-            org_name=self.org_shape.name,
-            frozen_steps=self.frozen_steps,
-            repo_url=self.repository.url,
-        ).cache_key()
+        if self.frozen_steps:
+            assert not self.plan
+            self.cache_key = PooledOrgRequest(
+                org_name=self.org_shape.name,
+                frozen_steps=self.frozen_steps,
+                repo_url=self.repository.url,
+            ).cache_key()
+        else:
+            assert self.plan, "Supply either frozen_steps or plan"
+            assert not self.org_shape, "Do not supply an org_shape and a plan"
+            assert self.commit, "Please supply either a commit or frozen_steps"
+            self.cache_key = PooledFullBuildOrgRequest(
+                plan_name=self.plan.name,
+                repo_url=self.repository.url,
+                commit=self.commit,
+            ).cache_key()
+
         super().save(*args, **kwargs)
+        print("XXX saved", args, kwargs)
 
 
 class ScratchOrgInstance(models.Model):
@@ -174,7 +206,8 @@ class ScratchOrgInstance(models.Model):
         blank=True,
         on_delete=models.CASCADE,
     )
-    org_note = models.CharField(max_length=255, default="", blank=True, null=True)
+    org_note = models.CharField(
+        max_length=255, default="", blank=True, null=True)
     username = models.CharField(max_length=255)
     sf_org_id = models.CharField(max_length=32)
     deleted = models.BooleanField(default=False)

@@ -111,7 +111,7 @@ class Command(BaseCommand):
             org = Org(
                 name="dev",
                 repo=repo,
-                json='{"config_file":"orgs/dev.json", "scratch":true}',
+                json={"config_file":"orgs/dev.json", "scratch":True},
                 scratch=True,
             )
             org.save()
