@@ -6,22 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cumulusci', '0017_auto_20211208_1840'),
+        ("cumulusci", "0017_auto_20211208_1840"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='orgpool',
-            name='dependencies',
+            model_name="orgpool",
+            name="dependencies",
         ),
         migrations.AddField(
-            model_name='orgpool',
-            name='frozen_steps',
+            model_name="orgpool",
+            name="frozen_steps",
             field=models.JSONField(default=list),
         ),
         migrations.AlterField(
-            model_name='orgpool',
-            name='cache_key',
+            model_name="orgpool",
+            name="cache_key",
             field=models.CharField(max_length=32, unique=True),
         ),
     ]

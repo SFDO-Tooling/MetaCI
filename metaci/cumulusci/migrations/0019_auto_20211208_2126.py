@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cumulusci', '0018_auto_20211208_2110'),
+        ("cumulusci", "0018_auto_20211208_2110"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='orgpool',
-            name='cache_key',
+            model_name="orgpool",
+            name="cache_key",
             field=models.CharField(max_length=128, unique=True),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cumulusci', '0016_metapool'),
+        ("cumulusci", "0016_metapool"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='orgpool',
-            name='dependencies',
+            model_name="orgpool",
+            name="dependencies",
             field=models.JSONField(default=dict),
         ),
     ]

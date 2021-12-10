@@ -8,26 +8,62 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('repository', '0011_metadata'),
-        ('cumulusci', '0015_json_encoder'),
+        ("repository", "0011_metadata"),
+        ("cumulusci", "0015_json_encoder"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OrgPool',
+            name="OrgPool",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('minimum_lifespan', models.IntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(30)])),
-                ('minimum_org_count', models.IntegerField()),
-                ('cache_key', models.CharField(max_length=32)),
-                ('dependencies', models.JSONField()),
-                ('org_shape', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='org_pools', to='cumulusci.org')),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='org_pools', to='repository.repository')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "minimum_lifespan",
+                    models.IntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(30),
+                        ]
+                    ),
+                ),
+                ("minimum_org_count", models.IntegerField()),
+                ("cache_key", models.CharField(max_length=32)),
+                ("dependencies", models.JSONField()),
+                (
+                    "org_shape",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="org_pools",
+                        to="cumulusci.org",
+                    ),
+                ),
+                (
+                    "repository",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="org_pools",
+                        to="repository.repository",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='scratchorginstance',
-            name='org_pool',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='pooled_orgs', to='cumulusci.orgpool'),
+            model_name="scratchorginstance",
+            name="org_pool",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="pooled_orgs",
+                to="cumulusci.orgpool",
+            ),
         ),
     ]

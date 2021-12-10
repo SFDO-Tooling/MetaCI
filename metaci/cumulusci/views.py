@@ -11,7 +11,12 @@ from django.views.decorators.csrf import csrf_exempt
 
 from metaci.build.utils import paginate, view_queryset
 from metaci.cumulusci.forms import OrgLockForm, OrgUnlockForm
-from metaci.cumulusci.models import Org, get_org_pool, PooledOrgRequest, ScratchOrgInstance
+from metaci.cumulusci.models import (
+    Org,
+    get_org_pool,
+    PooledOrgRequest,
+    ScratchOrgInstance,
+)
 from metaci.cumulusci.tasks import org_claimed
 
 

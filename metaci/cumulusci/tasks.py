@@ -9,7 +9,6 @@ from metaci.cumulusci.signals import org_claimed
 from metaci.plan.models import Plan
 
 
-
 def fill_new_pool(sender, instance, created, **kwargs):
     if created:
         fill_pool(instance, instance.minimum_org_count)
@@ -47,7 +46,9 @@ def top_up_org_pools():
             if org.days >= pool.minimum_lifespan:
                 good_org_count += 1
         # or do you have builds already running?
-        good_org_count += pool.builds.filter(status__in=Build.IN_PROGRESS_STATUSES).count()
+        good_org_count += pool.builds.filter(
+            status__in=Build.IN_PROGRESS_STATUSES
+        ).count()
 
         orgs_short = pool.minimum_org_count - good_org_count
         if orgs_short > 0:
