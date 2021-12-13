@@ -15,6 +15,9 @@ import socket
 
 from .base import *
 
+from django.core.management.utils import get_random_secret_key
+
+
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool("DJANGO_DEBUG", default=True)
@@ -25,7 +28,7 @@ TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key only used for development and testing.
 SECRET_KEY = env(
-    "DJANGO_SECRET_KEY", default="!)_b4xaov6!0b^_=96*wh@p-9si4p0ho-@4&g7eija9gaxhmo!"
+    "DJANGO_SECRET_KEY", default=f"default-random-{get_random_secret_key()}"
 )
 
 DB_ENCRYPTION_KEYS = env("DB_ENCRYPTION_KEYS", cast=nl_separated_bytes_list)
