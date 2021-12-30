@@ -389,10 +389,6 @@ CRON_JOBS = {
         "func": "metaci.plan.tasks.run_scheduled_hourly",
         "cron_string": "0 * * * *",
     },
-    "generate_summaries_job": {
-        "func": "metaci.testresults.tasks.generate_summaries",
-        "cron_string": "0,30 * * * *",
-    },
     "prune_branches": {
         "func": "metaci.repository.tasks.prune_branches",
         "cron_string": "0 * * * *",
