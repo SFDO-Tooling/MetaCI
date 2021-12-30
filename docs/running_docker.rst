@@ -215,12 +215,6 @@ CHROMEDRIVER_DIR:
     This environment variable represents the directory where the chromedriver package resides
     in the filesystem. CHROMEDRIVER_DIR is set for you in the Dockerfile.
 
-NODE_VERSION: 
-    Environment variable used to set node version for download, defaults to the version set in the engines.node field of package.json.
-
-YARN_VERSION: 
-    Environment variable used to set yarn version for download, defaults to the version set in the engines.yarn field of package.json.
-
 PYTHONUNBUFFERED: 
     Environment variable set in Dockerfile used to not write .pyc files to Docker container
        

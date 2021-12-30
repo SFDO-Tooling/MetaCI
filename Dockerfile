@@ -32,18 +32,7 @@ COPY ./docker/utility/install_chromedriver.sh /app/docker/utility/install_chrome
 RUN /app/docker/utility/install_chromedriver.sh $CHROMEDRIVER_DIR $CHROMEDRIVER_VERSION
 
 # Update PATH
-ENV PATH $CHROMEDRIVER_DIR:./node_modules/.bin:$PATH:/app/sfdx/bin
-
-# installing node
-WORKDIR /app
-COPY package.json ./
-COPY ./docker/utility/install_node.sh ./docker/utility/install_node.sh
-RUN /bin/sh /app/docker/utility/install_node.sh
-
-# declaring necessary node and yarn versions
-# installing yarn
-COPY ./docker/utility/install_yarn.sh ./docker/utility/install_yarn.sh
-RUN /bin/sh /app/docker/utility/install_yarn.sh
+ENV PATH $CHROMEDRIVER_DIR:$PATH:/app/sfdx/bin
 
 # installing sfdx
 COPY ./docker/utility/install_sfdx.sh ./docker/utility/install_sfdx.sh
@@ -55,9 +44,6 @@ RUN pip install --no-cache-dir --upgrade pip pip-tools
 RUN pip install --no-cache-dir -r /app/requirements/prod.txt
 RUN if [ "${BUILD_ENV}" = "dev" ]; then pip install --no-cache-dir -r /app/requirements/dev.txt; fi
 
-# installing yarn dependencies
-COPY yarn.lock ./
-RUN yarn install
 # copying rest of working directory to /app folder
 COPY . /app
 
@@ -68,5 +54,4 @@ ENV DJANGO_HASHID_SALT='sample hashid=salt' \
   REDIS_URL="redis://redis:6379"
 
 # Avoid building prod assets in development
-RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist/prod ; fi
 RUN if [ "${BUILD_ENV}" = "production" ]; then python /app/manage.py collectstatic --noinput; fi

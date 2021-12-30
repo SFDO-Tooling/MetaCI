@@ -23,7 +23,6 @@ from metaci.testresults.models import (
     TestClass,
     TestMethod,
     TestResult,
-    TestResultPerfWeeklySummary,
 )
 from metaci.users.models import User
 
@@ -187,10 +186,6 @@ class TestResultFactory(factory.django.DjangoModelFactory):
         return ["Pass", "Pass", "Pass", "CompileFail", "Fail", "Skip"][
             result.method._runs % 6
         ]
-
-    @factory.post_generation
-    def summarize(obj, create, extracted, **kwargs):
-        TestResultPerfWeeklySummary.summarize_week(obj.build_flow.time_end)
 
 
 class UserFactory(factory.django.DjangoModelFactory):

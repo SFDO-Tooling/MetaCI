@@ -105,15 +105,6 @@ def repo_orgs(request, owner, name):
     return render(request, "repository/repo_orgs.html", context=context)
 
 
-def repo_perf(request, owner, name, tab):
-    repo = Repository.objects.get_for_user_or_404(
-        request.user, {"owner": owner, "name": name}
-    )
-
-    context = {"repo": repo, "tab": tab}
-    return render(request, "repository/repo_perf.html", context=context)
-
-
 def repo_results(request, owner, name, tab):
     repo = Repository.objects.get_for_user_or_404(
         request.user, {"owner": owner, "name": name}
@@ -121,9 +112,6 @@ def repo_results(request, owner, name, tab):
 
     context = {"repo": repo, "tab": tab}
     return render(request, "repository/repo_results.html", context=context)
-
-
-repo_tests = repo_perf
 
 
 def branch_detail(request, owner, name, branch):

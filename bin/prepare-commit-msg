@@ -28,30 +28,6 @@ has_migrations () {
     fi
 }
 
-has_yarn () {
-    if [[ $CHANGED == *"yarn.lock"* ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-has_nodepocalypse () {
-    if [[ $CHANGED == *"bin/unpack-node"* ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-
-if has_nodepocalypse; then
-    prepend_emoji 🙀
-else
-    if has_yarn; then
-        prepend_emoji 🐈
-    fi
-fi
 
 if has_migrations; then
     prepend_emoji 🛢

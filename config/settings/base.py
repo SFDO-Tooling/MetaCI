@@ -230,7 +230,6 @@ STATICFILES_DIRS = (
     str(APPS_DIR.path("static")),
     str(ROOT_DIR.path("dist")),
     str(ROOT_DIR.path("locales")),
-    str(ROOT_DIR.path("node_modules/@salesforce-ux")),
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders

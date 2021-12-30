@@ -53,30 +53,6 @@ Now you can install MetaCI's Python dependencies::
     make dev-install
 
 
-Installing Javascript Requirements
-==================================
-
-The project-local version of `Node.js`_ is bundled with the repo and can be
-unpacked locally (in the git-ignored ``node/`` directory), so you don't have to
-install it system-wide (and possibly conflict with other projects wanting other
-Node versions).
-
-To install the project-local version of Node (and `yarn`_)::
-
-    bin/unpack-node
-
-If you can run ``which node`` and see a path inside your project directory ending with
-``.../node/bin/node``, then you've got it set up right and can move on. Otherwise go
-back and check if your environment includes the PATH environment variable from env.example
-
-Then use ``yarn`` to install dependencies::
-
-    yarn
-
-.. _Node.js: http://nodejs.org
-.. _yarn: https://yarnpkg.com/
-
-
 Set Up The Database
 ===================
 
@@ -119,9 +95,9 @@ Run The Server
 
 To run the local development server::
 
-    yarn serve
+    make start
 
-This starts a process running Django, a process running Node, and an ``rq`` worker process.
+This starts a process running Django and an ``rq`` worker process.
 The running server will be available at `<http://localhost:8080/>`_.
 
 Admin Login

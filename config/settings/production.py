@@ -128,7 +128,6 @@ STATICFILES_DIRS = (
     str(APPS_DIR.path("static")),
     str(ROOT_DIR.path("dist", "prod")),
     str(ROOT_DIR.path("locales")),
-    str(ROOT_DIR.path("node_modules/@salesforce-ux")),
 )
 
 TEMPLATES[0]["DIRS"] = [
