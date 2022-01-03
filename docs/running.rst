@@ -15,20 +15,12 @@ Configuring MetaCI
 ==================
 
 There are a number of environment variables which need to be configured in order to run MetaCI.
-The easiest way to set these up is to copy our example ``env.example`` file::
+The easiest way to set these up is to copy our example ``.env.example`` file::
 
-    cp env.example env
+    cp .env.example env
 
-Then edit ``env`` to fill in the necessary settings.
+Then edit ``.env`` to fill in the necessary settings.
 Please see `<./docs/configuring.rst>`_ for more details.
-
-To activate the configuration, run::
-
-    source env ; rehash
-
-You must do this each time you open a new terminal before working on MetaCI.
-Longer term, you should probably use direnv and .envrc to do the same on new
-terminals so you do not forget to source env each time.
 
 
 Install MetaCI
@@ -98,11 +90,11 @@ To run the local development server::
     make start
 
 This starts a process running Django and an ``rq`` worker process.
-The running server will be available at `<http://localhost:8080/>`_.
+The running server will be available at `<http://localhost:5000/>`_.
 
 Admin Login
 ===========
 
 To log in as your superuser, use the admin URL (NOT the Log In link at upper right, which is for logging in via GitHub):
 
-    http://localhost:8000/admin
+    http://localhost:5000/admin
