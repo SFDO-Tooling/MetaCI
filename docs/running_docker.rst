@@ -85,7 +85,7 @@ Then run the following command:
     or 
     docker-compose up (for debug mode)
 
-After running this command which will take a couple minutes on startup visit ``localhost:8000/admin/login``
+After running this command which will take a couple minutes on startup visit ``http://localhost:5000/admin/login``
 and login with the following credentials if DJANGO_SETTINGS_MODULE is config.settings.dev:
 
 username:
@@ -186,18 +186,18 @@ commands (this terminal runs inside the Docker container and can run all the com
 RUNNING.RST and CONTRIBUTING.RST)::
 
     $ python manage.py migrate  # run database migrations
-    $ yarn serve  # start the development server/watcher
+    $ honcho start web dev_worker  # start the development server & watcher
 
 For any commands, when using the VS Code integrated terminal inside the
 Docker container, omit any ``docker-compose run --rm web...`` prefix, e.g.::
 
     $ python manage.py promote_superuser <your email>
-    $ yarn test:js
+    $ pytest
     $ python manage.py truncate_data
     $ python manage.py populate_data
 
-``yarn serve`` is run for you on connection to container. You can view the running app at
-`<http://localhost:8080/>`_ in your browser.
+The app is started for you on connection to container. You can view the running app at
+`<http://localhost:5000/>`_ in your browser.
 
 For more detailed instructions and options, see the `VS Code documentation`_.
 

@@ -89,11 +89,9 @@ INSTALLED_APPS = WHITENOISE_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
-    "127.0.0.1:8000",
-    "127.0.0.1:8080",
+    "127.0.0.1:5000",
     "localhost",
-    "localhost:8000",
-    "localhost:8080",
+    "localhost:5000",
 ]
 
 # MIDDLEWARE CONFIGURATION
@@ -174,14 +172,7 @@ USE_TZ = True
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#templates
-production_app_path = Path(ROOT_DIR.path("dist", "prod"))
-if production_app_path.exists():
-    TEMPLATE_DIRS = [
-        str(ROOT_DIR.path("dist", "prod")),
-        str(APPS_DIR.path("templates")),
-    ]
-else:
-    TEMPLATE_DIRS = [str(ROOT_DIR.path("dist")), str(APPS_DIR.path("templates"))]
+TEMPLATE_DIRS = [str(APPS_DIR.path("templates"))]
 TEMPLATES = [
     {
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
@@ -226,11 +217,7 @@ STATIC_ROOT = str(ROOT_DIR("staticfiles"))
 STATIC_URL = "/static/"
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = (
-    str(APPS_DIR.path("static")),
-    str(ROOT_DIR.path("dist")),
-    str(ROOT_DIR.path("locales")),
-)
+STATICFILES_DIRS = (str(APPS_DIR.path("static")),)
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = (

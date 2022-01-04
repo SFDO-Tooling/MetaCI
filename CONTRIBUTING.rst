@@ -24,7 +24,7 @@ Docker runs the server automatically. If you are not using Docker for
 development, you can run it like this:
 
 - ``make start``: starts development server (with watcher) at
-  `<http://localhost:8080/>`_ (assets are served from ``dist/`` dir)
+  `<http://localhost:5000/>`_
 
 Development Tasks
 =================
@@ -51,7 +51,6 @@ automatically prepended to commit messages):
 
 - 📦 (``:package:``) -> ``pip install -r requirements/local.txt``
 - 🛢 (``:oil_drum:``) -> ``python manage.py migrate``
-- 🐈 (``:cat2:``) -> ``yarn``
 
 Internationalization
 ====================
@@ -69,6 +68,6 @@ These commands require the `GNU gettext toolset`_ (``brew install gettext``).
 Developing with SLDS
 ====================
 
-MetaCI uses https://github.com/SalesforceFoundation/django-slds which imports version 2.1.2 of the Salesforce Lightning Design System.
+MetaCI uses the Salesforce Lightning Design System.
 
-You can find a CSS and component reference archived here: https://archive-2_1_2.lightningdesignsystem.com/
+You can find a CSS and component reference here: https://www.lightningdesignsystem.com/
