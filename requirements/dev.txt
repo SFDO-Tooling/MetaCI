@@ -6,8 +6,6 @@
 #
 alabaster==0.7.12
     # via sphinx
-appnope==0.1.2
-    # via ipython
 asgiref==3.4.1
     # via
     #   -c requirements/prod.txt
@@ -18,6 +16,10 @@ babel==2.9.1
     # via sphinx
 backcall==0.2.0
     # via ipython
+backports.zoneinfo==0.2.1
+    # via
+    #   -c requirements/prod.txt
+    #   django
 black==21.12b0
     # via -r requirements/dev.in
 certifi==2021.10.8
@@ -46,7 +48,7 @@ decorator==5.1.0
     #   ipython
 distlib==0.3.4
     # via virtualenv
-django==3.1.14
+django==4.0.1
     # via
     #   -c requirements/prod.txt
     #   django-debug-toolbar
@@ -172,7 +174,6 @@ pytz==2021.3
     # via
     #   -c requirements/prod.txt
     #   babel
-    #   django
 pyyaml==6.0
     # via
     #   -c requirements/prod.txt
