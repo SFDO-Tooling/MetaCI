@@ -13,10 +13,9 @@ Local settings
 import os
 import socket
 
-from .base import *
-
 from django.core.management.utils import get_random_secret_key
 
+from .base import *
 
 # DEBUG
 # ------------------------------------------------------------------------------
@@ -94,19 +93,9 @@ HIREFIRE_PROCS = ["config.procs.WorkerProc"]
 HIREFIRE_TOKEN = env("HIREFIRE_TOKEN", default="localtest")
 
 METACI_WORKER_AUTOSCALER = "metaci.build.autoscaling.LocalAutoscaler"
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "127.0.0.1:8000",
-    "127.0.0.1:8080",
-    "localhost",
-    "0.0.0.0:8000",
-    "localhost:8000",
-    "localhost:8080",
-    "0.0.0.0",
-]
 METACI_LONG_RUNNING_BUILD_CLASS = "metaci.build.autoscaling.LocalOneOffBuilder"
 # Site URL
-SITE_URL = env("SITE_URL", default="http://localhost:8000")
+SITE_URL = env("SITE_URL", default="http://localhost:5000")
 
 # Github credentials
 GITHUB_STATUS_UPDATES_ENABLED = env.bool("GITHUB_STATUS_UPDATES_ENABLED", False)

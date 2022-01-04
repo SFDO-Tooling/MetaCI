@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0005_auto_20170208_1344'),
+        ("build", "0005_auto_20170208_1344"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='build',
-            name='commit_message',
+            model_name="build",
+            name="commit_message",
             field=models.TextField(blank=True, null=True),
         ),
     ]

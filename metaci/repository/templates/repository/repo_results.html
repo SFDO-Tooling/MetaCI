@@ -27,7 +27,6 @@
     <li class="slds-tabs--default__item" title="Branches" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/branches" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Branches</a></li>
     <li class="slds-tabs--default__item" title="Plans" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/plans" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item">Plans</a></li>
     <li class="slds-tabs--default__item" title="Orgs" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/orgs" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-4" id="tab-default-4__item">Orgs</a></li>
-    <li class="slds-tabs--default__item {% if tab == 'perf' %}slds-active {% endif %}" title="Perf" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/perf" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-5" id="tab-default-5__item">Perf (Beta)</a></li>
     <li class="slds-tabs--default__item {% if tab == 'results' %}slds-active {% endif %}" title="Robot Results" role="presentation"><a class="slds-tabs--default__link" href="{{ repo.get_absolute_url }}/results" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-6" id="tab-default-6__item">Robot Results</a></li>
   </ul>
 </div>
@@ -49,7 +48,7 @@
         <br /> <!-- why must I use this? Why isn't there naturally some space between paragraphs? -->
         <div class="slds-media__figure">
           <svg class="slds-button__icon slds-theme--info_alt" aria-hidden="true">
-            <use xlink:href="/static/design-system/assets/icons/utility-sprite/svg/symbols.svg#bookmark"></use>
+            <use xlink:href="/static/slds/icons/utility-sprite/svg/symbols.svg#bookmark"></use>
           </svg>
           <span class="slds-assistive-text">Info</span>
           The links on this page use relative dates, so they can be bookmarked.

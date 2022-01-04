@@ -9,19 +9,33 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('release', '0002_auto_20180815_2248'),
-        ('build', '0014_auto_20180601_2003'),
+        ("release", "0002_auto_20180815_2248"),
+        ("build", "0014_auto_20180601_2003"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='build',
-            name='release',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='release.Release'),
+            model_name="build",
+            name="release",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="release.Release",
+            ),
         ),
         migrations.AddField(
-            model_name='build',
-            name='release_relationship_type',
-            field=models.CharField(blank=True, choices=[('test', 'Release Test'), ('automation', 'Release Automation'), ('manual', 'Manual Release Activity')], max_length=50, null=True),
+            model_name="build",
+            name="release_relationship_type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("test", "Release Test"),
+                    ("automation", "Release Automation"),
+                    ("manual", "Manual Release Activity"),
+                ],
+                max_length=50,
+                null=True,
+            ),
         ),
     ]

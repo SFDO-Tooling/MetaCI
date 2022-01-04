@@ -7,6 +7,6 @@ from django.utils import timezone
 class Migration(migrations.Migration):
     atomic = False
 
-    dependencies = [("testresults", "0012_create_summaries")]
+    dependencies = [("testresults", "0011_auto_20190426_1755")]
 
     operations = []

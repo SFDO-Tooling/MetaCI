@@ -58,8 +58,8 @@ This next section assumes you have downloaded ``docker`` and ``docker-compose``.
 Additionally it assumes you have a ``.env`` file in the root directory of this 
 project, a template of variables needed can be found under ``env.example``.
 
-To configure and run your environment you must run 2 commands in the root directory of MetaCI
-Note that docker-compose build will take some significant time to build the first time but will
+To configure and run your environment you must run 2 commands in the root directory of MetaCI.
+ Note that docker-compose build will take some significant time to build the first time but will
 be much faster for subsequent builds. It is also important to note that once you bring 
 up the web application it will take roughly 60 seconds to fully compile.
 ::
@@ -85,7 +85,7 @@ Then run the following command:
     or 
     docker-compose up (for debug mode)
 
-After running this command which will take a couple minutes on startup visit ``localhost:8000/admin/login``
+After running this command which will take a couple minutes on startup visit ``http://localhost:5000/admin/login``
 and login with the following credentials if DJANGO_SETTINGS_MODULE is config.settings.dev:
 
 username:
@@ -186,18 +186,18 @@ commands (this terminal runs inside the Docker container and can run all the com
 RUNNING.RST and CONTRIBUTING.RST)::
 
     $ python manage.py migrate  # run database migrations
-    $ yarn serve  # start the development server/watcher
+    $ honcho start web dev_worker  # start the development server & watcher
 
 For any commands, when using the VS Code integrated terminal inside the
 Docker container, omit any ``docker-compose run --rm web...`` prefix, e.g.::
 
     $ python manage.py promote_superuser <your email>
-    $ yarn test:js
+    $ pytest
     $ python manage.py truncate_data
     $ python manage.py populate_data
 
-``yarn serve`` is run for you on connection to container. You can view the running app at
-`<http://localhost:8080/>`_ in your browser.
+The app is started for you on connection to container. You can view the running app at
+`<http://localhost:5000/>`_ in your browser.
 
 For more detailed instructions and options, see the `VS Code documentation`_.
 
@@ -214,12 +214,6 @@ Environment Variables That Modify The Docker Environment
 CHROMEDRIVER_DIR:
     This environment variable represents the directory where the chromedriver package resides
     in the filesystem. CHROMEDRIVER_DIR is set for you in the Dockerfile.
-
-NODE_VERSION: 
-    Environment variable used to set node version for download, defaults to the version set in the engines.node field of package.json.
-
-YARN_VERSION: 
-    Environment variable used to set yarn version for download, defaults to the version set in the engines.yarn field of package.json.
 
 PYTHONUNBUFFERED: 
     Environment variable set in Dockerfile used to not write .pyc files to Docker container

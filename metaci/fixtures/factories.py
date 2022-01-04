@@ -19,12 +19,7 @@ from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.plan.models import Plan, PlanRepository, PlanSchedule
 from metaci.release.models import ChangeCaseTemplate, Release, ReleaseCohort
 from metaci.repository.models import Branch, Repository
-from metaci.testresults.models import (
-    TestClass,
-    TestMethod,
-    TestResult,
-    TestResultPerfWeeklySummary,
-)
+from metaci.testresults.models import TestClass, TestMethod, TestResult
 from metaci.users.models import User
 
 BUILD_STATUS_NAMES = (
@@ -187,10 +182,6 @@ class TestResultFactory(factory.django.DjangoModelFactory):
         return ["Pass", "Pass", "Pass", "CompileFail", "Fail", "Skip"][
             result.method._runs % 6
         ]
-
-    @factory.post_generation
-    def summarize(obj, create, extracted, **kwargs):
-        TestResultPerfWeeklySummary.summarize_week(obj.build_flow.time_end)
 
 
 class UserFactory(factory.django.DjangoModelFactory):

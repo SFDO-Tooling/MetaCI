@@ -10,32 +10,84 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0011_auto_20170814_1739_squashed_0013_auto_20170814_1745'),
+        ("build", "0011_auto_20170814_1739_squashed_0013_auto_20170814_1745"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FlowTask',
+            name="FlowTask",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('time_start', models.DateTimeField(blank=True, null=True)),
-                ('time_end', models.DateTimeField(blank=True, null=True)),
-                ('time_initialize', models.DateTimeField(blank=True, null=True)),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('stepnum', models.DecimalField(decimal_places=2, max_digits=12, verbose_name='step number')),
-                ('options', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
-                ('result', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
-                ('return_values', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
-                ('exception', models.CharField(blank=True, max_length=255, null=True)),
-                ('exception_value', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('initializing', 'Initializing'), ('running', 'Running'), ('complete', 'Completed'), ('error', 'Error')], default='queued', max_length=16)),
-                ('build_flow', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tasks', to='build.BuildFlow')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("time_start", models.DateTimeField(blank=True, null=True)),
+                ("time_end", models.DateTimeField(blank=True, null=True)),
+                ("time_initialize", models.DateTimeField(blank=True, null=True)),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "stepnum",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=12, verbose_name="step number"
+                    ),
+                ),
+                (
+                    "options",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, null=True
+                    ),
+                ),
+                (
+                    "result",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, null=True
+                    ),
+                ),
+                (
+                    "return_values",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, null=True
+                    ),
+                ),
+                ("exception", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "exception_value",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, null=True
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("initializing", "Initializing"),
+                            ("running", "Running"),
+                            ("complete", "Completed"),
+                            ("error", "Error"),
+                        ],
+                        default="queued",
+                        max_length=16,
+                    ),
+                ),
+                (
+                    "build_flow",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="tasks",
+                        to="build.BuildFlow",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-build_flow', 'stepnum'],
-                'verbose_name': 'Flow Task',
-                'verbose_name_plural': 'Flow Tasks',
+                "ordering": ["-build_flow", "stepnum"],
+                "verbose_name": "Flow Task",
+                "verbose_name_plural": "Flow Tasks",
             },
         ),
     ]

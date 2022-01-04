@@ -159,7 +159,9 @@ def build_rebuild(request, build_id):
     if not build.log:
         build.log = ""
 
-    build.log += f"\n=== Build restarted at {timezone.now()} by {request.user.username} ===\n"
+    build.log += (
+        f"\n=== Build restarted at {timezone.now()} by {request.user.username} ===\n"
+    )
     build.current_rebuild = rebuild
     build.save()
 

@@ -8,6 +8,7 @@ factory_boy
 flake8
 ipdb
 isort
+pre-commit
 pytest
 pytest-django
 pytest-factoryboy

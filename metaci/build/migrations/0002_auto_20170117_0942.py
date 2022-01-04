@@ -11,42 +11,82 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('build', '0001_initial'),
+        ("build", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Rebuild',
+            name="Rebuild",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('queued', 'Queued'), ('running', 'Running'), ('success', 'Success'), ('error', 'Error'), ('fail', 'Failed')], max_length=16)),
-                ('time_queue', models.DateTimeField(auto_now_add=True)),
-                ('time_start', models.DateTimeField(blank=True, null=True)),
-                ('time_end', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("queued", "Queued"),
+                            ("running", "Running"),
+                            ("success", "Success"),
+                            ("error", "Error"),
+                            ("fail", "Failed"),
+                        ],
+                        max_length=16,
+                    ),
+                ),
+                ("time_queue", models.DateTimeField(auto_now_add=True)),
+                ("time_start", models.DateTimeField(blank=True, null=True)),
+                ("time_end", models.DateTimeField(blank=True, null=True)),
             ],
         ),
         migrations.RemoveField(
-            model_name='build',
-            name='current_flow_index',
+            model_name="build",
+            name="current_flow_index",
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='build',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='rebuilds', to='build.Build'),
+            model_name="rebuild",
+            name="build",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="rebuilds",
+                to="build.Build",
+            ),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='rebuilds', to=settings.AUTH_USER_MODEL),
+            model_name="rebuild",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="rebuilds",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='build',
-            name='current_rebuild',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='current_builds', to='build.Rebuild'),
+            model_name="build",
+            name="current_rebuild",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="current_builds",
+                to="build.Rebuild",
+            ),
         ),
         migrations.AddField(
-            model_name='buildflow',
-            name='rebuild',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='flows', to='build.Rebuild'),
+            model_name="buildflow",
+            name="rebuild",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="flows",
+                to="build.Rebuild",
+            ),
         ),
     ]

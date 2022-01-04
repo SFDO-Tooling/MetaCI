@@ -8,12 +8,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0008_build_schedule'),
+        ("build", "0008_build_schedule"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='rebuild',
-            options={'ordering': ['-id']},
+            name="rebuild",
+            options={"ordering": ["-id"]},
         ),
     ]

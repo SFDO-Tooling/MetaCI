@@ -6,27 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0025_buildflowasset_category'),
+        ("build", "0025_buildflowasset_category"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='flowtask',
-            name='name',
+            model_name="flowtask",
+            name="name",
         ),
         migrations.RemoveField(
-            model_name='flowtask',
-            name='step_string',
+            model_name="flowtask",
+            name="step_string",
         ),
         migrations.AddField(
-            model_name='flowtask',
-            name='path',
-            field=models.CharField(default='', help_text='dotted path e.g. flow1.flow2.task_name', max_length=2048),
+            model_name="flowtask",
+            name="path",
+            field=models.CharField(
+                default="",
+                help_text="dotted path e.g. flow1.flow2.task_name",
+                max_length=2048,
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='flowtask',
-            name='stepnum',
-            field=models.CharField(help_text='dotted step number for CCI task', max_length=64),
+            model_name="flowtask",
+            name="stepnum",
+            field=models.CharField(
+                help_text="dotted step number for CCI task", max_length=64
+            ),
         ),
     ]

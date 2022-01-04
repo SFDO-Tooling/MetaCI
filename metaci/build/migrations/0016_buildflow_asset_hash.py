@@ -5,8 +5,9 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import metaci.utils
 
+
 def populate_hash(apps, schema_editor):
-    BuildFlow = apps.get_model('build', 'BuildFlow')
+    BuildFlow = apps.get_model("build", "BuildFlow")
     for build_flow in BuildFlow.objects.all().iterator():
         build_flow.asset_hash = metaci.utils.generate_hash()
         build_flow.save()
@@ -15,23 +16,23 @@ def populate_hash(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0015_auto_20180815_2300'),
+        ("build", "0015_auto_20180815_2300"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='buildflow',
-            name='asset_hash',
+            model_name="buildflow",
+            name="asset_hash",
             field=models.CharField(max_length=64, null=True),
             preserve_default=False,
         ),
-        migrations.RunPython(
-            populate_hash
-        ),
+        migrations.RunPython(populate_hash),
         migrations.AlterField(
-            model_name='buildflow',
-            name='asset_hash',
-            field=models.CharField(default=metaci.utils.generate_hash, max_length=64, unique=True),
+            model_name="buildflow",
+            name="asset_hash",
+            field=models.CharField(
+                default=metaci.utils.generate_hash, max_length=64, unique=True
+            ),
             preserve_default=True,
         ),
     ]

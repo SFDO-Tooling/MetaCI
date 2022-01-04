@@ -11,8 +11,6 @@ from metaci.api.views.cumulusci import (
 from metaci.api.views.plan import PlanRepositoryViewSet, PlanViewSet
 from metaci.api.views.repository import BranchViewSet, RepositoryViewSet
 from metaci.api.views.robot import RobotTestResultViewSet
-from metaci.api.views.testmethod_perf import TestMethodPerfListView
-from metaci.api.views.testmethod_perf_UI import TestMethodPerfUIApiView
 
 router = DefaultRouter()
 router.register(r"branches", BranchViewSet, basename="branch")
@@ -25,10 +23,6 @@ router.register(r"rebuilds", RebuildViewSet, basename="rebuild")
 router.register(r"repos", RepositoryViewSet, basename="repo")
 router.register(r"scratch_orgs", ScratchOrgInstanceViewSet, basename="scratch_org")
 router.register(r"services", ServiceViewSet, basename="service")
-router.register(r"testmethod_perf", TestMethodPerfListView, basename="testmethod_perf")
-router.register(
-    r"testmethod_perf_UI", TestMethodPerfUIApiView, basename="testmethod_perf_UI"
-)
 router.register(r"robot", RobotTestResultViewSet, basename="robot")
 
 urlpatterns = router.urls

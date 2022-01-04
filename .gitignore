@@ -94,13 +94,7 @@ dump.rdb
 # pyenv
 .python-version
 
-# JS dependencies
-requirements/node*
-requirements/yarn*
-/node
-
 # postgres database
 postgres/
 # safeguarding secrets
 sfdx_hub.key
-
