@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 import json
 from ipaddress import IPv4Network
-from pathlib import Path
 from typing import List
 
 import environ
@@ -18,7 +17,7 @@ ROOT_DIR = environ.Path(__file__) - 3  # (metaci/config/settings/base.py - 3 = m
 APPS_DIR = ROOT_DIR.path("metaci")
 
 env = environ.Env()
-env.read_env()
+env.read_env(".env")
 
 
 def ipv4_networks(val: str) -> List[IPv4Network]:
