@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0017_auto_20180904_1457_squashed_0020_auto_20180907_1414')
+        ("build", "0017_auto_20180904_1457_squashed_0020_auto_20180907_1414")
     ]
 
     # obsolete operations were removed here

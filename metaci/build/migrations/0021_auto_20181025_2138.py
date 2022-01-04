@@ -10,13 +10,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0020_auto_20181019_0116'),
+        ("build", "0020_auto_20181019_0116"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='build',
-            name='qa_user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='builds_qa', to=settings.AUTH_USER_MODEL),
+            model_name="build",
+            name="qa_user",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="builds_qa",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

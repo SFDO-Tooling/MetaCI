@@ -11,18 +11,28 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('build', '0018_rebuild_qa_comment'),
+        ("build", "0018_rebuild_qa_comment"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='build',
-            name='qa_user',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='builds_qa', to=settings.AUTH_USER_MODEL),
+            model_name="build",
+            name="qa_user",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="builds_qa",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='qa_user',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='rebuilds_qa', to=settings.AUTH_USER_MODEL),
+            model_name="rebuild",
+            name="qa_user",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="rebuilds_qa",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

@@ -9,22 +9,40 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('build', '0011_auto_20170814_1739'), ('build', '0012_auto_20170814_1744'), ('build', '0013_auto_20170814_1745')]
+    replaces = [
+        ("build", "0011_auto_20170814_1739"),
+        ("build", "0012_auto_20170814_1744"),
+        ("build", "0013_auto_20170814_1745"),
+    ]
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('build', '0010_auto_20170810_2356'),
+        ("build", "0010_auto_20170810_2356"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='build',
-            name='build_type',
-            field=models.CharField(choices=[('manual', 'Manual'), ('auto', 'Auto'), ('scheduled', 'Scheduled'), ('legacy', 'Legacy - Probably Automatic')], default='legacy', max_length=16),
+            model_name="build",
+            name="build_type",
+            field=models.CharField(
+                choices=[
+                    ("manual", "Manual"),
+                    ("auto", "Auto"),
+                    ("scheduled", "Scheduled"),
+                    ("legacy", "Legacy - Probably Automatic"),
+                ],
+                default="legacy",
+                max_length=16,
+            ),
         ),
         migrations.AddField(
-            model_name='build',
-            name='user',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='builds', to=settings.AUTH_USER_MODEL),
+            model_name="build",
+            name="user",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="builds",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

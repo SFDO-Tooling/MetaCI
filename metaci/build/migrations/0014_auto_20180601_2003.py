@@ -10,28 +10,36 @@ import metaci.build.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0013_auto_20180508_2112'),
+        ("build", "0013_auto_20180508_2112"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='flowtask',
-            name='exception_value',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True),
+            model_name="flowtask",
+            name="exception_value",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='flowtask',
-            name='options',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True),
+            model_name="flowtask",
+            name="options",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='flowtask',
-            name='result',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True),
+            model_name="flowtask",
+            name="result",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='flowtask',
-            name='return_values',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True),
+            model_name="flowtask",
+            name="return_values",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True
+            ),
         ),
     ]

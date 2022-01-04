@@ -8,28 +8,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0019_auto_20180907_1335'),
+        ("build", "0019_auto_20180907_1335"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='build',
-            name='time_qa_end',
+            model_name="build",
+            name="time_qa_end",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='build',
-            name='time_qa_start',
+            model_name="build",
+            name="time_qa_start",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='time_qa_end',
+            model_name="rebuild",
+            name="time_qa_end",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='time_qa_start',
+            model_name="rebuild",
+            name="time_qa_start",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

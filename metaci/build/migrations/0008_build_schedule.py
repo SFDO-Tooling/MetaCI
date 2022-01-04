@@ -9,8 +9,8 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plan', '0004_remove_plan_devhub'),
-        ('build', '0007_auto_20170505_1607'),
+        ("plan", "0004_remove_plan_devhub"),
+        ("build", "0007_auto_20170505_1607"),
     ]
     # obsolete operations were removed here
     # because they were causing errors:

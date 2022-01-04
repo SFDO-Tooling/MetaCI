@@ -9,24 +9,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cumulusci', '0005_scratchorginstance_delete_error'),
-        ('build', '0009_auto_20170809_1723'),
+        ("cumulusci", "0005_scratchorginstance_delete_error"),
+        ("build", "0009_auto_20170809_1723"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='rebuild',
-            name='error_message',
+            model_name="rebuild",
+            name="error_message",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='exception',
+            model_name="rebuild",
+            name="exception",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='org_instance',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='rebuilds', to='cumulusci.ScratchOrgInstance'),
+            model_name="rebuild",
+            name="org_instance",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="rebuilds",
+                to="cumulusci.ScratchOrgInstance",
+            ),
         ),
     ]

@@ -11,50 +11,131 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('plan', '__first__'),
-        ('repository', '__first__'),
+        ("plan", "__first__"),
+        ("repository", "__first__"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Build',
+            name="Build",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('commit', models.CharField(max_length=64)),
-                ('tag', models.CharField(blank=True, max_length=255, null=True)),
-                ('pr', models.IntegerField(blank=True, null=True)),
-                ('log', models.TextField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('queued', 'Queued'), ('running', 'Running'), ('success', 'Success'), ('error', 'Error'), ('fail', 'Failed')], default='queued', max_length=16)),
-                ('current_flow_index', models.IntegerField(default=0)),
-                ('task_id_status_start', models.CharField(blank=True, max_length=64, null=True)),
-                ('task_id_check', models.CharField(blank=True, max_length=64, null=True)),
-                ('task_id_run', models.CharField(blank=True, max_length=64, null=True)),
-                ('task_id_status_end', models.CharField(blank=True, max_length=64, null=True)),
-                ('time_queue', models.DateTimeField(auto_now_add=True)),
-                ('time_start', models.DateTimeField(blank=True, null=True)),
-                ('time_end', models.DateTimeField(blank=True, null=True)),
-                ('branch', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='builds', to='repository.Branch')),
-                ('plan', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='builds', to='plan.Plan')),
-                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='builds', to='repository.Repository')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("commit", models.CharField(max_length=64)),
+                ("tag", models.CharField(blank=True, max_length=255, null=True)),
+                ("pr", models.IntegerField(blank=True, null=True)),
+                ("log", models.TextField(blank=True, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("queued", "Queued"),
+                            ("running", "Running"),
+                            ("success", "Success"),
+                            ("error", "Error"),
+                            ("fail", "Failed"),
+                        ],
+                        default="queued",
+                        max_length=16,
+                    ),
+                ),
+                ("current_flow_index", models.IntegerField(default=0)),
+                (
+                    "task_id_status_start",
+                    models.CharField(blank=True, max_length=64, null=True),
+                ),
+                (
+                    "task_id_check",
+                    models.CharField(blank=True, max_length=64, null=True),
+                ),
+                ("task_id_run", models.CharField(blank=True, max_length=64, null=True)),
+                (
+                    "task_id_status_end",
+                    models.CharField(blank=True, max_length=64, null=True),
+                ),
+                ("time_queue", models.DateTimeField(auto_now_add=True)),
+                ("time_start", models.DateTimeField(blank=True, null=True)),
+                ("time_end", models.DateTimeField(blank=True, null=True)),
+                (
+                    "branch",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="builds",
+                        to="repository.Branch",
+                    ),
+                ),
+                (
+                    "plan",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="builds",
+                        to="plan.Plan",
+                    ),
+                ),
+                (
+                    "repo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="builds",
+                        to="repository.Repository",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-time_queue'],
+                "ordering": ["-time_queue"],
             },
         ),
         migrations.CreateModel(
-            name='BuildFlow',
+            name="BuildFlow",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('queued', 'Queued'), ('running', 'Running'), ('success', 'Success'), ('error', 'Error'), ('fail', 'Failed')], default='queued', max_length=16)),
-                ('flow', models.CharField(blank=True, max_length=255, null=True)),
-                ('log', models.TextField(blank=True, null=True)),
-                ('time_queue', models.DateTimeField(auto_now_add=True)),
-                ('time_start', models.DateTimeField(blank=True, null=True)),
-                ('time_end', models.DateTimeField(blank=True, null=True)),
-                ('tests_total', models.IntegerField(blank=True, null=True)),
-                ('tests_pass', models.IntegerField(blank=True, null=True)),
-                ('tests_fail', models.IntegerField(blank=True, null=True)),
-                ('build', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='flows', to='build.Build')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("queued", "Queued"),
+                            ("running", "Running"),
+                            ("success", "Success"),
+                            ("error", "Error"),
+                            ("fail", "Failed"),
+                        ],
+                        default="queued",
+                        max_length=16,
+                    ),
+                ),
+                ("flow", models.CharField(blank=True, max_length=255, null=True)),
+                ("log", models.TextField(blank=True, null=True)),
+                ("time_queue", models.DateTimeField(auto_now_add=True)),
+                ("time_start", models.DateTimeField(blank=True, null=True)),
+                ("time_end", models.DateTimeField(blank=True, null=True)),
+                ("tests_total", models.IntegerField(blank=True, null=True)),
+                ("tests_pass", models.IntegerField(blank=True, null=True)),
+                ("tests_fail", models.IntegerField(blank=True, null=True)),
+                (
+                    "build",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="flows",
+                        to="build.Build",
+                    ),
+                ),
             ],
         ),
     ]

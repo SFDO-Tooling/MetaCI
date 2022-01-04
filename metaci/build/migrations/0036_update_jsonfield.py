@@ -7,28 +7,36 @@ import metaci.build.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0035_build_commit_status'),
+        ("build", "0035_build_commit_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='flowtask',
-            name='exception_value',
-            field=models.JSONField(blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True),
+            model_name="flowtask",
+            name="exception_value",
+            field=models.JSONField(
+                blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='flowtask',
-            name='options',
-            field=models.JSONField(blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True),
+            model_name="flowtask",
+            name="options",
+            field=models.JSONField(
+                blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='flowtask',
-            name='result',
-            field=models.JSONField(blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True),
+            model_name="flowtask",
+            name="result",
+            field=models.JSONField(
+                blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='flowtask',
-            name='return_values',
-            field=models.JSONField(blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True),
+            model_name="flowtask",
+            name="return_values",
+            field=models.JSONField(
+                blank=True, encoder=metaci.build.models.GnarlyEncoder, null=True
+            ),
         ),
     ]

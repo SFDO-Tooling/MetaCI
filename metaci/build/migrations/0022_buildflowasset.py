@@ -10,16 +10,34 @@ import metaci.build.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0021_auto_20181025_2138'),
+        ("build", "0021_auto_20181025_2138"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BuildFlowAsset',
+            name="BuildFlowAsset",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('asset', models.FileField(upload_to=metaci.build.models.asset_upload_to)),
-                ('build_flow', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='assets', to='build.BuildFlow')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "asset",
+                    models.FileField(upload_to=metaci.build.models.asset_upload_to),
+                ),
+                (
+                    "build_flow",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="assets",
+                        to="build.BuildFlow",
+                    ),
+                ),
             ],
         ),
     ]

@@ -9,62 +9,101 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('build', '0017_auto_20180904_1457'), ('build', '0018_rebuild_qa_comment'), ('build', '0019_auto_20180907_1335'), ('build', '0020_auto_20180907_1414')]
+    replaces = [
+        ("build", "0017_auto_20180904_1457"),
+        ("build", "0018_rebuild_qa_comment"),
+        ("build", "0019_auto_20180907_1335"),
+        ("build", "0020_auto_20180907_1414"),
+    ]
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('build', '0016_buildflow_asset_hash'),
+        ("build", "0016_buildflow_asset_hash"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='build',
-            name='qa_comment',
+            model_name="build",
+            name="qa_comment",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='build',
-            name='status',
-            field=models.CharField(choices=[('queued', 'Queued'), ('waiting', 'Waiting'), ('running', 'Running'), ('success', 'Success'), ('error', 'Error'), ('fail', 'Failed'), ('qa', 'QA Testing')], default='queued', max_length=16),
+            model_name="build",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("queued", "Queued"),
+                    ("waiting", "Waiting"),
+                    ("running", "Running"),
+                    ("success", "Success"),
+                    ("error", "Error"),
+                    ("fail", "Failed"),
+                    ("qa", "QA Testing"),
+                ],
+                default="queued",
+                max_length=16,
+            ),
         ),
         migrations.AlterField(
-            model_name='rebuild',
-            name='status',
-            field=models.CharField(choices=[('queued', 'Queued'), ('waiting', 'Waiting'), ('running', 'Running'), ('success', 'Success'), ('error', 'Error'), ('fail', 'Failed'), ('qa', 'QA Testing')], default='queued', max_length=16),
+            model_name="rebuild",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("queued", "Queued"),
+                    ("waiting", "Waiting"),
+                    ("running", "Running"),
+                    ("success", "Success"),
+                    ("error", "Error"),
+                    ("fail", "Failed"),
+                    ("qa", "QA Testing"),
+                ],
+                default="queued",
+                max_length=16,
+            ),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='qa_comment',
+            model_name="rebuild",
+            name="qa_comment",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='build',
-            name='qa_user',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='builds_qa', to=settings.AUTH_USER_MODEL),
+            model_name="build",
+            name="qa_user",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="builds_qa",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='qa_user',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='rebuilds_qa', to=settings.AUTH_USER_MODEL),
+            model_name="rebuild",
+            name="qa_user",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="rebuilds_qa",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='build',
-            name='time_qa_end',
+            model_name="build",
+            name="time_qa_end",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='build',
-            name='time_qa_start',
+            model_name="build",
+            name="time_qa_start",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='time_qa_end',
+            model_name="rebuild",
+            name="time_qa_end",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='rebuild',
-            name='time_qa_start',
+            model_name="rebuild",
+            name="time_qa_start",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

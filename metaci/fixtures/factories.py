@@ -19,11 +19,7 @@ from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.plan.models import Plan, PlanRepository, PlanSchedule
 from metaci.release.models import ChangeCaseTemplate, Release, ReleaseCohort
 from metaci.repository.models import Branch, Repository
-from metaci.testresults.models import (
-    TestClass,
-    TestMethod,
-    TestResult,
-)
+from metaci.testresults.models import TestClass, TestMethod, TestResult
 from metaci.users.models import User
 
 BUILD_STATUS_NAMES = (

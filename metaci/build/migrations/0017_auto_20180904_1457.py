@@ -8,23 +8,47 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0016_buildflow_asset_hash'),
+        ("build", "0016_buildflow_asset_hash"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='build',
-            name='qa_comment',
+            model_name="build",
+            name="qa_comment",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='build',
-            name='status',
-            field=models.CharField(choices=[('queued', 'Queued'), ('waiting', 'Waiting'), ('running', 'Running'), ('success', 'Success'), ('error', 'Error'), ('fail', 'Failed'), ('qa', 'QA Testing')], default='queued', max_length=16),
+            model_name="build",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("queued", "Queued"),
+                    ("waiting", "Waiting"),
+                    ("running", "Running"),
+                    ("success", "Success"),
+                    ("error", "Error"),
+                    ("fail", "Failed"),
+                    ("qa", "QA Testing"),
+                ],
+                default="queued",
+                max_length=16,
+            ),
         ),
         migrations.AlterField(
-            model_name='rebuild',
-            name='status',
-            field=models.CharField(choices=[('queued', 'Queued'), ('waiting', 'Waiting'), ('running', 'Running'), ('success', 'Success'), ('error', 'Error'), ('fail', 'Failed'), ('qa', 'QA Testing')], default='queued', max_length=16),
+            model_name="rebuild",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("queued", "Queued"),
+                    ("waiting", "Waiting"),
+                    ("running", "Running"),
+                    ("success", "Success"),
+                    ("error", "Error"),
+                    ("fail", "Failed"),
+                    ("qa", "QA Testing"),
+                ],
+                default="queued",
+                max_length=16,
+            ),
         ),
     ]

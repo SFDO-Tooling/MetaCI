@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0023_buildflow_traceback'),
-        ('build', '0022_buildflowasset'),
+        ("build", "0023_buildflow_traceback"),
+        ("build", "0022_buildflowasset"),
     ]
 
-    operations = [
-    ]
+    operations = []
