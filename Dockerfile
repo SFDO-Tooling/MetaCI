@@ -34,6 +34,8 @@ RUN /app/docker/utility/install_chromedriver.sh $CHROMEDRIVER_DIR $CHROMEDRIVER_
 # Update PATH
 ENV PATH $CHROMEDRIVER_DIR:$PATH:/app/sfdx/bin
 
+WORKDIR /app
+
 # installing sfdx
 COPY ./docker/utility/install_sfdx.sh ./docker/utility/install_sfdx.sh
 RUN /bin/sh /app/docker/utility/install_sfdx.sh
