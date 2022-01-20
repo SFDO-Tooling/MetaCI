@@ -26,9 +26,9 @@ Please see `<./docs/configuring.rst>`_ for more details.
 Install MetaCI
 ==============
 
-MetaCI development requires Python v3.8. If ``which python3.8`` returns a
+MetaCI development requires Python v3.9. If ``which python3.9`` returns a
 non-empty path, it's already installed and you can continue to the next step. If
-it returns nothing, then install Python v3.8 using ``brew install python``, or
+it returns nothing, then install Python v3.9 using ``brew install python``, or
 from `Python.org`_.
 
 .. _Python.org: https://www.python.org/downloads/
@@ -37,7 +37,7 @@ Python software should always be installed into a "virtualenv" (virtual environm
 to make sure that its dependencies are isolated from other Python software on your machine.
 To create a new virtualenv, run::
 
-    python3.8 -m venv venv
+    python3.9 -m venv venv
     rehash
 
 Now you can install MetaCI's Python dependencies::
