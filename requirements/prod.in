@@ -22,7 +22,6 @@ djangorestframework-filters==1.0.0.dev2
 django-filter
 gunicorn
 honcho
-Pillow
 psycopg2-binary
 PyJWT
 redis
