@@ -48,15 +48,39 @@ class TestRelease:
 
         assert "in Planned status" in str(e)
 
-        cohort.status = "Canceled"
+        cohort.status = "Planned"
         cohort.save()
         release.release_cohort=cohort
         release.save()
 
     @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+    def test_release_cannot_remove_from_cohort_unless_status_is_planned(self, smfs_mock):
+        cohort = ReleaseCohortFactory()
+        cohort.status = "Planned"
+        cohort.save()
+
+        release = ReleaseFactory()
+        release.release_cohort=cohort
+        release.save()
+
+        cohort.status = "Canceled"
+        cohort.save()
+        release.release_cohort=None
+
+        with pytest.raises(ValidationError) as e:
+            release.save()
+
+        assert "cannot be removed from a Release Cohort" in str(e)
+
+        cohort.status = "Planned"
+        cohort.save()
+        release.release_cohort=None
+        release.save()
+
+    @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
     def test_release_cannot_move_between_cohorts_unless_both_planned(self, smfs_mock):
-        cohort = ReleaseCohortFactory(status="Canceled")
-        other_cohort = ReleaseCohortFactory(status="Planned")
+        cohort = ReleaseCohortFactory(status="Planned")
+        other_cohort = ReleaseCohortFactory(status="Canceled")
 
         release = ReleaseFactory()
         release.release_cohort=cohort
@@ -66,8 +90,9 @@ class TestRelease:
             release.release_cohort = other_cohort
             release.save()
 
-        assert "moved between Release Cohorts" in str(e)
+        assert "Release Cohort in Planned status" in str(e)
 
+    @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
     def test_release_can_move_between_cohorts_both_planned(self, smfs_mock):
         cohort = ReleaseCohortFactory(status="Planned")
         other_cohort = ReleaseCohortFactory(status="Planned")
