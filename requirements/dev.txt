@@ -6,9 +6,7 @@
 #
 alabaster==0.7.12
     # via sphinx
-appnope==0.1.2
-    # via ipython
-asgiref==3.4.1
+asgiref==3.5.0
     # via
     #   -c requirements/prod.txt
     #   django
@@ -38,7 +36,7 @@ click==7.1.2
     # via
     #   -c requirements/prod.txt
     #   black
-coverage==6.2
+coverage==6.3
     # via
     #   -r requirements/dev.in
     #   coveralls
@@ -79,7 +77,7 @@ filelock==3.4.2
     # via virtualenv
 flake8==4.0.1
     # via -r requirements/dev.in
-identify==2.4.4
+identify==2.4.5
     # via pre-commit
 idna==3.3
     # via
@@ -144,7 +142,7 @@ prompt-toolkit==3.0.24
     # via ipython
 ptyprocess==0.7.0
     # via pexpect
-pure-eval==0.2.1
+pure-eval==0.2.2
     # via stack-data
 py==1.11.0
     # via pytest
@@ -157,7 +155,7 @@ pygments==2.11.2
     #   -c requirements/prod.txt
     #   ipython
     #   sphinx
-pyparsing==3.0.6
+pyparsing==3.0.7
     # via
     #   -c requirements/prod.txt
     #   packaging
