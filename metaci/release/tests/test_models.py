@@ -1,4 +1,5 @@
 import datetime
+import unittest
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -7,6 +8,7 @@ from model_utils import Choices
 from metaci.conftest import RepositoryFactory
 from metaci.fixtures.factories import (
     PlanFactory,
+    ReleaseFactory,
     PlanRepositoryFactory,
     ReleaseCohortFactory,
 )
@@ -33,6 +35,51 @@ class TestImplementationSteps:
 
 @pytest.mark.django_db
 class TestRelease:
+    @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+    def test_release_cannot_link_to_cohort_unless_status_is_planned(self, smfs_mock):
+        cohort = ReleaseCohortFactory()
+        cohort.status = "Canceled"
+        cohort.save()
+
+        release = ReleaseFactory()
+        release.release_cohort=cohort
+        with pytest.raises(ValidationError) as e:
+            release.save()
+
+        assert "in Planned status" in str(e)
+
+        cohort.status = "Canceled"
+        cohort.save()
+        release.release_cohort=cohort
+        release.save()
+
+    @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+    def test_release_cannot_move_between_cohorts_unless_both_planned(self, smfs_mock):
+        cohort = ReleaseCohortFactory(status="Canceled")
+        other_cohort = ReleaseCohortFactory(status="Planned")
+
+        release = ReleaseFactory()
+        release.release_cohort=cohort
+        release.save()
+
+        with pytest.raises(ValidationError) as e:
+            release.release_cohort = other_cohort
+            release.save()
+
+        assert "moved between Release Cohorts" in str(e)
+
+    def test_release_can_move_between_cohorts_both_planned(self, smfs_mock):
+        cohort = ReleaseCohortFactory(status="Planned")
+        other_cohort = ReleaseCohortFactory(status="Planned")
+
+        release = ReleaseFactory()
+        release.release_cohort=cohort
+        release.save()
+
+        release.release_cohort = other_cohort
+        release.save()  # "assertion" is that no ValidationError is thrown.
+
+
     def test_empty_release_init(self):
         release = Release(repo=Repository(), change_case_template=ChangeCaseTemplate())
         assert release.release_creation_date == datetime.date.today()

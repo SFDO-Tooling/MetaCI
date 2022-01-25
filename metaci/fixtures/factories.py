@@ -247,6 +247,6 @@ class ReleaseCohortFactory(factory.django.DjangoModelFactory):
         model = ReleaseCohort
 
     name = fake_name()
-    status = "Active"
-    merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
-    merge_freeze_end = datetime.now(tz=timezone.utc) + timedelta(days=1)
+    status = "Planned"
+    merge_freeze_start = datetime.now(tz=timezone.utc) + timedelta(days=1)
+    merge_freeze_end = datetime.now(tz=timezone.utc) + timedelta(days=2)

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone, timedelta
 import json
 from unittest import mock
 from unittest.mock import patch
@@ -354,6 +355,12 @@ class TestRepositoryViews(TestCase):
     def test_handle_github_pr_webhook__freeze_on(self, smfs_mock, smfsc_mock):
         cohort = ReleaseCohortFactory()
         ReleaseFactory(release_cohort=cohort, repo=self.repo)
+
+        cohort.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(
+            minutes=20
+        )
+        cohort.status = "Active"
+        cohort.save()
 
         payload = {
             "repository": {"id": self.repo.github_id},
