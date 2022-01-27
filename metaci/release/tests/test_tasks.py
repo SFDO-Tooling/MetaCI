@@ -23,6 +23,7 @@ def test_update_release_cohorts():
     cohort_ended.merge_freeze_end = datetime.now(tz=timezone.utc) - timedelta(
         minutes=20
     )
+    cohort_ended.status = "Active"
     cohort_ended.save()
 
     cohort_started = ReleaseCohortFactory()
@@ -78,18 +79,14 @@ def test_set_merge_freeze_status__off():
 @pytest.mark.django_db
 def test_react_to_release_cohort_change__activate(smfs_mock, rmfs_mock):
     cohort = ReleaseCohortFactory()
-    cohort.status = "Canceled"
-    cohort.save()
     release = ReleaseFactory(repo=RepositoryFactory())
     release.release_cohort = cohort
     release.save()
 
     cohort.status = "Active"
+    cohort.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
     cohort.save()
 
-    # release_merge_freeze_if_safe() will also be called once,
-    # when we associate the Release to a Canceled Cohort.
-    # That is not under test here.
     smfs_mock.assert_called_once_with(release.repo, freeze=True)
 
 
@@ -101,6 +98,12 @@ def test_react_to_release_cohort_change__deactivate(smfs_mock, rmfs_mock):
     release = ReleaseFactory(repo=RepositoryFactory())
     release.release_cohort = cohort
     release.save()
+    cohort.status = "Active"
+    cohort.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
+    cohort.save()
+
+    rmfs_mock.reset_mock()  # Called once on initial add to cohort.
+
     cohort.status = "Canceled"
     cohort.save()
 
@@ -108,49 +111,6 @@ def test_react_to_release_cohort_change__deactivate(smfs_mock, rmfs_mock):
     # when the release is associated with the cohort,
     # but that's not under test here.
     rmfs_mock.assert_called_once_with(release.repo)
-
-
-@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
-@pytest.mark.django_db
-def test_react_to_release_change__created_active(smfs_mock):
-    cohort = ReleaseCohortFactory()
-    release = ReleaseFactory(repo=RepositoryFactory())
-    release.release_cohort = cohort
-    release.save()
-
-    smfs_mock.assert_called_once_with(release.repo, freeze=True)
-
-
-@pytest.mark.django_db
-@unittest.mock.patch("metaci.release.tasks.release_merge_freeze_if_safe")
-def test_react_to_release_change__moved_active(rmfs_mock):
-    canceled_cohort = ReleaseCohortFactory(status="Canceled")
-    cohort = ReleaseCohortFactory()
-    release = ReleaseFactory(repo=RepositoryFactory(), release_cohort=canceled_cohort)
-
-    with unittest.mock.patch(
-        "metaci.release.tasks.set_merge_freeze_status"
-    ) as smfs_mock:
-        release.release_cohort = cohort
-        release.save()
-
-        smfs_mock.assert_called_once_with(release.repo, freeze=True)
-
-
-@pytest.mark.django_db
-@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
-def test_react_to_release_change__moved_inactive(smfs_mock):
-    canceled_cohort = ReleaseCohortFactory(status="Canceled")
-    cohort = ReleaseCohortFactory()
-    release = ReleaseFactory(repo=RepositoryFactory(), release_cohort=cohort)
-
-    with unittest.mock.patch(
-        "metaci.release.tasks.release_merge_freeze_if_safe"
-    ) as rmfs_mock:
-        release.release_cohort = canceled_cohort
-        release.save()
-
-        rmfs_mock.assert_called_once_with(release.repo)
 
 
 @pytest.mark.django_db
@@ -169,6 +129,10 @@ def test_react_to_release_deletion(smfs_mock, rmfs_mock):
 def test_release_merge_freeze_if_safe__not_safe(smfs_mock):
     cohort = ReleaseCohortFactory()
     release = ReleaseFactory(repo=RepositoryFactory(), release_cohort=cohort)
+    cohort.status = "Active"
+    cohort.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
+    cohort.save()
+    
     smfs_mock.reset_mock()
 
     release_merge_freeze_if_safe(release.repo)

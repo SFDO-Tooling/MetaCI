@@ -213,6 +213,21 @@ class Release(StatusModel):
         update_release_from_github(self)
 
     def save(self, *args, **kw):
+        # We don't allow adding a Release to a Release Cohort other than in Planned status.
+        # We also don't allow reparenting from one Release Cohort to another unless both Cohorts
+        # are in Planned status.
+        if not self.pk:
+            old_cohort = None
+        else:
+            old_cohort = Release.objects.get(pk=self.pk).release_cohort
+
+        if old_cohort != self.release_cohort:
+            if self.release_cohort and self.release_cohort.status != "Planned":
+                raise ValidationError(_("Releases must be added to a Release Cohort in Planned status."))
+
+            if old_cohort and old_cohort.status != "Planned":
+                raise ValidationError(_("Releases cannot be removed from a Release Cohort that is not in Planned status."))
+
         super().save(*args, **kw)
         for step_dict in self.repo.default_implementation_steps:
             if len(step_dict) > 0:
