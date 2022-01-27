@@ -491,3 +491,8 @@ GUARDIAN_MONKEY_PATCH = False
 
 JS_REVERSE_JS_VAR_NAME = "api_urls"
 JS_REVERSE_EXCLUDE_NAMESPACES = ["admin", "admin_rest"]
+
+# MetaPush integration settings
+
+METAPUSH_ENDPOINT_URL = env("METAPUSH_ENDPOINT_URL", default=None)
+METAPUSH_AUTHORIZATION_TOKEN = end("METAPUSH_AUTHORIZATION_TOKEN", default=None)
