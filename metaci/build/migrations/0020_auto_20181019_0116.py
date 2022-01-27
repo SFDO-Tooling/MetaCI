@@ -8,12 +8,15 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0019_build_planrepo'),
+        ("build", "0019_build_planrepo"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='build',
-            options={'ordering': ['-time_queue'], 'permissions': (('search_builds', 'Search Builds'),)},
+            name="build",
+            options={
+                "ordering": ["-time_queue"],
+                "permissions": (("search_builds", "Search Builds"),),
+            },
         ),
     ]

@@ -29,22 +29,10 @@ urlpatterns = [
         name="repo_orgs",
     ),
     re_path(
-        r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/perf",
-        repository_views.repo_perf,
-        name="repo_perf",
-        kwargs={"tab": "perf"},
-    ),
-    re_path(
         r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/results",
         repository_views.repo_results,
         name="repo_results",
         kwargs={"tab": "results"},
-    ),
-    re_path(
-        r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/tests",
-        repository_views.repo_tests,
-        name="repo_tests",
-        kwargs={"tab": "tests"},
     ),
     re_path(
         r"(?P<owner>[-\w]+)/(?P<name>[^/].*)/*$",

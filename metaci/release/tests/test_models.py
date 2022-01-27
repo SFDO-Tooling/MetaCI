@@ -1,15 +1,24 @@
 import datetime
+import unittest
 
 import pytest
 from django.core.exceptions import ValidationError
 from model_utils import Choices
 
 from metaci.conftest import RepositoryFactory
-from metaci.fixtures.factories import (PlanFactory, PlanRepositoryFactory,
-                                       ReleaseCohortFactory)
-from metaci.release.models import (ChangeCaseTemplate,
-                                   DefaultImplementationStep,
-                                   ImplementationStep, Release)
+from metaci.fixtures.factories import (
+    PlanFactory,
+    ReleaseFactory,
+    PlanRepositoryFactory,
+    ReleaseCohortFactory,
+)
+from metaci.release.models import (
+    ChangeCaseTemplate,
+    DefaultImplementationStep,
+    ImplementationStep,
+    Release,
+    ReleaseCohort
+)
 from metaci.repository.models import Repository
 
 
@@ -27,6 +36,76 @@ class TestImplementationSteps:
 
 @pytest.mark.django_db
 class TestRelease:
+    @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+    def test_release_cannot_link_to_cohort_unless_status_is_planned(self, smfs_mock):
+        cohort = ReleaseCohortFactory()
+        cohort.status = ReleaseCohort.STATUS.canceled
+        cohort.save()
+
+        release = ReleaseFactory()
+        release.release_cohort=cohort
+        with pytest.raises(ValidationError) as e:
+            release.save()
+
+        assert "in Planned status" in str(e)
+
+        cohort.status = ReleaseCohort.STATUS.planned
+        cohort.save()
+        release.release_cohort=cohort
+        release.save()
+
+    @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+    def test_release_cannot_remove_from_cohort_unless_status_is_planned(self, smfs_mock):
+        cohort = ReleaseCohortFactory()
+        cohort.status = ReleaseCohort.STATUS.planned
+        cohort.save()
+
+        release = ReleaseFactory()
+        release.release_cohort=cohort
+        release.save()
+
+        cohort.status = ReleaseCohort.STATUS.canceled
+        cohort.save()
+        release.release_cohort=None
+
+        with pytest.raises(ValidationError) as e:
+            release.save()
+
+        assert "cannot be removed from a Release Cohort" in str(e)
+
+        cohort.status = ReleaseCohort.STATUS.planned
+        cohort.save()
+        release.release_cohort=None
+        release.save()
+
+    @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+    def test_release_cannot_move_between_cohorts_unless_both_planned(self, smfs_mock):
+        cohort = ReleaseCohortFactory(status=ReleaseCohort.STATUS.planned)
+        other_cohort = ReleaseCohortFactory(status=ReleaseCohort.STATUS.canceled)
+
+        release = ReleaseFactory()
+        release.release_cohort=cohort
+        release.save()
+
+        with pytest.raises(ValidationError) as e:
+            release.release_cohort = other_cohort
+            release.save()
+
+        assert "Release Cohort in Planned status" in str(e)
+
+    @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+    def test_release_can_move_between_cohorts_both_planned(self, smfs_mock):
+        cohort = ReleaseCohortFactory(status=ReleaseCohort.STATUS.planned)
+        other_cohort = ReleaseCohortFactory(status=ReleaseCohort.STATUS.planned)
+
+        release = ReleaseFactory()
+        release.release_cohort=cohort
+        release.save()
+
+        release.release_cohort = other_cohort
+        release.save()  # "assertion" is that no ValidationError is thrown.
+
+
     def test_empty_release_init(self):
         release = Release(repo=Repository(), change_case_template=ChangeCaseTemplate())
         assert release.release_creation_date == datetime.date.today()
@@ -99,7 +178,7 @@ class TestReleaseCohort:
     def test_validation_active(self):
         cohort = ReleaseCohortFactory()
         with pytest.raises(ValidationError) as e:
-            cohort.status = "Completed"
+            cohort.status = ReleaseCohort.STATUS.completed
             cohort.clean()
             assert "must be in Active status" in str(e)
 
@@ -118,6 +197,6 @@ class TestReleaseCohort:
     def test_validation_completed_without_date(self):
         cohort = ReleaseCohortFactory()
         with pytest.raises(ValidationError) as e:
-            cohort.status = "Completed"
+            cohort.status = ReleaseCohort.STATUS.completed
             cohort.clean()
             assert "may not be in Completed status" in str(e)

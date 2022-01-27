@@ -8,13 +8,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0006_build_commit_message'),
+        ("build", "0006_build_commit_message"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='rebuild',
-            name='status',
-            field=models.CharField(choices=[('queued', 'Queued'), ('waiting', 'Waiting'), ('running', 'Running'), ('success', 'Success'), ('error', 'Error'), ('fail', 'Failed')], default='queued', max_length=16),
+            model_name="rebuild",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("queued", "Queued"),
+                    ("waiting", "Waiting"),
+                    ("running", "Running"),
+                    ("success", "Success"),
+                    ("error", "Error"),
+                    ("fail", "Failed"),
+                ],
+                default="queued",
+                max_length=16,
+            ),
         ),
     ]

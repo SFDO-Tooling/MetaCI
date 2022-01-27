@@ -1,3 +1,4 @@
+from datetime import datetime, timezone, timedelta
 import json
 from unittest import mock
 from unittest.mock import patch
@@ -20,6 +21,7 @@ from metaci.conftest import (
     UserFactory,
 )
 from metaci.fixtures.factories import ReleaseCohortFactory
+from metaci.release.models import ReleaseCohort
 from metaci.repository import views
 from metaci.repository.models import Branch
 
@@ -144,31 +146,6 @@ class TestRepositoryViews(TestCase):
         assert response.status_code == 404  # no permissions
 
         assign_perm("plan.org_login", self.user, self.planrepo)
-
-        response = self.client.get(url)
-        assert response.status_code == 200
-
-    @pytest.mark.django_db
-    def test_repo_perf__as_superuser(self):
-        self.client.force_login(self.superuser)
-        url = reverse(
-            "repo_perf", kwargs={"owner": self.repo.owner, "name": self.repo.name}
-        )
-
-        response = self.client.get(url)
-        assert response.status_code == 200
-
-    @pytest.mark.django_db
-    def test_repo_perf__as_user(self):
-        self.client.force_login(self.user)
-        url = reverse(
-            "repo_perf", kwargs={"owner": self.repo.owner, "name": self.repo.name}
-        )
-
-        response = self.client.get(url)
-        assert response.status_code == 404  # no permissions
-
-        assign_perm("plan.view_builds", self.user, self.planrepo)
 
         response = self.client.get(url)
         assert response.status_code == 200
@@ -379,6 +356,12 @@ class TestRepositoryViews(TestCase):
     def test_handle_github_pr_webhook__freeze_on(self, smfs_mock, smfsc_mock):
         cohort = ReleaseCohortFactory()
         ReleaseFactory(release_cohort=cohort, repo=self.repo)
+
+        cohort.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(
+            minutes=20
+        )
+        cohort.status = ReleaseCohort.STATUS.active
+        cohort.save()
 
         payload = {
             "repository": {"id": self.repo.github_id},

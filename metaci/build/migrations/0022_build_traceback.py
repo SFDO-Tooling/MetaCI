@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0021_auto_20181025_2138'),
+        ("build", "0021_auto_20181025_2138"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='build',
-            name='traceback',
+            model_name="build",
+            name="traceback",
             field=models.TextField(blank=True, null=True),
         ),
     ]

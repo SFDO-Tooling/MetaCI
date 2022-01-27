@@ -328,18 +328,14 @@ def test_set_merge_freeze_status__off():
 @pytest.mark.django_db
 def test_react_to_release_cohort_change__activate(smfs_mock, rmfs_mock):
     cohort = ReleaseCohortFactory()
-    cohort.status = ReleaseCohort.STATUS.canceled
-    cohort.save()
     release = ReleaseFactory(repo=RepositoryFactory())
     release.release_cohort = cohort
     release.save()
 
     cohort.status = ReleaseCohort.STATUS.active
+    cohort.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
     cohort.save()
 
-    # release_merge_freeze_if_safe() will also be called once,
-    # when we associate the Release to a Canceled Cohort.
-    # That is not under test here.
     smfs_mock.assert_called_once_with(release.repo, freeze=True)
 
 
@@ -351,6 +347,12 @@ def test_react_to_release_cohort_change__deactivate(smfs_mock, rmfs_mock):
     release = ReleaseFactory(repo=RepositoryFactory())
     release.release_cohort = cohort
     release.save()
+    cohort.status = ReleaseCohort.STATUS.active
+    cohort.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
+    cohort.save()
+
+    rmfs_mock.reset_mock()  # Called once on initial add to cohort.
+
     cohort.status = ReleaseCohort.STATUS.canceled
     cohort.save()
 
@@ -358,49 +360,6 @@ def test_react_to_release_cohort_change__deactivate(smfs_mock, rmfs_mock):
     # when the release is associated with the cohort,
     # but that's not under test here.
     rmfs_mock.assert_called_once_with(release.repo)
-
-
-@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
-@pytest.mark.django_db
-def test_react_to_release_change__created_active(smfs_mock):
-    cohort = ReleaseCohortFactory()
-    release = ReleaseFactory(repo=RepositoryFactory())
-    release.release_cohort = cohort
-    release.save()
-
-    smfs_mock.assert_called_once_with(release.repo, freeze=True)
-
-
-@pytest.mark.django_db
-@unittest.mock.patch("metaci.release.tasks.release_merge_freeze_if_safe")
-def test_react_to_release_change__moved_active(rmfs_mock):
-    canceled_cohort = ReleaseCohortFactory(status=ReleaseCohort.STATUS.canceled)
-    cohort = ReleaseCohortFactory()
-    release = ReleaseFactory(repo=RepositoryFactory(), release_cohort=canceled_cohort)
-
-    with unittest.mock.patch(
-        "metaci.release.tasks.set_merge_freeze_status"
-    ) as smfs_mock:
-        release.release_cohort = cohort
-        release.save()
-
-        smfs_mock.assert_called_once_with(release.repo, freeze=True)
-
-
-@pytest.mark.django_db
-@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
-def test_react_to_release_change__moved_inactive(smfs_mock):
-    canceled_cohort = ReleaseCohortFactory(status=ReleaseCohort.STATUS.canceled)
-    cohort = ReleaseCohortFactory()
-    release = ReleaseFactory(repo=RepositoryFactory(), release_cohort=cohort)
-
-    with unittest.mock.patch(
-        "metaci.release.tasks.release_merge_freeze_if_safe"
-    ) as rmfs_mock:
-        release.release_cohort = canceled_cohort
-        release.save()
-
-        rmfs_mock.assert_called_once_with(release.repo)
 
 
 @pytest.mark.django_db
@@ -419,6 +378,10 @@ def test_react_to_release_deletion(smfs_mock, rmfs_mock):
 def test_release_merge_freeze_if_safe__not_safe(smfs_mock):
     cohort = ReleaseCohortFactory()
     release = ReleaseFactory(repo=RepositoryFactory(), release_cohort=cohort)
+    cohort.status = ReleaseCohort.STATUS.active
+    cohort.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
+    cohort.save()
+    
     smfs_mock.reset_mock()
 
     release_merge_freeze_if_safe(release.repo)
@@ -525,16 +488,19 @@ def test_execute_active_release_cohorts__creates_dependency_trees(
     smfs_mock,
     get_dependency_graph_mock,
 ):
-    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.approved)
+    rc = ReleaseCohortFactory()
     _ = ReleaseFactory(
         repo__url="foo", release_cohort=rc, status=Release.STATUS.waiting
     )
-    get_dependency_graph_mock.return_value = {}
+    get_dependency_graph_mock.return_value = {"foo": "bar"}
+
+    rc.status = ReleaseCohort.STATUS.approved
+    rc.save()
 
     execute_active_release_cohorts()
     rc.refresh_from_db()
 
-    assert rc.dependency_graph == {}
+    assert rc.dependency_graph == {"foo": "bar"}
 
 
 @pytest.mark.django_db
@@ -543,13 +509,14 @@ def test_execute_active_release_cohorts__creates_dependency_trees(
 def test_execute_active_release_cohorts__completes_finished_cohorts(
     advance_releases_mock, smfs_mock
 ):
-    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    rc = ReleaseCohortFactory(dependency_graph={})
     _ = ReleaseFactory(
         repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
     )
+    rc.status=ReleaseCohort.STATUS.active
+    rc.save()
 
-    rc_progress = ReleaseCohortFactory(
-        status=ReleaseCohort.STATUS.active, dependency_graph={}
+    rc_progress = ReleaseCohortFactory( dependency_graph={}
     )
     _ = ReleaseFactory(
         repo__url="bar", release_cohort=rc_progress, status=Release.STATUS.blocked
@@ -557,8 +524,11 @@ def test_execute_active_release_cohorts__completes_finished_cohorts(
     _ = ReleaseFactory(
         repo__url="baz", release_cohort=rc_progress, status=Release.STATUS.completed
     )
+    rc_progress.status = ReleaseCohort.STATUS.active
+    rc_progress.save()
 
     execute_active_release_cohorts()
+    
     rc.refresh_from_db()
     rc_progress.refresh_from_db()
 
@@ -573,11 +543,15 @@ def test_execute_active_release_cohorts__advances_release_cohorts(
     smfs_mock,
     advance_releases_mock,
 ):
-    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    rc = ReleaseCohortFactory(dependency_graph={})
     _ = ReleaseFactory(
         repo__url="foo", release_cohort=rc, status=Release.STATUS.inprogress
     )
     _ = ReleaseCohortFactory(status=ReleaseCohort.STATUS.completed, dependency_graph={})
+
+    rc.status = ReleaseCohort.STATUS.active
+    rc.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
+    rc.save()
 
     execute_active_release_cohorts()
 
@@ -592,7 +566,7 @@ def test_get_dependency_graph(smfs_mock):
     # A repo with no other relationships
 
     # Create database entries
-    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    rc = ReleaseCohortFactory(dependency_graph={})
     top = ReleaseFactory(
         repo__url="https://github.com/example/top",
         release_cohort=rc,
@@ -657,7 +631,7 @@ def test_get_dependency_graph(smfs_mock):
 @pytest.mark.django_db
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
 def test_get_dependency_graph__duplicate_releases(smfs_mock):
-    rc = ReleaseCohortFactory(status=ReleaseCohort.STATUS.active, dependency_graph={})
+    rc = ReleaseCohortFactory(dependency_graph={})
     first = ReleaseFactory(
         repo__url="https://github.com/example/test1",
         release_cohort=rc,

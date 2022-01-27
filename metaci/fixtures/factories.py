@@ -19,12 +19,7 @@ from metaci.cumulusci.models import Org, ScratchOrgInstance
 from metaci.plan.models import Plan, PlanRepository, PlanSchedule
 from metaci.release.models import ChangeCaseTemplate, Release, ReleaseCohort
 from metaci.repository.models import Branch, Repository
-from metaci.testresults.models import (
-    TestClass,
-    TestMethod,
-    TestResult,
-    TestResultPerfWeeklySummary,
-)
+from metaci.testresults.models import TestClass, TestMethod, TestResult
 from metaci.users.models import User
 
 BUILD_STATUS_NAMES = (
@@ -188,10 +183,6 @@ class TestResultFactory(factory.django.DjangoModelFactory):
             result.method._runs % 6
         ]
 
-    @factory.post_generation
-    def summarize(obj, create, extracted, **kwargs):
-        TestResultPerfWeeklySummary.summarize_week(obj.build_flow.time_end)
-
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -256,6 +247,6 @@ class ReleaseCohortFactory(factory.django.DjangoModelFactory):
         model = ReleaseCohort
 
     name = fake_name()
-    status = ReleaseCohort.STATUS.active
-    merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
-    merge_freeze_end = datetime.now(tz=timezone.utc) + timedelta(days=1)
+    status = ReleaseCohort.STATUS.planned
+    merge_freeze_start = datetime.now(tz=timezone.utc) + timedelta(days=1)
+    merge_freeze_end = datetime.now(tz=timezone.utc) + timedelta(days=2)

@@ -1,4 +1,3 @@
-import os
 import subprocess
 
 from ansi2html import Ansi2HTMLConverter
@@ -78,7 +77,7 @@ def run_command(command, env=None, cwd=None):
         bufsize=1,
         shell=True,
         executable="/bin/bash",
-        **kwargs
+        **kwargs,
     )
     for line in iter(p.stdout.readline, ""):
         yield line

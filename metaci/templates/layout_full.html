@@ -24,7 +24,7 @@
         <div class="slds-form-element__control lookup__search-control slds-input-has-icon slds-input-has-icon--left">
           {% autoescape off %}
           <svg class="slds-input__icon" aria-hidden="true">
-            <use xlink:href="/static/design-system/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
+            <use xlink:href="/static/slds/icons/utility-sprite/svg/symbols.svg#search"></use>
           </svg>
           {% endautoescape %}
           <input type="search" id="global-search-01" class="slds-input slds-lookup__search-input" name="q" {% if query %}value="{{ query }}"{% else %}placeholder="Search Builds"{% endif %} />
@@ -90,7 +90,7 @@
           <div class="slds-media__figure">
             {% autoescape off %}
             <svg class="slds-button__icon slds-global-header__icon" aria-hidden="true">
-              <use xlink:href="/static/design-system/assets/icons/utility-sprite/svg/symbols.svg#notification"></use>
+              <use xlink:href="/static/slds/icons/utility-sprite/svg/symbols.svg#notification"></use>
             </svg>
             {% endautoescape %}
             <span class="slds-assistive-text">Notifications</span>
@@ -105,7 +105,7 @@
           <div class="slds-media__figure">
             {% autoescape off %}
             <svg class="slds-button__icon slds-global-header__icon" aria-hidden="true">
-              <use xlink:href="/static/design-system/assets/icons/utility-sprite/svg/symbols.svg#settings"></use>
+              <use xlink:href="/static/slds/icons/utility-sprite/svg/symbols.svg#settings"></use>
             </svg>
             {% endautoescape %}
             <span class="slds-assistive-text">Admin</span>
@@ -117,7 +117,7 @@
       <li class="slds-m-left--large">
         <a href="{% url 'users:detail' request.user.username  %}" class="slds-button" title="person name" aria-haspopup="true">
           <span class="slds-avatar slds-avatar--circle slds-avatar--medium">
-            <img src="/static/design-system/assets/images/avatar2.jpg" alt="person name" />
+            <img src="/static/slds/images/avatar2.jpg" alt="person name" />
           </span>
         </a>
       </li>
@@ -127,7 +127,7 @@
           <div class="slds-media__figure"> 
             {% autoescape off %}
             <svg class="slds-button__icon" aria-hidden="true">
-              <use xlink:href="/static/design-system/assets/icons/utility-sprite/svg/symbols.svg#logout"></use>
+              <use xlink:href="/static/slds/icons/utility-sprite/svg/symbols.svg#logout"></use>
             </svg>
             {% endautoescape %}
             <span class="slds-assistive-text">Log Out</span>
@@ -145,7 +145,7 @@
           <div class="slds-media__figure"> 
             {% autoescape off %}
             <svg class="slds-button__icon" aria-hidden="true">
-              <use xlink:href="/static/design-system/assets/icons/utility-sprite/svg/symbols.svg#groups"></use>
+              <use xlink:href="/static/slds/icons/utility-sprite/svg/symbols.svg#groups"></use>
             </svg>
             {% endautoescape %}
             <span class="slds-assistive-text">Log In</span>

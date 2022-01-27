@@ -38,3 +38,6 @@ update-deps:
 dev-install:
 	pip install pip-tools
 	pip-sync requirements/*.txt
+
+start:
+	honcho start web dev_worker

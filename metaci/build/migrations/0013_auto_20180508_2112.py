@@ -8,23 +8,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('build', '0012_flowtask'),
+        ("build", "0012_flowtask"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='flowtask',
-            name='time_initialize',
+            model_name="flowtask",
+            name="time_initialize",
         ),
         migrations.AddField(
-            model_name='flowtask',
-            name='class_path',
+            model_name="flowtask",
+            name="class_path",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='flowtask',
-            name='step_string',
-            field=models.CharField(default='.', max_length=255),
+            model_name="flowtask",
+            name="step_string",
+            field=models.CharField(default=".", max_length=255),
             preserve_default=False,
         ),
     ]
