@@ -67,9 +67,8 @@ class TestPackagingOrgUsers(TestCase):
         salesforce_client.query = fake_query
         c = Command()
         print(sys.modules.keys())
-        with mock.patch("cumulusci.core.config.org_config.SKIP_REFRESH", True):
-            output = io.StringIO()
-            c.handle(stream=output)
+        output = io.StringIO()
+        c.handle(stream=output)
         assert json.loads(output.getvalue()) == {
             "orgs": [
                 {
