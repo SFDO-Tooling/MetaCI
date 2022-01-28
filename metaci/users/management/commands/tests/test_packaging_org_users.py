@@ -66,7 +66,6 @@ class TestPackagingOrgUsers(TestCase):
         OrgFactory(name="packaging", repo__name="RepoD")
         salesforce_client.query = fake_query
         c = Command()
-        print(sys.modules.keys())
         output = io.StringIO()
         c.handle(stream=output)
         assert json.loads(output.getvalue()) == {
