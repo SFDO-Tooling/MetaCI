@@ -35,6 +35,12 @@ class ReleaseCohort(models.Model):
     error_message = models.TextField(null=True, blank=True)
     dependency_graph = models.JSONField(null=True, blank=True)
 
+    # Fields for MetaPush integration
+    metapush_push_schedule_id = models.CharField(max_length=32, null=True, blank=True)
+    send_to_metapush = models.BooleanField(default=True)
+    metapush_error = models.TextField(null=True, blank=True)
+    metapush_push_cohort_id = models.CharField(max_length=32, null=True, blank=True)
+
     def __str__(self):
         return self.name
 
