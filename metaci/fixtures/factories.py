@@ -69,7 +69,7 @@ class RepositoryFactory(factory.django.DjangoModelFactory):
     github_id = 1234
     name_prefix = "Repo_"
     owner = factory.fuzzy.FuzzyChoice(["SFDO", "SFDC", "Partner1", "Partner2"])
-
+    metapush_enabled = True
 
 class OrgFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -214,6 +214,8 @@ class FlowTaskFactory(factory.django.DjangoModelFactory):
     build_flow = factory.SubFactory(BuildFlowFactory)
     stepnum = factory.Sequence(lambda n: f"{n}")
     path = factory.Sequence(lambda n: f"flow_1.task_{n}")
+    return_values = {}
+    class_path = "cumulusci"
 
 
 class RebuildFactory(factory.django.DjangoModelFactory):

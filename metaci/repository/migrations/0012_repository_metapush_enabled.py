@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('repository', '0011_metadata'),
+        ("repository", "0011_metadata"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='repository',
-            name='metapush_enabled',
+            model_name="repository",
+            name="metapush_enabled",
             field=models.BooleanField(default=False),
         ),
     ]

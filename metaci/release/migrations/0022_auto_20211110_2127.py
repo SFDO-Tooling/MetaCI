@@ -6,23 +6,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('release', '0021_auto_20210922_2102'),
+        ("release", "0021_auto_20210922_2102"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='release',
-            name='error_message',
-            field=models.TextField(blank=True, null=True, verbose_name='error message'),
+            model_name="release",
+            name="error_message",
+            field=models.TextField(blank=True, null=True, verbose_name="error message"),
         ),
         migrations.AlterField(
-            model_name='release',
-            name='created_from_commit',
-            field=models.CharField(max_length=1024, null=True, verbose_name='created from commit'),
+            model_name="release",
+            name="created_from_commit",
+            field=models.CharField(
+                max_length=1024, null=True, verbose_name="created from commit"
+            ),
         ),
         migrations.AlterField(
-            model_name='releasecohort',
-            name='status',
-            field=models.CharField(choices=[('Planned', 'Planned'), ('Active', 'Active'), ('Canceled', 'Canceled'), ('Completed', 'Completed'), ('Failed', 'Failed')], default='Planned', max_length=9),
+            model_name="releasecohort",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("Planned", "Planned"),
+                    ("Active", "Active"),
+                    ("Canceled", "Canceled"),
+                    ("Completed", "Completed"),
+                    ("Failed", "Failed"),
+                ],
+                default="Planned",
+                max_length=9,
+            ),
         ),
     ]

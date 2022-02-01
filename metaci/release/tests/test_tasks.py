@@ -15,6 +15,8 @@ from metaci.build.models import BUILD_STATUSES
 from metaci.fixtures.factories import (
     Build,
     BuildFactory,
+    BuildFlowFactory,
+    FlowTaskFactory,
     PlanFactory,
     PlanRepositoryFactory,
     ReleaseCohortFactory,
@@ -35,7 +37,10 @@ from metaci.release.tasks import (
     get_dependency_graph,
     release_merge_freeze_if_safe,
     set_merge_freeze_status,
+    get_package_ids_from_build,
+    convert_dependency_graph_to_metapush
 )
+from metaci.release.metapush import DependencyGraphItem, DependencyGraph
 
 
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
@@ -381,7 +386,7 @@ def test_release_merge_freeze_if_safe__not_safe(smfs_mock):
     cohort.status = ReleaseCohort.STATUS.active
     cohort.merge_freeze_start = datetime.now(tz=timezone.utc) - timedelta(days=1)
     cohort.save()
-    
+
     smfs_mock.reset_mock()
 
     release_merge_freeze_if_safe(release.repo)
@@ -513,11 +518,10 @@ def test_execute_active_release_cohorts__completes_finished_cohorts(
     _ = ReleaseFactory(
         repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
     )
-    rc.status=ReleaseCohort.STATUS.active
+    rc.status = ReleaseCohort.STATUS.active
     rc.save()
 
-    rc_progress = ReleaseCohortFactory( dependency_graph={}
-    )
+    rc_progress = ReleaseCohortFactory(dependency_graph={})
     _ = ReleaseFactory(
         repo__url="bar", release_cohort=rc_progress, status=Release.STATUS.blocked
     )
@@ -528,7 +532,7 @@ def test_execute_active_release_cohorts__completes_finished_cohorts(
     rc_progress.save()
 
     execute_active_release_cohorts()
-    
+
     rc.refresh_from_db()
     rc_progress.refresh_from_db()
 
@@ -659,3 +663,177 @@ def test_non_project_config(get_github_api_mock):
     )
     get_github_api_mock.return_value.repository.assert_called_once_with("test", "foo")
     assert pc.logger is not None
+
+@pytest.mark.django_db
+def test_get_package_ids_from_build():
+    build = BuildFactory(status=BUILD_STATUSES.success)
+    build_flow_1 = BuildFlowFactory(build=build)
+    build_flow_2 = BuildFlowFactory(build=build)
+    flow_task_1 = FlowTaskFactory(class_path="cumulusci.foo", build_flow=build_flow_1)
+    flow_task_2 = FlowTaskFactory(
+        class_path="cumulusci.tasks.create_package_version.CreatePackageVersion",
+        build_flow=build_flow_2,
+        return_values={
+            "subscriber_package_version_id": "04t000000000000",
+            "package_id": "033000000000000",
+        },
+    )
+
+    assert get_package_ids_from_build(build) == DependencyGraphItem(
+        AllPackageId="033000000000000", AllPackageVersionId="04t000000000000", Dependencies=[]
+    )
+
+
+@pytest.mark.django_db
+def test_get_package_ids_from_build__1gp():
+    build = BuildFactory(status=BUILD_STATUSES.success)
+    build_flow_1 = BuildFlowFactory(build=build)
+    build_flow_2 = BuildFlowFactory(build=build)
+    flow_task_1 = FlowTaskFactory(class_path="cumulusci.foo", build_flow=build_flow_1)
+    flow_task_2 = FlowTaskFactory(
+        class_path="cumulusci.tasks.salesforce.PackageUpload",
+        build_flow=build_flow_2,
+        return_values={
+            "version_id": "04t000000000000",
+            "package_id": "033000000000000",
+        },
+    )
+
+    assert get_package_ids_from_build(build) == DependencyGraphItem(
+        AllPackageId="033000000000000", AllPackageVersionId="04t000000000000", Dependencies=[]
+    )
+
+
+@pytest.mark.django_db
+
+def test_get_package_ids_from_build__not_found():
+    build = BuildFactory(status=BUILD_STATUSES.success)
+    build_flow_1 = BuildFlowFactory(build=build)
+    build_flow_2 = BuildFlowFactory(build=build)
+    flow_task_1 = FlowTaskFactory(class_path="cumulusci.foo", build_flow=build_flow_1)
+
+    assert get_package_ids_from_build(build) is None
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_convert_dependency_graph_to_metapush(smfs_mock):
+    rc = ReleaseCohortFactory(dependency_graph={})
+    top = ReleaseFactory(
+        repo__url="https://github.com/example/top",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="abc",
+    )
+    left = ReleaseFactory(
+        repo__url="https://github.com/example/left",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="ghi",
+
+    )
+    right = ReleaseFactory(
+        repo__url="https://github.com/example/right",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="jkl",
+
+    )
+    separate = ReleaseFactory(
+        repo__url="https://github.com/example/separate",
+        release_cohort=rc,
+        status=Release.STATUS.draft,
+        created_from_commit="mno",
+    )
+    rc.status=ReleaseCohort.STATUS.completed
+    rc.save()
+    top.status = left.status = right.status = separate.status = Release.STATUS.completed
+
+    build_top = BuildFactory(release=top, planrepo__plan__role="release", status=BUILD_STATUSES.success)
+    build_flow_top = BuildFlowFactory(build=build_top)
+    flow_task_top = FlowTaskFactory(
+        class_path="cumulusci.tasks.salesforce.PackageUpload",
+        build_flow=build_flow_top,
+        return_values={
+            "version_id": "04t000000000top",
+            "package_id": "033000000000top",
+        },
+    )
+
+    build_left = BuildFactory(release=left, planrepo__plan__role="release", status=BUILD_STATUSES.success)
+    build_flow_left = BuildFlowFactory(build=build_left)
+    flow_task_left = FlowTaskFactory(
+        class_path="cumulusci.tasks.salesforce.PackageUpload",
+        build_flow=build_flow_left,
+        return_values={
+            "version_id": "04t00000000left",
+            "package_id": "03300000000left",
+        },
+    )
+
+    build_right = BuildFactory(release=right, planrepo__plan__role="release", status=BUILD_STATUSES.success)
+    build_flow_right = BuildFlowFactory(build=build_right)
+    flow_task_right = FlowTaskFactory(
+        class_path="cumulusci.tasks.salesforce.PackageUpload",
+        build_flow=build_flow_right,
+        return_values={
+            "version_id": "04t0000000right",
+            "package_id": "0330000000right",
+        },
+    )
+
+    build_separate = BuildFactory(release=separate, planrepo__plan__role="release", status=BUILD_STATUSES.success)
+    build_flow_separate = BuildFlowFactory(build=build_separate)
+    flow_task_separate = FlowTaskFactory(
+        class_path="cumulusci.tasks.salesforce.PackageUpload",
+        build_flow=build_flow_separate,
+        return_values={
+            "version_id": "04t0000separate",
+            "package_id": "0330000separate",
+        },
+    )
+
+    rc.dependency_graph = {
+            left.repo.url: [top.repo.url],
+            right.repo.url: [top.repo.url, left.repo.url],
+        }
+    rc.save()
+
+    result = list(convert_dependency_graph_to_metapush(rc) )
+    assert len(result) == 4
+    assert DependencyGraphItem(
+            AllPackageId="033000000000top",
+            AllPackageVersionId="04t000000000top",
+            Dependencies=[]
+        ) in result
+    assert DependencyGraphItem(
+            AllPackageId="03300000000left",
+            AllPackageVersionId="04t00000000left",
+            Dependencies=["04t000000000top"]
+        ) in result
+    assert DependencyGraphItem(
+            AllPackageId="0330000000right",
+            AllPackageVersionId="04t0000000right",
+            Dependencies=["04t000000000top", "04t00000000left"]
+        ) in result
+    assert DependencyGraphItem(
+            AllPackageId="0330000separate",
+            AllPackageVersionId="04t0000separate",
+            Dependencies=[]
+        ) in result
+
+
+
+def test_convert_dependency_graph_to_metapush__build_not_found():
+    pass
+
+
+def test_convert_dependency_graph_to_metapush__package_not_found():
+    pass
+
+
+def test_convert_dependency_graph_to_metapush__missing_dependency():
+    pass
+
+
+def test_send_to_metapush():
+    pass

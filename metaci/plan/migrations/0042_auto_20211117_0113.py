@@ -7,13 +7,17 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('plan', '0041_auto_20211110_2138'),
+        ("plan", "0041_auto_20211110_2138"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='planrepository',
-            name='plan',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='planrepos', to='plan.plan'),
+            model_name="planrepository",
+            name="plan",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="planrepos",
+                to="plan.plan",
+            ),
         ),
     ]

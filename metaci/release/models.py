@@ -246,11 +246,20 @@ class Release(StatusModel):
             old_cohort = Release.objects.get(pk=self.pk).release_cohort
 
         if old_cohort != self.release_cohort:
-            if self.release_cohort and self.release_cohort.status != ReleaseCohort.STATUS.planned:
-                raise ValidationError(_("Releases must be added to a Release Cohort in Planned status."))
+            if (
+                self.release_cohort
+                and self.release_cohort.status != ReleaseCohort.STATUS.planned
+            ):
+                raise ValidationError(
+                    _("Releases must be added to a Release Cohort in Planned status.")
+                )
 
             if old_cohort and old_cohort.status != ReleaseCohort.STATUS.planned:
-                raise ValidationError(_("Releases cannot be removed from a Release Cohort that is not in Planned status."))
+                raise ValidationError(
+                    _(
+                        "Releases cannot be removed from a Release Cohort that is not in Planned status."
+                    )
+                )
 
         super().save(*args, **kw)
         for step_dict in self.repo.default_implementation_steps:

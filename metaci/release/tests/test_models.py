@@ -17,7 +17,7 @@ from metaci.release.models import (
     DefaultImplementationStep,
     ImplementationStep,
     Release,
-    ReleaseCohort
+    ReleaseCohort,
 )
 from metaci.repository.models import Repository
 
@@ -43,7 +43,7 @@ class TestRelease:
         cohort.save()
 
         release = ReleaseFactory()
-        release.release_cohort=cohort
+        release.release_cohort = cohort
         with pytest.raises(ValidationError) as e:
             release.save()
 
@@ -51,22 +51,24 @@ class TestRelease:
 
         cohort.status = ReleaseCohort.STATUS.planned
         cohort.save()
-        release.release_cohort=cohort
+        release.release_cohort = cohort
         release.save()
 
     @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
-    def test_release_cannot_remove_from_cohort_unless_status_is_planned(self, smfs_mock):
+    def test_release_cannot_remove_from_cohort_unless_status_is_planned(
+        self, smfs_mock
+    ):
         cohort = ReleaseCohortFactory()
         cohort.status = ReleaseCohort.STATUS.planned
         cohort.save()
 
         release = ReleaseFactory()
-        release.release_cohort=cohort
+        release.release_cohort = cohort
         release.save()
 
         cohort.status = ReleaseCohort.STATUS.canceled
         cohort.save()
-        release.release_cohort=None
+        release.release_cohort = None
 
         with pytest.raises(ValidationError) as e:
             release.save()
@@ -75,7 +77,7 @@ class TestRelease:
 
         cohort.status = ReleaseCohort.STATUS.planned
         cohort.save()
-        release.release_cohort=None
+        release.release_cohort = None
         release.save()
 
     @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
@@ -84,7 +86,7 @@ class TestRelease:
         other_cohort = ReleaseCohortFactory(status=ReleaseCohort.STATUS.canceled)
 
         release = ReleaseFactory()
-        release.release_cohort=cohort
+        release.release_cohort = cohort
         release.save()
 
         with pytest.raises(ValidationError) as e:
@@ -99,12 +101,11 @@ class TestRelease:
         other_cohort = ReleaseCohortFactory(status=ReleaseCohort.STATUS.planned)
 
         release = ReleaseFactory()
-        release.release_cohort=cohort
+        release.release_cohort = cohort
         release.save()
 
         release.release_cohort = other_cohort
         release.save()  # "assertion" is that no ValidationError is thrown.
-
 
     def test_empty_release_init(self):
         release = Release(repo=Repository(), change_case_template=ChangeCaseTemplate())

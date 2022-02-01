@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('release', '0026_auto_20211123_1841'),
+        ("release", "0026_auto_20211123_1841"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='releasecohort',
-            name='metapush_error',
+            model_name="releasecohort",
+            name="metapush_error",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='releasecohort',
-            name='metapush_push_cohort_id',
+            model_name="releasecohort",
+            name="metapush_push_cohort_id",
             field=models.CharField(blank=True, max_length=32, null=True),
         ),
         migrations.AddField(
-            model_name='releasecohort',
-            name='metapush_push_schedule_id',
+            model_name="releasecohort",
+            name="metapush_push_schedule_id",
             field=models.CharField(blank=True, max_length=32, null=True),
         ),
         migrations.AddField(
-            model_name='releasecohort',
-            name='send_to_metapush',
+            model_name="releasecohort",
+            name="send_to_metapush",
             field=models.BooleanField(default=True),
         ),
     ]
