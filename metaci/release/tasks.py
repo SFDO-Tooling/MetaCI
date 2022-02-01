@@ -343,7 +343,7 @@ def get_package_ids_from_build(build: Build) -> Optional[DependencyGraphItem]:
                     return DependencyGraphItem(
                         AllPackageId=all_package_id,
                         AllPackageVersionId=all_package_version_id,
-                        Dependencies=[]
+                        Dependencies=[],
                     )
 
 
@@ -373,19 +373,13 @@ def convert_dependency_graph_to_metapush(rc: ReleaseCohort) -> DependencyGraph:
         if not dep_graph_item:
             raise DependencyGraphError("Unable to source package details from Build")
         dep_graph.__root__.append(dep_graph_item)
-        package_versions_to_github_urls[
-            dep_graph_item.AllPackageVersionId
-        ] = github_url
-        github_urls_to_package_versions[
-            github_url
-        ] = dep_graph_item.AllPackageVersionId
+        package_versions_to_github_urls[dep_graph_item.AllPackageVersionId] = github_url
+        github_urls_to_package_versions[github_url] = dep_graph_item.AllPackageVersionId
 
     # Now, populate the dependencies in the graph.
     for dep_graph_item in dep_graph:
         # Get the GitHub URL for _this_ dependency item
-        github_url = package_versions_to_github_urls[
-            dep_graph_item.AllPackageVersionId
-        ]
+        github_url = package_versions_to_github_urls[dep_graph_item.AllPackageVersionId]
         # ... get its dependencies from the Release Cohort's graph...
         deps = rc.dependency_graph.get(github_url, [])
         # and convert those GitHub URLs back to created Package Versions

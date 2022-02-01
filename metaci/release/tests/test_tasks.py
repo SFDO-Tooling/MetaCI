@@ -38,7 +38,7 @@ from metaci.release.tasks import (
     release_merge_freeze_if_safe,
     set_merge_freeze_status,
     get_package_ids_from_build,
-    convert_dependency_graph_to_metapush
+    convert_dependency_graph_to_metapush,
 )
 from metaci.release.metapush import DependencyGraphItem, DependencyGraph
 
@@ -664,6 +664,7 @@ def test_non_project_config(get_github_api_mock):
     get_github_api_mock.return_value.repository.assert_called_once_with("test", "foo")
     assert pc.logger is not None
 
+
 @pytest.mark.django_db
 def test_get_package_ids_from_build():
     build = BuildFactory(status=BUILD_STATUSES.success)
@@ -680,7 +681,9 @@ def test_get_package_ids_from_build():
     )
 
     assert get_package_ids_from_build(build) == DependencyGraphItem(
-        AllPackageId="033000000000000", AllPackageVersionId="04t000000000000", Dependencies=[]
+        AllPackageId="033000000000000",
+        AllPackageVersionId="04t000000000000",
+        Dependencies=[],
     )
 
 
@@ -700,12 +703,13 @@ def test_get_package_ids_from_build__1gp():
     )
 
     assert get_package_ids_from_build(build) == DependencyGraphItem(
-        AllPackageId="033000000000000", AllPackageVersionId="04t000000000000", Dependencies=[]
+        AllPackageId="033000000000000",
+        AllPackageVersionId="04t000000000000",
+        Dependencies=[],
     )
 
 
 @pytest.mark.django_db
-
 def test_get_package_ids_from_build__not_found():
     build = BuildFactory(status=BUILD_STATUSES.success)
     build_flow_1 = BuildFlowFactory(build=build)
@@ -713,6 +717,7 @@ def test_get_package_ids_from_build__not_found():
     flow_task_1 = FlowTaskFactory(class_path="cumulusci.foo", build_flow=build_flow_1)
 
     assert get_package_ids_from_build(build) is None
+
 
 @pytest.mark.django_db
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
@@ -729,14 +734,12 @@ def test_convert_dependency_graph_to_metapush(smfs_mock):
         release_cohort=rc,
         status=Release.STATUS.draft,
         created_from_commit="ghi",
-
     )
     right = ReleaseFactory(
         repo__url="https://github.com/example/right",
         release_cohort=rc,
         status=Release.STATUS.draft,
         created_from_commit="jkl",
-
     )
     separate = ReleaseFactory(
         repo__url="https://github.com/example/separate",
@@ -744,11 +747,13 @@ def test_convert_dependency_graph_to_metapush(smfs_mock):
         status=Release.STATUS.draft,
         created_from_commit="mno",
     )
-    rc.status=ReleaseCohort.STATUS.completed
+    rc.status = ReleaseCohort.STATUS.completed
     rc.save()
     top.status = left.status = right.status = separate.status = Release.STATUS.completed
 
-    build_top = BuildFactory(release=top, planrepo__plan__role="release", status=BUILD_STATUSES.success)
+    build_top = BuildFactory(
+        release=top, planrepo__plan__role="release", status=BUILD_STATUSES.success
+    )
     build_flow_top = BuildFlowFactory(build=build_top)
     flow_task_top = FlowTaskFactory(
         class_path="cumulusci.tasks.salesforce.PackageUpload",
@@ -759,7 +764,9 @@ def test_convert_dependency_graph_to_metapush(smfs_mock):
         },
     )
 
-    build_left = BuildFactory(release=left, planrepo__plan__role="release", status=BUILD_STATUSES.success)
+    build_left = BuildFactory(
+        release=left, planrepo__plan__role="release", status=BUILD_STATUSES.success
+    )
     build_flow_left = BuildFlowFactory(build=build_left)
     flow_task_left = FlowTaskFactory(
         class_path="cumulusci.tasks.salesforce.PackageUpload",
@@ -770,7 +777,9 @@ def test_convert_dependency_graph_to_metapush(smfs_mock):
         },
     )
 
-    build_right = BuildFactory(release=right, planrepo__plan__role="release", status=BUILD_STATUSES.success)
+    build_right = BuildFactory(
+        release=right, planrepo__plan__role="release", status=BUILD_STATUSES.success
+    )
     build_flow_right = BuildFlowFactory(build=build_right)
     flow_task_right = FlowTaskFactory(
         class_path="cumulusci.tasks.salesforce.PackageUpload",
@@ -781,7 +790,9 @@ def test_convert_dependency_graph_to_metapush(smfs_mock):
         },
     )
 
-    build_separate = BuildFactory(release=separate, planrepo__plan__role="release", status=BUILD_STATUSES.success)
+    build_separate = BuildFactory(
+        release=separate, planrepo__plan__role="release", status=BUILD_STATUSES.success
+    )
     build_flow_separate = BuildFlowFactory(build=build_separate)
     flow_task_separate = FlowTaskFactory(
         class_path="cumulusci.tasks.salesforce.PackageUpload",
@@ -793,34 +804,45 @@ def test_convert_dependency_graph_to_metapush(smfs_mock):
     )
 
     rc.dependency_graph = {
-            left.repo.url: [top.repo.url],
-            right.repo.url: [top.repo.url, left.repo.url],
-        }
+        left.repo.url: [top.repo.url],
+        right.repo.url: [top.repo.url, left.repo.url],
+    }
     rc.save()
 
-    result = list(convert_dependency_graph_to_metapush(rc) )
+    result = list(convert_dependency_graph_to_metapush(rc))
     assert len(result) == 4
-    assert DependencyGraphItem(
+    assert (
+        DependencyGraphItem(
             AllPackageId="033000000000top",
             AllPackageVersionId="04t000000000top",
-            Dependencies=[]
-        ) in result
-    assert DependencyGraphItem(
+            Dependencies=[],
+        )
+        in result
+    )
+    assert (
+        DependencyGraphItem(
             AllPackageId="03300000000left",
             AllPackageVersionId="04t00000000left",
-            Dependencies=["04t000000000top"]
-        ) in result
-    assert DependencyGraphItem(
+            Dependencies=["04t000000000top"],
+        )
+        in result
+    )
+    assert (
+        DependencyGraphItem(
             AllPackageId="0330000000right",
             AllPackageVersionId="04t0000000right",
-            Dependencies=["04t000000000top", "04t00000000left"]
-        ) in result
-    assert DependencyGraphItem(
+            Dependencies=["04t000000000top", "04t00000000left"],
+        )
+        in result
+    )
+    assert (
+        DependencyGraphItem(
             AllPackageId="0330000separate",
             AllPackageVersionId="04t0000separate",
-            Dependencies=[]
-        ) in result
-
+            Dependencies=[],
+        )
+        in result
+    )
 
 
 def test_convert_dependency_graph_to_metapush__build_not_found():

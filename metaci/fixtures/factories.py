@@ -71,6 +71,7 @@ class RepositoryFactory(factory.django.DjangoModelFactory):
     owner = factory.fuzzy.FuzzyChoice(["SFDO", "SFDC", "Partner1", "Partner2"])
     metapush_enabled = True
 
+
 class OrgFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Org
