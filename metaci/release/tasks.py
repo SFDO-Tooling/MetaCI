@@ -266,7 +266,7 @@ def advance_releases(rc: ReleaseCohort):
                 _run_release_builds(release)
 
 
-def is_metapush_enabled():
+def is_metapush_configured():
     return settings.METAPUSH_ENDPOINT_URL and settings.METAPUSH_AUTHENTICATION_TOKEN
 
 
@@ -286,7 +286,7 @@ def execute_active_release_cohorts():
         rc.save()
 
         # Send this Release Cohort to MetaPush for push upgrades, if configured.
-        if is_metapush_enabled() and rc.send_to_metapush:
+        if is_metapush_configured() and rc.send_to_metapush:
             send_to_metapush(rc)
 
     # Next, identify in-progress Release Cohorts that need to be advanced.
@@ -361,11 +361,13 @@ def convert_dependency_graph_to_metapush(rc: ReleaseCohort) -> DependencyGraph:
             continue
 
         github_url = release.repo.url
+
         # We should have exactly one succeeded Release (Upload Release) build for this Release
-        build = release.build_set.filter(
-            plan__role="release", status=BUILD_STATUSES.success
-        ).first()
-        if not build:
+        try:
+            build = release.build_set.get(
+                plan__role="release", status=BUILD_STATUSES.success
+            )
+        except Build.DoesNotExist:
             raise DependencyGraphError(
                 f"Unable to find Build with role Release on {release}"
             )
@@ -406,34 +408,35 @@ def _send_to_metapush(rc: ReleaseCohort):
     token = settings.METAPUSH_AUTHENTICATION_TOKEN
     endpoint = settings.METAPUSH_ENDPOINT_URL
 
-    if endpoint and token:
-        # Take our dependency graph (GitHub URL-based) and convert to
-        # MetaPush-style 04t/033 id based. MetaPush does not know
-        # about repositories - just packages.
-
-        try:
-            metapush_graph = convert_dependency_graph_to_metapush(rc)
-        except DependencyGraphError as e:
-            rc.metapush_error = str(e)
-            rc.save()
-            return
-
-        # Send the request to MetaPush to create the Push Cohort.
-        try:
-            url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
-            requests.post(
-                url,
-                headers={"Authorization": f"Token {token}"},
-                json={
-                    "dependency_graph": metapush_graph.dict(),
-                    "push_schedule": rc.metapush_push_schedule_id,
-                },
-            ).raise_for_status()
-        except requests.exceptions.RequestException as e:
-            rc.metapush_error = str(e)
-            rc.save()
-    else:
+    if not (endpoint and token):
         rc.metapush_error = "MetaPush configuration is missing"
+        rc.save()
+        return
+
+    # Take our dependency graph (GitHub URL-based) and convert to
+    # MetaPush-style 04t/033 id based. MetaPush does not know
+    # about repositories - just packages.
+
+    try:
+        metapush_graph = convert_dependency_graph_to_metapush(rc)
+    except DependencyGraphError as e:
+        rc.metapush_error = str(e)
+        rc.save()
+        return
+
+    # Send the request to MetaPush to create the Push Cohort.
+    try:
+        url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
+        requests.post(
+            url,
+            headers={"Authorization": f"Token {token}"},
+            json={
+                "dependency_graph": metapush_graph.dict(),
+                "push_schedule": rc.metapush_push_schedule_id,
+            },
+        ).raise_for_status()
+    except requests.exceptions.RequestException as e:
+        rc.metapush_error = str(e)
         rc.save()
 
 
