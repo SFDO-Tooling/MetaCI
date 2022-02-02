@@ -1,9 +1,11 @@
 import json
 import logging
+import urllib
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import DefaultDict, List, Optional
 
+import requests
 from cumulusci.core.dependencies.dependencies import GitHubDynamicDependency
 from cumulusci.core.dependencies.resolvers import DependencyResolutionStrategy
 from cumulusci.core.github import get_github_api_for_repo
@@ -16,14 +18,13 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django_rq import job
 from github3.repos.repo import Repository as GitHubRepository
-import requests
 
 from metaci.build.models import BUILD_STATUSES, Build
 from metaci.cumulusci.keychain import GitHubSettingsKeychain
 from metaci.plan.models import PlanRepository
+from metaci.release.metapush import DependencyGraph, DependencyGraphItem
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
-from metaci.release.metapush import DependencyGraph, DependencyGraphItem
 
 
 class DependencyGraphError(Exception):
@@ -398,7 +399,7 @@ def convert_dependency_graph_to_metapush(rc: ReleaseCohort) -> DependencyGraph:
 
 @job
 def send_to_metapush(rc: ReleaseCohort):
-    _send_to_metapush(rc)
+    _send_to_metapush(rc)  # pragma: no cover
 
 
 def _send_to_metapush(rc: ReleaseCohort):
@@ -419,14 +420,16 @@ def _send_to_metapush(rc: ReleaseCohort):
 
         # Send the request to MetaPush to create the Push Cohort.
         try:
+            url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
             requests.post(
-                f"{endpoint}/api/pushcohorts/",
-                body={
-                    "dependency_graph": metapush_graph,
+                url,
+                headers={"Authorization": f"Token {token}"},
+                json={
+                    "dependency_graph": metapush_graph.dict(),
                     "push_schedule": rc.metapush_push_schedule_id,
                 },
             )
-        except Exception as e:
+        except requests.exceptions.RequestException as e:
             rc.metapush_error = str(e)
             rc.save()
     else:

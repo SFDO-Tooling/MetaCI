@@ -1,46 +1,36 @@
 import unittest
+import urllib
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, call
 
 import pytest
+import responses
 from cumulusci.core.dependencies.dependencies import (
-    GitHubDynamicDependency,
-    UnmanagedGitHubRefDependency,
-)
+    GitHubDynamicDependency, UnmanagedGitHubRefDependency)
 from django.conf import settings
 from django.urls.base import reverse
 
-from metaci.build.models import BUILD_STATUSES
-from metaci.fixtures.factories import (
-    Build,
-    BuildFactory,
-    BuildFlowFactory,
-    FlowTaskFactory,
-    PlanFactory,
-    PlanRepositoryFactory,
-    ReleaseCohortFactory,
-    ReleaseFactory,
-    RepositoryFactory,
-)
+from metaci.build.models import BUILD_STATUSES, Build, BuildFlow, FlowTask
+from metaci.fixtures.factories import (BuildFactory, BuildFlowFactory,
+                                       FlowTaskFactory, PlanFactory,
+                                       PlanRepositoryFactory,
+                                       ReleaseCohortFactory, ReleaseFactory,
+                                       RepositoryFactory)
+from metaci.release.metapush import DependencyGraph, DependencyGraphItem
 from metaci.release.models import Release, ReleaseCohort
-from metaci.release.tasks import (
-    DependencyGraphError,
-    NonProjectConfig,
-    _run_planrepo_for_release,
-    _run_release_builds,
-    _update_release_cohorts,
-    advance_releases,
-    all_deps_satisfied,
-    create_dependency_tree,
-    execute_active_release_cohorts,
-    get_dependency_graph,
-    release_merge_freeze_if_safe,
-    set_merge_freeze_status,
-    get_package_ids_from_build,
-    convert_dependency_graph_to_metapush,
-)
-from metaci.release.metapush import DependencyGraphItem, DependencyGraph
+from metaci.release.tasks import (DependencyGraphError, NonProjectConfig,
+                                  _run_planrepo_for_release,
+                                  _run_release_builds, _send_to_metapush,
+                                  _update_release_cohorts, advance_releases,
+                                  all_deps_satisfied,
+                                  convert_dependency_graph_to_metapush,
+                                  create_dependency_tree,
+                                  execute_active_release_cohorts,
+                                  get_dependency_graph,
+                                  get_package_ids_from_build,
+                                  release_merge_freeze_if_safe,
+                                  set_merge_freeze_status)
 
 
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
@@ -564,37 +554,12 @@ def test_execute_active_release_cohorts__advances_release_cohorts(
 
 @pytest.mark.django_db
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
-def test_get_dependency_graph(smfs_mock):
+def test_get_dependency_graph(smfs_mock, dependent_releases):
     # Create a simulated repo graph that includes:
     # Two repos depending on the same base, one of which also requires the other.
     # A repo with no other relationships
 
-    # Create database entries
-    rc = ReleaseCohortFactory(dependency_graph={})
-    top = ReleaseFactory(
-        repo__url="https://github.com/example/top",
-        release_cohort=rc,
-        status=Release.STATUS.draft,
-        created_from_commit="abc",
-    )
-    left = ReleaseFactory(
-        repo__url="https://github.com/example/left",
-        release_cohort=rc,
-        status=Release.STATUS.draft,
-        created_from_commit="ghi",
-    )
-    right = ReleaseFactory(
-        repo__url="https://github.com/example/right",
-        release_cohort=rc,
-        status=Release.STATUS.draft,
-        created_from_commit="jkl",
-    )
-    separate = ReleaseFactory(
-        repo__url="https://github.com/example/separate",
-        release_cohort=rc,
-        status=Release.STATUS.draft,
-        created_from_commit="mno",
-    )
+    rc, top, left, right, separate = dependent_releases()
 
     # Mock results from GitHubDynamicDependency.flatten()
     flatten_results = {
@@ -721,93 +686,10 @@ def test_get_package_ids_from_build__not_found():
 
 @pytest.mark.django_db
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
-def test_convert_dependency_graph_to_metapush(smfs_mock):
-    rc = ReleaseCohortFactory(dependency_graph={})
-    top = ReleaseFactory(
-        repo__url="https://github.com/example/top",
-        release_cohort=rc,
-        status=Release.STATUS.draft,
-        created_from_commit="abc",
-    )
-    left = ReleaseFactory(
-        repo__url="https://github.com/example/left",
-        release_cohort=rc,
-        status=Release.STATUS.draft,
-        created_from_commit="ghi",
-    )
-    right = ReleaseFactory(
-        repo__url="https://github.com/example/right",
-        release_cohort=rc,
-        status=Release.STATUS.draft,
-        created_from_commit="jkl",
-    )
-    separate = ReleaseFactory(
-        repo__url="https://github.com/example/separate",
-        release_cohort=rc,
-        status=Release.STATUS.draft,
-        created_from_commit="mno",
-    )
-    rc.status = ReleaseCohort.STATUS.completed
-    rc.save()
-    top.status = left.status = right.status = separate.status = Release.STATUS.completed
-
-    build_top = BuildFactory(
-        release=top, planrepo__plan__role="release", status=BUILD_STATUSES.success
-    )
-    build_flow_top = BuildFlowFactory(build=build_top)
-    flow_task_top = FlowTaskFactory(
-        class_path="cumulusci.tasks.salesforce.PackageUpload",
-        build_flow=build_flow_top,
-        return_values={
-            "version_id": "04t000000000top",
-            "package_id": "033000000000top",
-        },
-    )
-
-    build_left = BuildFactory(
-        release=left, planrepo__plan__role="release", status=BUILD_STATUSES.success
-    )
-    build_flow_left = BuildFlowFactory(build=build_left)
-    flow_task_left = FlowTaskFactory(
-        class_path="cumulusci.tasks.salesforce.PackageUpload",
-        build_flow=build_flow_left,
-        return_values={
-            "version_id": "04t00000000left",
-            "package_id": "03300000000left",
-        },
-    )
-
-    build_right = BuildFactory(
-        release=right, planrepo__plan__role="release", status=BUILD_STATUSES.success
-    )
-    build_flow_right = BuildFlowFactory(build=build_right)
-    flow_task_right = FlowTaskFactory(
-        class_path="cumulusci.tasks.salesforce.PackageUpload",
-        build_flow=build_flow_right,
-        return_values={
-            "version_id": "04t0000000right",
-            "package_id": "0330000000right",
-        },
-    )
-
-    build_separate = BuildFactory(
-        release=separate, planrepo__plan__role="release", status=BUILD_STATUSES.success
-    )
-    build_flow_separate = BuildFlowFactory(build=build_separate)
-    flow_task_separate = FlowTaskFactory(
-        class_path="cumulusci.tasks.salesforce.PackageUpload",
-        build_flow=build_flow_separate,
-        return_values={
-            "version_id": "04t0000separate",
-            "package_id": "0330000separate",
-        },
-    )
-
-    rc.dependency_graph = {
-        left.repo.url: [top.repo.url],
-        right.repo.url: [top.repo.url, left.repo.url],
-    }
-    rc.save()
+def test_convert_dependency_graph_to_metapush(
+    smfs_mock, dependent_releases_with_builds
+):
+    rc, _, _, _, _ = dependent_releases_with_builds()
 
     result = list(convert_dependency_graph_to_metapush(rc))
     assert len(result) == 4
@@ -845,17 +727,109 @@ def test_convert_dependency_graph_to_metapush(smfs_mock):
     )
 
 
-def test_convert_dependency_graph_to_metapush__build_not_found():
-    pass
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_convert_dependency_graph_to_metapush__build_not_found(
+    smfs_mock, dependent_releases
+):
+    rc, top, left, right, separate = dependent_releases()
+
+    with pytest.raises(DependencyGraphError) as e:
+        convert_dependency_graph_to_metapush(rc)
+
+    assert "Unable to find Build with role Release" in str(e)
 
 
-def test_convert_dependency_graph_to_metapush__package_not_found():
-    pass
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_convert_dependency_graph_to_metapush__package_not_found(
+    smfs_mock, dependent_releases_with_builds
+):
+    rc, top, _, _, _ = dependent_releases_with_builds()
+    flow_task = FlowTask.objects.filter(build_flow__build__release=top).first()
+    flow_task.class_path = "cumulusci.foo"
+    flow_task.save()
+
+    with pytest.raises(DependencyGraphError) as e:
+        convert_dependency_graph_to_metapush(rc)
+
+    assert "Unable to source package details" in str(e)
 
 
-def test_convert_dependency_graph_to_metapush__missing_dependency():
-    pass
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_convert_dependency_graph_to_metapush__missing_dependency(
+    smfs_mock, dependent_releases_with_builds
+):
+    rc, _, left, _, _ = dependent_releases_with_builds()
+
+    left.repo.metapush_enabled = False
+    left.save()
+
+    with pytest.raises(DependencyGraphError) as e:
+        convert_dependency_graph_to_metapush(rc)
+
+    assert "A dependency package version is missing" in str(e)
 
 
-def test_send_to_metapush():
-    pass
+@pytest.mark.django_db
+@responses.activate
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_send_to_metapush(
+    smfs_mock, metapush_configured, dependent_releases_with_builds
+):
+    rc, _, _, _, _ = dependent_releases_with_builds()
+    endpoint, token = metapush_configured
+
+    url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
+    responses.add(
+        "POST",
+        url,
+        match=[
+            responses.json_params_matcher(
+                {"dependency_graph": {}, "push_schedule": None}
+            )
+        ],
+    )
+    with responses.RequestsMock():
+        _send_to_metapush(rc)
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@responses.activate
+def test_send_to_metapush__http_failure(
+    smfs_mock, metapush_configured, dependent_releases_with_builds
+):
+    rc, _, _, _, _ = dependent_releases_with_builds()
+
+    endpoint, token = metapush_configured
+
+    url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
+    responses.add(
+        "POST",
+        url,
+        match=[
+            responses.json_params_matcher(
+                {"dependency_graph": {}, "push_schedule": None}
+            )
+        ],
+        status=400,
+    )
+
+    with responses.RequestsMock():
+        _send_to_metapush(rc)
+
+    assert rc.metapush_error == "MetaPush configuration is missing"
+
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+def test_send_to_metapush__not_configured(
+    smfs_mock, metapush_not_configured, dependent_releases_with_builds
+):
+    rc, _, _, _, _ = dependent_releases_with_builds()
+
+    _send_to_metapush(rc)
+
+    assert rc.metapush_error == "MetaPush configuration is missing"
