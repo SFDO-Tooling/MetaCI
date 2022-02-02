@@ -530,6 +530,41 @@ def test_execute_active_release_cohorts__completes_finished_cohorts(
     assert rc_progress.status == ReleaseCohort.STATUS.active
 
 
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@unittest.mock.patch("metaci.release.tasks.send_to_metapush")
+@pytest.mark.django_db
+def test_execute_active_release_cohorts__sends_to_metapush(
+    send_to_metapush_mock, smfs_mock, metapush_configured
+):
+    rc = ReleaseCohortFactory(dependency_graph={})
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
+    )
+    rc.status = ReleaseCohort.STATUS.active
+    rc.save()
+
+    execute_active_release_cohorts()
+
+    send_to_metapush_mock.assert_called_once_with(rc)
+
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@unittest.mock.patch("metaci.release.tasks.send_to_metapush")
+@pytest.mark.django_db
+def test_execute_active_release_cohorts__skips_metapush_for_opt_out(
+    send_to_metapush_mock, smfs_mock, metapush_configured
+):
+    rc = ReleaseCohortFactory(dependency_graph={}, send_to_metapush=False)
+    _ = ReleaseFactory(
+        repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
+    )
+    rc.status = ReleaseCohort.STATUS.active
+    rc.save()
+
+    execute_active_release_cohorts()
+
+    send_to_metapush_mock.assert_not_called()
+
+
 @pytest.mark.django_db
 @unittest.mock.patch("metaci.release.tasks.advance_releases")
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
@@ -821,6 +856,20 @@ def test_send_to_metapush__http_failure(
         _send_to_metapush(rc)
 
     assert "400 Client Error: Bad Request" in rc.metapush_error
+
+@pytest.mark.django_db
+@unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@responses.activate
+def test_send_to_metapush__dependency_graph_failure(
+    smfs_mock, metapush_configured, dependent_releases_with_builds
+):
+    rc, _, left, _, _ = dependent_releases_with_builds()
+    left.repo.metapush_enabled = False
+    left.repo.save()
+
+    _send_to_metapush(rc)
+
+    assert "A dependency package version is missing" in rc.metapush_error
 
 
 @pytest.mark.django_db
