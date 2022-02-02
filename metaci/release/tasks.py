@@ -428,7 +428,7 @@ def _send_to_metapush(rc: ReleaseCohort):
                     "dependency_graph": metapush_graph.dict(),
                     "push_schedule": rc.metapush_push_schedule_id,
                 },
-            )
+            ).raise_for_status()
         except requests.exceptions.RequestException as e:
             rc.metapush_error = str(e)
             rc.save()

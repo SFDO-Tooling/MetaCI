@@ -764,7 +764,7 @@ def test_convert_dependency_graph_to_metapush__missing_dependency(
     rc, _, left, _, _ = dependent_releases_with_builds()
 
     left.repo.metapush_enabled = False
-    left.save()
+    left.repo.save()
 
     with pytest.raises(DependencyGraphError) as e:
         convert_dependency_graph_to_metapush(rc)
@@ -773,8 +773,8 @@ def test_convert_dependency_graph_to_metapush__missing_dependency(
 
 
 @pytest.mark.django_db
-@responses.activate
 @unittest.mock.patch("metaci.release.tasks.set_merge_freeze_status")
+@responses.activate
 def test_send_to_metapush(
     smfs_mock, metapush_configured, dependent_releases_with_builds
 ):
@@ -782,16 +782,20 @@ def test_send_to_metapush(
     endpoint, token = metapush_configured
 
     url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
-    responses.add(
-        "POST",
-        url,
-        match=[
-            responses.json_params_matcher(
-                {"dependency_graph": {}, "push_schedule": None}
-            )
-        ],
-    )
-    with responses.RequestsMock():
+    dependency_graph = convert_dependency_graph_to_metapush(rc)
+    rc.metapush_push_schedule_id = 'foobar'
+
+    with responses.RequestsMock() as rsps:
+        rsps.add(
+            responses.POST,
+            url,
+            match=[
+                responses.json_params_matcher(
+                    {"dependency_graph": dependency_graph.dict(), "push_schedule": 'foobar'}
+                )
+            ],
+        )
+
         _send_to_metapush(rc)
 
 
@@ -806,21 +810,17 @@ def test_send_to_metapush__http_failure(
     endpoint, token = metapush_configured
 
     url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
-    responses.add(
-        "POST",
-        url,
-        match=[
-            responses.json_params_matcher(
-                {"dependency_graph": {}, "push_schedule": None}
-            )
-        ],
-        status=400,
-    )
 
-    with responses.RequestsMock():
+    with responses.RequestsMock() as rsps:
+        rsps.add(
+            responses.POST,
+            url,
+            status=400,
+        )
+
         _send_to_metapush(rc)
 
-    assert rc.metapush_error == "MetaPush configuration is missing"
+    assert "400 Client Error: Bad Request" in rc.metapush_error
 
 
 @pytest.mark.django_db
