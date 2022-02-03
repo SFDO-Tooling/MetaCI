@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, call
 
 import pytest
+import requests
 import responses
 from cumulusci.core.dependencies.dependencies import (
     GitHubDynamicDependency, UnmanagedGitHubRefDependency)
@@ -830,7 +831,6 @@ def test_send_to_metapush(
             ],
         )
         _send_to_metapush(rc)
-        breakpoint()
 
 
 @pytest.mark.django_db
@@ -843,7 +843,7 @@ def test_send_to_metapush__http_failure(
 
     endpoint, token = metapush_configured
 
-    url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
+    url = requests.compat.urljoin(endpoint, "api/pushcohorts/")
 
     with responses.RequestsMock() as rsps:
         rsps.add(
