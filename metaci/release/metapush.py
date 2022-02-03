@@ -14,3 +14,6 @@ class DependencyGraph(BaseModel):
 
     def __iter__(self):
         return iter(self.__root__)
+
+    def append(self, item):
+        self.__root__.append(item)
