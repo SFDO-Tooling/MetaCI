@@ -1,5 +1,4 @@
 import unittest
-import urllib
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, call
@@ -553,7 +552,7 @@ def test_execute_active_release_cohorts__sends_to_metapush(
 def test_execute_active_release_cohorts__skips_metapush_for_opt_out(
     send_to_metapush_mock, smfs_mock, metapush_configured
 ):
-    rc = ReleaseCohortFactory(dependency_graph={}, send_to_metapush=False)
+    rc = ReleaseCohortFactory(dependency_graph={}, enable_metapush=False)
     _ = ReleaseFactory(
         repo__url="foo", release_cohort=rc, status=Release.STATUS.completed
     )
@@ -816,7 +815,7 @@ def test_send_to_metapush(
     rc, _, _, _, _ = dependent_releases_with_builds()
     endpoint, token = metapush_configured
 
-    url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
+    url = requests.compat.urljoin(endpoint, "api/pushcohorts/")
     dependency_graph = convert_dependency_graph_to_metapush(rc)
     rc.metapush_push_schedule_id = 'foobar'
 
@@ -830,8 +829,8 @@ def test_send_to_metapush(
                 )
             ],
         )
-
         _send_to_metapush(rc)
+        breakpoint()
 
 
 @pytest.mark.django_db

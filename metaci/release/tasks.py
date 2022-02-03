@@ -1,6 +1,5 @@
 import json
 import logging
-import urllib
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import DefaultDict, List, Optional
@@ -19,7 +18,7 @@ from django.utils.translation import gettext as _
 from django_rq import job
 from github3.repos.repo import Repository as GitHubRepository
 
-from metaci.build.models import BUILD_STATUSES, Build
+from metaci.build.models import BUILD_STATUSES, Build, FlowTask
 from metaci.cumulusci.keychain import GitHubSettingsKeychain
 from metaci.plan.models import PlanRepository
 from metaci.release.metapush import DependencyGraph, DependencyGraphItem
@@ -286,7 +285,7 @@ def execute_active_release_cohorts():
         rc.save()
 
         # Send this Release Cohort to MetaPush for push upgrades, if configured.
-        if is_metapush_configured() and rc.send_to_metapush:
+        if is_metapush_configured() and rc.enable_metapush:
             send_to_metapush(rc)
 
     # Next, identify in-progress Release Cohorts that need to be advanced.
@@ -331,21 +330,26 @@ def get_package_ids_from_build(build: Build) -> Optional[DependencyGraphItem]:
     """Traverse the Flow Tasks associated with this Build until we locate
     a package upload task. Return a DependencyGraphItem with the package
     details from its output, or None if not found."""
-    for build_flow in build.flows.all():
-        for flow_task in build_flow.tasks.all():
-            if flow_task.class_path in PACKAGE_UPLOAD_TASK_PATHS:
-                # Grab the return values, which will include the 033 and 04t ids
-                all_package_id = flow_task.return_values["package_id"]
-                # The upload tasks for 1GP and 2GP have different return_values shapes
-                all_package_version_id = flow_task.return_values.get(
-                    "version_id"
-                ) or flow_task.return_values.get("subscriber_package_version_id")
-                if all_package_id and all_package_version_id:
-                    return DependencyGraphItem(
-                        AllPackageId=all_package_id,
-                        AllPackageVersionId=all_package_version_id,
-                        Dependencies=[],
-                    )
+    flow_tasks = FlowTask.objects.filter(
+        build_flow__build=build,
+        class_path__in=PACKAGE_UPLOAD_TASK_PATHS
+    )
+    if flow_tasks.count() == 1:
+        flow_task = flow_tasks.first()
+        # Grab the return values, which will include the 033 and 04t ids
+        all_package_id = flow_task.return_values["package_id"]
+        # The upload tasks for 1GP and 2GP have different return_values shapes
+        all_package_version_id = flow_task.return_values.get(
+            "version_id"
+        ) or flow_task.return_values.get("subscriber_package_version_id")
+        if all_package_id and all_package_version_id:
+            return DependencyGraphItem(
+                AllPackageId=all_package_id,
+                AllPackageVersionId=all_package_version_id,
+                Dependencies=[],
+            )
+
+    return None
 
 
 def convert_dependency_graph_to_metapush(rc: ReleaseCohort) -> DependencyGraph:
@@ -405,10 +409,7 @@ def send_to_metapush(rc: ReleaseCohort):
 
 
 def _send_to_metapush(rc: ReleaseCohort):
-    token = settings.METAPUSH_AUTHENTICATION_TOKEN
-    endpoint = settings.METAPUSH_ENDPOINT_URL
-
-    if not (endpoint and token):
+    if not is_metapush_configured():
         rc.metapush_error = "MetaPush configuration is missing"
         rc.save()
         return
@@ -426,10 +427,10 @@ def _send_to_metapush(rc: ReleaseCohort):
 
     # Send the request to MetaPush to create the Push Cohort.
     try:
-        url = urllib.parse.urljoin(endpoint, "api/pushcohorts/")
+        url = requests.compat.urljoin(settings.METAPUSH_ENDPOINT_URL, "api/pushcohorts/")
         requests.post(
             url,
-            headers={"Authorization": f"Token {token}"},
+            headers={"Authorization": f"Token {settings.METAPUSH_AUTHENTICATION_TOKEN}"},
             json={
                 "dependency_graph": metapush_graph.dict(),
                 "push_schedule": rc.metapush_push_schedule_id,

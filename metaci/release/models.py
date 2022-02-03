@@ -37,7 +37,7 @@ class ReleaseCohort(models.Model):
 
     # Fields for MetaPush integration
     metapush_push_schedule_id = models.CharField(max_length=32, null=True, blank=True)
-    send_to_metapush = models.BooleanField(default=True)
+    enable_metapush = models.BooleanField(default=True)
     metapush_error = models.TextField(null=True, blank=True)
     metapush_push_cohort_id = models.CharField(max_length=32, null=True, blank=True)
 
