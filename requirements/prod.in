@@ -1,7 +1,7 @@
 ansi2html
 boto3
 coloredlogs
-cumulusci==3.52.0.dev0
+cumulusci
 django<3.2
 django-allauth
 django-anymail
