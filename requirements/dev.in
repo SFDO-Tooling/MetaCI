@@ -16,4 +16,4 @@ pytest-mock
 pytest-tap
 responses<=0.13.4
 Sphinx
-Werkzeug<2
+Werkzeug<3
