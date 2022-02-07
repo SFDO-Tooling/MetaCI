@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('release', '0025_auto_20211117_0126'),
+        ("release", "0025_auto_20211117_0126"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='releasecohort',
-            name='dependency_graph',
+            model_name="releasecohort",
+            name="dependency_graph",
             field=models.JSONField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='releasecohort',
-            name='error_message',
+            model_name="releasecohort",
+            name="error_message",
             field=models.TextField(blank=True, null=True),
         ),
     ]

@@ -7,14 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('repository', '0011_metadata'),
-        ('plan', '0040_plan_commit_status_regex'),
+        ("repository", "0011_metadata"),
+        ("plan", "0040_plan_commit_status_regex"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='planrepository',
-            name='repo',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='planrepos', to='repository.repository'),
+            model_name="planrepository",
+            name="repo",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="planrepos",
+                to="repository.repository",
+            ),
         ),
     ]

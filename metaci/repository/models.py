@@ -37,6 +37,7 @@ class Repository(models.Model):
     release_tag_regex = models.CharField(max_length=255, blank=True, null=True)
     default_implementation_steps = models.JSONField(null=True, blank=True, default=list)
     metadata = models.JSONField(null=True, blank=True, default=dict)
+    metapush_enabled = models.BooleanField(default=False)
 
     objects = RepositoryQuerySet.as_manager()
 

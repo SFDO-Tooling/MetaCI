@@ -35,6 +35,12 @@ class ReleaseCohort(models.Model):
     error_message = models.TextField(null=True, blank=True)
     dependency_graph = models.JSONField(null=True, blank=True)
 
+    # Fields for MetaPush integration
+    metapush_push_schedule_id = models.CharField(max_length=32, null=True, blank=True)
+    enable_metapush = models.BooleanField(default=True)
+    metapush_error = models.TextField(null=True, blank=True)
+    metapush_push_cohort_id = models.CharField(max_length=32, null=True, blank=True)
+
     def __str__(self):
         return self.name
 
@@ -240,11 +246,20 @@ class Release(StatusModel):
             old_cohort = Release.objects.get(pk=self.pk).release_cohort
 
         if old_cohort != self.release_cohort:
-            if self.release_cohort and self.release_cohort.status != ReleaseCohort.STATUS.planned:
-                raise ValidationError(_("Releases must be added to a Release Cohort in Planned status."))
+            if (
+                self.release_cohort
+                and self.release_cohort.status != ReleaseCohort.STATUS.planned
+            ):
+                raise ValidationError(
+                    _("Releases must be added to a Release Cohort in Planned status.")
+                )
 
             if old_cohort and old_cohort.status != ReleaseCohort.STATUS.planned:
-                raise ValidationError(_("Releases cannot be removed from a Release Cohort that is not in Planned status."))
+                raise ValidationError(
+                    _(
+                        "Releases cannot be removed from a Release Cohort that is not in Planned status."
+                    )
+                )
 
         super().save(*args, **kw)
         for step_dict in self.repo.default_implementation_steps:

@@ -4,6 +4,7 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from typing import DefaultDict, List, Optional
 
+import requests
 from cumulusci.core.dependencies.dependencies import GitHubDynamicDependency
 from cumulusci.core.dependencies.resolvers import DependencyResolutionStrategy
 from cumulusci.core.github import get_github_api_for_repo
@@ -17,9 +18,10 @@ from django.utils.translation import gettext as _
 from django_rq import job
 from github3.repos.repo import Repository as GitHubRepository
 
-from metaci.build.models import BUILD_STATUSES, Build
+from metaci.build.models import BUILD_STATUSES, Build, FlowTask
 from metaci.cumulusci.keychain import GitHubSettingsKeychain
 from metaci.plan.models import PlanRepository
+from metaci.release.metapush import DependencyGraph, DependencyGraphItem
 from metaci.release.models import Release, ReleaseCohort
 from metaci.repository.models import Repository
 
@@ -263,6 +265,10 @@ def advance_releases(rc: ReleaseCohort):
                 _run_release_builds(release)
 
 
+def is_metapush_configured():
+    return settings.METAPUSH_ENDPOINT_URL and settings.METAPUSH_AUTHENTICATION_TOKEN
+
+
 def execute_active_release_cohorts():
     # First, identify Release Cohorts that need their dependency trees created.
     for rc in ReleaseCohort.objects.filter(
@@ -277,6 +283,10 @@ def execute_active_release_cohorts():
     ):
         rc.status = ReleaseCohort.STATUS.completed
         rc.save()
+
+        # Send this Release Cohort to MetaPush for push upgrades, if configured.
+        if is_metapush_configured() and rc.enable_metapush:
+            send_to_metapush(rc)
 
     # Next, identify in-progress Release Cohorts that need to be advanced.
     for rc in ReleaseCohort.objects.filter(
@@ -308,6 +318,127 @@ def all_deps_satisfied(
         for d in deps
         if d not in releases_dict
     )
+
+
+PACKAGE_UPLOAD_TASK_PATHS = [
+    "cumulusci.tasks.create_package_version.CreatePackageVersion",
+    "cumulusci.tasks.salesforce.PackageUpload",
+]
+
+
+def get_package_ids_from_build(build: Build) -> Optional[DependencyGraphItem]:
+    """Traverse the Flow Tasks associated with this Build until we locate
+    a package upload task. Return a DependencyGraphItem with the package
+    details from its output, or None if not found."""
+    flow_tasks = FlowTask.objects.filter(
+        build_flow__build=build,
+        class_path__in=PACKAGE_UPLOAD_TASK_PATHS
+    )
+    if flow_tasks.count() == 1:
+        flow_task = flow_tasks.first()
+        # Grab the return values, which will include the 033 and 04t ids
+        all_package_id = flow_task.return_values["package_id"]
+        # The upload tasks for 1GP and 2GP have different return_values shapes
+        all_package_version_id = flow_task.return_values.get(
+            "version_id"
+        ) or flow_task.return_values.get("subscriber_package_version_id")
+        if all_package_id and all_package_version_id:
+            return DependencyGraphItem(
+                AllPackageId=all_package_id,
+                AllPackageVersionId=all_package_version_id,
+                Dependencies=[],
+            )
+
+    return None
+
+
+def convert_dependency_graph_to_metapush(rc: ReleaseCohort) -> DependencyGraph:
+    """Convert the Release Cohort's dependency graph (expressed in terms of GitHub URLs)
+    to a MetaPush-style dependency graph (expressed in terms of 04t and 033 package ids)
+    """
+    package_versions_to_github_urls = {}
+    github_urls_to_package_versions = {}
+    dep_graph = DependencyGraph.parse_obj([])
+
+    for release in rc.releases.all():
+        if not release.repo.metapush_enabled:
+            continue
+
+        github_url = release.repo.url
+
+        # We should have exactly one succeeded Release (Upload Release) build for this Release
+        try:
+            build = release.build_set.get(
+                plan__role="release", status=BUILD_STATUSES.success
+            )
+        except Build.DoesNotExist:
+            raise DependencyGraphError(
+                f"Unable to find Build with role Release on {release}"
+            )
+
+        dep_graph_item = get_package_ids_from_build(build)
+        if not dep_graph_item:
+            raise DependencyGraphError("Unable to source package details from Build")
+        dep_graph.append(dep_graph_item)
+        package_versions_to_github_urls[dep_graph_item.AllPackageVersionId] = github_url
+        github_urls_to_package_versions[github_url] = dep_graph_item.AllPackageVersionId
+
+    # Now, populate the dependencies in the graph.
+    for dep_graph_item in dep_graph:
+        # Get the GitHub URL for _this_ dependency item
+        github_url = package_versions_to_github_urls[dep_graph_item.AllPackageVersionId]
+        # ... get its dependencies from the Release Cohort's graph...
+        deps = rc.dependency_graph.get(github_url, [])
+        # and convert those GitHub URLs back to created Package Versions
+        for url in deps:
+            package_version = github_urls_to_package_versions.get(url)
+            if not package_version:
+                # This would happen if an intermediate link in the dependency chain
+                # is marked metapush_enabled = False
+                raise DependencyGraphError(
+                    "A dependency package version is missing because one or more repositories are not MetaPush-enabled."
+                )
+            dep_graph_item.Dependencies.append(package_version)
+
+    return dep_graph
+
+
+@job
+def send_to_metapush(rc: ReleaseCohort):
+    _send_to_metapush(rc)  # pragma: no cover
+
+
+def _send_to_metapush(rc: ReleaseCohort):
+    if not is_metapush_configured():
+        rc.metapush_error = "MetaPush configuration is missing"
+        rc.save()
+        return
+
+    # Take our dependency graph (GitHub URL-based) and convert to
+    # MetaPush-style 04t/033 id based. MetaPush does not know
+    # about repositories - just packages.
+
+    try:
+        metapush_graph = convert_dependency_graph_to_metapush(rc)
+    except DependencyGraphError as e:
+        rc.metapush_error = str(e)
+        rc.save()
+        return
+
+    # Send the request to MetaPush to create the Push Cohort.
+    try:
+        url = requests.compat.urljoin(settings.METAPUSH_ENDPOINT_URL, "api/pushcohorts/")
+        requests.post(
+            url,
+            headers={"Authorization": f"Token {settings.METAPUSH_AUTHENTICATION_TOKEN}"},
+            json={
+                "dependency_graph": metapush_graph.dict(),
+                "push_schedule": rc.metapush_push_schedule_id,
+            },
+        ).raise_for_status()
+    except requests.exceptions.RequestException as e:
+        rc.metapush_error = str(e)
+        rc.save()
 
 
 @job
