@@ -379,7 +379,7 @@ def convert_dependency_graph_to_metapush(rc: ReleaseCohort) -> DependencyGraph:
         dep_graph_item = get_package_ids_from_build(build)
         if not dep_graph_item:
             raise DependencyGraphError("Unable to source package details from Build")
-        dep_graph.__root__.append(dep_graph_item)
+        dep_graph.append(dep_graph_item)
         package_versions_to_github_urls[dep_graph_item.AllPackageVersionId] = github_url
         github_urls_to_package_versions[github_url] = dep_graph_item.AllPackageVersionId
 
