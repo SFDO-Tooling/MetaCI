@@ -3,7 +3,7 @@ from unittest import mock
 import github3.exceptions
 import pytest
 
-from metaci.fixtures.factories import BranchFactory
+from metaci.fixtures.factories import BranchFactory, RepositoryFactory
 
 
 @pytest.mark.django_db
@@ -13,6 +13,12 @@ def test_branch_is_tag():
 
     branch.name = "tag: " + branch.name
     assert branch.is_tag()
+
+
+@pytest.mark.django_db
+def test_no_repo_latest_release():
+    repo = RepositoryFactory()
+    assert not repo.latest_release
 
 
 @pytest.mark.django_db

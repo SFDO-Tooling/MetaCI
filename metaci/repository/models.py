@@ -68,8 +68,6 @@ class Repository(models.Model):
                 version_number=1.0,
                 git_tag=f"{self.release_tag_regex}1.0",
             )
-        except Repository.DoesNotExist:
-            return None
 
 
 class BranchManager(SoftDeletableManager):
