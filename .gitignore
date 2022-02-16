@@ -104,3 +104,5 @@ postgres/
 # safeguarding secrets
 sfdx_hub.key
 
+# QAR output files
+QAR/
