@@ -57,9 +57,11 @@ class Repository(models.Model):
 
     @property
     def latest_release(self):
+        from metaci.release.models import Release
+
         try:
-            return self.releases.latest()
-        except Repository.DoesNotExist:
+            return self.releases.latest()  # Also for MetaCI create release button.
+        except Release.DoesNotExist:
             return None
 
 
