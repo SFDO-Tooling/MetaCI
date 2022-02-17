@@ -62,12 +62,7 @@ class Repository(models.Model):
         try:
             return self.releases.latest()  # Also for MetaCI create release button.
         except Release.DoesNotExist:
-            Release(
-                repo=self,
-                version_name="1.0",
-                version_number=1.0,
-                git_tag=f"{self.release_tag_regex}1.0",
-            )
+            return None
 
 
 class BranchManager(SoftDeletableManager):
