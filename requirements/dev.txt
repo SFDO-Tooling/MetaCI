@@ -38,7 +38,7 @@ click==8.0.3
     # via
     #   -c requirements/prod.txt
     #   black
-coverage==6.3.1
+coverage==6.3.2
     # via
     #   -r requirements/dev.in
     #   coveralls
@@ -75,11 +75,11 @@ faker==12.0.0
     # via
     #   -c requirements/prod.txt
     #   factory-boy
-filelock==3.4.2
+filelock==3.6.0
     # via virtualenv
 flake8==4.0.1
     # via -r requirements/dev.in
-identify==2.4.8
+identify==2.4.10
     # via pre-commit
 idna==3.3
     # via
@@ -132,7 +132,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-platformdirs==2.4.1
+platformdirs==2.5.1
     # via
     #   black
     #   virtualenv
@@ -140,7 +140,7 @@ pluggy==1.0.0
     # via pytest
 pre-commit==2.17.0
     # via -r requirements/dev.in
-prompt-toolkit==3.0.26
+prompt-toolkit==3.0.28
     # via ipython
 ptyprocess==0.7.0
     # via pexpect
@@ -169,7 +169,7 @@ pytest-mock==3.7.0
     # via -r requirements/dev.in
 pytest-tap==3.3
     # via -r requirements/dev.in
-pytest==6.2.5
+pytest==7.0.1
     # via
     #   -r requirements/dev.in
     #   pytest-django
@@ -224,7 +224,7 @@ sqlparse==0.4.2
     #   -c requirements/prod.txt
     #   django
     #   django-debug-toolbar
-stack-data==0.1.4
+stack-data==0.2.0
     # via ipython
 tap.py==3.1
     # via pytest-tap
@@ -232,9 +232,10 @@ toml==0.10.2
     # via
     #   ipdb
     #   pre-commit
+tomli==2.0.1
+    # via
+    #   black
     #   pytest
-tomli==2.0.0
-    # via black
 traitlets==5.1.1
     # via
     #   ipython
@@ -248,7 +249,7 @@ urllib3==1.26.8
     #   -c requirements/prod.txt
     #   requests
     #   responses
-virtualenv==20.13.0
+virtualenv==20.13.1
     # via pre-commit
 wcwidth==0.2.5
     # via prompt-toolkit
