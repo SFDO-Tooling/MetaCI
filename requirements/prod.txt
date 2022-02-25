@@ -18,9 +18,9 @@ authlib==0.15.5
     #   simple-salesforce
 bleach==4.1.0
     # via sfdo-template-helpers
-boto3==1.21.4
+boto3==1.21.8
     # via -r requirements/prod.in
-botocore==1.24.4
+botocore==1.24.8
     # via
     #   boto3
     #   s3transfer
@@ -59,19 +59,15 @@ cryptography==36.0.1
     # via
     #   authlib
     #   cumulusci
-    #   jwcrypto
     #   pyjwt
     #   sfdo-template-helpers
-cumulusci==3.52.0
+cumulusci==3.53.0
     # via -r requirements/prod.in
 defusedxml==0.7.1
     # via python3-openid
 deprecated==1.2.13
-    # via
-    #   cumulusci
-    #   jwcrypto
-    #   redis
-django-allauth==0.48.0
+    # via redis
+django-allauth==0.49.0
     # via -r requirements/prod.in
 django-anymail==8.5
     # via -r requirements/prod.in
@@ -133,9 +129,9 @@ faker==12.0.0
     # via
     #   cumulusci
     #   snowfakery
-fs==2.4.14
+fs==2.4.15
     # via cumulusci
-github3.py==3.0.0
+github3.py==3.1.0
     # via cumulusci
 greenlet==1.1.2
     # via
@@ -157,7 +153,7 @@ idna==3.3
     #   cumulusci
     #   requests
     #   snowfakery
-importlib-metadata==4.10.1
+importlib-metadata==4.11.0
     # via
     #   cumulusci
     #   keyring
@@ -170,10 +166,6 @@ jmespath==0.10.0
     # via
     #   boto3
     #   botocore
-jwcrypto==1.0
-    # via
-    #   cumulusci
-    #   github3.py
 keyring==23.0.1
     # via cumulusci
 logfmt==0.4
@@ -214,6 +206,7 @@ pyjwt[crypto]==2.3.0
     #   -r requirements/prod.in
     #   cumulusci
     #   django-allauth
+    #   github3.py
 pyparsing==3.0.7
     # via packaging
 python-baseconv==1.2.2
@@ -264,7 +257,7 @@ requests==2.27.1
     #   salesforce-bulk
     #   simple-salesforce
     #   snowfakery
-rich==11.1.0
+rich==11.2.0
     # via cumulusci
 robotframework-lint==1.1
     # via cumulusci
@@ -299,7 +292,7 @@ rq==1.10.1
     #   rq-scheduler
 rst2ansi==0.1.5
     # via cumulusci
-s3transfer==0.5.1
+s3transfer==0.5.2
     # via boto3
 salesforce-bulk==2.2.0
     # via cumulusci
@@ -323,7 +316,7 @@ six==1.16.0
     #   python-dateutil
     #   salesforce-bulk
     #   snowfakery
-snowfakery==2.5.0
+snowfakery==3.0.0
     # via cumulusci
 sqlalchemy==1.4.31
     # via
@@ -356,9 +349,7 @@ webencodings==0.5.1
 whitenoise==6.0.0
     # via -r requirements/prod.in
 wrapt==1.13.3
-    # via
-    #   cumulusci
-    #   deprecated
+    # via deprecated
 xmltodict==0.12.0
     # via cumulusci
 zipp==3.7.0
