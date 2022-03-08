@@ -14,6 +14,14 @@ RELEASE_MANAGER_PERMISSIONS = [
 
 
 def make_release_managers_group(apps, schema_editor):
+    # Ensure permissions for release cohort have been created
+    # (see https://code.djangoproject.com/ticket/23422 and
+    # https://stackoverflow.com/questions/31735042/adding-django-admin-permissions-in-a-migration-permission-matching-query-does-n)
+    for app_config in apps.get_app_configs():
+        app_config.models_module = True
+        create_permissions(app_config, apps=apps, verbosity=0)
+        app_config.models_module = None
+
     # Create release managers group with desired perms
     Group = apps.get_model("auth", "Group")
     g = Group.objects.create(name="Release Managers")
