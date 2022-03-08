@@ -91,6 +91,9 @@ dump.rdb
 # backup
 *.bak
 
+# sfdx
+sfdx/
+
 # pyenv
 .python-version
 

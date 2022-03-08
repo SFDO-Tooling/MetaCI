@@ -18,10 +18,11 @@ from metaci.release.utils import update_release_from_github
 class ReleaseCohort(models.Model):
     name = models.CharField(_("name"), max_length=255)
     status_choices = [
-        ("Planned", "Planned"),
         ("Active", "Active"),
+        ("Approved", "Approved"),
         ("Canceled", "Canceled"),
         ("Completed", "Completed"),
+        ("Planned", "Planned"),
     ]
     status = models.CharField(
         max_length=9,
