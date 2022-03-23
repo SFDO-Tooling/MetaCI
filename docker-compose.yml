@@ -7,20 +7,16 @@ services:
     volumes:
       - ./docker/postgres:/var/lib/postgresql/data:delegated
     image: postgres:12
-    ports: 
-    - "5432:5432/tcp"
     restart: always
   redis:
     image: "redis:6"
-    ports:
-      - "6379:6379"
   web:
     build:
       context: .
       dockerfile: Dockerfile
     command: |
-        /bin/bash -c 'while !</dev/tcp/postgres/5432; do echo "Waiting for postgres database to start..."; /bin/sleep 1; done; \
-        /bin/sleep 1; /bin/sh /app/docker/utility/start_server.sh;'
+      /bin/bash -c 'while !</dev/tcp/postgres/5432; do echo "Waiting for postgres database to start..."; /bin/sleep 1; done; \
+      /bin/sleep 1; /bin/sh /app/docker/utility/start_server.sh;'
     ports:
       - "5000:5000"
     depends_on:
