@@ -18,11 +18,11 @@ authlib==1.0.0
     # via
     #   cumulusci
     #   simple-salesforce
-bleach==4.1.0
+bleach==5.0.0
     # via sfdo-template-helpers
-boto3==1.21.26
+boto3==1.21.35
     # via -r requirements/prod.in
-botocore==1.24.26
+botocore==1.24.35
     # via
     #   boto3
     #   s3transfer
@@ -180,9 +180,7 @@ markupsafe==2.0.1
 oauthlib==3.2.0
     # via requests-oauthlib
 packaging==21.3
-    # via
-    #   bleach
-    #   redis
+    # via redis
 psutil==5.9.0
     # via cumulusci
 psycopg2-binary==2.9.3
@@ -232,7 +230,7 @@ pyyaml==6.0
     # via
     #   cumulusci
     #   snowfakery
-redis==4.2.0
+redis==4.2.2
     # via
     #   -r requirements/prod.in
     #   django-defender
@@ -326,7 +324,6 @@ typing-extensions==4.0.1
     # via
     #   cumulusci
     #   pydantic
-    #   redis
     #   snowfakery
 unicodecsv==0.14.1
     # via
