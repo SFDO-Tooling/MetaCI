@@ -20,9 +20,9 @@ authlib==1.0.0
     #   simple-salesforce
 bleach==5.0.0
     # via sfdo-template-helpers
-boto3==1.21.35
+boto3==1.21.38
     # via -r requirements/prod.in
-botocore==1.24.35
+botocore==1.24.38
     # via
     #   boto3
     #   s3transfer
@@ -203,7 +203,7 @@ pyjwt[crypto]==2.3.0
     #   cumulusci
     #   django-allauth
     #   github3.py
-pyparsing==3.0.7
+pyparsing==3.0.8
     # via packaging
 python-baseconv==1.2.2
     # via
@@ -253,11 +253,11 @@ requests==2.27.1
     #   salesforce-bulk
     #   simple-salesforce
     #   snowfakery
-rich==12.0.1
+rich==12.2.0
     # via cumulusci
 robotframework-lint==1.1
     # via cumulusci
-robotframework-pabot==2.5.1
+robotframework-pabot==2.5.2
     # via cumulusci
 robotframework-pythonlibcore==3.0.0
     # via
@@ -324,6 +324,7 @@ typing-extensions==4.0.1
     # via
     #   cumulusci
     #   pydantic
+    #   rich
     #   snowfakery
 unicodecsv==0.14.1
     # via
@@ -348,7 +349,7 @@ wrapt==1.14.0
     # via deprecated
 xmltodict==0.12.0
     # via cumulusci
-zipp==3.7.0
+zipp==3.8.0
     # via
     #   cumulusci
     #   importlib-metadata
