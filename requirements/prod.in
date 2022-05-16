@@ -2,7 +2,7 @@ ansi2html
 boto3
 coloredlogs
 cumulusci
-django<3.2
+django
 django-allauth
 django-anymail
 django-crispy-forms
