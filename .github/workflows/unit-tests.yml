@@ -17,6 +17,7 @@ env:
   REDIS_URL: redis://localhost:6379
   GITHUB_CLIENT_ID: NO_GITHUB_CLIENT
   GITHUB_CLIENT_SECRET: NO_GITHUB_SECRET
+  DATABASE_URL: postgres://postgres:postgres@postgres:5432/github_actions
 
 jobs:
   unit-tests:
