@@ -24,10 +24,6 @@ babel==2.10.1
     # via sphinx
 backcall==0.2.0
     # via ipython
-backports.zoneinfo==0.2.1
-    # via
-    #   -c requirements/prod.txt
-    #   django
 black==22.3.0
     # via -r requirements/dev.in
 certifi==2021.10.8
@@ -60,7 +56,7 @@ django-debug-toolbar==3.4.0
     # via -r requirements/dev.in
 django-extensions==3.1.5
     # via -r requirements/dev.in
-django==4.0.4
+django==3.2.13
     # via
     #   -c requirements/prod.txt
     #   django-debug-toolbar
@@ -85,7 +81,7 @@ filelock==3.7.0
     # via virtualenv
 flake8==4.0.1
     # via -r requirements/dev.in
-identify==2.5.0
+identify==2.5.1
     # via pre-commit
 idna==3.3
     # via
@@ -193,6 +189,7 @@ pytz==2022.1
     # via
     #   -c requirements/prod.txt
     #   babel
+    #   django
 pyyaml==6.0
     # via
     #   -c requirements/prod.txt
