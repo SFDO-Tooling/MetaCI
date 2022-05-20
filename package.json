@@ -1,0 +1,17 @@
+{
+  "name": "metaci",
+  "version": "0.1.0",
+  "private": true,
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SFDO-Tooling/MetaCI.git"
+  },
+  "resolutions": {
+    "glob-parent": "5.1.2"
+  },
+  "engines": {
+    "node": "16.x",
+    "yarn": "1.x"
+  }
+}
