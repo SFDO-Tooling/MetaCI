@@ -126,6 +126,9 @@
   ],
   "buildpacks": [
     {
+      "url": "heroku/nodejs"
+    },
+    {
       "url": "https://github.com/SalesforceFoundation/simple-salesforce-dx-buildpack.git"
     },
     {

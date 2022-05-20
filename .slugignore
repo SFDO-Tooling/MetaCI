@@ -1,0 +1,4 @@
+/.circleci
+/.github
+docker-compose.yml
+env.example
