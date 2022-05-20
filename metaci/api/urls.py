@@ -1,4 +1,4 @@
-from django.conf.urls import re_path
+from django.urls import re_path
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import get_schema_view
 
