@@ -20,9 +20,9 @@ authlib==1.0.1
     #   simple-salesforce
 bleach==5.0.0
     # via sfdo-template-helpers
-boto3==1.23.9
+boto3==1.24.0
     # via -r requirements/prod.in
-botocore==1.26.9
+botocore==1.27.0
     # via
     #   boto3
     #   s3transfer
@@ -59,7 +59,7 @@ cryptography==37.0.2
     #   cumulusci
     #   pyjwt
     #   sfdo-template-helpers
-cumulusci==3.59.0
+cumulusci==3.59.1
     # via -r requirements/prod.in
 defusedxml==0.7.1
     # via python3-openid
@@ -287,7 +287,7 @@ rq==1.10.1
     #   rq-scheduler
 rst2ansi==0.1.5
     # via cumulusci
-s3transfer==0.5.2
+s3transfer==0.6.0
     # via boto3
 salesforce-bulk==2.2.0
     # via cumulusci
