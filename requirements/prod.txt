@@ -4,6 +4,7 @@
 #
 #    pip-compile requirements/prod.in
 #
+
 ansi2html==1.7.0
     # via -r requirements/prod.in
 appdirs==1.4.4
@@ -20,9 +21,9 @@ authlib==1.0.1
     #   simple-salesforce
 bleach==5.0.0
     # via sfdo-template-helpers
-boto3==1.24.0
+boto3==1.24.2
     # via -r requirements/prod.in
-botocore==1.27.0
+botocore==1.27.2
     # via
     #   boto3
     #   s3transfer
@@ -59,7 +60,7 @@ cryptography==37.0.2
     #   cumulusci
     #   pyjwt
     #   sfdo-template-helpers
-cumulusci==3.59.1
+cumulusci==3.60.0.dev1
     # via -r requirements/prod.in
 defusedxml==0.7.1
     # via python3-openid
@@ -229,7 +230,7 @@ pyyaml==6.0
     # via
     #   cumulusci
     #   snowfakery
-redis==4.3.1
+redis==4.3.3
     # via
     #   -r requirements/prod.in
     #   django-defender
@@ -323,7 +324,6 @@ typing-extensions==4.2.0
     # via
     #   cumulusci
     #   pydantic
-    #   rich
     #   snowfakery
 unicodecsv==0.14.1
     # via
