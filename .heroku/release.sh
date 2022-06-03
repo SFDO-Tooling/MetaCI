@@ -9,4 +9,6 @@ else
      python manage.py migrate --noinput
 fi
 
+python .heroku/chrome-smoke-test.py
+
 echo "Done."
