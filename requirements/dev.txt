@@ -4,11 +4,8 @@
 #
 #    pip-compile requirements/dev.in
 #
-
 alabaster==0.7.12
     # via sphinx
-appnope==0.1.3
-    # via ipython
 asgiref==3.5.2
     # via
     #   -c requirements/prod.txt
@@ -49,15 +46,15 @@ decorator==5.1.1
     #   ipython
 distlib==0.3.4
     # via virtualenv
-django-debug-toolbar==3.4.0
-    # via -r requirements/dev.in
-django-extensions==3.1.5
-    # via -r requirements/dev.in
 django==3.2.13
     # via
     #   -c requirements/prod.txt
     #   django-debug-toolbar
     #   django-extensions
+django-debug-toolbar==3.4.0
+    # via -r requirements/dev.in
+django-extensions==3.1.5
+    # via -r requirements/dev.in
 docopt==0.6.2
     # via coveralls
 docutils==0.16
@@ -160,6 +157,13 @@ pyparsing==3.0.9
     # via
     #   -c requirements/prod.txt
     #   packaging
+pytest==7.1.2
+    # via
+    #   -r requirements/dev.in
+    #   pytest-django
+    #   pytest-factoryboy
+    #   pytest-mock
+    #   pytest-tap
 pytest-django==4.5.2
     # via -r requirements/dev.in
 pytest-factoryboy==2.4.0
@@ -168,13 +172,6 @@ pytest-mock==3.7.0
     # via -r requirements/dev.in
 pytest-tap==3.3
     # via -r requirements/dev.in
-pytest==7.1.2
-    # via
-    #   -r requirements/dev.in
-    #   pytest-django
-    #   pytest-factoryboy
-    #   pytest-mock
-    #   pytest-tap
 python-dateutil==2.8.2
     # via
     #   -c requirements/prod.txt
@@ -194,13 +191,12 @@ requests==2.27.1
     #   coveralls
     #   responses
     #   sphinx
-responses==0.13.4
+responses==0.21.0
     # via -r requirements/dev.in
 six==1.16.0
     # via
     #   -c requirements/prod.txt
     #   python-dateutil
-    #   responses
     #   virtualenv
 snowballstemmer==2.2.0
     # via sphinx
@@ -225,7 +221,7 @@ sqlparse==0.4.2
     #   django-debug-toolbar
 stack-data==0.2.0
     # via ipython
-tap.py==3.1
+tap-py==3.1
     # via pytest-tap
 toml==0.10.2
     # via
