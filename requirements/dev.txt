@@ -17,7 +17,7 @@ asttokens==2.0.5
     # via stack-data
 attrs==21.4.0
     # via pytest
-babel==2.10.1
+babel==2.10.3
     # via sphinx
 backcall==0.2.0
     # via ipython
@@ -162,7 +162,7 @@ pyparsing==3.0.9
     #   packaging
 pytest-django==4.5.2
     # via -r requirements/dev.in
-pytest-factoryboy==2.4.0
+pytest-factoryboy==2.5.0
     # via -r requirements/dev.in
 pytest-mock==3.7.0
     # via -r requirements/dev.in
@@ -204,7 +204,7 @@ six==1.16.0
     #   virtualenv
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==5.0.1
+sphinx==5.0.2
     # via -r requirements/dev.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
@@ -223,7 +223,7 @@ sqlparse==0.4.2
     #   -c requirements/prod.txt
     #   django
     #   django-debug-toolbar
-stack-data==0.2.0
+stack-data==0.3.0
     # via ipython
 tap.py==3.1
     # via pytest-tap
@@ -235,7 +235,7 @@ tomli==2.0.1
     # via
     #   black
     #   pytest
-traitlets==5.2.2.post1
+traitlets==5.3.0
     # via
     #   ipython
     #   matplotlib-inline
