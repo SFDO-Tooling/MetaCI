@@ -21,9 +21,9 @@ authlib==1.0.1
     #   simple-salesforce
 bleach==5.0.0
     # via sfdo-template-helpers
-boto3==1.24.14
+boto3==1.24.15
     # via -r requirements/prod.in
-botocore==1.27.14
+botocore==1.27.15
     # via
     #   boto3
     #   s3transfer
@@ -61,7 +61,7 @@ cryptography==37.0.2
     #   pyjwt
     #   secretstorage
     #   sfdo-template-helpers
-cumulusci==3.61.0.dev2
+cumulusci==3.61.0.dev3
     # via -r requirements/prod.in
 defusedxml==0.7.1
     # via python3-openid
