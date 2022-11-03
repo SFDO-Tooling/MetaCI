@@ -1,7 +1,7 @@
 ansi2html
 boto3
 coloredlogs
-cumulusci==3.61.0.dev3
+cumulusci
 # Until we can go through: https://docs.djangoproject.com/en/4.0/releases/4.0/#backwards-incompatible-changes-in-4-0
 django<4
 django-allauth
