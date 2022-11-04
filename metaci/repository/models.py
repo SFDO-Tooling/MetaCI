@@ -51,7 +51,7 @@ class Repository(models.Model):
         return f"{self.owner}/{self.name}"
 
     def get_github_api(self):
-        gh = get_github_api_for_repo(GitHubSettingsKeychain(), self.owner, self.name)
+        gh = get_github_api_for_repo(GitHubSettingsKeychain(), self.url)
         repo = gh.repository(self.owner, self.name)
         return repo
 

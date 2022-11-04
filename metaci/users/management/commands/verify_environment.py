@@ -68,7 +68,7 @@ def test_github():
     else:
         keychain = None
         print("Using GITHUB_APP_ID")
-    api = get_github_api_for_repo(keychain, "github", "docs")
+    api = get_github_api_for_repo(keychain, "github.com/github/docs")
     api.session.mount("https://api.github.com", HTTPAdapter(max_retries=0))
     print(api.me())
 
