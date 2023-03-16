@@ -61,12 +61,10 @@ jobs:
                   cache: pip
                   cache-dependency-path: "requirements/*.txt"
 
-            - name: Set up yarn cache
-              id: yarn-cache
-              uses: actions/cache@v3
+            - uses: actions/setup-node@v3
               with:
-                  path: ${{ env.YARN_CACHE_DIR }}
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+                node-version: 16
+                cache: 'yarn'
 
             - name: Install Python dependencies
               run: |
