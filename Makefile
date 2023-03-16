@@ -35,6 +35,10 @@ update-deps:
 	pip-compile --upgrade requirements/prod.in
 	pip-compile --upgrade requirements/dev.in
 
+update-deps-cci:
+	pip-compile --upgrade-package cumulusci requirements/dev.in -o requirements/dev.txt
+	pip-compile --upgrade-package cumulusci requirements/prod.in -o requirements/prod.txt
+
 dev-install:
 	pip install pip-tools
 	pip-sync requirements/*.txt
