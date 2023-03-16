@@ -61,18 +61,10 @@ jobs:
                   cache: pip
                   cache-dependency-path: "requirements/*.txt"
 
-            - uses: actions/setup-node@v3
-              with:
-                node-version: 16
-                cache: 'yarn'
-
             - name: Install Python dependencies
               run: |
                   pip install -r requirements/prod.txt
                   pip install -r requirements/dev.txt
-
-            - name: Install Javascript dependencies
-              run: yarn install
 
             - name: Run migrations
               run: python manage.py migrate
