@@ -1,0 +1,8 @@
+clean: false
+production_secret:
+non_production_secret: []
+mock_secret:
+ -
+  id: MetaCI://.github/workflows/unit-tests.yml_39bb9d07aaa44fff710b6c9b061ffc3b524fb82c
+  justification: Mock secret used in testing
+false_positive: []
