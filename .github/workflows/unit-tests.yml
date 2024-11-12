@@ -22,7 +22,7 @@ env:
 jobs:
     unit-tests:
         name: Unit tests
-        runs-on: sfdc-ubuntu-latest
+        runs-on: SFDO-Tooling-Ubuntu
         env:
             YARN_CACHE_DIR: ~/.yarn_cache
 
