@@ -18,7 +18,7 @@ authlib==1.2.0
     # via
     #   cumulusci
     #   simple-salesforce
-bleach==5.0.0
+bleach==6.2.0
     # via sfdo-template-helpers
 boto3==1.24.15
     # via -r requirements/prod.in
