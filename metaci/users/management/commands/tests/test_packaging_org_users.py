@@ -25,7 +25,7 @@ def fake_query(query):
         raise SalesforceMalformedRequest("Q", "R", "S", "T")
     elif (
         query
-        == "SELECT Name, Email, UserType, IsActive, Profile.Name, Title from User WHERE IsActive=True"
+        == "SELECT Name, Email, UserType, IsActive, Profile.Name, Title from User WHERE IsActive=True AND UserType='Standard'"
     ):
         return {
             "records": [
