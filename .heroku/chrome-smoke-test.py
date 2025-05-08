@@ -4,8 +4,6 @@ import sys,os
 options = selenium.webdriver.chrome.options.Options()
 options.headless = True
 options.add_argument('--no-sandbox')
-os.mkdir('/tmp/test-data')
-options.add_argument('--user-data-dir=/tmp/test-data')
 
 try:
     selenium.webdriver.Chrome(options=options)
