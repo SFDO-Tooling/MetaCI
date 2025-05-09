@@ -3,6 +3,8 @@ import selenium.webdriver
 import sys
 options = selenium.webdriver.chrome.options.Options()
 options.headless = True
+options.add_argument('--no-sandbox')
+
 try:
     selenium.webdriver.Chrome(options=options)
 except Exception as e:
