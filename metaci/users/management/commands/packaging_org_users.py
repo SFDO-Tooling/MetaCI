@@ -38,7 +38,7 @@ def _handle_packaging_org(org):
         org_config.refresh_oauth_token(keychain=None)
         sf = org_config.salesforce_client
         users = sf.query(
-            "SELECT Name, Email, UserType, IsActive, Profile.Name, Title from User WHERE IsActive=True"
+            "SELECT Name, Email, UserType, IsActive, Profile.Name, Title from User WHERE IsActive=True AND UserType='Standard'"
         )
         name, namespace = None, None
         try:
