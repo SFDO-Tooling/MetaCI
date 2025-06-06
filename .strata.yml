@@ -1,0 +1,9 @@
+global:
+  email-reply-to: IndustriesEngineeringDevOps@salesforce.com
+  production-branches:
+    - master
+    - release-\d+\.\d+\.\d+
+stages:
+  precheck:
+    - work-item-and-reviewer:
+        required: false
