@@ -171,7 +171,7 @@ keyring==23.0.1
     # via cumulusci
 logfmt==0.4
     # via sfdo-template-helpers
-lxml==4.9.2
+lxml==6.1.0
     # via cumulusci
 markdown-it-py==2.1.0
     # via
