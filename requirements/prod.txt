@@ -349,7 +349,7 @@ uritemplate==4.1.1
     # via
     #   cumulusci
     #   github3-py
-urllib3==1.26.14
+urllib3==2.7.0
     # via
     #   botocore
     #   cumulusci
