@@ -14,7 +14,7 @@ asgiref==3.5.2
     # via django
 async-timeout==4.0.2
     # via redis
-authlib==1.2.0
+authlib==1.6.12
     # via
     #   cumulusci
     #   simple-salesforce
