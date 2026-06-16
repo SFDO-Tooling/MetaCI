@@ -212,7 +212,7 @@ pygments==2.14.0
     # via
     #   cumulusci
     #   rich
-pyjwt[crypto]==2.6.0
+pyjwt[crypto]==2.13.0
     # via
     #   -r requirements/prod.in
     #   cumulusci
