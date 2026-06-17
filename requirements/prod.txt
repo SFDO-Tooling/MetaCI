@@ -49,7 +49,7 @@ coloredlogs==15.0.1
     # via -r requirements/prod.in
 croniter==1.3.5
     # via rq-scheduler
-cryptography==39.0.1
+cryptography==48.0.1
     # via
     #   authlib
     #   cumulusci
